@@ -18,33 +18,14 @@ module.exports = function( grunt ) {
         }]
       }
     },
-    // babel: {
-    //   options: {
-    //     sourceMap: true,
-    //     // presets: ['es2015']
-    //   },
-    //   dist: {
-    //     files: [{
-    //       expand: true,
-    //       cwd: "temp/collect",
-    //       src: ["**/*.js"],
-    //       dest: "temp/es5",
-    //       ext: ".js"
-    //     }]
-    //   }
-    // },
     browserify: {
       options: {
         transform: [
           ["babelify", {
-             // loose: "all"
              presets:"es2015"
-             // plugins: "transform-es2015-modules-commonjs"
           }]
         ],
-        banner: banner,
-        // sourceType: "module",
-        // plugins: [["babelify", {plugins: "transform-es2015-modules-commonjs"}]]
+        banner: banner
       },
       dist: {
         files: {
@@ -60,8 +41,7 @@ module.exports = function( grunt ) {
           },
           dead_code: true
         },
-        banner: banner,
-        report: 'gzip'
+        banner: banner
       },
       dist: {
         files: {
@@ -71,18 +51,19 @@ module.exports = function( grunt ) {
     },
     watch: {
       babel: {
-        files: ["src/js-raw/**/*", "Gruntfile.js"],
-        tasks: ["dist"],
+        files: ["src/js-raw/**/*.js", "Gruntfile.js"],
+        tasks: ["distBase"],
         options: {
-          spawn: false,
+          // spawn: false,
           interrupt: true
         },
       }
     }
   });
 
-  grunt.registerTask("dist", ["clean", "copy:dist", /*"babel",*/ "browserify:dist", "uglify:dist"]);
-  grunt.registerTask("watchdist", ["dist", "watch"]);
+  grunt.registerTask("distBase", ["clean", "copy:dist", "browserify:dist"]);
+  grunt.registerTask("dist", ["distBase", "uglify:dist"]);
+  grunt.registerTask("watchdistBase", ["distBase", "watch"]);
 
-  grunt.registerTask("default", ["watchdist"]);
+  grunt.registerTask("default", ["watchdistBase"]);
 };

@@ -15,8 +15,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.3.16",
-    "babel-plugin-transform-es2015-modules-systemjs": "^6.3.13",
     "babel-preset-es2015": "^6.3.13",
     "babelify": "^7.2.0",
     "grunt-banner": "^0.6.0",
