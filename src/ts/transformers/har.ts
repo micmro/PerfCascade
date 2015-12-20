@@ -7,6 +7,7 @@ import {Har,
   Request,
   Content,
   Response,
+  Timings,
   Entry
 } from "../typing/har"
 import TimeBlock from '../typing/time-block'
@@ -31,7 +32,7 @@ export default class HarTransformer{
     //temp - TODO: remove
     window["data"] = data
 
-    var lastEndTime = 0;
+    var doneTime = 0;
     //only support one page for now
     let blocks = data.entries
       .filter(entry => entry.pageref === data.pages[0].id)
@@ -41,10 +42,19 @@ export default class HarTransformer{
         let entryStartDate = new Date(entry.startedDateTime)
         let startRelative = entryStartDate.getTime() - pageStartDate.getTime()
 
-        if (lastEndTime < (startRelative + entry.time)){
-          lastEndTime = startRelative + entry.time
+        if (doneTime < (startRelative + entry.time)){
+          doneTime = startRelative + entry.time
         }
-        return new TimeBlock(entry.request.url, startRelative, startRelative + entry.time, this.makeBlockCssClass(entry.response.content.mimeType), [], entry)
+
+        let subModules = entry.timings
+
+        return new TimeBlock(entry.request.url, 
+          startRelative,
+          startRelative + entry.time,
+          this.makeBlockCssClass(entry.response.content.mimeType),
+          this.buildSectionBlocks(startRelative, entry.timings),
+          entry
+        )
     })
     console["table"](blocks.map(b => {
       return {
@@ -55,11 +65,37 @@ export default class HarTransformer{
       }
     }))
 
+    console.log(blocks)
+
     return {
-      durationMs: lastEndTime,
+      durationMs: doneTime,
       blocks: blocks,
       marks: [],
       lines: [],
     }
+  }
+
+  static buildSectionBlocks(startRelative: number, t: Timings) {
+    // var timings = []
+    return ["blocked", "dns", "connect", "send", "wait", "receive", "ssl"].reduce((collect: Array<TimeBlock>, key) => {
+      if (t[key] && t[key] !== -1){
+        let start = (collect.length > 0) ? collect[collect.length - 1].end : startRelative
+        return collect.concat([new TimeBlock(key, start, start + t[key], "block-" + key)])
+      }
+      return collect
+    }, [])
+    // "blocked": 0,
+    // "dns": -1,
+    // "connect": 15,
+    // "send": 20,
+    // "wait": 38,
+    // "receive": 12,
+    // "ssl": -1,
+    // return [
+    //   new TimeBlock("blocked", 0, t.blocked, "block-blocking"),
+    //   new TimeBlock("DNS", t.send, t.send, "block-dns"),
+    //   new TimeBlock("connect", t.blocked, t.connect, "block-dns"),
+    //   new TimeBlock("DNS", t.dns, t.receive, "block-dns")
+    // ]
   }
 }

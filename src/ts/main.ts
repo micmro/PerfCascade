@@ -55,4 +55,4 @@ function renderHar(logData: Har){
 
 
 //Dev/Test only - load test file TODO: remove
-window["fetch"]("test-data/www.google.co.kr.har").then(f => f.json().then(j => renderHar(j.log)))
+window["fetch"]("test-data/www.bbc.com.har").then(f => f.json().then(j => renderHar(j.log)))

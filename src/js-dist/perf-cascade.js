@@ -1,4 +1,4 @@
-/*PerfCascade build:20/12/2015 */
+/*PerfCascade build:21/12/2015 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
@@ -390,7 +390,7 @@ function renderHar(logData) {
     outputHolder.appendChild(waterfall_1.default.setupTimeLine(data));
 }
 //Dev/Test only - load test file TODO: remove
-window["fetch"]("test-data/www.google.co.kr.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
+window["fetch"]("test-data/www.bbc.com.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 
 },{"./helpers/dom":1,"./helpers/waterfall":3,"./transformers/har":5}],5:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
@@ -412,7 +412,7 @@ var HarTransformer = (function () {
         console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
         //temp - TODO: remove
         window["data"] = data;
-        var lastEndTime = 0;
+        var doneTime = 0;
         //only support one page for now
         var blocks = data.entries
             .filter(function (entry) { return entry.pageref === data.pages[0].id; })
@@ -421,10 +421,11 @@ var HarTransformer = (function () {
             var pageStartDate = new Date(currPage.startedDateTime);
             var entryStartDate = new Date(entry.startedDateTime);
             var startRelative = entryStartDate.getTime() - pageStartDate.getTime();
-            if (lastEndTime < (startRelative + entry.time)) {
-                lastEndTime = startRelative + entry.time;
+            if (doneTime < (startRelative + entry.time)) {
+                doneTime = startRelative + entry.time;
             }
-            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, _this.makeBlockCssClass(entry.response.content.mimeType), [], entry);
+            var subModules = entry.timings;
+            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, _this.makeBlockCssClass(entry.response.content.mimeType), _this.buildSectionBlocks(startRelative, entry.timings), entry);
         });
         console["table"](blocks.map(function (b) {
             return {
@@ -434,12 +435,36 @@ var HarTransformer = (function () {
                 total: b.total
             };
         }));
+        console.log(blocks);
         return {
-            durationMs: lastEndTime,
+            durationMs: doneTime,
             blocks: blocks,
             marks: [],
             lines: [],
         };
+    };
+    HarTransformer.buildSectionBlocks = function (startRelative, t) {
+        // var timings = []
+        return ["blocked", "dns", "connect", "send", "wait", "receive", "ssl"].reduce(function (collect, key) {
+            if (t[key] && t[key] !== -1) {
+                var start = (collect.length > 0) ? collect[collect.length - 1].end : startRelative;
+                return collect.concat([new time_block_1.default(key, start, start + t[key], "block-" + key)]);
+            }
+            return collect;
+        }, []);
+        // "blocked": 0,
+        // "dns": -1,
+        // "connect": 15,
+        // "send": 20,
+        // "wait": 38,
+        // "receive": 12,
+        // "ssl": -1,
+        // return [
+        //   new TimeBlock("blocked", 0, t.blocked, "block-blocking"),
+        //   new TimeBlock("DNS", t.send, t.send, "block-dns"),
+        //   new TimeBlock("connect", t.blocked, t.connect, "block-dns"),
+        //   new TimeBlock("DNS", t.dns, t.receive, "block-dns")
+        // ]
     };
     return HarTransformer;
 })();
