@@ -33,7 +33,7 @@ function onFileInput(evt) {
   reader.onload = (e => {
     let harData
     try {
-      //TODO: add proper check for HAR file and later other formats
+      //TODO: add proper check for HAR files and later other formats
       harData = JSON.parse(e.target["result"])
     } catch (e) {
       showErrorMsg("File does not seem to be a valid HAR file")
@@ -43,20 +43,16 @@ function onFileInput(evt) {
   })
   reader.readAsText(files[0])
 }
+
 document.getElementById('fileinput').addEventListener('change', onFileInput, false)
 
 function renderHar(logData: Har){
   var data = HarTransformer.transfrom(logData)
-  var x = waterfall.setupTimeLine(data)
-
   dom.removeAllChildren(outputHolder)
-  outputHolder.appendChild(x)
-  console.log(x)
+  outputHolder.appendChild(waterfall.setupTimeLine(data))
 }
 
 
 
 //Dev/Test only - load test file TODO: remove
 window["fetch"]("test-data/www.google.co.kr.har").then(f => f.json().then(j => renderHar(j.log)))
-
-console.log(waterfall)

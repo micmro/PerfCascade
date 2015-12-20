@@ -18,7 +18,6 @@ export default class HarTransformer{
     let types = mimeType.split("/");
     switch (types[0]){
       case "image": return "block-image"
-      // case "javascript": return "block-js"
     }
     switch(types[1]){
       case "x-font-woff": return "block-font"
@@ -32,7 +31,6 @@ export default class HarTransformer{
     //temp - TODO: remove
     window["data"] = data
 
-    console["table"](data.entries)
     var lastEndTime = 0;
     //only support one page for now
     let blocks = data.entries
@@ -42,14 +40,20 @@ export default class HarTransformer{
         let pageStartDate = new Date(currPage.startedDateTime)
         let entryStartDate = new Date(entry.startedDateTime)
         let startRelative = entryStartDate.getTime() - pageStartDate.getTime()
-        console.log(startRelative)
 
         if (lastEndTime < (startRelative + entry.time)){
           lastEndTime = startRelative + entry.time
         }
         return new TimeBlock(entry.request.url, startRelative, startRelative + entry.time, this.makeBlockCssClass(entry.response.content.mimeType), [], entry)
     })
-    console["table"](blocks)
+    console["table"](blocks.map(b => {
+      return {
+        name: b.name,
+        start: b.start,
+        end: b.end,
+        total: b.total
+      }
+    }))
 
     return {
       durationMs: lastEndTime,

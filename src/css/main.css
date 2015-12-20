@@ -61,7 +61,7 @@ textarea {
 
 * {box-sizing: border-box;}
 
-#output {margin: 2em 0;}
+#output {margin: 2em 0; font-size: 0.7em;}
 
 .water-fall-holder {fill:#ccc;}
 

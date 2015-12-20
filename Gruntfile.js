@@ -3,7 +3,7 @@ module.exports = function( grunt ) {
 
   require("load-grunt-tasks")(grunt);
 
-  var banner = "/*HarHarHar build:<%= grunt.template.today(\"dd/mm/yyyy\") %> */\n";
+  var banner = "/*PerfCascade build:<%= grunt.template.today(\"dd/mm/yyyy\") %> */\n";
 
   grunt.initConfig({
     clean : {
@@ -17,7 +17,7 @@ module.exports = function( grunt ) {
       },
       dist: {
         files: {
-          "src/js-dist/har-har-har.js": ["src/ts/main.ts"],
+          "src/js-dist/perf-cascade.js": ["src/ts/main.ts"],
         }
       }
     },
@@ -33,7 +33,7 @@ module.exports = function( grunt ) {
       },
       dist: {
         files: {
-          "src/js-dist/har-har-har.min.js": ["src/js-dist/har-har-har.js"]
+          "src/js-dist/perf-cascade.min.js": ["src/js-dist/perf-cascade.js"]
         }
       }
     },

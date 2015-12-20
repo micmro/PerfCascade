@@ -1,4 +1,4 @@
-/*HarHarHar build:20/12/2015 */
+/*PerfCascade build:20/12/2015 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
@@ -372,7 +372,7 @@ function onFileInput(evt) {
     reader.onload = (function (e) {
         var harData;
         try {
-            //TODO: add proper check for HAR file and later other formats
+            //TODO: add proper check for HAR files and later other formats
             harData = JSON.parse(e.target["result"]);
         }
         catch (e) {
@@ -386,14 +386,11 @@ function onFileInput(evt) {
 document.getElementById('fileinput').addEventListener('change', onFileInput, false);
 function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
-    var x = waterfall_1.default.setupTimeLine(data);
     dom_1.default.removeAllChildren(outputHolder);
-    outputHolder.appendChild(x);
-    console.log(x);
+    outputHolder.appendChild(waterfall_1.default.setupTimeLine(data));
 }
 //Dev/Test only - load test file TODO: remove
 window["fetch"]("test-data/www.google.co.kr.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
-console.log(waterfall_1.default);
 
 },{"./helpers/dom":1,"./helpers/waterfall":3,"./transformers/har":5}],5:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
@@ -415,7 +412,6 @@ var HarTransformer = (function () {
         console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
         //temp - TODO: remove
         window["data"] = data;
-        console["table"](data.entries);
         var lastEndTime = 0;
         //only support one page for now
         var blocks = data.entries
@@ -425,13 +421,19 @@ var HarTransformer = (function () {
             var pageStartDate = new Date(currPage.startedDateTime);
             var entryStartDate = new Date(entry.startedDateTime);
             var startRelative = entryStartDate.getTime() - pageStartDate.getTime();
-            console.log(startRelative);
             if (lastEndTime < (startRelative + entry.time)) {
                 lastEndTime = startRelative + entry.time;
             }
             return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, _this.makeBlockCssClass(entry.response.content.mimeType), [], entry);
         });
-        console["table"](blocks);
+        console["table"](blocks.map(function (b) {
+            return {
+                name: b.name,
+                start: b.start,
+                end: b.end,
+                total: b.total
+            };
+        }));
         return {
             durationMs: lastEndTime,
             blocks: blocks,
