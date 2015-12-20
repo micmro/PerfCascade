@@ -169,12 +169,6 @@ textarea {
 .block-wait {fill: #1fe11f;} /*TODO: define colour*/
 .block-receive {fill: #1977dd;}
 
-#1f7c83 - DNS Lookup
-#e58226 - Initial Connection
-#c141cd - SSL Negotiation
-#1fe11f - Time to First Byte
-#1977dd - Content Download
-
 
 
 
