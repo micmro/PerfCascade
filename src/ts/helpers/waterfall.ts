@@ -66,7 +66,7 @@ var waterfall = {
       dom.removeClass(startline, "active")
     }
 
-    var createRect = function(width: number, height: number, x: number, y: number, cssClass: Object, label: Object, segments?: Array<TimeBlock>): SVGElement {
+    var createRect = function(width: number, height: number, x: number, y: number, cssClass: string, label: string, segments?: Array<TimeBlock>): SVGElement {
       var rectHolder
       var rect = svg.newEl("rect", {
         width: (width / unit) + "%",

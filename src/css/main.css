@@ -60,10 +60,104 @@ textarea {
    ========================================================================== */
 
 * {box-sizing: border-box;}
-.water-fall-chart {width: 100%; height: 100%; overflow: visible;}
+
+#output {margin: 2em 0;}
+
+.water-fall-holder {fill:#ccc;}
+
+.water-fall-chart {width:100%; background:#f0f5f0;}
+.water-fall-chart .marker-holder {width:100%;}
+.water-fall-chart .line-holder {stroke-width:1; stroke: #ccc; stroke-opacity:0.5;}
+.water-fall-chart .line-holder.active {stroke: #69009e; stroke-width:2; stroke-opacity:1;}
+.water-fall-chart .labels {width:100%;}
+.water-fall-chart .labels .inner-label {pointer-events: none;}
+.water-fall-chart .time-block.active {opacity: 0.8;}
+.water-fall-chart .line-end, .water-fall-chart .line-start {display: none; stroke-width:1; stroke-opacity:0.5; stroke: #000;}
+.water-fall-chart .line-end.active, .water-fall-chart .line-start.active {display: block;}
+.water-fall-chart .mark-holder text {-webkit-writing-mode: tb; writing-mode:vertical-lr; writing-mode: tb;}
+
+.time-scale line {stroke:#0cc; stroke-width:1;}
+.time-scale text {font-weight:bold;}
+
+.domain-selector {float:right; margin: -35px 0 0 0;}
 
 
 
+
+
+/*initiator and file types*/
+.css {background: #afd899;}
+.iframe,
+.html,
+.internal {background: #85b3f2;}
+.img,
+.image {background: #bc9dd6;}
+.script,
+.js {background: #e7bd8c;}
+.link {background: #89afe6;}
+.swf,
+.flash {background: #4db3ba;}
+.font {background: #e96859;}
+.xmlhttprequest,
+.ajax {background: #e7d98c;}
+.other {background: #bebebe;}
+
+.css-light {background: #b9cfa0;}
+.iframe-light,
+.html-light,
+.internal-light {background: #c2d9f9;}
+.img-light,
+.image-light {background: #deceeb;}
+.script-light,
+.js-light {background: #f3dec6;}
+.link-light {background: #c4d7f3;}
+.swf-light,
+.flash-light {background: #a6d9dd;}
+.font-light {background: #f4b4ac;}
+.xmlhttprequest-light,
+.ajax-light {background: #f3ecc6;}
+.other-light {background: #dfdfdf;}
+
+/*block colours*/
+.block-css {fill: #afd899;}
+.block-iframe,
+.block-html,
+.block-internal {fill: #85b3f2;}
+.block-img,
+.block-image {fill: #bc9dd6;}
+.block-script,
+.block-javascript,
+.block-js {fill: #e7bd8c;}
+.block-link {fill: #89afe6;}
+.block-swf,
+.block-flash {fill: #4db3ba;}
+.block-font {fill: #e96859;}
+.block-xmlhttprequest,
+.block-ajax {fill: #e7d98c;}
+.block-other {fill: #bebebe;}
+
+.block-total {fill: #ccc;}
+.block-unload {fill: #909;}
+.block-redirect {fill: #ffff60;}
+.block-appcache {fill: #1f831f;}
+.block-dns {fill: #1f7c83;}
+.block-tcp {fill: #e58226;}
+.block-ttfb {fill: #1fe11f;}
+.block-response {fill: #1977dd;}
+.block-dom {fill: #9cc;}
+.block-dom-content-loaded {fill: #d888df;}
+.block-onload {fill: #c0c0ff;}
+
+.block-ssl {fill: #c141cd; }
+.block-ms-first-paint-event {fill: #8fbc83; }
+.block-dom-interactive-event {fill: #d888df; }
+.block-network-server {fill: #8cd18c; }
+.block-custom-measure {fill: #f00; }
+
+.block-navigation-api-total {fill: #ccc;}
+.block-blocking {fill: #cdcdcd;}
+
+.block-undefined {fill: #0f0;} 
 
 
 

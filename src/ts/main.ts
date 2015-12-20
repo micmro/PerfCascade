@@ -12,6 +12,7 @@ import {Har,
   Entry
 } from "./typing/har"
 
+import dom from './helpers/dom'
 import TimeBlock from './typing/time-block'
 import HarTransformer from './transformers/har'
 
@@ -19,7 +20,7 @@ function showErrorMsg(msg){
   alert(msg)
 }
 
-let harHolder = document.getElementById("output")
+let outputHolder = document.getElementById("output")
 
 function onFileInput(evt) {
   let files = evt.target.files 
@@ -48,7 +49,8 @@ function renderHar(logData: Har){
   var data = HarTransformer.transfrom(logData)
   var x = waterfall.setupTimeLine(data)
 
-  harHolder.appendChild(x)
+  dom.removeAllChildren(outputHolder)
+  outputHolder.appendChild(x)
   console.log(x)
 }
 

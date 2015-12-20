@@ -91,6 +91,12 @@ var dom = {
       el.setAttribute("class", el.getAttribute("class").replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"))
     }
     return el
+  },
+
+  removeAllChildren: function(el: HTMLElement | SVGElement){
+    while(el.childNodes.length > 0){
+      el.removeChild(el.childNodes[0])
+    }
   }
 }
 

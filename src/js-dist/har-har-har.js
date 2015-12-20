@@ -92,6 +92,11 @@ var dom = {
             el.setAttribute("class", el.getAttribute("class").replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"));
         }
         return el;
+    },
+    removeAllChildren: function (el) {
+        while (el.childNodes.length > 0) {
+            el.removeChild(el.childNodes[0]);
+        }
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -351,11 +356,12 @@ exports.default = waterfall;
 
 },{"../helpers/dom":1,"../helpers/svg":2}],4:[function(require,module,exports){
 var waterfall_1 = require("./helpers/waterfall");
+var dom_1 = require('./helpers/dom');
 var har_1 = require('./transformers/har');
 function showErrorMsg(msg) {
     alert(msg);
 }
-var harHolder = document.getElementById("output");
+var outputHolder = document.getElementById("output");
 function onFileInput(evt) {
     var files = evt.target.files;
     if (!files) {
@@ -381,19 +387,31 @@ document.getElementById('fileinput').addEventListener('change', onFileInput, fal
 function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
     var x = waterfall_1.default.setupTimeLine(data);
-    harHolder.appendChild(x);
+    dom_1.default.removeAllChildren(outputHolder);
+    outputHolder.appendChild(x);
     console.log(x);
 }
 //Dev/Test only - load test file TODO: remove
 window["fetch"]("test-data/www.google.co.kr.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 console.log(waterfall_1.default);
 
-},{"./helpers/waterfall":3,"./transformers/har":5}],5:[function(require,module,exports){
+},{"./helpers/dom":1,"./helpers/waterfall":3,"./transformers/har":5}],5:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
 var HarTransformer = (function () {
     function HarTransformer() {
     }
+    HarTransformer.makeBlockCssClass = function (mimeType) {
+        var types = mimeType.split("/");
+        switch (types[0]) {
+            case "image": return "block-image";
+        }
+        switch (types[1]) {
+            case "x-font-woff": return "block-font";
+        }
+        return "block-" + mimeType.split("/")[1];
+    };
     HarTransformer.transfrom = function (data) {
+        var _this = this;
         console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
         //temp - TODO: remove
         window["data"] = data;
@@ -411,7 +429,7 @@ var HarTransformer = (function () {
             if (lastEndTime < (startRelative + entry.time)) {
                 lastEndTime = startRelative + entry.time;
             }
-            return new time_block_1.default(entry.request.url.substr(0, 20) + "...", startRelative, startRelative + entry.time, {}, [], entry);
+            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, _this.makeBlockCssClass(entry.response.content.mimeType), [], entry);
         });
         console["table"](blocks);
         return {
@@ -429,6 +447,8 @@ exports.default = HarTransformer;
 },{"../typing/time-block":6}],6:[function(require,module,exports){
 var TimeBlock = (function () {
     function TimeBlock(name, start, end, cssClass, segments, rawResource) {
+        if (cssClass === void 0) { cssClass = ""; }
+        if (segments === void 0) { segments = []; }
         this.name = name;
         this.start = start;
         this.end = end;

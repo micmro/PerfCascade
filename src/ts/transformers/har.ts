@@ -14,6 +14,18 @@ import {WaterfallData} from '../typing/waterfall-data'
 
 
 export default class HarTransformer{
+  static makeBlockCssClass(mimeType: string){
+    let types = mimeType.split("/");
+    switch (types[0]){
+      case "image": return "block-image"
+      // case "javascript": return "block-js"
+    }
+    switch(types[1]){
+      case "x-font-woff": return "block-font"
+    }
+    return "block-" + mimeType.split("/")[1]
+  }
+
   static transfrom(data: Har): WaterfallData {
     console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length)
     
@@ -35,7 +47,7 @@ export default class HarTransformer{
         if (lastEndTime < (startRelative + entry.time)){
           lastEndTime = startRelative + entry.time
         }
-        return new TimeBlock(entry.request.url.substr(0,20)+"...", startRelative, startRelative + entry.time, {}, [], entry)
+        return new TimeBlock(entry.request.url, startRelative, startRelative + entry.time, this.makeBlockCssClass(entry.response.content.mimeType), [], entry)
     })
     console["table"](blocks)
 
