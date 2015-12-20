@@ -8,7 +8,7 @@ module.exports = function( grunt ) {
   grunt.initConfig({
     clean : {
       dist: ["temp/", "src/js-dist"],
-      js: ["src/js-raw/*.js", "src/js-raw/*.js.map"]
+      js: ["src/ts/*.js", "src/ts/*.js.map"]
     },
     browserify: {
       options: {
@@ -17,7 +17,7 @@ module.exports = function( grunt ) {
       },
       dist: {
         files: {
-          "src/js-dist/har-har-har.js": ["src/js-raw/main.ts"],
+          "src/js-dist/har-har-har.js": ["src/ts/main.ts"],
         }
       }
     },
@@ -39,7 +39,7 @@ module.exports = function( grunt ) {
     },
     watch: {
       babel: {
-        files: ["src/js-raw/**/*.ts", "Gruntfile.js"],
+        files: ["src/ts/**/*.ts", "Gruntfile.js"],
         tasks: ["distBase"],
         options: {
           spawn: false,
