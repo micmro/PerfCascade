@@ -77,4 +77,3 @@ export interface Har {
 	pages: Array<Page>
 	version: string
 }
-
