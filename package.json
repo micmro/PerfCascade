@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node_modules/.bin/live-server --wait=50 --open=src/index.html",
+    "start": "node_modules/.bin/live-server --wait=50 --open=src/index.html --ignore=src/js-raw/",
     "build": "Grunt dist"
   },
   "author": {
@@ -17,6 +17,7 @@
   "devDependencies": {
     "babel-preset-es2015": "^6.3.13",
     "babelify": "^7.2.0",
+    "browserify-typescript": "0.0.1",
     "grunt-banner": "^0.6.0",
     "grunt-browserify": "^4.0.1",
     "grunt-contrib-clean": "^0.7.0",
@@ -24,6 +25,7 @@
     "grunt-contrib-uglify": "^0.11.0",
     "grunt-contrib-watch": "^0.6.1",
     "live-server": "^0.9.0",
-    "load-grunt-tasks": "^3.3.0"
+    "load-grunt-tasks": "^3.3.0",
+    "typescript": "^1.7.5"
   }
 }

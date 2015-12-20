@@ -7,29 +7,31 @@ module.exports = function( grunt ) {
 
   grunt.initConfig({
     clean : ["temp/", "src/js-dist"],
-    copy : {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: "src/js-raw",
-          src: ["**/*.js"],
-          dest: "temp",
-          ext: ".js"
-        }]
-      }
-    },
+    // copy : {
+    //   dist: {
+    //     files: [{
+    //       expand: true,
+    //       cwd: "src/js-raw",
+    //       src: ["**/*.js"],
+    //       dest: "temp",
+    //       ext: ".js"
+    //     }]
+    //   }
+    // },
     browserify: {
       options: {
         transform: [
-          ["babelify", {
-             presets:"es2015"
-          }]
+          // ["babelify", {
+          //    presets:"es2015"
+          // }]
+          "typescript"
         ],
+        // extensions: [".ts"],
         banner: banner
       },
       dist: {
         files: {
-          "src/js-dist/har-har-har.js": ["temp/**/*.js"],
+          "src/js-dist/har-har-har.js": ["src/js-raw/**/*.ts"],
         }
       }
     },
@@ -51,7 +53,7 @@ module.exports = function( grunt ) {
     },
     watch: {
       babel: {
-        files: ["src/js-raw/**/*.js", "Gruntfile.js"],
+        files: ["src/js-raw/**/*.ts", "Gruntfile.js"],
         tasks: ["distBase"],
         options: {
           // spawn: false,
@@ -61,7 +63,7 @@ module.exports = function( grunt ) {
     }
   });
 
-  grunt.registerTask("distBase", ["clean", "copy:dist", "browserify:dist"]);
+  grunt.registerTask("distBase", ["clean", /*"copy:dist",*/ "browserify:dist"]);
   grunt.registerTask("dist", ["distBase", "uglify:dist"]);
   grunt.registerTask("watchdistBase", ["distBase", "watch"]);
 
