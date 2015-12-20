@@ -1,4 +1,4 @@
-(Under contstruction)
+*Under development - check again later*
 
 # PerfCascase
-Enxtensible Har viewer
+Extensible waterfall-viewer that works with HAR and other formats.
