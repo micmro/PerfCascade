@@ -144,15 +144,12 @@ var svg_1 = require("../helpers/svg");
 var dom_1 = require("../helpers/dom");
 var waterfall = {
     //model for block and segment
-    setupTimeLine: function (durationMs, blocks, marks, lines) {
-        var unit = durationMs / 100, barsToShow = blocks
+    setupTimeLine: function (data) {
+        var unit = data.durationMs / 100, barsToShow = data.blocks
             .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
-            .sort(function (a, b) { return (a.start || 0) - (b.start || 0); }), maxMarkTextLength = marks.length > 0 ? marks.reduce(function (currMax, currValue) {
+            .sort(function (a, b) { return (a.start || 0) - (b.start || 0); }), maxMarkTextLength = data.marks.length > 0 ? data.marks.reduce(function (currMax, currValue) {
             return Math.max((typeof currMax == "number" ? currMax : 0), svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
         }) : 0, diagramHeight = (barsToShow.length + 1) * 25, chartHolderHeight = diagramHeight + maxMarkTextLength + 35;
-        var chartHolder = dom_1.default.newTag("section", {
-            class: "resource-timing water-fall-holder chart-holder"
-        });
         var timeLineHolder = svg_1.default.newEl("svg:svg", {
             height: Math.floor(chartHolderHeight),
             class: "water-fall-chart"
@@ -236,7 +233,7 @@ var waterfall = {
         };
         var createTimeWrapper = function () {
             var timeHolder = svg_1.default.newEl("g", { class: "time-scale full-width" });
-            for (var i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
+            for (var i = 0, secs = data.durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
                 var lineLabel = svg_1.default.newTextEl(i + "sec", diagramHeight);
                 if (i > secs - 0.2) {
                     lineLabel.setAttribute("x", secPerc * i - 0.5 + "%");
@@ -261,7 +258,7 @@ var waterfall = {
                 transform: "scale(1, 1)",
                 class: "marker-holder"
             });
-            marks.forEach(function (mark, i) {
+            data.marks.forEach(function (mark, i) {
                 var x = mark.startTime / unit;
                 var markHolder = svg_1.default.newEl("g", {
                     class: "mark-holder"
@@ -284,9 +281,9 @@ var waterfall = {
                     x2: x + "%",
                     y2: diagramHeight
                 }));
-                if (marks[i - 1] && mark.x - marks[i - 1].x < 1) {
-                    lineLabel.setAttribute("x", marks[i - 1].x + 1 + "%");
-                    mark.x = marks[i - 1].x + 1;
+                if (data.marks[i - 1] && mark.x - data.marks[i - 1].x < 1) {
+                    lineLabel.setAttribute("x", data.marks[i - 1].x + 1 + "%");
+                    mark.x = data.marks[i - 1].x + 1;
                 }
                 //would use polyline but can't use percentage for points 
                 lineHolder.appendChild(svg_1.default.newEl("line", {
@@ -322,7 +319,7 @@ var waterfall = {
         };
         timeLineHolder.appendChild(createTimeWrapper());
         timeLineHolder.appendChild(renderMarks());
-        lines.forEach(function (block, i) {
+        data.lines.forEach(function (block, i) {
             timeLineHolder.appendChild(createBgRect(block));
         });
         barsToShow.forEach(function (block, i) {
@@ -346,8 +343,7 @@ var waterfall = {
             timeLineLabelHolder.appendChild(blockLabel);
         });
         timeLineHolder.appendChild(timeLineLabelHolder);
-        chartHolder.appendChild(timeLineHolder);
-        return chartHolder;
+        return timeLineHolder;
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -355,6 +351,7 @@ exports.default = waterfall;
 
 },{"../helpers/dom":1,"../helpers/svg":2}],4:[function(require,module,exports){
 var waterfall_1 = require("./helpers/waterfall");
+var har_1 = require('./transformers/har');
 function showErrorMsg(msg) {
     alert(msg);
 }
@@ -369,7 +366,7 @@ function onFileInput(evt) {
     reader.onload = (function (e) {
         var harData;
         try {
-            //TODO: add proper check for HAR file
+            //TODO: add proper check for HAR file and later other formats
             harData = JSON.parse(e.target["result"]);
         }
         catch (e) {
@@ -382,25 +379,67 @@ function onFileInput(evt) {
 }
 document.getElementById('fileinput').addEventListener('change', onFileInput, false);
 function renderHar(logData) {
-    console.log("HAR created by %s(%s) of %s page(s)", logData.creator.name, logData.creator.version, logData.pages.length);
-    window["logData"] = logData;
-    //var page1 = 
-    var blocks = [];
-    logData.entries.map(function (x) {
-        x.startedDateTime;
-        console.log(x);
-        //name, start, end, cssClass, segments, rawResource
-        // new waterfall.timeBlock(x.request.url, x.startedDateTime, x.response., cssClass, segments, rawResource)
-        blocks.push(x.timings);
-    });
-    console.log(logData.entries);
-    console["table"](logData.entries);
-    console.log(logData);
-    //durationMs, blocks, marks, lines, title
-    // waterfall.setupTimeLine()
+    var data = har_1.default.transfrom(logData);
+    var x = waterfall_1.default.setupTimeLine(data);
+    harHolder.appendChild(x);
+    console.log(x);
 }
-//Dev/Test only - load test file
-// fetch("test-data/www.google.co.kr.har").then(f => f.json().then(j => renderHar(j.log)))
+//Dev/Test only - load test file TODO: remove
+window["fetch"]("test-data/www.google.co.kr.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 console.log(waterfall_1.default);
 
-},{"./helpers/waterfall":3}]},{},[4]);
+},{"./helpers/waterfall":3,"./transformers/har":5}],5:[function(require,module,exports){
+var time_block_1 = require('../typing/time-block');
+var HarTransformer = (function () {
+    function HarTransformer() {
+    }
+    HarTransformer.transfrom = function (data) {
+        console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
+        //temp - TODO: remove
+        window["data"] = data;
+        console["table"](data.entries);
+        var lastEndTime = 0;
+        //only support one page for now
+        var blocks = data.entries
+            .filter(function (entry) { return entry.pageref === data.pages[0].id; })
+            .map(function (entry) {
+            var currPage = data.pages.filter(function (page) { return page.id === entry.pageref; })[0];
+            var pageStartDate = new Date(currPage.startedDateTime);
+            var entryStartDate = new Date(entry.startedDateTime);
+            var startRelative = entryStartDate.getTime() - pageStartDate.getTime();
+            console.log(startRelative);
+            if (lastEndTime < (startRelative + entry.time)) {
+                lastEndTime = startRelative + entry.time;
+            }
+            return new time_block_1.default(entry.request.url.substr(0, 20) + "...", startRelative, startRelative + entry.time, {}, [], entry);
+        });
+        console["table"](blocks);
+        return {
+            durationMs: lastEndTime,
+            blocks: blocks,
+            marks: [],
+            lines: [],
+        };
+    };
+    return HarTransformer;
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = HarTransformer;
+
+},{"../typing/time-block":6}],6:[function(require,module,exports){
+var TimeBlock = (function () {
+    function TimeBlock(name, start, end, cssClass, segments, rawResource) {
+        this.name = name;
+        this.start = start;
+        this.end = end;
+        this.cssClass = cssClass;
+        this.segments = segments;
+        this.rawResource = rawResource;
+        this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    }
+    return TimeBlock;
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = TimeBlock;
+
+},{}]},{},[4]);

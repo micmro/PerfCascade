@@ -59,8 +59,8 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
-
-
+* {box-sizing: border-box;}
+.water-fall-chart {width: 100%; height: 100%; overflow: visible;}
 
 
 

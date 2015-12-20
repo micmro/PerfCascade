@@ -3,25 +3,23 @@ Helper to create waterfall timelines
 */
 import svg from "../helpers/svg"
 import dom from "../helpers/dom"
-import TimeBlock from "../interfaces/timeblock"
+import TimeBlock from "../typing/time-block"
+import {WaterfallData} from "../typing/waterfall-data"
 
 var waterfall = {
   //model for block and segment
 
-  setupTimeLine: function(durationMs: number, blocks: Array<TimeBlock>, marks: Array<any>, lines: Array<any>) {
-    const unit = durationMs / 100,
-      barsToShow = blocks
+  setupTimeLine: function(data: WaterfallData) {
+    const unit = data.durationMs / 100,
+      barsToShow = data.blocks
         .filter((block) => (typeof block.start == "number" && typeof block.total == "number"))
         .sort((a, b) => (a.start || 0) - (b.start || 0)),
-      maxMarkTextLength = marks.length > 0 ? marks.reduce((currMax, currValue) => {
+      maxMarkTextLength = data.marks.length > 0 ? data.marks.reduce((currMax, currValue) => {
         return Math.max((typeof currMax == "number" ? currMax : 0), svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0)))
       }) : 0,
       diagramHeight = (barsToShow.length + 1) * 25,
       chartHolderHeight = diagramHeight + maxMarkTextLength + 35
 
-    var chartHolder = dom.newTag("section", {
-      class: "resource-timing water-fall-holder chart-holder"
-    })
     var timeLineHolder = svg.newEl("svg:svg", {
       height: Math.floor(chartHolderHeight),
       class: "water-fall-chart"
@@ -68,7 +66,7 @@ var waterfall = {
       dom.removeClass(startline, "active")
     }
 
-    var createRect = function(width: number, height: number, x: number, y: number, cssClass: Object, label: Object, segments?: Array<any>): SVGElement {
+    var createRect = function(width: number, height: number, x: number, y: number, cssClass: Object, label: Object, segments?: Array<TimeBlock>): SVGElement {
       var rectHolder
       var rect = svg.newEl("rect", {
         width: (width / unit) + "%",
@@ -117,7 +115,7 @@ var waterfall = {
 
     var createTimeWrapper = function() {
       var timeHolder = svg.newEl("g", { class: "time-scale full-width" })
-      for (let i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
+      for (let i = 0, secs = data.durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
         var lineLabel = svg.newTextEl(i + "sec", diagramHeight)
         if (i > secs - 0.2) {
           lineLabel.setAttribute("x", secPerc * i - 0.5 + "%")
@@ -145,7 +143,7 @@ var waterfall = {
         class: "marker-holder"
       })
 
-      marks.forEach((mark, i) => {
+      data.marks.forEach((mark, i) => {
         var x = mark.startTime / unit
         var markHolder = svg.newEl("g", {
           class: "mark-holder"
@@ -171,9 +169,9 @@ var waterfall = {
           y2: diagramHeight
         }))
 
-        if (marks[i - 1] && mark.x - marks[i - 1].x < 1) {
-          lineLabel.setAttribute("x", marks[i - 1].x + 1 + "%")
-          mark.x = marks[i - 1].x + 1
+        if (data.marks[i - 1] && mark.x - data.marks[i - 1].x < 1) {
+          lineLabel.setAttribute("x", data.marks[i - 1].x + 1 + "%")
+          mark.x = data.marks[i - 1].x + 1
         }
 
         //would use polyline but can't use percentage for points 
@@ -217,7 +215,7 @@ var waterfall = {
     timeLineHolder.appendChild(createTimeWrapper())
     timeLineHolder.appendChild(renderMarks())
 
-    lines.forEach((block, i) => {
+    data.lines.forEach((block, i) => {
       timeLineHolder.appendChild(createBgRect(block))
     })
 
@@ -245,12 +243,8 @@ var waterfall = {
 
     timeLineHolder.appendChild(timeLineLabelHolder)
 
-    chartHolder.appendChild(timeLineHolder)
 
-
-
-
-    return chartHolder
+    return timeLineHolder
   }
 }
 

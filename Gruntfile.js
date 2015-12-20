@@ -8,7 +8,7 @@ module.exports = function( grunt ) {
   grunt.initConfig({
     clean : {
       dist: ["temp/", "src/js-dist"],
-      js: ["src/ts/*.js", "src/ts/*.js.map"]
+      js: ["src/ts/**/*.js", "src/ts/**/*.js.map"]
     },
     browserify: {
       options: {
