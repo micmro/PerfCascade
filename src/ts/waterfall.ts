@@ -1,10 +1,10 @@
 /*
 Helper to create waterfall timelines 
 */
-import svg from "../helpers/svg"
-import dom from "../helpers/dom"
-import TimeBlock from "../typing/time-block"
-import {WaterfallData} from "../typing/waterfall-data"
+import svg from "./helpers/svg"
+import dom from "./helpers/dom"
+import TimeBlock from "./typing/time-block"
+import {WaterfallData} from "./typing/waterfall-data"
 
 var waterfall = {
   //model for block and segment
