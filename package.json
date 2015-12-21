@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node_modules/.bin/live-server --wait=50 --open=src/index.html --ignore=src/ts/",
+    "watch": "Grunt",
     "build": "Grunt dist"
   },
   "author": {
