@@ -1,7 +1,6 @@
-/*
-SVG Helpers
-*/
-
+/**
+ *  SVG Helpers
+ */
 
 var svg = {
   newEl : function(tagName: string, settings?, css?): SVGElement{

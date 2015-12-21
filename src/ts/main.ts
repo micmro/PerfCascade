@@ -1,5 +1,6 @@
-import waterfall from "./waterfall"
+import {setupTimeLine} from "./waterfall"
 
+import TimeBlock from './typing/time-block'
 import {Har,
   Page,
   PageTimings,
@@ -11,9 +12,7 @@ import {Har,
   Response,
   Entry
 } from "./typing/har"
-
 import dom from './helpers/dom'
-import TimeBlock from './typing/time-block'
 import HarTransformer from './transformers/har'
 
 function showErrorMsg(msg){
@@ -49,7 +48,7 @@ document.getElementById('fileinput').addEventListener('change', onFileInput, fal
 function renderHar(logData: Har){
   var data = HarTransformer.transfrom(logData)
   dom.removeAllChildren(outputHolder)
-  outputHolder.appendChild(waterfall.setupTimeLine(data))
+  outputHolder.appendChild(setupTimeLine(data))
 }
 
 

@@ -4,5 +4,5 @@ export interface WaterfallData {
 	durationMs: number,
 	blocks: Array<TimeBlock>,
 	marks: Array<any>,
-	lines: Array<any>
+	lines: Array<TimeBlock>
 }

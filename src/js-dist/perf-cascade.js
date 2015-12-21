@@ -1,9 +1,9 @@
-/*PerfCascade build:21/12/2015 */
+/*PerfCascade build:22/12/2015 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/*
-DOM Helpers
-*/
+/**
+ *  DOM Helpers
+ */
 var dom = {
     newTextNode: function (text) {
         return document.createTextNode(text);
@@ -103,9 +103,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = dom;
 
 },{}],2:[function(require,module,exports){
-/*
-SVG Helpers
-*/
+/**
+ *  SVG Helpers
+ */
 var svg = {
     newEl: function (tagName, settings, css) {
         var el = document.createElementNS("http://www.w3.org/2000/svg", tagName);
@@ -142,226 +142,171 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = svg;
 
 },{}],3:[function(require,module,exports){
-/*
-Helper to create waterfall timelines
-*/
+/**
+ * Creation of sub-components of the waterfall chart
+ */
 var svg_1 = require("../helpers/svg");
 var dom_1 = require("../helpers/dom");
-var waterfall = {
-    //model for block and segment
-    setupTimeLine: function (data) {
-        var unit = data.durationMs / 100, barsToShow = data.blocks
-            .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
-            .sort(function (a, b) { return (a.start || 0) - (b.start || 0); }), maxMarkTextLength = data.marks.length > 0 ? data.marks.reduce(function (currMax, currValue) {
-            return Math.max((typeof currMax == "number" ? currMax : 0), svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
-        }) : 0, diagramHeight = (barsToShow.length + 1) * 25, chartHolderHeight = diagramHeight + maxMarkTextLength + 35;
-        var timeLineHolder = svg_1.default.newEl("svg:svg", {
-            height: Math.floor(chartHolderHeight),
-            class: "water-fall-chart"
-        });
-        var timeLineLabelHolder = svg_1.default.newEl("g", { class: "labels" });
-        var endline = svg_1.default.newEl("line", {
-            x1: "0",
-            y1: "0",
-            x2: "0",
-            y2: diagramHeight,
-            class: "line-end"
-        });
-        var startline = svg_1.default.newEl("line", {
-            x1: "0",
-            y1: "0",
-            x2: "0",
-            y2: diagramHeight,
-            class: "line-start"
-        });
-        var onRectMouseEnter = function (evt) {
-            var targetRect = evt.target;
-            dom_1.default.addClass(targetRect, "active");
-            var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits + targetRect.width.baseVal.valueInSpecifiedUnits + "%";
-            var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
-            endline.x1.baseVal.valueAsString = xPosEnd;
-            endline.x2.baseVal.valueAsString = xPosEnd;
-            startline.x1.baseVal.valueAsString = xPosStart;
-            startline.x2.baseVal.valueAsString = xPosStart;
-            dom_1.default.addClass(endline, "active");
-            dom_1.default.addClass(startline, "active");
-            targetRect.parentNode.appendChild(endline);
-            targetRect.parentNode.appendChild(startline);
-        };
-        var onRectMouseLeave = function (evt) {
-            dom_1.default.removeClass(evt.target, "active");
-            dom_1.default.removeClass(endline, "active");
-            dom_1.default.removeClass(startline, "active");
-        };
-        var createRect = function (width, height, x, y, cssClass, label, segments) {
-            var rectHolder;
-            var rect = svg_1.default.newEl("rect", {
-                width: (width / unit) + "%",
-                height: height - 1,
-                x: Math.round((x / unit) * 100) / 100 + "%",
-                y: y,
-                class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " " + (cssClass || "block-other")
-            });
-            if (label) {
-                rect.appendChild(svg_1.default.newEl("title", {
-                    text: label
-                })); // Add tile to wedge path
-            }
-            rect.addEventListener("mouseenter", onRectMouseEnter);
-            rect.addEventListener("mouseleave", onRectMouseLeave);
-            if (segments && segments.length > 0) {
-                rectHolder = svg_1.default.newEl("g");
-                rectHolder.appendChild(rect);
-                segments.forEach(function (segment) {
-                    if (segment.total > 0 && typeof segment.start === "number") {
-                        rectHolder.appendChild(createRect(segment.total, 8, segment.start || 0.001, y, segment.cssClass, segment.name + " (" + Math.round(segment.start) + "ms - " + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)"));
-                    }
-                });
-                return rectHolder;
-            }
-            else {
-                return rect;
-            }
-        };
-        var createBgRect = function (block) {
-            var rect = svg_1.default.newEl("rect", {
-                width: ((block.total || 1) / unit) + "%",
-                height: diagramHeight,
-                x: ((block.start || 0.001) / unit) + "%",
-                y: 0,
-                class: block.cssClass || "block-other"
-            });
-            rect.appendChild(svg_1.default.newEl("title", {
-                text: block.name
-            })); // Add tile to wedge path
-            return rect;
-        };
-        var createTimeWrapper = function () {
-            var timeHolder = svg_1.default.newEl("g", { class: "time-scale full-width" });
-            for (var i = 0, secs = data.durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
-                var lineLabel = svg_1.default.newTextEl(i + "sec", diagramHeight);
-                if (i > secs - 0.2) {
-                    lineLabel.setAttribute("x", secPerc * i - 0.5 + "%");
-                    lineLabel.setAttribute("text-anchor", "end");
-                }
-                else {
-                    lineLabel.setAttribute("x", secPerc * i + 0.5 + "%");
-                }
-                var lineEl = svg_1.default.newEl("line", {
-                    x1: secPerc * i + "%",
-                    y1: "0",
-                    x2: secPerc * i + "%",
-                    y2: diagramHeight
-                });
-                timeHolder.appendChild(lineEl);
-                timeHolder.appendChild(lineLabel);
-            }
-            return timeHolder;
-        };
-        var renderMarks = function () {
-            var marksHolder = svg_1.default.newEl("g", {
-                transform: "scale(1, 1)",
-                class: "marker-holder"
-            });
-            data.marks.forEach(function (mark, i) {
-                var x = mark.startTime / unit;
-                var markHolder = svg_1.default.newEl("g", {
-                    class: "mark-holder"
-                });
-                var lineHolder = svg_1.default.newEl("g", {
-                    class: "line-holder"
-                });
-                var lineLableHolder = svg_1.default.newEl("g", {
-                    class: "line-lable-holder",
-                    x: x + "%"
-                });
-                mark.x = x;
-                var lineLabel = svg_1.default.newTextEl(mark.name, diagramHeight + 25);
-                //lineLabel.setAttribute("writing-mode", "tb")
-                lineLabel.setAttribute("x", x + "%");
-                lineLabel.setAttribute("stroke", "");
-                lineHolder.appendChild(svg_1.default.newEl("line", {
-                    x1: x + "%",
-                    y1: 0,
-                    x2: x + "%",
-                    y2: diagramHeight
-                }));
-                if (data.marks[i - 1] && mark.x - data.marks[i - 1].x < 1) {
-                    lineLabel.setAttribute("x", data.marks[i - 1].x + 1 + "%");
-                    mark.x = data.marks[i - 1].x + 1;
-                }
-                //would use polyline but can't use percentage for points 
-                lineHolder.appendChild(svg_1.default.newEl("line", {
-                    x1: x + "%",
-                    y1: diagramHeight,
-                    x2: mark.x + "%",
-                    y2: diagramHeight + 23
-                }));
-                var isActive = false;
-                var onLableMouseEnter = function (evt) {
-                    if (!isActive) {
-                        isActive = true;
-                        dom_1.default.addClass(lineHolder, "active");
-                        //firefox has issues with this
-                        markHolder.parentNode.appendChild(markHolder);
-                    }
-                };
-                var onLableMouseLeave = function (evt) {
-                    isActive = false;
-                    dom_1.default.removeClass(lineHolder, "active");
-                };
-                lineLabel.addEventListener("mouseenter", onLableMouseEnter);
-                lineLabel.addEventListener("mouseleave", onLableMouseLeave);
-                lineLableHolder.appendChild(lineLabel);
-                markHolder.appendChild(svg_1.default.newEl("title", {
-                    text: mark.name + " (" + Math.round(mark.startTime) + "ms)",
-                }));
-                markHolder.appendChild(lineHolder);
-                marksHolder.appendChild(markHolder);
-                markHolder.appendChild(lineLableHolder);
-            });
-            return marksHolder;
-        };
-        timeLineHolder.appendChild(createTimeWrapper());
-        timeLineHolder.appendChild(renderMarks());
-        data.lines.forEach(function (block, i) {
-            timeLineHolder.appendChild(createBgRect(block));
-        });
-        barsToShow.forEach(function (block, i) {
-            var blockWidth = block.total || 1;
-            var y = 25 * i;
-            timeLineHolder.appendChild(createRect(blockWidth, 25, block.start || 0.001, y, block.cssClass, block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)", block.segments));
-            //crop name if longer than 30 characters
-            var clipName = (block.name.length > 30 && block.name.indexOf("?") > 0);
-            var blockName = (clipName) ? block.name.split("?")[0] + "?...." : block.name;
-            var blockLabel = svg_1.default.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)));
-            blockLabel.appendChild(svg_1.default.newEl("title", {
-                text: block.name
-            }));
-            if (((block.total || 1) / unit) > 10 && svg_1.default.getNodeTextWidth(blockLabel) < 200) {
-                blockLabel.setAttribute("class", "inner-label");
-                blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + 0.5 + "%");
-                blockLabel.setAttribute("width", (blockWidth / unit) + "%");
-            }
-            else if (((block.start || 0.001) / unit) + (blockWidth / unit) < 80) {
-                blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + (blockWidth / unit) + 0.5 + "%");
-            }
-            else {
-                blockLabel.setAttribute("x", (block.start || 0.001) / unit - 0.5 + "%");
-                blockLabel.setAttribute("text-anchor", "end");
-            }
-            blockLabel.style.opacity = block.name.match(/js.map$/) ? "0.5" : "1";
-            timeLineLabelHolder.appendChild(blockLabel);
-        });
-        timeLineHolder.appendChild(timeLineLabelHolder);
-        return timeLineHolder;
+/**
+ * Render the block and timings for a request
+ * @param  {RectData}         rectData Basic dependencys and globals
+ * @param  {Array<TimeBlock>} segments Request and Timing Data
+ * @return {SVGElement}             Renerated SVG
+ */
+function createRect(rectData, segments) {
+    var rectHolder;
+    var rect = svg_1.default.newEl("rect", {
+        width: (rectData.width / rectData.unit) + "%",
+        height: rectData.height - 1,
+        x: Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
+        y: rectData.y,
+        class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " " + (rectData.cssClass || "block-other")
+    });
+    if (rectData.label) {
+        rect.appendChild(svg_1.default.newEl("title", {
+            text: rectData.label
+        })); // Add tile to wedge path
     }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = waterfall;
+    rect.addEventListener("mouseenter", rectData.onRectMouseEnter);
+    rect.addEventListener("mouseleave", rectData.onRectMouseLeave);
+    if (segments && segments.length > 0) {
+        rectHolder = svg_1.default.newEl("g");
+        rectHolder.appendChild(rect);
+        segments.forEach(function (segment) {
+            if (segment.total > 0 && typeof segment.start === "number") {
+                var childRectData = {
+                    width: segment.total,
+                    height: 8,
+                    x: segment.start || 0.001,
+                    y: rectData.y,
+                    cssClass: segment.cssClass,
+                    label: segment.name + " (" + Math.round(segment.start) + "ms - " + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
+                    unit: rectData.unit,
+                    onRectMouseEnter: rectData.onRectMouseEnter,
+                    onRectMouseLeave: rectData.onRectMouseLeave
+                };
+                rectHolder.appendChild(createRect(childRectData));
+            }
+        });
+        return rectHolder;
+    }
+    else {
+        return rect;
+    }
+}
+exports.createRect = createRect;
+/**
+ * Renders the time-scale SVG elements (1sec, 2sec...)
+ * @param {number} durationMs    Full duration of the waterfall
+ * @param {number} diagramHeight Full height of SVG in px
+ */
+function createTimeWrapper(durationMs, diagramHeight) {
+    var timeHolder = svg_1.default.newEl("g", { class: "time-scale full-width" });
+    for (var i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
+        var lineLabel = svg_1.default.newTextEl(i + "sec", diagramHeight);
+        if (i > secs - 0.2) {
+            lineLabel.setAttribute("x", secPerc * i - 0.5 + "%");
+            lineLabel.setAttribute("text-anchor", "end");
+        }
+        else {
+            lineLabel.setAttribute("x", secPerc * i + 0.5 + "%");
+        }
+        var lineEl = svg_1.default.newEl("line", {
+            x1: secPerc * i + "%",
+            y1: "0",
+            x2: secPerc * i + "%",
+            y2: diagramHeight
+        });
+        timeHolder.appendChild(lineEl);
+        timeHolder.appendChild(lineLabel);
+    }
+    return timeHolder;
+}
+exports.createTimeWrapper = createTimeWrapper;
+//TODO: Implement - data for this not parsed yet
+function createBgRect(block, unit, diagramHeight) {
+    var rect = svg_1.default.newEl("rect", {
+        width: ((block.total || 1) / unit) + "%",
+        height: diagramHeight,
+        x: ((block.start || 0.001) / unit) + "%",
+        y: 0,
+        class: block.cssClass || "block-other"
+    });
+    rect.appendChild(svg_1.default.newEl("title", {
+        text: block.name
+    })); // Add tile to wedge path
+    return rect;
+}
+exports.createBgRect = createBgRect;
+//TODO: Implement - data for this not parsed yet
+function renderMarks(marks, unit, diagramHeight) {
+    var marksHolder = svg_1.default.newEl("g", {
+        transform: "scale(1, 1)",
+        class: "marker-holder"
+    });
+    marks.forEach(function (mark, i) {
+        var x = mark.startTime / unit;
+        var markHolder = svg_1.default.newEl("g", {
+            class: "mark-holder"
+        });
+        var lineHolder = svg_1.default.newEl("g", {
+            class: "line-holder"
+        });
+        var lineLableHolder = svg_1.default.newEl("g", {
+            class: "line-lable-holder",
+            x: x + "%"
+        });
+        mark.x = x;
+        var lineLabel = svg_1.default.newTextEl(mark.name, diagramHeight + 25);
+        //lineLabel.setAttribute("writing-mode", "tb")
+        lineLabel.setAttribute("x", x + "%");
+        lineLabel.setAttribute("stroke", "");
+        lineHolder.appendChild(svg_1.default.newEl("line", {
+            x1: x + "%",
+            y1: 0,
+            x2: x + "%",
+            y2: diagramHeight
+        }));
+        if (marks[i - 1] && mark.x - marks[i - 1].x < 1) {
+            lineLabel.setAttribute("x", marks[i - 1].x + 1 + "%");
+            mark.x = marks[i - 1].x + 1;
+        }
+        //would use polyline but can't use percentage for points 
+        lineHolder.appendChild(svg_1.default.newEl("line", {
+            x1: x + "%",
+            y1: diagramHeight,
+            x2: mark.x + "%",
+            y2: diagramHeight + 23
+        }));
+        var isActive = false;
+        var onLableMouseEnter = function (evt) {
+            if (!isActive) {
+                isActive = true;
+                dom_1.default.addClass(lineHolder, "active");
+                //firefox has issues with this
+                markHolder.parentNode.appendChild(markHolder);
+            }
+        };
+        var onLableMouseLeave = function (evt) {
+            isActive = false;
+            dom_1.default.removeClass(lineHolder, "active");
+        };
+        lineLabel.addEventListener("mouseenter", onLableMouseEnter);
+        lineLabel.addEventListener("mouseleave", onLableMouseLeave);
+        lineLableHolder.appendChild(lineLabel);
+        markHolder.appendChild(svg_1.default.newEl("title", {
+            text: mark.name + " (" + Math.round(mark.startTime) + "ms)",
+        }));
+        markHolder.appendChild(lineHolder);
+        marksHolder.appendChild(markHolder);
+        markHolder.appendChild(lineLableHolder);
+    });
+    return marksHolder;
+}
+exports.renderMarks = renderMarks;
 
 },{"../helpers/dom":1,"../helpers/svg":2}],4:[function(require,module,exports){
-var waterfall_1 = require("./helpers/waterfall");
+var waterfall_1 = require("./waterfall");
 var dom_1 = require('./helpers/dom');
 var har_1 = require('./transformers/har');
 function showErrorMsg(msg) {
@@ -393,12 +338,12 @@ document.getElementById('fileinput').addEventListener('change', onFileInput, fal
 function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
     dom_1.default.removeAllChildren(outputHolder);
-    outputHolder.appendChild(waterfall_1.default.setupTimeLine(data));
+    outputHolder.appendChild(waterfall_1.setupTimeLine(data));
 }
 //Dev/Test only - load test file TODO: remove
 window["fetch"]("test-data/www.bbc.com.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 
-},{"./helpers/dom":1,"./helpers/waterfall":3,"./transformers/har":5}],5:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":5,"./waterfall":7}],5:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
 var HarTransformer = (function () {
     function HarTransformer() {
@@ -514,4 +459,113 @@ var TimeBlock = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
-},{}]},{},[4]);
+},{}],7:[function(require,module,exports){
+var svg_1 = require("./helpers/svg");
+var dom_1 = require("./helpers/dom");
+var waterfall_componets_1 = require("./helpers/waterfall-componets");
+/**
+ * Entry point to start rendeing the full waterfall SVG
+ * @param {WaterfallData} data Object containing the setup parameter
+ * @return {SVGSVGElement}      SVG Element ready to render
+ */
+function setupTimeLine(data) {
+    //constants
+    var unit = data.durationMs / 100;
+    var barsToShow = data.blocks
+        .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
+        .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
+    var maxMarkTextLength = (data.marks.length > 0 ? data.marks.reduce(function (currMax, currValue) {
+        return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
+    }, 0) : 0);
+    var diagramHeight = (barsToShow.length + 1) * 25;
+    var chartHolderHeight = diagramHeight + maxMarkTextLength + 35;
+    //Main holder
+    var timeLineHolder = svg_1.default.newEl("svg:svg", {
+        height: Math.floor(chartHolderHeight),
+        class: "water-fall-chart"
+    });
+    var timeLineLabelHolder = svg_1.default.newEl("g", { class: "labels" });
+    //Setup of vertical-alignment-bars to show on hover
+    var endline = svg_1.default.newEl("line", {
+        x1: "0",
+        y1: "0",
+        x2: "0",
+        y2: diagramHeight,
+        class: "line-end"
+    });
+    var startline = svg_1.default.newEl("line", {
+        x1: "0",
+        y1: "0",
+        x2: "0",
+        y2: diagramHeight,
+        class: "line-start"
+    });
+    var onRectMouseEnter = function (evt) {
+        var targetRect = evt.target;
+        dom_1.default.addClass(targetRect, "active");
+        var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits + targetRect.width.baseVal.valueInSpecifiedUnits + "%";
+        var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
+        endline.x1.baseVal.valueAsString = xPosEnd;
+        endline.x2.baseVal.valueAsString = xPosEnd;
+        startline.x1.baseVal.valueAsString = xPosStart;
+        startline.x2.baseVal.valueAsString = xPosStart;
+        dom_1.default.addClass(endline, "active");
+        dom_1.default.addClass(startline, "active");
+        targetRect.parentNode.appendChild(endline);
+        targetRect.parentNode.appendChild(startline);
+    };
+    var onRectMouseLeave = function (evt) {
+        dom_1.default.removeClass(evt.target, "active");
+        dom_1.default.removeClass(endline, "active");
+        dom_1.default.removeClass(startline, "active");
+    };
+    //Start appending SVG elements to the holder element (timeLineHolder)
+    timeLineHolder.appendChild(waterfall_componets_1.createTimeWrapper(data.durationMs, diagramHeight));
+    timeLineHolder.appendChild(waterfall_componets_1.renderMarks(data.marks, unit, diagramHeight));
+    data.lines.forEach(function (block, i) {
+        timeLineHolder.appendChild(waterfall_componets_1.createBgRect(block, unit, diagramHeight));
+    });
+    //Main loop to render blocks
+    barsToShow.forEach(function (block, i) {
+        var blockWidth = block.total || 1;
+        var y = 25 * i;
+        var rectData = {
+            width: blockWidth,
+            height: 25,
+            x: block.start || 0.001,
+            y: y,
+            cssClass: block.cssClass,
+            label: block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+            unit: unit,
+            onRectMouseEnter: onRectMouseEnter,
+            onRectMouseLeave: onRectMouseLeave
+        };
+        timeLineHolder.appendChild(waterfall_componets_1.createRect(rectData, block.segments));
+        //crop name if longer than 30 characters
+        var clipName = (block.name.length > 30 && block.name.indexOf("?") > 0);
+        var blockName = (clipName) ? block.name.split("?")[0] + "?...." : block.name;
+        var blockLabel = svg_1.default.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)));
+        blockLabel.appendChild(svg_1.default.newEl("title", {
+            text: block.name
+        }));
+        if (((block.total || 1) / unit) > 10 && svg_1.default.getNodeTextWidth(blockLabel) < 200) {
+            blockLabel.setAttribute("class", "inner-label");
+            blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + 0.5 + "%");
+            blockLabel.setAttribute("width", (blockWidth / unit) + "%");
+        }
+        else if (((block.start || 0.001) / unit) + (blockWidth / unit) < 80) {
+            blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + (blockWidth / unit) + 0.5 + "%");
+        }
+        else {
+            blockLabel.setAttribute("x", (block.start || 0.001) / unit - 0.5 + "%");
+            blockLabel.setAttribute("text-anchor", "end");
+        }
+        blockLabel.style.opacity = block.name.match(/js.map$/) ? "0.5" : "1";
+        timeLineLabelHolder.appendChild(blockLabel);
+    });
+    timeLineHolder.appendChild(timeLineLabelHolder);
+    return timeLineHolder;
+}
+exports.setupTimeLine = setupTimeLine;
+
+},{"./helpers/dom":1,"./helpers/svg":2,"./helpers/waterfall-componets":3}]},{},[4]);

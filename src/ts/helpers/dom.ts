@@ -1,6 +1,7 @@
-/*
-DOM Helpers
-*/
+/**
+ *  DOM Helpers
+ */
+
 var dom = {
 
   newTextNode: function(text): Node {
