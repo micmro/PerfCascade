@@ -1,4 +1,4 @@
-import waterfall from "./helpers/waterfall"
+import waterfall from "./waterfall"
 
 import {Har,
   Page,
