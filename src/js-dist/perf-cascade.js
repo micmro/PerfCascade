@@ -200,7 +200,7 @@ var waterfall = {
                 height: height - 1,
                 x: Math.round((x / unit) * 100) / 100 + "%",
                 y: y,
-                class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " " + (cssClass || "block-undefined")
+                class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " " + (cssClass || "block-other")
             });
             if (label) {
                 rect.appendChild(svg_1.default.newEl("title", {
@@ -229,7 +229,7 @@ var waterfall = {
                 height: diagramHeight,
                 x: ((block.start || 0.001) / unit) + "%",
                 y: 0,
-                class: block.cssClass || "block-undefined"
+                class: block.cssClass || "block-other"
             });
             rect.appendChild(svg_1.default.newEl("title", {
                 text: block.name
@@ -331,7 +331,13 @@ var waterfall = {
             var blockWidth = block.total || 1;
             var y = 25 * i;
             timeLineHolder.appendChild(createRect(blockWidth, 25, block.start || 0.001, y, block.cssClass, block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)", block.segments));
-            var blockLabel = svg_1.default.newTextEl(block.name + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)));
+            //crop name if longer than 30 characters
+            var clipName = (block.name.length > 30 && block.name.indexOf("?") > 0);
+            var blockName = (clipName) ? block.name.split("?")[0] + "?...." : block.name;
+            var blockLabel = svg_1.default.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)));
+            blockLabel.appendChild(svg_1.default.newEl("title", {
+                text: block.name
+            }));
             if (((block.total || 1) / unit) > 10 && svg_1.default.getNodeTextWidth(blockLabel) < 200) {
                 blockLabel.setAttribute("class", "inner-label");
                 blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + 0.5 + "%");
@@ -398,14 +404,32 @@ var HarTransformer = (function () {
     function HarTransformer() {
     }
     HarTransformer.makeBlockCssClass = function (mimeType) {
-        var types = mimeType.split("/");
-        switch (types[0]) {
-            case "image": return "block-image";
-        }
-        switch (types[1]) {
-            case "x-font-woff": return "block-font";
-        }
-        return "block-" + mimeType.split("/")[1];
+        var mimeCssClass = function (mimeType) {
+            //TODO: can we make this more elegant?
+            var types = mimeType.split("/");
+            switch (types[0]) {
+                case "image": return "image";
+                case "font": return "font";
+            }
+            switch (types[1]) {
+                case "svg+xml": //TODO: perhaps we can setup a new colour for SVG
+                case "html": return "html";
+                case "css": return "css";
+                case "vnd.ms-fontobject":
+                case "font-woff":
+                case "font-woff2":
+                case "x-font-truetype":
+                case "x-font-opentype":
+                case "x-font-woff": return "font";
+                case "javascript":
+                case "x-javascript":
+                case "script":
+                case "json": return "javascript";
+                case "x-shockwave-flash": return "flash";
+            }
+            return "other";
+        };
+        return "block-" + mimeCssClass(mimeType);
     };
     HarTransformer.transfrom = function (data) {
         var _this = this;
@@ -432,6 +456,7 @@ var HarTransformer = (function () {
                 name: b.name,
                 start: b.start,
                 end: b.end,
+                TEMP: b.cssClass,
                 total: b.total
             };
         }));

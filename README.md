@@ -5,7 +5,7 @@ Extensible waterfall-viewer that works with HAR and other formats.
 
 ## Dev
 - Start live-reload server `npm start`
-- Start Typescript compiler with watch: `npm run watch`
+- Start Server and Typescript compiler with watch: `npm run watch`
 - Create Uglified version `npm run build`
 
 

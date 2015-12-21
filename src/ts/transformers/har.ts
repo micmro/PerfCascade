@@ -15,15 +15,36 @@ import {WaterfallData} from '../typing/waterfall-data'
 
 
 export default class HarTransformer{
-  static makeBlockCssClass(mimeType: string){
-    let types = mimeType.split("/");
-    switch (types[0]){
-      case "image": return "block-image"
+  
+
+  static makeBlockCssClass(mimeType: string) {
+    let mimeCssClass = function(mimeType: string){
+      //TODO: can we make this more elegant?
+      let types = mimeType.split("/");
+      switch (types[0]) {
+        case "image": return "image"
+        case "font": return "font"
+      }
+      switch (types[1]) {
+        case "svg+xml": //TODO: perhaps we can setup a new colour for SVG
+        case "html": return "html"
+        case "css": return "css"
+        case "vnd.ms-fontobject":
+        case "font-woff":
+        case "font-woff2":
+        case "x-font-truetype":
+        case "x-font-opentype":
+        case "x-font-woff": return "font"
+        case "javascript":
+        case "x-javascript":
+        case "script":
+        case "json": return "javascript"
+        case "x-shockwave-flash": return "flash"
+      }
+      return "other"
     }
-    switch(types[1]){
-      case "x-font-woff": return "block-font"
-    }
-    return "block-" + mimeType.split("/")[1]
+
+    return "block-" + mimeCssClass(mimeType)
   }
 
   static transfrom(data: Har): WaterfallData {
@@ -61,6 +82,7 @@ export default class HarTransformer{
         name: b.name,
         start: b.start,
         end: b.end,
+        TEMP: b.cssClass,
         total: b.total
       }
     }))

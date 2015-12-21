@@ -119,22 +119,22 @@ textarea {
 .other-light {background: #dfdfdf;}
 
 /*block colours*/
-.block-css {fill: #afd899;}
+.block-css {fill: #a6d18f;}
 .block-iframe,
 .block-html,
-.block-internal {fill: #85b3f2;}
+.block-internal {fill: #82a8de;}
 .block-img,
-.block-image {fill: #bc9dd6;}
+.block-image {fill: #b394cf;}
 .block-script,
 .block-javascript,
-.block-js {fill: #e7bd8c;}
+.block-js {fill: #e0b483;}
 .block-link {fill: #89afe6;}
 .block-swf,
-.block-flash {fill: #4db3ba;}
-.block-font {fill: #e96859;}
+.block-flash {fill: #42aab1;}
+.block-font {fill: #e15d4e;}
 .block-xmlhttprequest,
-.block-ajax {fill: #e7d98c;}
-.block-other {fill: #bebebe;}
+.block-ajax {fill: #f00;} /*remove?*/
+.block-other {fill: #b3b3b3;}
 
 .block-total {fill: #ccc;}
 .block-unload {fill: #909;}

@@ -73,7 +73,7 @@ var waterfall = {
         height: height - 1,
         x: Math.round((x / unit) * 100) / 100 + "%",
         y: y,
-        class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " " + (cssClass || "block-undefined")
+        class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " " + (cssClass || "block-other")
       })
       if (label) {
         rect.appendChild(svg.newEl("title", {
@@ -104,7 +104,7 @@ var waterfall = {
         height: diagramHeight,
         x: ((block.start || 0.001) / unit) + "%",
         y: 0,
-        class: block.cssClass || "block-undefined"
+        class: block.cssClass || "block-other"
       })
 
       rect.appendChild(svg.newEl("title", {
@@ -224,8 +224,15 @@ var waterfall = {
 
       var y = 25 * i
       timeLineHolder.appendChild(createRect(blockWidth, 25, block.start || 0.001, y, block.cssClass, block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)", block.segments))
+      
+      //crop name if longer than 30 characters
+      var clipName = (block.name.length > 30 && block.name.indexOf("?") > 0)
+      var blockName = (clipName) ? block.name.split("?")[0] + "?...." : block.name
 
-      var blockLabel = svg.newTextEl(block.name + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)))
+      var blockLabel = svg.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)))
+      blockLabel.appendChild(svg.newEl("title", {
+        text: block.name
+      }))
 
       if (((block.total || 1) / unit) > 10 && svg.getNodeTextWidth(blockLabel) < 200) {
         blockLabel.setAttribute("class", "inner-label")
