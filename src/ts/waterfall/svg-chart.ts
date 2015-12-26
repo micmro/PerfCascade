@@ -38,12 +38,15 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100
 
+  /** height of every request bar block plus spacer pixel */
+  const requestBarHeight: number = 21
+
   const barsToShow = data.blocks
     .filter((block) => (typeof block.start == "number" && typeof block.total == "number"))
     .sort((a, b) => (a.start || 0) - (b.start || 0))
 
   /** height of the requests part of the diagram in px */
-  const diagramHeight = (barsToShow.length + 1) * 25
+  const diagramHeight = (barsToShow.length + 1) * requestBarHeight
 
   /** full height of the SVG chart in px */
   const chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight)
@@ -75,11 +78,11 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
 
   barsToShow.forEach((block, i) => {
     let blockWidth = block.total || 1
-    let y = 25 * i
+    let y = requestBarHeight * i
 
     let rectData = {
       width: blockWidth,
-      height: 25,
+      height: requestBarHeight,
       x: block.start || 0.001,
       y: y,
       cssClass: block.cssClass,

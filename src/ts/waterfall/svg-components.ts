@@ -4,6 +4,7 @@
 
 import svg from "../helpers/svg"
 import TimeBlock from "../typing/time-block"
+import {Mark} from "../typing/waterfall-data"
 
 /**
  * Interface for `createRect` parameter
@@ -79,10 +80,11 @@ export function makeHoverEvtListener(diagramHeight: number) {
  * @return {SVGElement}                Renerated SVG (rect or g element)
  */
 export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVGElement {
+  const blockHeight = rectData.height - 1
   let rectHolder
   let rect = svg.newEl("rect", {
     width: (rectData.width / rectData.unit) + "%",
-    height: rectData.height - 1,
+    height: blockHeight,
     x: Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
     y: rectData.y,
     class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
@@ -104,7 +106,7 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
       if (segment.total > 0 && typeof segment.start === "number") {
         let childRectData = {
           width: segment.total,
-          height: 8,
+          height: (blockHeight - 5),
           x: segment.start || 0.001,
           y: rectData.y,
           cssClass: segment.cssClass,
@@ -129,15 +131,15 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
  * Create a new SVG Text element to label a request block
  * @param {TimeBlock} block      Asset Request
  * @param {number}    blockWidth Width of request block
- * @param {number}    y          vertical postion (in px)
+ * @param {number}    blockY     vertical postion of request block (in px)
  * @param {number}    unit       horizontal unit (duration in ms of 1%)
  */
-export function createRequestLabel(block: TimeBlock, blockWidth: number, y: number, unit: number): SVGTextElement {
+export function createRequestLabel(block: TimeBlock, blockWidth: number, blockY: number, unit: number): SVGTextElement {
   //crop name if longer than 30 characters
   let clipName = (block.name.length > 30 && block.name.indexOf("?") > 0)
   let blockName = (clipName) ? block.name.split("?")[0] + "?…" : block.name
   
-  let blockLabel = svg.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)))
+  let blockLabel = svg.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (blockY + 14))
 
   blockLabel.appendChild(svg.newEl("title", {
     text: block.name
@@ -211,7 +213,7 @@ export function createBgRect(block: TimeBlock, unit: number, diagramHeight: numb
 
 
 //TODO: Implement - data for this not parsed yet
-export function renderMarks(marks: Array<any>, unit: number, diagramHeight: number) {
+export function renderMarks(marks: Array<Mark>, unit: number, diagramHeight: number) {
   var marksHolder = svg.newEl("g", {
     transform: "scale(1, 1)",
     class: "marker-holder"
@@ -243,9 +245,10 @@ export function renderMarks(marks: Array<any>, unit: number, diagramHeight: numb
       y2: diagramHeight
     }))
 
-    if (marks[i - 1] && mark.x - marks[i - 1].x < 1) {
-      lineLabel.setAttribute("x", marks[i - 1].x + 1 + "%")
-      mark.x = marks[i - 1].x + 1
+    const lastMark = marks[i - 1]
+    if (lastMark && mark.x - lastMark.x < 1) {
+      lineLabel.setAttribute("x", lastMark.x + 1 + "%")
+      mark.x = lastMark.x + 1
     }
 
     //would use polyline but can't use percentage for points 

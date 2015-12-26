@@ -1,4 +1,4 @@
-/*PerfCascade build:26/12/2015 */
+/*PerfCascade build:27/12/2015 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -149,15 +149,15 @@ var HarTransformer = (function () {
         console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
         //temp - TODO: remove
         window["data"] = data;
+        //only support one page (first) for now
+        var currentPageIndex = 0;
+        var currPage = data.pages[currentPageIndex];
+        var pageStartTime = new Date(currPage.startedDateTime).getTime();
         var doneTime = 0;
-        //only support one page for now
         var blocks = data.entries
-            .filter(function (entry) { return entry.pageref === data.pages[0].id; })
+            .filter(function (entry) { return entry.pageref === currPage.id; })
             .map(function (entry) {
-            var currPage = data.pages.filter(function (page) { return page.id === entry.pageref; })[0];
-            var pageStartDate = new Date(currPage.startedDateTime);
-            var entryStartDate = new Date(entry.startedDateTime);
-            var startRelative = entryStartDate.getTime() - pageStartDate.getTime();
+            var startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
             if (doneTime < (startRelative + entry.time)) {
                 doneTime = startRelative + entry.time;
             }
@@ -169,14 +169,23 @@ var HarTransformer = (function () {
                 name: b.name,
                 start: b.start,
                 end: b.end,
-                TEMP: b.cssClass,
                 total: b.total
             };
         }));
+        var marks = ["onContentLoad", "onLoad"]
+            .filter(function (k) { return (data.pages[currentPageIndex].pageTimings[k] != undefined && data.pages[currentPageIndex].pageTimings[k] >= 0); })
+            .map(function (k) {
+            var startRelative = currPage.pageTimings[k];
+            console.log(currPage.pageTimings[k]);
+            return {
+                "name": k,
+                "startTime": startRelative
+            };
+        });
         return {
             durationMs: doneTime,
             blocks: blocks,
-            marks: [],
+            marks: marks,
             lines: [],
         };
     };
@@ -243,11 +252,13 @@ function createWaterfallSvg(data) {
     //constants
     /** horizontal unit (duration in ms of 1%) */
     var unit = data.durationMs / 100;
+    /** height of every request bar block plus spacer pixel */
+    var requestBarHeight = 21;
     var barsToShow = data.blocks
         .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
         .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
     /** height of the requests part of the diagram in px */
-    var diagramHeight = (barsToShow.length + 1) * 25;
+    var diagramHeight = (barsToShow.length + 1) * requestBarHeight;
     /** full height of the SVG chart in px */
     var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
     //Main holder
@@ -268,10 +279,10 @@ function createWaterfallSvg(data) {
     //Main loop to render blocks
     barsToShow.forEach(function (block, i) {
         var blockWidth = block.total || 1;
-        var y = 25 * i;
+        var y = requestBarHeight * i;
         var rectData = {
             width: blockWidth,
-            height: 25,
+            height: requestBarHeight,
             x: block.start || 0.001,
             y: y,
             cssClass: block.cssClass,
@@ -345,10 +356,11 @@ exports.makeHoverEvtListener = makeHoverEvtListener;
  * @return {SVGElement}                Renerated SVG (rect or g element)
  */
 function createRect(rectData, segments) {
+    var blockHeight = rectData.height - 1;
     var rectHolder;
     var rect = svg_1.default.newEl("rect", {
         width: (rectData.width / rectData.unit) + "%",
-        height: rectData.height - 1,
+        height: blockHeight,
         x: Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
         y: rectData.y,
         class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
@@ -368,7 +380,7 @@ function createRect(rectData, segments) {
             if (segment.total > 0 && typeof segment.start === "number") {
                 var childRectData = {
                     width: segment.total,
-                    height: 8,
+                    height: (blockHeight - 5),
                     x: segment.start || 0.001,
                     y: rectData.y,
                     cssClass: segment.cssClass,
@@ -392,14 +404,14 @@ exports.createRect = createRect;
  * Create a new SVG Text element to label a request block
  * @param {TimeBlock} block      Asset Request
  * @param {number}    blockWidth Width of request block
- * @param {number}    y          vertical postion (in px)
+ * @param {number}    blockY     vertical postion of request block (in px)
  * @param {number}    unit       horizontal unit (duration in ms of 1%)
  */
-function createRequestLabel(block, blockWidth, y, unit) {
+function createRequestLabel(block, blockWidth, blockY, unit) {
     //crop name if longer than 30 characters
     var clipName = (block.name.length > 30 && block.name.indexOf("?") > 0);
     var blockName = (clipName) ? block.name.split("?")[0] + "?…" : block.name;
-    var blockLabel = svg_1.default.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)));
+    var blockLabel = svg_1.default.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (blockY + 14));
     blockLabel.appendChild(svg_1.default.newEl("title", {
         text: block.name
     }));
@@ -493,9 +505,10 @@ function renderMarks(marks, unit, diagramHeight) {
             x2: x + "%",
             y2: diagramHeight
         }));
-        if (marks[i - 1] && mark.x - marks[i - 1].x < 1) {
-            lineLabel.setAttribute("x", marks[i - 1].x + 1 + "%");
-            mark.x = marks[i - 1].x + 1;
+        var lastMark = marks[i - 1];
+        if (lastMark && mark.x - lastMark.x < 1) {
+            lineLabel.setAttribute("x", lastMark.x + 1 + "%");
+            mark.x = lastMark.x + 1;
         }
         //would use polyline but can't use percentage for points 
         lineHolder.appendChild(svg_1.default.newEl("line", {

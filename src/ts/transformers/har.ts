@@ -10,7 +10,10 @@ import {Har,
   Entry
 } from "../typing/har"
 import TimeBlock from '../typing/time-block'
-import {WaterfallData} from '../typing/waterfall-data'
+import {
+  WaterfallData,
+  Mark
+} from '../typing/waterfall-data'
 
 
 export default class HarTransformer{
@@ -52,15 +55,16 @@ export default class HarTransformer{
     //temp - TODO: remove
     window["data"] = data
 
+    //only support one page (first) for now
+    const currentPageIndex = 0
+    const currPage = data.pages[currentPageIndex]
+    const pageStartTime = new Date(currPage.startedDateTime).getTime()
+
     let doneTime = 0;
-    //only support one page for now
     const blocks = data.entries
-      .filter(entry => entry.pageref === data.pages[0].id)
+      .filter(entry => entry.pageref === currPage.id)
       .map((entry) => {
-        const currPage = data.pages.filter(page => page.id === entry.pageref)[0]
-        const pageStartDate = new Date(currPage.startedDateTime)
-        const entryStartDate = new Date(entry.startedDateTime)
-        const startRelative = entryStartDate.getTime() - pageStartDate.getTime()
+        const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime
 
         if (doneTime < (startRelative + entry.time)){
           doneTime = startRelative + entry.time
@@ -81,15 +85,28 @@ export default class HarTransformer{
         name: b.name,
         start: b.start,
         end: b.end,
-        TEMP: b.cssClass,
         total: b.total
       }
     }))
 
+    const marks = ["onContentLoad", "onLoad"]
+      .filter(k => (data.pages[currentPageIndex].pageTimings[k] != undefined && data.pages[currentPageIndex].pageTimings[k] >= 0))
+      .map(k => {
+        const startRelative = currPage.pageTimings[k]
+
+        console.log(currPage.pageTimings[k])
+        return {
+          "name": k,
+          "startTime": startRelative
+        } as Mark
+      })
+
+
+
     return {
       durationMs: doneTime,
       blocks: blocks,
-      marks: [],
+      marks: marks,
       lines: [],
     }
   }
