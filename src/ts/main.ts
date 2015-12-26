@@ -1,4 +1,4 @@
-import {setupTimeLine} from "./waterfall"
+import {createWaterfallSvg} from "./waterfall"
 
 import TimeBlock from './typing/time-block'
 import {Har,
@@ -48,7 +48,7 @@ document.getElementById('fileinput').addEventListener('change', onFileInput, fal
 function renderHar(logData: Har){
   var data = HarTransformer.transfrom(logData)
   dom.removeAllChildren(outputHolder)
-  outputHolder.appendChild(setupTimeLine(data))
+  outputHolder.appendChild(createWaterfallSvg(data))
 }
 
 

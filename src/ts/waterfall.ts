@@ -5,29 +5,49 @@ import dom from "./helpers/dom"
 import {
   RectData,
   createRect,
+  createRequestLabel,
   createBgRect,
   createTimeWrapper,
-  renderMarks
+  renderMarks,
+  makeHoverEvtListener
 } from "./helpers/waterfall-componets"
 
 
+
 /**
- * Entry point to start rendeing the full waterfall SVG
- * @param {WaterfallData} data Object containing the setup parameter
+ * Calculate the height of the SVG chart in px 
+ * @param {any[]}       marks      [description]
+ * @param {TimeBlock[]} barsToShow [description]
+ */
+function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: number) {
+  const maxMarkTextLength = marks.reduce((currMax: number, currValue: TimeBlock) => {
+    return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0)))
+    }, 0)
+
+  return diagramHeight + maxMarkTextLength + 35
+}
+
+/**
+ * Entry point to start rendering the full waterfall SVG
+ * @param {WaterfallData} data  Object containing the setup parameter
  * @return {SVGSVGElement}      SVG Element ready to render
  */
-export function setupTimeLine(data: WaterfallData): SVGSVGElement {
+export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
 
   //constants
+  
+  /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100
+
   const barsToShow = data.blocks
     .filter((block) => (typeof block.start == "number" && typeof block.total == "number"))
     .sort((a, b) => (a.start || 0) - (b.start || 0))
-  const maxMarkTextLength: number = (data.marks.length > 0 ? data.marks.reduce((currMax: number, currValue: TimeBlock) => {
-      return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0)))
-    }, 0) : 0)
+
+  /** height of the requests part of the diagram in px */
   const diagramHeight = (barsToShow.length + 1) * 25
-  const chartHolderHeight = diagramHeight + maxMarkTextLength + 35
+
+  /** full height of the SVG chart in px */
+  const chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight)
 
   //Main holder
   let timeLineHolder = svg.newEl("svg:svg", {
@@ -35,52 +55,12 @@ export function setupTimeLine(data: WaterfallData): SVGSVGElement {
     class: "water-fall-chart"
   }) as SVGSVGElement
 
-  let timeLineLabelHolder = svg.newEl("g", { class: "labels" }) as SVGGElement
 
+  let timeLineLabelHolder = svg.newEl("g", {
+    class: "labels"
+  }) as SVGGElement
 
-
-  //Setup of vertical-alignment-bars to show on hover
-
-  let endline = svg.newEl("line", {
-    x1: "0",
-    y1: "0",
-    x2: "0",
-    y2: diagramHeight,
-    class: "line-end"
-  }) as SVGLineElement
-
-  let startline = svg.newEl("line", {
-    x1: "0",
-    y1: "0",
-    x2: "0",
-    y2: diagramHeight,
-    class: "line-start"
-  }) as SVGLineElement
-
-  let onRectMouseEnter = function(evt: MouseEvent) {
-    let targetRect = evt.target as SVGRectElement
-    dom.addClass(targetRect, "active")
-
-    const xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits + targetRect.width.baseVal.valueInSpecifiedUnits + "%"
-    const xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%"
-
-    endline.x1.baseVal.valueAsString = xPosEnd
-    endline.x2.baseVal.valueAsString = xPosEnd
-    startline.x1.baseVal.valueAsString = xPosStart
-    startline.x2.baseVal.valueAsString = xPosStart
-    dom.addClass(endline, "active")
-    dom.addClass(startline, "active")
-
-    targetRect.parentNode.appendChild(endline)
-    targetRect.parentNode.appendChild(startline)
-  }
-
-  let onRectMouseLeave = function(evt: MouseEvent) {
-    dom.removeClass(evt.target as SVGRectElement, "active")
-    dom.removeClass(endline, "active")
-    dom.removeClass(startline, "active")
-  }
-
+  let mouseListeners = makeHoverEvtListener(diagramHeight)
 
 
   //Start appending SVG elements to the holder element (timeLineHolder)
@@ -93,10 +73,11 @@ export function setupTimeLine(data: WaterfallData): SVGSVGElement {
   })
 
   //Main loop to render blocks
+
   barsToShow.forEach((block, i) => {
     let blockWidth = block.total || 1
-
     let y = 25 * i
+
     let rectData = {
       width: blockWidth,
       height: 25,
@@ -105,37 +86,18 @@ export function setupTimeLine(data: WaterfallData): SVGSVGElement {
       cssClass: block.cssClass,
       label: block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
       unit: unit,
-      onRectMouseEnter: onRectMouseEnter,
-      onRectMouseLeave: onRectMouseLeave
+      onRectMouseEnter: mouseListeners.onRectMouseEnter,
+      onRectMouseLeave: mouseListeners.onRectMouseLeave
     } as RectData
 
+    //create and attach request block
     timeLineHolder.appendChild(createRect(rectData, block.segments))
-    
-    //crop name if longer than 30 characters
-    let clipName = (block.name.length > 30 && block.name.indexOf("?") > 0)
-    let blockName = (clipName) ? block.name.split("?")[0] + "?...." : block.name
 
-    let blockLabel = svg.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)))
-    blockLabel.appendChild(svg.newEl("title", {
-      text: block.name
-    }))
-
-    if (((block.total || 1) / unit) > 10 && svg.getNodeTextWidth(blockLabel) < 200) {
-      blockLabel.setAttribute("class", "inner-label")
-      blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + 0.5 + "%")
-      blockLabel.setAttribute("width", (blockWidth / unit) + "%")
-    } else if (((block.start || 0.001) / unit) + (blockWidth / unit) < 80) {
-      blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + (blockWidth / unit) + 0.5 + "%")
-    } else {
-      blockLabel.setAttribute("x", (block.start || 0.001) / unit - 0.5 + "%")
-      blockLabel.setAttribute("text-anchor", "end")
-    }
-    blockLabel.style.opacity = block.name.match(/js.map$/) ? "0.5" : "1"
-    timeLineLabelHolder.appendChild(blockLabel)
+    //create and attach request label
+    timeLineLabelHolder.appendChild(createRequestLabel(block, blockWidth, y, unit))
   })
 
   timeLineHolder.appendChild(timeLineLabelHolder)
-
 
   return timeLineHolder
 }

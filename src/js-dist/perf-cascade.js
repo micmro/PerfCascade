@@ -1,4 +1,4 @@
-/*PerfCascade build:22/12/2015 */
+/*PerfCascade build:26/12/2015 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -148,10 +148,53 @@ exports.default = svg;
 var svg_1 = require("../helpers/svg");
 var dom_1 = require("../helpers/dom");
 /**
+ * Eventlisteners for verticale alignment bars to be shown on hover
+ * @param {number} diagramHeight  height of the requests part of the diagram in px
+ */
+function makeHoverEvtListener(diagramHeight) {
+    var endline = svg_1.default.newEl("line", {
+        x1: "0",
+        y1: "0",
+        x2: "0",
+        y2: diagramHeight,
+        class: "line-end"
+    });
+    var startline = svg_1.default.newEl("line", {
+        x1: "0",
+        y1: "0",
+        x2: "0",
+        y2: diagramHeight,
+        class: "line-start"
+    });
+    return {
+        onRectMouseEnter: function (evt) {
+            var targetRect = evt.target;
+            dom_1.default.addClass(targetRect, "active");
+            var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
+                targetRect.width.baseVal.valueInSpecifiedUnits + "%";
+            var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
+            endline.x1.baseVal.valueAsString = xPosEnd;
+            endline.x2.baseVal.valueAsString = xPosEnd;
+            startline.x1.baseVal.valueAsString = xPosStart;
+            startline.x2.baseVal.valueAsString = xPosStart;
+            dom_1.default.addClass(endline, "active");
+            dom_1.default.addClass(startline, "active");
+            targetRect.parentNode.appendChild(endline);
+            targetRect.parentNode.appendChild(startline);
+        },
+        onRectMouseLeave: function (evt) {
+            dom_1.default.removeClass(evt.target, "active");
+            dom_1.default.removeClass(endline, "active");
+            dom_1.default.removeClass(startline, "active");
+        }
+    };
+}
+exports.makeHoverEvtListener = makeHoverEvtListener;
+/**
  * Render the block and timings for a request
  * @param  {RectData}         rectData Basic dependencys and globals
  * @param  {Array<TimeBlock>} segments Request and Timing Data
- * @return {SVGElement}             Renerated SVG
+ * @return {SVGElement}                Renerated SVG (rect or g element)
  */
 function createRect(rectData, segments) {
     var rectHolder;
@@ -160,7 +203,8 @@ function createRect(rectData, segments) {
         height: rectData.height - 1,
         x: Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
         y: rectData.y,
-        class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " " + (rectData.cssClass || "block-other")
+        class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
+            + (rectData.cssClass || "block-other")
     });
     if (rectData.label) {
         rect.appendChild(svg_1.default.newEl("title", {
@@ -180,7 +224,8 @@ function createRect(rectData, segments) {
                     x: segment.start || 0.001,
                     y: rectData.y,
                     cssClass: segment.cssClass,
-                    label: segment.name + " (" + Math.round(segment.start) + "ms - " + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
+                    label: segment.name + " (" + Math.round(segment.start) + "ms - "
+                        + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
                     unit: rectData.unit,
                     onRectMouseEnter: rectData.onRectMouseEnter,
                     onRectMouseLeave: rectData.onRectMouseLeave
@@ -195,6 +240,39 @@ function createRect(rectData, segments) {
     }
 }
 exports.createRect = createRect;
+/**
+ * Create a new SVG Text element to label a request block
+ * @param {TimeBlock} block      Asset Request
+ * @param {number}    blockWidth Width of request block
+ * @param {number}    y          vertical postion (in px)
+ * @param {number}    unit       horizontal unit (duration in ms of 1%)
+ */
+function createRequestLabel(block, blockWidth, y, unit) {
+    //crop name if longer than 30 characters
+    var clipName = (block.name.length > 30 && block.name.indexOf("?") > 0);
+    var blockName = (clipName) ? block.name.split("?")[0] + "?…" : block.name;
+    var blockLabel = svg_1.default.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)));
+    blockLabel.appendChild(svg_1.default.newEl("title", {
+        text: block.name
+    }));
+    if (((block.total || 1) / unit) > 10 && svg_1.default.getNodeTextWidth(blockLabel) < 200) {
+        //position label within block
+        blockLabel.setAttribute("class", "inner-label");
+        blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + 0.5 + "%");
+        blockLabel.setAttribute("width", (blockWidth / unit) + "%");
+    }
+    else if (((block.start || 0.001) / unit) + (blockWidth / unit) < 80) {
+        //position label
+        blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + (blockWidth / unit) + 0.5 + "%");
+    }
+    else {
+        blockLabel.setAttribute("x", (block.start || 0.001) / unit - 0.5 + "%");
+        blockLabel.setAttribute("text-anchor", "end");
+    }
+    blockLabel.style.opacity = block.name.match(/js.map$/) ? "0.5" : "1";
+    return blockLabel;
+}
+exports.createRequestLabel = createRequestLabel;
 /**
  * Renders the time-scale SVG elements (1sec, 2sec...)
  * @param {number} durationMs    Full duration of the waterfall
@@ -252,8 +330,8 @@ function renderMarks(marks, unit, diagramHeight) {
         var lineHolder = svg_1.default.newEl("g", {
             class: "line-holder"
         });
-        var lineLableHolder = svg_1.default.newEl("g", {
-            class: "line-lable-holder",
+        var lineLabelHolder = svg_1.default.newEl("g", {
+            class: "line-label-holder",
             x: x + "%"
         });
         mark.x = x;
@@ -293,13 +371,13 @@ function renderMarks(marks, unit, diagramHeight) {
         };
         lineLabel.addEventListener("mouseenter", onLableMouseEnter);
         lineLabel.addEventListener("mouseleave", onLableMouseLeave);
-        lineLableHolder.appendChild(lineLabel);
+        lineLabelHolder.appendChild(lineLabel);
         markHolder.appendChild(svg_1.default.newEl("title", {
             text: mark.name + " (" + Math.round(mark.startTime) + "ms)",
         }));
         markHolder.appendChild(lineHolder);
         marksHolder.appendChild(markHolder);
-        markHolder.appendChild(lineLableHolder);
+        markHolder.appendChild(lineLabelHolder);
     });
     return marksHolder;
 }
@@ -338,7 +416,7 @@ document.getElementById('fileinput').addEventListener('change', onFileInput, fal
 function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
     dom_1.default.removeAllChildren(outputHolder);
-    outputHolder.appendChild(waterfall_1.setupTimeLine(data));
+    outputHolder.appendChild(waterfall_1.createWaterfallSvg(data));
 }
 //Dev/Test only - load test file TODO: remove
 window["fetch"]("test-data/www.bbc.com.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
@@ -461,64 +539,43 @@ exports.default = TimeBlock;
 
 },{}],7:[function(require,module,exports){
 var svg_1 = require("./helpers/svg");
-var dom_1 = require("./helpers/dom");
 var waterfall_componets_1 = require("./helpers/waterfall-componets");
 /**
- * Entry point to start rendeing the full waterfall SVG
- * @param {WaterfallData} data Object containing the setup parameter
+ * Calculate the height of the SVG chart in px
+ * @param {any[]}       marks      [description]
+ * @param {TimeBlock[]} barsToShow [description]
+ */
+function getSvgHeight(marks, barsToShow, diagramHeight) {
+    var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
+        return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
+    }, 0);
+    return diagramHeight + maxMarkTextLength + 35;
+}
+/**
+ * Entry point to start rendering the full waterfall SVG
+ * @param {WaterfallData} data  Object containing the setup parameter
  * @return {SVGSVGElement}      SVG Element ready to render
  */
-function setupTimeLine(data) {
+function createWaterfallSvg(data) {
     //constants
+    /** horizontal unit (duration in ms of 1%) */
     var unit = data.durationMs / 100;
     var barsToShow = data.blocks
         .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
         .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
-    var maxMarkTextLength = (data.marks.length > 0 ? data.marks.reduce(function (currMax, currValue) {
-        return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
-    }, 0) : 0);
+    /** height of the requests part of the diagram in px */
     var diagramHeight = (barsToShow.length + 1) * 25;
-    var chartHolderHeight = diagramHeight + maxMarkTextLength + 35;
+    /** full height of the SVG chart in px */
+    var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
     //Main holder
     var timeLineHolder = svg_1.default.newEl("svg:svg", {
         height: Math.floor(chartHolderHeight),
         class: "water-fall-chart"
     });
-    var timeLineLabelHolder = svg_1.default.newEl("g", { class: "labels" });
-    //Setup of vertical-alignment-bars to show on hover
-    var endline = svg_1.default.newEl("line", {
-        x1: "0",
-        y1: "0",
-        x2: "0",
-        y2: diagramHeight,
-        class: "line-end"
+    var timeLineLabelHolder = svg_1.default.newEl("g", {
+        class: "labels"
     });
-    var startline = svg_1.default.newEl("line", {
-        x1: "0",
-        y1: "0",
-        x2: "0",
-        y2: diagramHeight,
-        class: "line-start"
-    });
-    var onRectMouseEnter = function (evt) {
-        var targetRect = evt.target;
-        dom_1.default.addClass(targetRect, "active");
-        var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits + targetRect.width.baseVal.valueInSpecifiedUnits + "%";
-        var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
-        endline.x1.baseVal.valueAsString = xPosEnd;
-        endline.x2.baseVal.valueAsString = xPosEnd;
-        startline.x1.baseVal.valueAsString = xPosStart;
-        startline.x2.baseVal.valueAsString = xPosStart;
-        dom_1.default.addClass(endline, "active");
-        dom_1.default.addClass(startline, "active");
-        targetRect.parentNode.appendChild(endline);
-        targetRect.parentNode.appendChild(startline);
-    };
-    var onRectMouseLeave = function (evt) {
-        dom_1.default.removeClass(evt.target, "active");
-        dom_1.default.removeClass(endline, "active");
-        dom_1.default.removeClass(startline, "active");
-    };
+    var mouseListeners = waterfall_componets_1.makeHoverEvtListener(diagramHeight);
     //Start appending SVG elements to the holder element (timeLineHolder)
     timeLineHolder.appendChild(waterfall_componets_1.createTimeWrapper(data.durationMs, diagramHeight));
     timeLineHolder.appendChild(waterfall_componets_1.renderMarks(data.marks, unit, diagramHeight));
@@ -537,35 +594,17 @@ function setupTimeLine(data) {
             cssClass: block.cssClass,
             label: block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
             unit: unit,
-            onRectMouseEnter: onRectMouseEnter,
-            onRectMouseLeave: onRectMouseLeave
+            onRectMouseEnter: mouseListeners.onRectMouseEnter,
+            onRectMouseLeave: mouseListeners.onRectMouseLeave
         };
+        //create and attach request block
         timeLineHolder.appendChild(waterfall_componets_1.createRect(rectData, block.segments));
-        //crop name if longer than 30 characters
-        var clipName = (block.name.length > 30 && block.name.indexOf("?") > 0);
-        var blockName = (clipName) ? block.name.split("?")[0] + "?...." : block.name;
-        var blockLabel = svg_1.default.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + (block.segments ? 20 : 17)));
-        blockLabel.appendChild(svg_1.default.newEl("title", {
-            text: block.name
-        }));
-        if (((block.total || 1) / unit) > 10 && svg_1.default.getNodeTextWidth(blockLabel) < 200) {
-            blockLabel.setAttribute("class", "inner-label");
-            blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + 0.5 + "%");
-            blockLabel.setAttribute("width", (blockWidth / unit) + "%");
-        }
-        else if (((block.start || 0.001) / unit) + (blockWidth / unit) < 80) {
-            blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + (blockWidth / unit) + 0.5 + "%");
-        }
-        else {
-            blockLabel.setAttribute("x", (block.start || 0.001) / unit - 0.5 + "%");
-            blockLabel.setAttribute("text-anchor", "end");
-        }
-        blockLabel.style.opacity = block.name.match(/js.map$/) ? "0.5" : "1";
-        timeLineLabelHolder.appendChild(blockLabel);
+        //create and attach request label
+        timeLineLabelHolder.appendChild(waterfall_componets_1.createRequestLabel(block, blockWidth, y, unit));
     });
     timeLineHolder.appendChild(timeLineLabelHolder);
     return timeLineHolder;
 }
-exports.setupTimeLine = setupTimeLine;
+exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"./helpers/dom":1,"./helpers/svg":2,"./helpers/waterfall-componets":3}]},{},[4]);
+},{"./helpers/svg":2,"./helpers/waterfall-componets":3}]},{},[4]);
