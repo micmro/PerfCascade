@@ -3,7 +3,6 @@
  */
 
 import svg from "../helpers/svg"
-import dom from "../helpers/dom"
 import TimeBlock from "../typing/time-block"
 
 /**
@@ -47,7 +46,7 @@ export function makeHoverEvtListener(diagramHeight: number) {
   return {
     onRectMouseEnter: function(evt: MouseEvent) {
       let targetRect = evt.target as SVGRectElement
-      dom.addClass(targetRect, "active")
+      svg.addClass(targetRect, "active")
 
       const xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits + 
         targetRect.width.baseVal.valueInSpecifiedUnits + "%"
@@ -57,16 +56,16 @@ export function makeHoverEvtListener(diagramHeight: number) {
       endline.x2.baseVal.valueAsString = xPosEnd
       startline.x1.baseVal.valueAsString = xPosStart
       startline.x2.baseVal.valueAsString = xPosStart
-      dom.addClass(endline, "active")
-      dom.addClass(startline, "active")
+      svg.addClass(endline, "active")
+      svg.addClass(startline, "active")
 
       targetRect.parentNode.appendChild(endline)
       targetRect.parentNode.appendChild(startline)
     },
     onRectMouseLeave: function(evt: MouseEvent) {
-      dom.removeClass(evt.target as SVGRectElement, "active")
-      dom.removeClass(endline, "active")
-      dom.removeClass(startline, "active")
+      svg.removeClass(evt.target as SVGRectElement, "active")
+      svg.removeClass(endline, "active")
+      svg.removeClass(startline, "active")
     }
   }
 }
@@ -115,6 +114,7 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
           onRectMouseEnter: rectData.onRectMouseEnter,
           onRectMouseLeave: rectData.onRectMouseLeave
         } as RectData
+
         rectHolder.appendChild(createRect(childRectData))
       }
     })
@@ -260,7 +260,7 @@ export function renderMarks(marks: Array<any>, unit: number, diagramHeight: numb
     var onLableMouseEnter = function(evt) {
       if (!isActive) {
         isActive = true
-        dom.addClass(lineHolder, "active")
+        svg.addClass(lineHolder, "active")
         //firefox has issues with this
         markHolder.parentNode.appendChild(markHolder)
       }
@@ -268,7 +268,7 @@ export function renderMarks(marks: Array<any>, unit: number, diagramHeight: numb
 
     var onLableMouseLeave = function(evt) {
       isActive = false
-      dom.removeClass(lineHolder, "active")
+      svg.removeClass(lineHolder, "active")
     }
 
     lineLabel.addEventListener("mouseenter", onLableMouseEnter)

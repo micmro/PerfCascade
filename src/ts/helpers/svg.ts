@@ -34,6 +34,26 @@ var svg = {
     const nodeWidth = textNode.getBBox().width
     tmp.parentNode.removeChild(tmp)
     return nodeWidth
+  },
+
+  addClass: function(el: SVGElement, className: string) {
+    if (el.classList) {
+      el.classList.add(className)
+    } else {
+      // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
+      el.setAttribute("class", el.getAttribute("class") + " " + className)
+    }
+    return el
+  },
+
+  removeClass: function(el: SVGElement, className: string) {
+    if (el.classList) {
+      el.classList.remove(className)
+    } else {
+      //IE doesn't support classList in SVG - also no need for dublication check i.t.m.
+      el.setAttribute("class", el.getAttribute("class").replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"))
+    }
+    return el
   }
 }
 

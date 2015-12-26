@@ -1,7 +1,6 @@
 import TimeBlock from "../typing/time-block"
 import {WaterfallData} from "../typing/waterfall-data"
 import svg from "../helpers/svg"
-import dom from "../helpers/dom"
 import {
   RectData,
   createRect,

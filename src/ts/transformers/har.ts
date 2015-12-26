@@ -2,7 +2,6 @@ import {Har,
   Page,
   PageTimings,
   Creator,
-  NameValueObj,
   Cookie,
   Request,
   Content,
@@ -53,27 +52,27 @@ export default class HarTransformer{
     //temp - TODO: remove
     window["data"] = data
 
-    var doneTime = 0;
+    let doneTime = 0;
     //only support one page for now
-    let blocks = data.entries
+    const blocks = data.entries
       .filter(entry => entry.pageref === data.pages[0].id)
       .map((entry) => {
-        let currPage = data.pages.filter(page => page.id === entry.pageref)[0]
-        let pageStartDate = new Date(currPage.startedDateTime)
-        let entryStartDate = new Date(entry.startedDateTime)
-        let startRelative = entryStartDate.getTime() - pageStartDate.getTime()
+        const currPage = data.pages.filter(page => page.id === entry.pageref)[0]
+        const pageStartDate = new Date(currPage.startedDateTime)
+        const entryStartDate = new Date(entry.startedDateTime)
+        const startRelative = entryStartDate.getTime() - pageStartDate.getTime()
 
         if (doneTime < (startRelative + entry.time)){
           doneTime = startRelative + entry.time
         }
 
-        let subModules = entry.timings
+        const subModules = entry.timings
 
         return new TimeBlock(entry.request.url, 
           startRelative,
           startRelative + entry.time,
           this.makeBlockCssClass(entry.response.content.mimeType),
-          this.buildSectionBlocks(startRelative, entry.timings),
+          this.buildDetailTimingBlocks(startRelative, entry.timings),
           entry
         )
     })
@@ -87,8 +86,6 @@ export default class HarTransformer{
       }
     }))
 
-    console.log(blocks)
-
     return {
       durationMs: doneTime,
       blocks: blocks,
@@ -97,27 +94,24 @@ export default class HarTransformer{
     }
   }
 
-  static buildSectionBlocks(startRelative: number, t: Timings) {
+  static buildDetailTimingBlocks(startRelative: number, t: Timings): Array<TimeBlock> {
     // var timings = []
-    return ["blocked", "dns", "connect", "send", "wait", "receive", "ssl"].reduce((collect: Array<TimeBlock>, key) => {
+    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<TimeBlock>, key) => {
       if (t[key] && t[key] !== -1){
-        let start = (collect.length > 0) ? collect[collect.length - 1].end : startRelative
+        const start = (collect.length > 0) ? collect[collect.length - 1].end : startRelative
+        
+
+        //special case for 'connect' && 'ssl' since they share time
+        //http://www.softwareishard.com/blog/har-12-spec/#timings
+        if (key === "connect" && t["ssl"] && t["ssl"] !== -1){
+          return collect
+            .concat([new TimeBlock("ssl", start, start + t.ssl, "block-ssl")])
+            .concat([new TimeBlock(key, start + t.ssl, start + t[key], "block-" + key)])
+        }
+
         return collect.concat([new TimeBlock(key, start, start + t[key], "block-" + key)])
       }
       return collect
     }, [])
-    // "blocked": 0,
-    // "dns": -1,
-    // "connect": 15,
-    // "send": 20,
-    // "wait": 38,
-    // "receive": 12,
-    // "ssl": -1,
-    // return [
-    //   new TimeBlock("blocked", 0, t.blocked, "block-blocking"),
-    //   new TimeBlock("DNS", t.send, t.send, "block-dns"),
-    //   new TimeBlock("connect", t.blocked, t.connect, "block-dns"),
-    //   new TimeBlock("DNS", t.dns, t.receive, "block-dns")
-    // ]
   }
 }

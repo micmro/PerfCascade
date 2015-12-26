@@ -5,7 +5,6 @@ import {Har,
   Page,
   PageTimings,
   Creator,
-  NameValueObj,
   Cookie,
   Request,
   Content,
@@ -15,13 +14,23 @@ import {Har,
 import dom from './helpers/dom'
 import HarTransformer from './transformers/har'
 
+
 function showErrorMsg(msg){
   alert(msg)
 }
 
-let outputHolder = document.getElementById("output")
 
-function onFileInput(evt) {
+const outputHolder = document.getElementById("output")
+
+
+function renderHar(logData: Har) {
+  const data = HarTransformer.transfrom(logData)
+  dom.removeAllChildren(outputHolder)
+  outputHolder.appendChild(createWaterfallSvg(data))
+}
+
+
+function onFileSubmit(evt) {
   let files = evt.target.files 
   if(!files) {
     showErrorMsg("Failed to load HAR file") 
@@ -43,15 +52,9 @@ function onFileInput(evt) {
   reader.readAsText(files[0])
 }
 
-document.getElementById('fileinput').addEventListener('change', onFileInput, false)
-
-function renderHar(logData: Har){
-  var data = HarTransformer.transfrom(logData)
-  dom.removeAllChildren(outputHolder)
-  outputHolder.appendChild(createWaterfallSvg(data))
-}
+document.getElementById('fileinput').addEventListener('change', onFileSubmit, false)
 
 
 
-//Dev/Test only - load test file TODO: remove
+//TODO: remove Dev/Test only - load test file
 window["fetch"]("test-data/www.bbc.com.har").then(f => f.json().then(j => renderHar(j.log)))

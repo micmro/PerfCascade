@@ -5,94 +5,6 @@
  *  DOM Helpers
  */
 var dom = {
-    newTextNode: function (text) {
-        return document.createTextNode(text);
-    },
-    //creat html tag
-    newTag: function (tagName, settings, css) {
-        settings = settings || {};
-        var tag = document.createElement(tagName);
-        for (var attr in settings) {
-            if (attr != "text") {
-                tag[attr] = settings[attr];
-            }
-        }
-        if (settings.text) {
-            tag.textContent = settings.text;
-        }
-        else if (settings.childElement) {
-            if (typeof settings.childElement === "object") {
-                //if childNodes NodeList is passed in
-                if (settings.childElement instanceof NodeList) {
-                    //NodeList is does not inherit from array
-                    Array.prototype.slice.call(settings.childElement, 0).forEach(function (childNode) {
-                        tag.appendChild(childNode);
-                    });
-                }
-                else {
-                    tag.appendChild(settings.childElement);
-                }
-            }
-            else {
-                tag.appendChild(dom.newTextNode(settings.childElement));
-            }
-        }
-        if (settings.class) {
-            tag.className = settings.class;
-        }
-        tag.style.cssText = css || "";
-        return tag;
-    },
-    tableFactory: function (id, headerBuilder, rowBuilder) {
-        if (id === void 0) { id = ""; }
-        var tableHolder = dom.newTag("div", {
-            id: id,
-            class: "table-holder"
-        });
-        var table = dom.newTag("table");
-        var thead = dom.newTag("thead");
-        thead.appendChild(headerBuilder(dom.newTag("tr")));
-        table.appendChild(thead);
-        table.appendChild(rowBuilder(dom.newTag("tbody")));
-        tableHolder.appendChild(table);
-        return tableHolder;
-    },
-    combineNodes: function (a, b) {
-        var wrapper = document.createElement("div");
-        if (typeof a === "object") {
-            wrapper.appendChild(a);
-        }
-        else if (typeof a === "string") {
-            wrapper.appendChild(dom.newTextNode(a));
-        }
-        if (typeof b === "object") {
-            wrapper.appendChild(b);
-        }
-        else if (typeof b === "string") {
-            wrapper.appendChild(dom.newTextNode(b));
-        }
-        return wrapper.childNodes;
-    },
-    addClass: function (el, className) {
-        if (el.classList) {
-            el.classList.add(className);
-        }
-        else {
-            // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
-            el.setAttribute("class", el.getAttribute("class") + " " + className);
-        }
-        return el;
-    },
-    removeClass: function (el, className) {
-        if (el.classList) {
-            el.classList.remove(className);
-        }
-        else {
-            //IE doesn't support classList in SVG - also no need for dublication check i.t.m.
-            el.setAttribute("class", el.getAttribute("class").replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"));
-        }
-        return el;
-    },
     removeAllChildren: function (el) {
         while (el.childNodes.length > 0) {
             el.removeChild(el.childNodes[0]);
@@ -136,6 +48,26 @@ var svg = {
         var nodeWidth = textNode.getBBox().width;
         tmp.parentNode.removeChild(tmp);
         return nodeWidth;
+    },
+    addClass: function (el, className) {
+        if (el.classList) {
+            el.classList.add(className);
+        }
+        else {
+            // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
+            el.setAttribute("class", el.getAttribute("class") + " " + className);
+        }
+        return el;
+    },
+    removeClass: function (el, className) {
+        if (el.classList) {
+            el.classList.remove(className);
+        }
+        else {
+            //IE doesn't support classList in SVG - also no need for dublication check i.t.m.
+            el.setAttribute("class", el.getAttribute("class").replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"));
+        }
+        return el;
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -149,7 +81,12 @@ function showErrorMsg(msg) {
     alert(msg);
 }
 var outputHolder = document.getElementById("output");
-function onFileInput(evt) {
+function renderHar(logData) {
+    var data = har_1.default.transfrom(logData);
+    dom_1.default.removeAllChildren(outputHolder);
+    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data));
+}
+function onFileSubmit(evt) {
     var files = evt.target.files;
     if (!files) {
         showErrorMsg("Failed to load HAR file");
@@ -170,13 +107,8 @@ function onFileInput(evt) {
     });
     reader.readAsText(files[0]);
 }
-document.getElementById('fileinput').addEventListener('change', onFileInput, false);
-function renderHar(logData) {
-    var data = har_1.default.transfrom(logData);
-    dom_1.default.removeAllChildren(outputHolder);
-    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data));
-}
-//Dev/Test only - load test file TODO: remove
+document.getElementById('fileinput').addEventListener('change', onFileSubmit, false);
+//TODO: remove Dev/Test only - load test file
 window["fetch"]("test-data/www.bbc.com.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 
 },{"./helpers/dom":1,"./transformers/har":4,"./waterfall/svg-chart":6}],4:[function(require,module,exports){
@@ -230,7 +162,7 @@ var HarTransformer = (function () {
                 doneTime = startRelative + entry.time;
             }
             var subModules = entry.timings;
-            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, _this.makeBlockCssClass(entry.response.content.mimeType), _this.buildSectionBlocks(startRelative, entry.timings), entry);
+            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, _this.makeBlockCssClass(entry.response.content.mimeType), _this.buildDetailTimingBlocks(startRelative, entry.timings), entry);
         });
         console["table"](blocks.map(function (b) {
             return {
@@ -241,7 +173,6 @@ var HarTransformer = (function () {
                 total: b.total
             };
         }));
-        console.log(blocks);
         return {
             durationMs: doneTime,
             blocks: blocks,
@@ -249,28 +180,22 @@ var HarTransformer = (function () {
             lines: [],
         };
     };
-    HarTransformer.buildSectionBlocks = function (startRelative, t) {
+    HarTransformer.buildDetailTimingBlocks = function (startRelative, t) {
         // var timings = []
-        return ["blocked", "dns", "connect", "send", "wait", "receive", "ssl"].reduce(function (collect, key) {
+        return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce(function (collect, key) {
             if (t[key] && t[key] !== -1) {
                 var start = (collect.length > 0) ? collect[collect.length - 1].end : startRelative;
+                //special case for 'connect' && 'ssl' since they share time
+                //http://www.softwareishard.com/blog/har-12-spec/#timings
+                if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
+                    return collect
+                        .concat([new time_block_1.default("ssl", start, start + t.ssl, "block-ssl")])
+                        .concat([new time_block_1.default(key, start + t.ssl, start + t[key], "block-" + key)]);
+                }
                 return collect.concat([new time_block_1.default(key, start, start + t[key], "block-" + key)]);
             }
             return collect;
         }, []);
-        // "blocked": 0,
-        // "dns": -1,
-        // "connect": 15,
-        // "send": 20,
-        // "wait": 38,
-        // "receive": 12,
-        // "ssl": -1,
-        // return [
-        //   new TimeBlock("blocked", 0, t.blocked, "block-blocking"),
-        //   new TimeBlock("DNS", t.send, t.send, "block-dns"),
-        //   new TimeBlock("connect", t.blocked, t.connect, "block-dns"),
-        //   new TimeBlock("DNS", t.dns, t.receive, "block-dns")
-        // ]
     };
     return HarTransformer;
 })();
@@ -370,7 +295,6 @@ exports.createWaterfallSvg = createWaterfallSvg;
  * Creation of sub-components of the waterfall chart
  */
 var svg_1 = require("../helpers/svg");
-var dom_1 = require("../helpers/dom");
 /**
  * Eventlisteners for verticale alignment bars to be shown on hover
  * @param {number} diagramHeight  height of the requests part of the diagram in px
@@ -393,7 +317,7 @@ function makeHoverEvtListener(diagramHeight) {
     return {
         onRectMouseEnter: function (evt) {
             var targetRect = evt.target;
-            dom_1.default.addClass(targetRect, "active");
+            svg_1.default.addClass(targetRect, "active");
             var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
                 targetRect.width.baseVal.valueInSpecifiedUnits + "%";
             var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
@@ -401,15 +325,15 @@ function makeHoverEvtListener(diagramHeight) {
             endline.x2.baseVal.valueAsString = xPosEnd;
             startline.x1.baseVal.valueAsString = xPosStart;
             startline.x2.baseVal.valueAsString = xPosStart;
-            dom_1.default.addClass(endline, "active");
-            dom_1.default.addClass(startline, "active");
+            svg_1.default.addClass(endline, "active");
+            svg_1.default.addClass(startline, "active");
             targetRect.parentNode.appendChild(endline);
             targetRect.parentNode.appendChild(startline);
         },
         onRectMouseLeave: function (evt) {
-            dom_1.default.removeClass(evt.target, "active");
-            dom_1.default.removeClass(endline, "active");
-            dom_1.default.removeClass(startline, "active");
+            svg_1.default.removeClass(evt.target, "active");
+            svg_1.default.removeClass(endline, "active");
+            svg_1.default.removeClass(startline, "active");
         }
     };
 }
@@ -584,14 +508,14 @@ function renderMarks(marks, unit, diagramHeight) {
         var onLableMouseEnter = function (evt) {
             if (!isActive) {
                 isActive = true;
-                dom_1.default.addClass(lineHolder, "active");
+                svg_1.default.addClass(lineHolder, "active");
                 //firefox has issues with this
                 markHolder.parentNode.appendChild(markHolder);
             }
         };
         var onLableMouseLeave = function (evt) {
             isActive = false;
-            dom_1.default.removeClass(lineHolder, "active");
+            svg_1.default.removeClass(lineHolder, "active");
         };
         lineLabel.addEventListener("mouseenter", onLableMouseEnter);
         lineLabel.addEventListener("mouseleave", onLableMouseLeave);
@@ -607,4 +531,4 @@ function renderMarks(marks, unit, diagramHeight) {
 }
 exports.renderMarks = renderMarks;
 
-},{"../helpers/dom":1,"../helpers/svg":2}]},{},[3]);
+},{"../helpers/svg":2}]},{},[3]);
