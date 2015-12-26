@@ -142,6 +142,230 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = svg;
 
 },{}],3:[function(require,module,exports){
+var svg_chart_1 = require("./waterfall/svg-chart");
+var dom_1 = require('./helpers/dom');
+var har_1 = require('./transformers/har');
+function showErrorMsg(msg) {
+    alert(msg);
+}
+var outputHolder = document.getElementById("output");
+function onFileInput(evt) {
+    var files = evt.target.files;
+    if (!files) {
+        showErrorMsg("Failed to load HAR file");
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = (function (e) {
+        var harData;
+        try {
+            //TODO: add proper check for HAR files and later other formats
+            harData = JSON.parse(e.target["result"]);
+        }
+        catch (e) {
+            showErrorMsg("File does not seem to be a valid HAR file");
+            return undefined;
+        }
+        renderHar(harData.log);
+    });
+    reader.readAsText(files[0]);
+}
+document.getElementById('fileinput').addEventListener('change', onFileInput, false);
+function renderHar(logData) {
+    var data = har_1.default.transfrom(logData);
+    dom_1.default.removeAllChildren(outputHolder);
+    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data));
+}
+//Dev/Test only - load test file TODO: remove
+window["fetch"]("test-data/www.bbc.com.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
+
+},{"./helpers/dom":1,"./transformers/har":4,"./waterfall/svg-chart":6}],4:[function(require,module,exports){
+var time_block_1 = require('../typing/time-block');
+var HarTransformer = (function () {
+    function HarTransformer() {
+    }
+    HarTransformer.makeBlockCssClass = function (mimeType) {
+        var mimeCssClass = function (mimeType) {
+            //TODO: can we make this more elegant?
+            var types = mimeType.split("/");
+            switch (types[0]) {
+                case "image": return "image";
+                case "font": return "font";
+            }
+            switch (types[1]) {
+                case "svg+xml": //TODO: perhaps we can setup a new colour for SVG
+                case "html": return "html";
+                case "css": return "css";
+                case "vnd.ms-fontobject":
+                case "font-woff":
+                case "font-woff2":
+                case "x-font-truetype":
+                case "x-font-opentype":
+                case "x-font-woff": return "font";
+                case "javascript":
+                case "x-javascript":
+                case "script":
+                case "json": return "javascript";
+                case "x-shockwave-flash": return "flash";
+            }
+            return "other";
+        };
+        return "block-" + mimeCssClass(mimeType);
+    };
+    HarTransformer.transfrom = function (data) {
+        var _this = this;
+        console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
+        //temp - TODO: remove
+        window["data"] = data;
+        var doneTime = 0;
+        //only support one page for now
+        var blocks = data.entries
+            .filter(function (entry) { return entry.pageref === data.pages[0].id; })
+            .map(function (entry) {
+            var currPage = data.pages.filter(function (page) { return page.id === entry.pageref; })[0];
+            var pageStartDate = new Date(currPage.startedDateTime);
+            var entryStartDate = new Date(entry.startedDateTime);
+            var startRelative = entryStartDate.getTime() - pageStartDate.getTime();
+            if (doneTime < (startRelative + entry.time)) {
+                doneTime = startRelative + entry.time;
+            }
+            var subModules = entry.timings;
+            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, _this.makeBlockCssClass(entry.response.content.mimeType), _this.buildSectionBlocks(startRelative, entry.timings), entry);
+        });
+        console["table"](blocks.map(function (b) {
+            return {
+                name: b.name,
+                start: b.start,
+                end: b.end,
+                TEMP: b.cssClass,
+                total: b.total
+            };
+        }));
+        console.log(blocks);
+        return {
+            durationMs: doneTime,
+            blocks: blocks,
+            marks: [],
+            lines: [],
+        };
+    };
+    HarTransformer.buildSectionBlocks = function (startRelative, t) {
+        // var timings = []
+        return ["blocked", "dns", "connect", "send", "wait", "receive", "ssl"].reduce(function (collect, key) {
+            if (t[key] && t[key] !== -1) {
+                var start = (collect.length > 0) ? collect[collect.length - 1].end : startRelative;
+                return collect.concat([new time_block_1.default(key, start, start + t[key], "block-" + key)]);
+            }
+            return collect;
+        }, []);
+        // "blocked": 0,
+        // "dns": -1,
+        // "connect": 15,
+        // "send": 20,
+        // "wait": 38,
+        // "receive": 12,
+        // "ssl": -1,
+        // return [
+        //   new TimeBlock("blocked", 0, t.blocked, "block-blocking"),
+        //   new TimeBlock("DNS", t.send, t.send, "block-dns"),
+        //   new TimeBlock("connect", t.blocked, t.connect, "block-dns"),
+        //   new TimeBlock("DNS", t.dns, t.receive, "block-dns")
+        // ]
+    };
+    return HarTransformer;
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = HarTransformer;
+
+},{"../typing/time-block":5}],5:[function(require,module,exports){
+var TimeBlock = (function () {
+    function TimeBlock(name, start, end, cssClass, segments, rawResource) {
+        if (cssClass === void 0) { cssClass = ""; }
+        if (segments === void 0) { segments = []; }
+        this.name = name;
+        this.start = start;
+        this.end = end;
+        this.cssClass = cssClass;
+        this.segments = segments;
+        this.rawResource = rawResource;
+        this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    }
+    return TimeBlock;
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = TimeBlock;
+
+},{}],6:[function(require,module,exports){
+var svg_1 = require("../helpers/svg");
+var svg_components_1 = require("./svg-components");
+/**
+ * Calculate the height of the SVG chart in px
+ * @param {any[]}       marks      [description]
+ * @param {TimeBlock[]} barsToShow [description]
+ */
+function getSvgHeight(marks, barsToShow, diagramHeight) {
+    var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
+        return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
+    }, 0);
+    return diagramHeight + maxMarkTextLength + 35;
+}
+/**
+ * Entry point to start rendering the full waterfall SVG
+ * @param {WaterfallData} data  Object containing the setup parameter
+ * @return {SVGSVGElement}      SVG Element ready to render
+ */
+function createWaterfallSvg(data) {
+    //constants
+    /** horizontal unit (duration in ms of 1%) */
+    var unit = data.durationMs / 100;
+    var barsToShow = data.blocks
+        .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
+        .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
+    /** height of the requests part of the diagram in px */
+    var diagramHeight = (barsToShow.length + 1) * 25;
+    /** full height of the SVG chart in px */
+    var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
+    //Main holder
+    var timeLineHolder = svg_1.default.newEl("svg:svg", {
+        height: Math.floor(chartHolderHeight),
+        class: "water-fall-chart"
+    });
+    var timeLineLabelHolder = svg_1.default.newEl("g", {
+        class: "labels"
+    });
+    var mouseListeners = svg_components_1.makeHoverEvtListener(diagramHeight);
+    //Start appending SVG elements to the holder element (timeLineHolder)
+    timeLineHolder.appendChild(svg_components_1.createTimeWrapper(data.durationMs, diagramHeight));
+    timeLineHolder.appendChild(svg_components_1.renderMarks(data.marks, unit, diagramHeight));
+    data.lines.forEach(function (block, i) {
+        timeLineHolder.appendChild(svg_components_1.createBgRect(block, unit, diagramHeight));
+    });
+    //Main loop to render blocks
+    barsToShow.forEach(function (block, i) {
+        var blockWidth = block.total || 1;
+        var y = 25 * i;
+        var rectData = {
+            width: blockWidth,
+            height: 25,
+            x: block.start || 0.001,
+            y: y,
+            cssClass: block.cssClass,
+            label: block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+            unit: unit,
+            onRectMouseEnter: mouseListeners.onRectMouseEnter,
+            onRectMouseLeave: mouseListeners.onRectMouseLeave
+        };
+        //create and attach request block
+        timeLineHolder.appendChild(svg_components_1.createRect(rectData, block.segments));
+        //create and attach request label
+        timeLineLabelHolder.appendChild(svg_components_1.createRequestLabel(block, blockWidth, y, unit));
+    });
+    timeLineHolder.appendChild(timeLineLabelHolder);
+    return timeLineHolder;
+}
+exports.createWaterfallSvg = createWaterfallSvg;
+
+},{"../helpers/svg":2,"./svg-components":7}],7:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -383,228 +607,4 @@ function renderMarks(marks, unit, diagramHeight) {
 }
 exports.renderMarks = renderMarks;
 
-},{"../helpers/dom":1,"../helpers/svg":2}],4:[function(require,module,exports){
-var waterfall_1 = require("./waterfall");
-var dom_1 = require('./helpers/dom');
-var har_1 = require('./transformers/har');
-function showErrorMsg(msg) {
-    alert(msg);
-}
-var outputHolder = document.getElementById("output");
-function onFileInput(evt) {
-    var files = evt.target.files;
-    if (!files) {
-        showErrorMsg("Failed to load HAR file");
-        return;
-    }
-    var reader = new FileReader();
-    reader.onload = (function (e) {
-        var harData;
-        try {
-            //TODO: add proper check for HAR files and later other formats
-            harData = JSON.parse(e.target["result"]);
-        }
-        catch (e) {
-            showErrorMsg("File does not seem to be a valid HAR file");
-            return undefined;
-        }
-        renderHar(harData.log);
-    });
-    reader.readAsText(files[0]);
-}
-document.getElementById('fileinput').addEventListener('change', onFileInput, false);
-function renderHar(logData) {
-    var data = har_1.default.transfrom(logData);
-    dom_1.default.removeAllChildren(outputHolder);
-    outputHolder.appendChild(waterfall_1.createWaterfallSvg(data));
-}
-//Dev/Test only - load test file TODO: remove
-window["fetch"]("test-data/www.bbc.com.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
-
-},{"./helpers/dom":1,"./transformers/har":5,"./waterfall":7}],5:[function(require,module,exports){
-var time_block_1 = require('../typing/time-block');
-var HarTransformer = (function () {
-    function HarTransformer() {
-    }
-    HarTransformer.makeBlockCssClass = function (mimeType) {
-        var mimeCssClass = function (mimeType) {
-            //TODO: can we make this more elegant?
-            var types = mimeType.split("/");
-            switch (types[0]) {
-                case "image": return "image";
-                case "font": return "font";
-            }
-            switch (types[1]) {
-                case "svg+xml": //TODO: perhaps we can setup a new colour for SVG
-                case "html": return "html";
-                case "css": return "css";
-                case "vnd.ms-fontobject":
-                case "font-woff":
-                case "font-woff2":
-                case "x-font-truetype":
-                case "x-font-opentype":
-                case "x-font-woff": return "font";
-                case "javascript":
-                case "x-javascript":
-                case "script":
-                case "json": return "javascript";
-                case "x-shockwave-flash": return "flash";
-            }
-            return "other";
-        };
-        return "block-" + mimeCssClass(mimeType);
-    };
-    HarTransformer.transfrom = function (data) {
-        var _this = this;
-        console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
-        //temp - TODO: remove
-        window["data"] = data;
-        var doneTime = 0;
-        //only support one page for now
-        var blocks = data.entries
-            .filter(function (entry) { return entry.pageref === data.pages[0].id; })
-            .map(function (entry) {
-            var currPage = data.pages.filter(function (page) { return page.id === entry.pageref; })[0];
-            var pageStartDate = new Date(currPage.startedDateTime);
-            var entryStartDate = new Date(entry.startedDateTime);
-            var startRelative = entryStartDate.getTime() - pageStartDate.getTime();
-            if (doneTime < (startRelative + entry.time)) {
-                doneTime = startRelative + entry.time;
-            }
-            var subModules = entry.timings;
-            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, _this.makeBlockCssClass(entry.response.content.mimeType), _this.buildSectionBlocks(startRelative, entry.timings), entry);
-        });
-        console["table"](blocks.map(function (b) {
-            return {
-                name: b.name,
-                start: b.start,
-                end: b.end,
-                TEMP: b.cssClass,
-                total: b.total
-            };
-        }));
-        console.log(blocks);
-        return {
-            durationMs: doneTime,
-            blocks: blocks,
-            marks: [],
-            lines: [],
-        };
-    };
-    HarTransformer.buildSectionBlocks = function (startRelative, t) {
-        // var timings = []
-        return ["blocked", "dns", "connect", "send", "wait", "receive", "ssl"].reduce(function (collect, key) {
-            if (t[key] && t[key] !== -1) {
-                var start = (collect.length > 0) ? collect[collect.length - 1].end : startRelative;
-                return collect.concat([new time_block_1.default(key, start, start + t[key], "block-" + key)]);
-            }
-            return collect;
-        }, []);
-        // "blocked": 0,
-        // "dns": -1,
-        // "connect": 15,
-        // "send": 20,
-        // "wait": 38,
-        // "receive": 12,
-        // "ssl": -1,
-        // return [
-        //   new TimeBlock("blocked", 0, t.blocked, "block-blocking"),
-        //   new TimeBlock("DNS", t.send, t.send, "block-dns"),
-        //   new TimeBlock("connect", t.blocked, t.connect, "block-dns"),
-        //   new TimeBlock("DNS", t.dns, t.receive, "block-dns")
-        // ]
-    };
-    return HarTransformer;
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = HarTransformer;
-
-},{"../typing/time-block":6}],6:[function(require,module,exports){
-var TimeBlock = (function () {
-    function TimeBlock(name, start, end, cssClass, segments, rawResource) {
-        if (cssClass === void 0) { cssClass = ""; }
-        if (segments === void 0) { segments = []; }
-        this.name = name;
-        this.start = start;
-        this.end = end;
-        this.cssClass = cssClass;
-        this.segments = segments;
-        this.rawResource = rawResource;
-        this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
-    }
-    return TimeBlock;
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = TimeBlock;
-
-},{}],7:[function(require,module,exports){
-var svg_1 = require("./helpers/svg");
-var waterfall_componets_1 = require("./helpers/waterfall-componets");
-/**
- * Calculate the height of the SVG chart in px
- * @param {any[]}       marks      [description]
- * @param {TimeBlock[]} barsToShow [description]
- */
-function getSvgHeight(marks, barsToShow, diagramHeight) {
-    var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
-        return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
-    }, 0);
-    return diagramHeight + maxMarkTextLength + 35;
-}
-/**
- * Entry point to start rendering the full waterfall SVG
- * @param {WaterfallData} data  Object containing the setup parameter
- * @return {SVGSVGElement}      SVG Element ready to render
- */
-function createWaterfallSvg(data) {
-    //constants
-    /** horizontal unit (duration in ms of 1%) */
-    var unit = data.durationMs / 100;
-    var barsToShow = data.blocks
-        .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
-        .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
-    /** height of the requests part of the diagram in px */
-    var diagramHeight = (barsToShow.length + 1) * 25;
-    /** full height of the SVG chart in px */
-    var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
-    //Main holder
-    var timeLineHolder = svg_1.default.newEl("svg:svg", {
-        height: Math.floor(chartHolderHeight),
-        class: "water-fall-chart"
-    });
-    var timeLineLabelHolder = svg_1.default.newEl("g", {
-        class: "labels"
-    });
-    var mouseListeners = waterfall_componets_1.makeHoverEvtListener(diagramHeight);
-    //Start appending SVG elements to the holder element (timeLineHolder)
-    timeLineHolder.appendChild(waterfall_componets_1.createTimeWrapper(data.durationMs, diagramHeight));
-    timeLineHolder.appendChild(waterfall_componets_1.renderMarks(data.marks, unit, diagramHeight));
-    data.lines.forEach(function (block, i) {
-        timeLineHolder.appendChild(waterfall_componets_1.createBgRect(block, unit, diagramHeight));
-    });
-    //Main loop to render blocks
-    barsToShow.forEach(function (block, i) {
-        var blockWidth = block.total || 1;
-        var y = 25 * i;
-        var rectData = {
-            width: blockWidth,
-            height: 25,
-            x: block.start || 0.001,
-            y: y,
-            cssClass: block.cssClass,
-            label: block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
-            unit: unit,
-            onRectMouseEnter: mouseListeners.onRectMouseEnter,
-            onRectMouseLeave: mouseListeners.onRectMouseLeave
-        };
-        //create and attach request block
-        timeLineHolder.appendChild(waterfall_componets_1.createRect(rectData, block.segments));
-        //create and attach request label
-        timeLineLabelHolder.appendChild(waterfall_componets_1.createRequestLabel(block, blockWidth, y, unit));
-    });
-    timeLineHolder.appendChild(timeLineLabelHolder);
-    return timeLineHolder;
-}
-exports.createWaterfallSvg = createWaterfallSvg;
-
-},{"./helpers/svg":2,"./helpers/waterfall-componets":3}]},{},[4]);
+},{"../helpers/dom":1,"../helpers/svg":2}]},{},[3]);

@@ -1,7 +1,7 @@
-import TimeBlock from "./typing/time-block"
-import {WaterfallData} from "./typing/waterfall-data"
-import svg from "./helpers/svg"
-import dom from "./helpers/dom"
+import TimeBlock from "../typing/time-block"
+import {WaterfallData} from "../typing/waterfall-data"
+import svg from "../helpers/svg"
+import dom from "../helpers/dom"
 import {
   RectData,
   createRect,
@@ -10,7 +10,7 @@ import {
   createTimeWrapper,
   renderMarks,
   makeHoverEvtListener
-} from "./helpers/waterfall-componets"
+} from "./svg-components"
 
 
 

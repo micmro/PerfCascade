@@ -1,4 +1,4 @@
-import {createWaterfallSvg} from "./waterfall"
+import {createWaterfallSvg} from "./waterfall/svg-chart"
 
 import TimeBlock from './typing/time-block'
 import {Har,
