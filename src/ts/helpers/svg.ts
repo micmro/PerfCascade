@@ -16,12 +16,16 @@ var svg = {
     return el
   },
 
-  newTextEl: function(text: string, y: number, css: string = ""): SVGTextElement {
-    return svg.newEl("text", {
+  newTextEl: function(text: string, y: number, x?, css?): SVGTextElement {
+    let opt = {
       fill: "#111",
       y: y.toString(),
       text: text
-    }, (css + " text-shadow:0 0 4px #fff;")) as SVGTextElement
+    }
+    if(x !== undefined){
+      opt["x"] = x
+    }
+    return svg.newEl("text", opt, ((css || "") + " text-shadow:0 0 4px #fff;")) as SVGTextElement
   },
 
   //needs access to body to measure size

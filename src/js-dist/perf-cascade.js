@@ -31,13 +31,16 @@ var svg = {
         el.style.cssText = css || "";
         return el;
     },
-    newTextEl: function (text, y, css) {
-        if (css === void 0) { css = ""; }
-        return svg.newEl("text", {
+    newTextEl: function (text, y, x, css) {
+        var opt = {
             fill: "#111",
             y: y.toString(),
             text: text
-        }, (css + " text-shadow:0 0 4px #fff;"));
+        };
+        if (x !== undefined) {
+            opt["x"] = x;
+        }
+        return svg.newEl("text", opt, ((css || "") + " text-shadow:0 0 4px #fff;"));
     },
     //needs access to body to measure size
     //TODO: refactor for server side use
@@ -109,41 +112,14 @@ function onFileSubmit(evt) {
 }
 document.getElementById('fileinput').addEventListener('change', onFileSubmit, false);
 //TODO: remove Dev/Test only - load test file
-window["fetch"]("test-data/www.bbc.com.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
+window["fetch"]("test-data/github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 
-},{"./helpers/dom":1,"./transformers/har":4,"./waterfall/svg-chart":6}],4:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":4,"./waterfall/svg-chart":7}],4:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
+var styling_converters_1 = require('./styling-converters');
 var HarTransformer = (function () {
     function HarTransformer() {
     }
-    HarTransformer.makeBlockCssClass = function (mimeType) {
-        var mimeCssClass = function (mimeType) {
-            //TODO: can we make this more elegant?
-            var types = mimeType.split("/");
-            switch (types[0]) {
-                case "image": return "image";
-                case "font": return "font";
-            }
-            switch (types[1]) {
-                case "svg+xml": //TODO: perhaps we can setup a new colour for SVG
-                case "html": return "html";
-                case "css": return "css";
-                case "vnd.ms-fontobject":
-                case "font-woff":
-                case "font-woff2":
-                case "x-font-truetype":
-                case "x-font-opentype":
-                case "x-font-woff": return "font";
-                case "javascript":
-                case "x-javascript":
-                case "script":
-                case "json": return "javascript";
-                case "x-shockwave-flash": return "flash";
-            }
-            return "other";
-        };
-        return "block-" + mimeCssClass(mimeType);
-    };
     HarTransformer.transfrom = function (data) {
         var _this = this;
         console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
@@ -162,16 +138,8 @@ var HarTransformer = (function () {
                 doneTime = startRelative + entry.time;
             }
             var subModules = entry.timings;
-            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, _this.makeBlockCssClass(entry.response.content.mimeType), _this.buildDetailTimingBlocks(startRelative, entry.timings), entry);
+            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, styling_converters_1.mimeToCssClass(entry.response.content.mimeType), _this.buildDetailTimingBlocks(startRelative, entry.timings), entry);
         });
-        console["table"](blocks.map(function (b) {
-            return {
-                name: b.name,
-                start: b.start,
-                end: b.end,
-                total: b.total
-            };
-        }));
         var marks = ["onContentLoad", "onLoad"]
             .filter(function (k) { return (data.pages[currentPageIndex].pageTimings[k] != undefined && data.pages[currentPageIndex].pageTimings[k] >= 0); })
             .map(function (k) {
@@ -211,7 +179,42 @@ var HarTransformer = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = HarTransformer;
 
-},{"../typing/time-block":5}],5:[function(require,module,exports){
+},{"../typing/time-block":6,"./styling-converters":5}],5:[function(require,module,exports){
+/**
+ * Convert a MIME type into a CSS class
+ * @param {string} mimeType
+ */
+function mimeToCssClass(mimeType) {
+    var mimeCssClass = function (mimeType) {
+        //TODO: can we make this more elegant?
+        var types = mimeType.split("/");
+        switch (types[0]) {
+            case "image": return "image";
+            case "font": return "font";
+        }
+        switch (types[1]) {
+            case "svg+xml": //TODO: perhaps we can setup a new colour for SVG
+            case "html": return "html";
+            case "css": return "css";
+            case "vnd.ms-fontobject":
+            case "font-woff":
+            case "font-woff2":
+            case "x-font-truetype":
+            case "x-font-opentype":
+            case "x-font-woff": return "font";
+            case "javascript":
+            case "x-javascript":
+            case "script":
+            case "json": return "javascript";
+            case "x-shockwave-flash": return "flash";
+        }
+        return "other";
+    };
+    return "block-" + mimeCssClass(mimeType);
+}
+exports.mimeToCssClass = mimeToCssClass;
+
+},{}],6:[function(require,module,exports){
 var TimeBlock = (function () {
     function TimeBlock(name, start, end, cssClass, segments, rawResource) {
         if (cssClass === void 0) { cssClass = ""; }
@@ -229,7 +232,7 @@ var TimeBlock = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var svg_components_1 = require("./svg-components");
 /**
@@ -269,86 +272,166 @@ function createWaterfallSvg(data) {
     var timeLineLabelHolder = svg_1.default.newEl("g", {
         class: "labels"
     });
-    var mouseListeners = svg_components_1.makeHoverEvtListener(diagramHeight);
+    var overlayHolder = svg_1.default.newEl("g", {
+        class: "overlays"
+    });
+    var hoverEl = svg_components_1.createAlignmentLines(diagramHeight);
+    overlayHolder.appendChild(hoverEl.startline);
+    overlayHolder.appendChild(hoverEl.endline);
+    var mouseListeners = svg_components_1.makeHoverEvtListeners(hoverEl);
     //Start appending SVG elements to the holder element (timeLineHolder)
     timeLineHolder.appendChild(svg_components_1.createTimeWrapper(data.durationMs, diagramHeight));
     timeLineHolder.appendChild(svg_components_1.renderMarks(data.marks, unit, diagramHeight));
     data.lines.forEach(function (block, i) {
         timeLineHolder.appendChild(svg_components_1.createBgRect(block, unit, diagramHeight));
     });
-    //Main loop to render blocks
+    //Main loop to render rows with blocks
     barsToShow.forEach(function (block, i) {
         var blockWidth = block.total || 1;
         var y = requestBarHeight * i;
+        var x = block.start || 0.001;
         var rectData = {
             width: blockWidth,
             height: requestBarHeight,
-            x: block.start || 0.001,
+            x: x,
             y: y,
             cssClass: block.cssClass,
             label: block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
             unit: unit,
-            onRectMouseEnter: mouseListeners.onRectMouseEnter,
-            onRectMouseLeave: mouseListeners.onRectMouseLeave
+            showOverlay: mouseListeners.onMouseEnterPartial,
+            hideOverlay: mouseListeners.onMouseLeavePartial
         };
+        var rect = svg_components_1.createRect(rectData, block.segments);
+        var infoOverlay = svg_components_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, unit);
+        rect.addEventListener('click', function (evt) {
+            overlayHolder.appendChild(infoOverlay);
+        });
         //create and attach request block
-        timeLineHolder.appendChild(svg_components_1.createRect(rectData, block.segments));
+        timeLineHolder.appendChild(rect);
         //create and attach request label
         timeLineLabelHolder.appendChild(svg_components_1.createRequestLabel(block, blockWidth, y, unit));
     });
     timeLineHolder.appendChild(timeLineLabelHolder);
+    timeLineHolder.appendChild(overlayHolder);
     return timeLineHolder;
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":2,"./svg-components":7}],7:[function(require,module,exports){
+},{"../helpers/svg":2,"./svg-components":8}],8:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
 var svg_1 = require("../helpers/svg");
 /**
- * Eventlisteners for verticale alignment bars to be shown on hover
+ * Creates verticale alignment bars
  * @param {number} diagramHeight  height of the requests part of the diagram in px
  */
-function makeHoverEvtListener(diagramHeight) {
-    var endline = svg_1.default.newEl("line", {
-        x1: "0",
-        y1: "0",
-        x2: "0",
-        y2: diagramHeight,
-        class: "line-end"
-    });
-    var startline = svg_1.default.newEl("line", {
-        x1: "0",
-        y1: "0",
-        x2: "0",
-        y2: diagramHeight,
-        class: "line-start"
-    });
+function createAlignmentLines(diagramHeight) {
     return {
-        onRectMouseEnter: function (evt) {
-            var targetRect = evt.target;
-            svg_1.default.addClass(targetRect, "active");
-            var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
-                targetRect.width.baseVal.valueInSpecifiedUnits + "%";
-            var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
-            endline.x1.baseVal.valueAsString = xPosEnd;
-            endline.x2.baseVal.valueAsString = xPosEnd;
-            startline.x1.baseVal.valueAsString = xPosStart;
-            startline.x2.baseVal.valueAsString = xPosStart;
-            svg_1.default.addClass(endline, "active");
-            svg_1.default.addClass(startline, "active");
-            targetRect.parentNode.appendChild(endline);
-            targetRect.parentNode.appendChild(startline);
+        endline: svg_1.default.newEl("line", {
+            x1: "0",
+            y1: "0",
+            x2: "0",
+            y2: diagramHeight,
+            class: "line-end"
+        }),
+        startline: svg_1.default.newEl("line", {
+            x1: "0",
+            y1: "0",
+            x2: "0",
+            y2: diagramHeight,
+            class: "line-start"
+        })
+    };
+}
+exports.createAlignmentLines = createAlignmentLines;
+/**
+ * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover
+ * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
+ */
+function makeHoverEvtListeners(hoverEl) {
+    return {
+        onMouseEnterPartial: function (rectData) {
+            //capture rectData
+            return function (evt) {
+                var targetRect = evt.target;
+                svg_1.default.addClass(targetRect, "active");
+                var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
+                    targetRect.width.baseVal.valueInSpecifiedUnits + "%";
+                var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
+                hoverEl.endline.x1.baseVal.valueAsString = xPosEnd;
+                hoverEl.endline.x2.baseVal.valueAsString = xPosEnd;
+                hoverEl.startline.x1.baseVal.valueAsString = xPosStart;
+                hoverEl.startline.x2.baseVal.valueAsString = xPosStart;
+                svg_1.default.addClass(hoverEl.endline, "active");
+                svg_1.default.addClass(hoverEl.startline, "active");
+            };
         },
-        onRectMouseLeave: function (evt) {
-            svg_1.default.removeClass(evt.target, "active");
-            svg_1.default.removeClass(endline, "active");
-            svg_1.default.removeClass(startline, "active");
+        onMouseLeavePartial: function (rectData) {
+            //capture rectData
+            return function (evt) {
+                var targetRect = evt.target;
+                svg_1.default.removeClass(targetRect, "active");
+                svg_1.default.removeClass(hoverEl.endline, "active");
+                svg_1.default.removeClass(hoverEl.startline, "active");
+            };
         }
     };
 }
-exports.makeHoverEvtListener = makeHoverEvtListener;
+exports.makeHoverEvtListeners = makeHoverEvtListeners;
+function createRowInfoOverlay(requestID, barX, y, block, unit) {
+    var holder = svg_1.default.newEl("g", {
+        "class": "info-overlay-holder"
+    });
+    var bg = svg_1.default.newEl("rect", {
+        width: "50%",
+        height: 200,
+        x: "20%",
+        y: y,
+        class: "info-overlay"
+    });
+    var closeBtn = svg_1.default.newEl("rect", {
+        width: 15,
+        height: 15,
+        x: "70%",
+        y: y,
+        class: "info-overlay-close-btn"
+    });
+    closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });
+    var html = svg_1.default.newEl("foreignObject", {
+        width: "50%",
+        height: 200,
+        x: "20%",
+        y: y
+    });
+    var body = document.createElement("body");
+    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    //TODO: dodgy casting - will not work for other adapters
+    var entry = block.rawResource;
+    var dlKeyValues = {
+        "Started": new Date(entry.startedDateTime).toLocaleString(),
+        "Server IPAddress": entry.serverIPAddress,
+        "Connection": entry.connection,
+        "HTTP Version": entry.request.httpVersion,
+        "Headers Size": entry.request.headersSize,
+        "Body Size": entry.request.bodySize
+    };
+    var dlData = Object.keys(dlKeyValues).map(function (key) { return ("\n    <dt>" + key + "</dt>\n    <dd>" + dlKeyValues[key] + "</dd>\n  "); }).join("");
+    // entry.request.httpVersion
+    body.innerHTML = "\n    <h3>#" + requestID + " " + block.name + "</h3>\n    <dl>\n      " + dlData + "\n    </dl>";
+    html.appendChild(body);
+    // let title = svg.newTextEl(block.name, y+15)
+    // title.setAttribute("x", "21%")
+    // title.setAttribute("width", "48%")
+    holder.appendChild(bg);
+    holder.appendChild(closeBtn);
+    holder.appendChild(html);
+    holder.appendChild(svg_1.default.newTextEl("x", y + 12, "70.7%", "pointer-events: none;"));
+    // let title = svg.newTextEl(block.name, y + 5)
+    return holder;
+    // bg.appendChild()
+}
+exports.createRowInfoOverlay = createRowInfoOverlay;
 /**
  * Render the block and timings for a request
  * @param  {RectData}         rectData Basic dependencys and globals
@@ -371,8 +454,8 @@ function createRect(rectData, segments) {
             text: rectData.label
         })); // Add tile to wedge path
     }
-    rect.addEventListener("mouseenter", rectData.onRectMouseEnter);
-    rect.addEventListener("mouseleave", rectData.onRectMouseLeave);
+    rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
+    rect.addEventListener("mouseleave", rectData.hideOverlay(rectData));
     if (segments && segments.length > 0) {
         rectHolder = svg_1.default.newEl("g");
         rectHolder.appendChild(rect);
@@ -387,8 +470,8 @@ function createRect(rectData, segments) {
                     label: segment.name + " (" + Math.round(segment.start) + "ms - "
                         + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
                     unit: rectData.unit,
-                    onRectMouseEnter: rectData.onRectMouseEnter,
-                    onRectMouseLeave: rectData.onRectMouseLeave
+                    showOverlay: rectData.showOverlay,
+                    hideOverlay: rectData.hideOverlay
                 };
                 rectHolder.appendChild(createRect(childRectData));
             }
@@ -476,7 +559,12 @@ function createBgRect(block, unit, diagramHeight) {
     return rect;
 }
 exports.createBgRect = createBgRect;
-//TODO: Implement - data for this not parsed yet
+/**
+ * Renders global markes for events like the onLoad event etc
+ * @param {Array<Mark>} marks         [description]
+ * @param {number}      unit          horizontal unit (duration in ms of 1%)
+ * @param {number}      diagramHeight Full height of SVG in px
+ */
 function renderMarks(marks, unit, diagramHeight) {
     var marksHolder = svg_1.default.newEl("g", {
         transform: "scale(1, 1)",

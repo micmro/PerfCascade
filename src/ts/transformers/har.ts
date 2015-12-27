@@ -14,41 +14,11 @@ import {
   WaterfallData,
   Mark
 } from '../typing/waterfall-data'
+import {mimeToCssClass} from './styling-converters'
 
 
 export default class HarTransformer{
   
-
-  static makeBlockCssClass(mimeType: string) {
-    let mimeCssClass = function(mimeType: string){
-      //TODO: can we make this more elegant?
-      let types = mimeType.split("/");
-      switch (types[0]) {
-        case "image": return "image"
-        case "font": return "font"
-      }
-      switch (types[1]) {
-        case "svg+xml": //TODO: perhaps we can setup a new colour for SVG
-        case "html": return "html"
-        case "css": return "css"
-        case "vnd.ms-fontobject":
-        case "font-woff":
-        case "font-woff2":
-        case "x-font-truetype":
-        case "x-font-opentype":
-        case "x-font-woff": return "font"
-        case "javascript":
-        case "x-javascript":
-        case "script":
-        case "json": return "javascript"
-        case "x-shockwave-flash": return "flash"
-      }
-      return "other"
-    }
-
-    return "block-" + mimeCssClass(mimeType)
-  }
-
   static transfrom(data: Har): WaterfallData {
     console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length)
     
@@ -75,19 +45,11 @@ export default class HarTransformer{
         return new TimeBlock(entry.request.url, 
           startRelative,
           startRelative + entry.time,
-          this.makeBlockCssClass(entry.response.content.mimeType),
+          mimeToCssClass(entry.response.content.mimeType),
           this.buildDetailTimingBlocks(startRelative, entry.timings),
           entry
         )
     })
-    console["table"](blocks.map(b => {
-      return {
-        name: b.name,
-        start: b.start,
-        end: b.end,
-        total: b.total
-      }
-    }))
 
     const marks = ["onContentLoad", "onLoad"]
       .filter(k => (data.pages[currentPageIndex].pageTimings[k] != undefined && data.pages[currentPageIndex].pageTimings[k] >= 0))
@@ -99,9 +61,7 @@ export default class HarTransformer{
           "name": k,
           "startTime": startRelative
         } as Mark
-      })
-
-
+    })
 
     return {
       durationMs: doneTime,

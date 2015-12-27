@@ -6,6 +6,10 @@ import svg from "../helpers/svg"
 import TimeBlock from "../typing/time-block"
 import {Mark} from "../typing/waterfall-data"
 
+//TODO: Delete - temp only - needt to greate source agnostic data structure
+import {Entry} from "../typing/har"
+
+
 /**
  * Interface for `createRect` parameter
  */
@@ -17,58 +21,160 @@ export interface RectData {
   cssClass: string
   label?: string
   unit: number
-  onRectMouseEnter: EventListener
-  onRectMouseLeave: EventListener
+  /** @type {Function} Partially appliable function (to capture row data) that return an event listener */
+  showOverlay: Function
+  /** @type {Function} Partially appliable function (to capture row data) that return an event listener */
+  hideOverlay: Function
 }
 
 
+export interface HoverElements{
+  endline: SVGLineElement,
+  startline: SVGLineElement
+}
+
 /**
- * Eventlisteners for verticale alignment bars to be shown on hover
+ * Creates verticale alignment bars
  * @param {number} diagramHeight  height of the requests part of the diagram in px
  */
-export function makeHoverEvtListener(diagramHeight: number) {
-
-  let endline = svg.newEl("line", {
-    x1: "0",
-    y1: "0",
-    x2: "0",
-    y2: diagramHeight,
-    class: "line-end"
-  }) as SVGLineElement
-
-  let startline = svg.newEl("line", {
-    x1: "0",
-    y1: "0",
-    x2: "0",
-    y2: diagramHeight,
-    class: "line-start"
-  }) as SVGLineElement
-
+export function createAlignmentLines(diagramHeight: number): HoverElements {
   return {
-    onRectMouseEnter: function(evt: MouseEvent) {
-      let targetRect = evt.target as SVGRectElement
-      svg.addClass(targetRect, "active")
+    endline: svg.newEl("line", {
+      x1: "0",
+      y1: "0",
+      x2: "0",
+      y2: diagramHeight,
+      class: "line-end"
+    }) as SVGLineElement,
 
-      const xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits + 
-        targetRect.width.baseVal.valueInSpecifiedUnits + "%"
-      const xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%"
+    startline: svg.newEl("line", {
+      x1: "0",
+      y1: "0",
+      x2: "0",
+      y2: diagramHeight,
+      class: "line-start"
+    }) as SVGLineElement
+  }
+}
 
-      endline.x1.baseVal.valueAsString = xPosEnd
-      endline.x2.baseVal.valueAsString = xPosEnd
-      startline.x1.baseVal.valueAsString = xPosStart
-      startline.x2.baseVal.valueAsString = xPosStart
-      svg.addClass(endline, "active")
-      svg.addClass(startline, "active")
 
-      targetRect.parentNode.appendChild(endline)
-      targetRect.parentNode.appendChild(startline)
+
+/**
+ * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover 
+ * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
+ */
+export function makeHoverEvtListeners(hoverEl: HoverElements) {
+  return {
+    onMouseEnterPartial: function(rectData: RectData) {
+      //capture rectData
+      return function(evt: MouseEvent) {
+        const targetRect = evt.target as SVGRectElement
+        svg.addClass(targetRect, "active")
+
+        const xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
+          targetRect.width.baseVal.valueInSpecifiedUnits + "%"
+        const xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%"
+
+        hoverEl.endline.x1.baseVal.valueAsString = xPosEnd
+        hoverEl.endline.x2.baseVal.valueAsString = xPosEnd
+        hoverEl.startline.x1.baseVal.valueAsString = xPosStart
+        hoverEl.startline.x2.baseVal.valueAsString = xPosStart
+        svg.addClass(hoverEl.endline, "active")
+        svg.addClass(hoverEl.startline, "active")
+      }
     },
-    onRectMouseLeave: function(evt: MouseEvent) {
-      svg.removeClass(evt.target as SVGRectElement, "active")
-      svg.removeClass(endline, "active")
-      svg.removeClass(startline, "active")
+    onMouseLeavePartial: function(rectData: RectData) {
+      //capture rectData
+      return function(evt: MouseEvent) {
+        const targetRect = evt.target as SVGRectElement
+        svg.removeClass(targetRect, "active")
+        svg.removeClass(hoverEl.endline, "active")
+        svg.removeClass(hoverEl.startline, "active")
+      }
     }
   }
+}
+
+
+
+export function createRowInfoOverlay(requestID: number, barX: number, y: number, block: TimeBlock, unit: number) {
+  let holder = svg.newEl("g", {
+    "class": "info-overlay-holder"
+  })
+
+  let bg = svg.newEl("rect", {
+    width: "50%",
+    height: 200,
+    x: "20%",
+    y: y,
+    class: "info-overlay"
+  })
+
+  let closeBtn = svg.newEl("rect", {
+    width: 15,
+    height: 15,
+    x: "70%",
+    y: y,
+    class: "info-overlay-close-btn"
+  })
+
+  closeBtn.addEventListener('click', evt => holder.parentElement.removeChild(holder))
+
+  let html = svg.newEl("foreignObject", {
+    width: "50%",
+    height: 200,
+    x: "20%",
+    y: y
+  }) as SVGForeignObjectElement
+
+
+
+  let body = document.createElement("body");
+  body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+  //TODO: dodgy casting - will not work for other adapters
+
+  let entry = block.rawResource as Entry
+
+  const dlKeyValues = {
+    "Started": new Date(entry.startedDateTime).toLocaleString(),
+    "Server IPAddress": entry.serverIPAddress,
+    "Connection": entry.connection,
+    "HTTP Version": entry.request.httpVersion,
+    "Headers Size": entry.request.headersSize,
+    "Body Size": entry.request.bodySize
+  }
+  const dlData = Object.keys(dlKeyValues).map(key => `
+    <dt>${key}</dt>
+    <dd>${dlKeyValues[key]}</dd>
+  `).join("")
+
+  // entry.request.httpVersion
+
+  body.innerHTML = `
+    <h3>#${requestID} ${block.name}</h3>
+    <dl>
+      ${dlData}
+    </dl>`
+
+  html.appendChild(body)
+
+  // let title = svg.newTextEl(block.name, y+15)
+  // title.setAttribute("x", "21%")
+  // title.setAttribute("width", "48%")
+  holder.appendChild(bg)
+  holder.appendChild(closeBtn)
+  holder.appendChild(html)
+  holder.appendChild(svg.newTextEl("x", y + 12, "70.7%", "pointer-events: none;"))
+
+  // let title = svg.newTextEl(block.name, y + 5)
+
+
+
+
+  return holder
+  // bg.appendChild()
+
+
 }
 
 
@@ -88,7 +194,7 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
     x: Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
     y: rectData.y,
     class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
-      + (rectData.cssClass || "block-other")
+    + (rectData.cssClass || "block-other")
   })
   if (rectData.label) {
     rect.appendChild(svg.newEl("title", {
@@ -96,8 +202,8 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
     })) // Add tile to wedge path
   }
 
-  rect.addEventListener("mouseenter", rectData.onRectMouseEnter)
-  rect.addEventListener("mouseleave", rectData.onRectMouseLeave)
+  rect.addEventListener("mouseenter", rectData.showOverlay(rectData))
+  rect.addEventListener("mouseleave", rectData.hideOverlay(rectData))
 
   if (segments && segments.length > 0) {
     rectHolder = svg.newEl("g")
@@ -113,8 +219,8 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
           label: segment.name + " (" + Math.round(segment.start) + "ms - " 
              + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
           unit: rectData.unit,
-          onRectMouseEnter: rectData.onRectMouseEnter,
-          onRectMouseLeave: rectData.onRectMouseLeave
+          showOverlay: rectData.showOverlay,
+          hideOverlay: rectData.hideOverlay
         } as RectData
 
         rectHolder.appendChild(createRect(childRectData))
@@ -212,7 +318,12 @@ export function createBgRect(block: TimeBlock, unit: number, diagramHeight: numb
 
 
 
-//TODO: Implement - data for this not parsed yet
+/**
+ * Renders global markes for events like the onLoad event etc
+ * @param {Array<Mark>} marks         [description]
+ * @param {number}      unit          horizontal unit (duration in ms of 1%)
+ * @param {number}      diagramHeight Full height of SVG in px
+ */
 export function renderMarks(marks: Array<Mark>, unit: number, diagramHeight: number) {
   var marksHolder = svg.newEl("g", {
     transform: "scale(1, 1)",
