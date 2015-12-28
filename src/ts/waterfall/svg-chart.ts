@@ -8,10 +8,11 @@ import {
   createBgRect,
   createTimeWrapper,
   renderMarks,
-  createRowInfoOverlay,
   makeHoverEvtListeners,
   createAlignmentLines
 } from "./svg-components"
+import {createRowInfoOverlay} from "./svg-details-overlay"
+import dom from '../helpers/dom'
 
 
 
@@ -64,14 +65,18 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     class: "labels"
   }) as SVGGElement
 
+  let hoverOverlayHolder = svg.newEl("g", {
+    class: "hover-overlays"
+  }) as SVGGElement
+
   let overlayHolder = svg.newEl("g", {
     class: "overlays"
   }) as SVGGElement
 
 
   let hoverEl = createAlignmentLines(diagramHeight)
-  overlayHolder.appendChild(hoverEl.startline)
-  overlayHolder.appendChild(hoverEl.endline)
+  hoverOverlayHolder.appendChild(hoverEl.startline)
+  hoverOverlayHolder.appendChild(hoverEl.endline)
   let mouseListeners = makeHoverEvtListeners(hoverEl)
 
 
@@ -107,6 +112,7 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
 
     let infoOverlay = createRowInfoOverlay(i+1, x, y + requestBarHeight, block, unit)
     rect.addEventListener('click', (evt) => {
+      dom.removeAllChildren(overlayHolder)
       overlayHolder.appendChild(infoOverlay)
     })
 
@@ -118,6 +124,8 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   })
 
   timeLineHolder.appendChild(timeLineLabelHolder)
+  
+  timeLineHolder.appendChild(hoverOverlayHolder)
   timeLineHolder.appendChild(overlayHolder)
 
 

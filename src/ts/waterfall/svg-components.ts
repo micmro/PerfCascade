@@ -6,9 +6,6 @@ import svg from "../helpers/svg"
 import TimeBlock from "../typing/time-block"
 import {Mark} from "../typing/waterfall-data"
 
-//TODO: Delete - temp only - needt to greate source agnostic data structure
-import {Entry} from "../typing/har"
-
 
 /**
  * Interface for `createRect` parameter
@@ -96,86 +93,6 @@ export function makeHoverEvtListeners(hoverEl: HoverElements) {
 }
 
 
-
-export function createRowInfoOverlay(requestID: number, barX: number, y: number, block: TimeBlock, unit: number) {
-  let holder = svg.newEl("g", {
-    "class": "info-overlay-holder"
-  })
-
-  let bg = svg.newEl("rect", {
-    width: "50%",
-    height: 200,
-    x: "20%",
-    y: y,
-    class: "info-overlay"
-  })
-
-  let closeBtn = svg.newEl("rect", {
-    width: 15,
-    height: 15,
-    x: "70%",
-    y: y,
-    class: "info-overlay-close-btn"
-  })
-
-  closeBtn.addEventListener('click', evt => holder.parentElement.removeChild(holder))
-
-  let html = svg.newEl("foreignObject", {
-    width: "50%",
-    height: 200,
-    x: "20%",
-    y: y
-  }) as SVGForeignObjectElement
-
-
-
-  let body = document.createElement("body");
-  body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-  //TODO: dodgy casting - will not work for other adapters
-
-  let entry = block.rawResource as Entry
-
-  const dlKeyValues = {
-    "Started": new Date(entry.startedDateTime).toLocaleString(),
-    "Server IPAddress": entry.serverIPAddress,
-    "Connection": entry.connection,
-    "HTTP Version": entry.request.httpVersion,
-    "Headers Size": entry.request.headersSize,
-    "Body Size": entry.request.bodySize
-  }
-  const dlData = Object.keys(dlKeyValues).map(key => `
-    <dt>${key}</dt>
-    <dd>${dlKeyValues[key]}</dd>
-  `).join("")
-
-  // entry.request.httpVersion
-
-  body.innerHTML = `
-    <h3>#${requestID} ${block.name}</h3>
-    <dl>
-      ${dlData}
-    </dl>`
-
-  html.appendChild(body)
-
-  // let title = svg.newTextEl(block.name, y+15)
-  // title.setAttribute("x", "21%")
-  // title.setAttribute("width", "48%")
-  holder.appendChild(bg)
-  holder.appendChild(closeBtn)
-  holder.appendChild(html)
-  holder.appendChild(svg.newTextEl("x", y + 12, "70.7%", "pointer-events: none;"))
-
-  // let title = svg.newTextEl(block.name, y + 5)
-
-
-
-
-  return holder
-  // bg.appendChild()
-
-
-}
 
 
 

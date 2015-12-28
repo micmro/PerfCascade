@@ -135,9 +135,9 @@ textarea {
 
 
 .info-overlay-holder {fill: #f00;}
-.info-overlay {fill: #ccc;}
-.info-overlay-close-btn {fill: #f00;}
-.info-overlay-close-btn text {fill: #ccc; pointer-events: none;}
+.info-overlay {fill: #fff;}
+.info-overlay-close-btn {fill: #faa;}
+.info-overlay-close-btn text {fill: #111; pointer-events: none;}
 
 .info-overlay-holder body {padding:2px 10px; overflow: scroll; height: 200px;}
 .info-overlay-holder h3 {font-size: 12px;}

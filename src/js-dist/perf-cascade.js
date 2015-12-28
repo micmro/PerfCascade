@@ -1,4 +1,4 @@
-/*PerfCascade build:27/12/2015 */
+/*PerfCascade build:28/12/2015 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -235,6 +235,8 @@ exports.default = TimeBlock;
 },{}],7:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var svg_components_1 = require("./svg-components");
+var svg_details_overlay_1 = require("./svg-details-overlay");
+var dom_1 = require('../helpers/dom');
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
@@ -272,12 +274,15 @@ function createWaterfallSvg(data) {
     var timeLineLabelHolder = svg_1.default.newEl("g", {
         class: "labels"
     });
+    var hoverOverlayHolder = svg_1.default.newEl("g", {
+        class: "hover-overlays"
+    });
     var overlayHolder = svg_1.default.newEl("g", {
         class: "overlays"
     });
     var hoverEl = svg_components_1.createAlignmentLines(diagramHeight);
-    overlayHolder.appendChild(hoverEl.startline);
-    overlayHolder.appendChild(hoverEl.endline);
+    hoverOverlayHolder.appendChild(hoverEl.startline);
+    hoverOverlayHolder.appendChild(hoverEl.endline);
     var mouseListeners = svg_components_1.makeHoverEvtListeners(hoverEl);
     //Start appending SVG elements to the holder element (timeLineHolder)
     timeLineHolder.appendChild(svg_components_1.createTimeWrapper(data.durationMs, diagramHeight));
@@ -302,8 +307,9 @@ function createWaterfallSvg(data) {
             hideOverlay: mouseListeners.onMouseLeavePartial
         };
         var rect = svg_components_1.createRect(rectData, block.segments);
-        var infoOverlay = svg_components_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, unit);
+        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, unit);
         rect.addEventListener('click', function (evt) {
+            dom_1.default.removeAllChildren(overlayHolder);
             overlayHolder.appendChild(infoOverlay);
         });
         //create and attach request block
@@ -312,12 +318,13 @@ function createWaterfallSvg(data) {
         timeLineLabelHolder.appendChild(svg_components_1.createRequestLabel(block, blockWidth, y, unit));
     });
     timeLineHolder.appendChild(timeLineLabelHolder);
+    timeLineHolder.appendChild(hoverOverlayHolder);
     timeLineHolder.appendChild(overlayHolder);
     return timeLineHolder;
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":2,"./svg-components":8}],8:[function(require,module,exports){
+},{"../helpers/dom":1,"../helpers/svg":2,"./svg-components":8,"./svg-details-overlay":9}],8:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -379,59 +386,6 @@ function makeHoverEvtListeners(hoverEl) {
     };
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
-function createRowInfoOverlay(requestID, barX, y, block, unit) {
-    var holder = svg_1.default.newEl("g", {
-        "class": "info-overlay-holder"
-    });
-    var bg = svg_1.default.newEl("rect", {
-        width: "50%",
-        height: 200,
-        x: "20%",
-        y: y,
-        class: "info-overlay"
-    });
-    var closeBtn = svg_1.default.newEl("rect", {
-        width: 15,
-        height: 15,
-        x: "70%",
-        y: y,
-        class: "info-overlay-close-btn"
-    });
-    closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });
-    var html = svg_1.default.newEl("foreignObject", {
-        width: "50%",
-        height: 200,
-        x: "20%",
-        y: y
-    });
-    var body = document.createElement("body");
-    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-    //TODO: dodgy casting - will not work for other adapters
-    var entry = block.rawResource;
-    var dlKeyValues = {
-        "Started": new Date(entry.startedDateTime).toLocaleString(),
-        "Server IPAddress": entry.serverIPAddress,
-        "Connection": entry.connection,
-        "HTTP Version": entry.request.httpVersion,
-        "Headers Size": entry.request.headersSize,
-        "Body Size": entry.request.bodySize
-    };
-    var dlData = Object.keys(dlKeyValues).map(function (key) { return ("\n    <dt>" + key + "</dt>\n    <dd>" + dlKeyValues[key] + "</dd>\n  "); }).join("");
-    // entry.request.httpVersion
-    body.innerHTML = "\n    <h3>#" + requestID + " " + block.name + "</h3>\n    <dl>\n      " + dlData + "\n    </dl>";
-    html.appendChild(body);
-    // let title = svg.newTextEl(block.name, y+15)
-    // title.setAttribute("x", "21%")
-    // title.setAttribute("width", "48%")
-    holder.appendChild(bg);
-    holder.appendChild(closeBtn);
-    holder.appendChild(html);
-    holder.appendChild(svg_1.default.newTextEl("x", y + 12, "70.7%", "pointer-events: none;"));
-    // let title = svg.newTextEl(block.name, y + 5)
-    return holder;
-    // bg.appendChild()
-}
-exports.createRowInfoOverlay = createRowInfoOverlay;
 /**
  * Render the block and timings for a request
  * @param  {RectData}         rectData Basic dependencys and globals
@@ -631,5 +585,108 @@ function renderMarks(marks, unit, diagramHeight) {
     return marksHolder;
 }
 exports.renderMarks = renderMarks;
+
+},{"../helpers/svg":2}],9:[function(require,module,exports){
+var svg_1 = require("../helpers/svg");
+function createCloseButtonSvg(y) {
+    var closeBtn = svg_1.default.newEl("g", {
+        width: 25,
+        height: 25,
+        x: "80%",
+        y: y,
+        class: "info-overlay-close-btn"
+    });
+    closeBtn.appendChild(svg_1.default.newEl("rect", {
+        width: 25,
+        height: 25,
+        x: "80%",
+        y: y,
+    }));
+    closeBtn.appendChild(svg_1.default.newEl("text", {
+        width: 25,
+        height: 25,
+        x: "80%",
+        y: y,
+        dx: 25 / 2,
+        dy: 25 / 2,
+        fill: "#111",
+        text: "X",
+        textAnchor: "middle"
+    }));
+    // closeBtn.appendChild(svg.newTextEl("X", y + 17, "71%", "pointer-events: none;"))
+    return closeBtn;
+}
+function createHolder(y) {
+    var holder = svg_1.default.newEl("g", {
+        "class": "info-overlay-holder"
+    });
+    var bg = svg_1.default.newEl("rect", {
+        width: "60%",
+        height: 200,
+        x: "20%",
+        y: y,
+        class: "info-overlay"
+    });
+    holder.appendChild(bg);
+    return holder;
+}
+function getKeys(entry) {
+    var ifValueDefined = function (value, fn) {
+        if (typeof value !== "number" || value <= 0) {
+            return undefined;
+        }
+        return fn(value);
+    };
+    var formatBytes = function (size) { return ifValueDefined(size, function (size) {
+        return (size + " byte (~" + Math.round(size / 1024 * 10) / 10 + "kb)");
+    }); };
+    var formatTime = function (size) { return ifValueDefined(size, function (size) {
+        return (size + "ms");
+    }); };
+    return {
+        "Started": new Date(entry.startedDateTime).toLocaleString(),
+        "Duration": formatTime(entry.time),
+        "Server IPAddress": entry.serverIPAddress,
+        "Connection": entry.connection,
+        "Request HTTP Version": entry.request.httpVersion,
+        "Request Headers Size": formatBytes(entry.request.headersSize),
+        "Request Body Size": formatBytes(entry.request.bodySize),
+        "Request Comment": entry.request.comment,
+        "Request Method": entry.request.method,
+        "Response Status": entry.response.status + " " + entry.response.statusText,
+        "Response HTTP Version": entry.response.httpVersion,
+        "Response Body Size": formatBytes(entry.response.bodySize),
+        "Response Header Size": formatBytes(entry.response.headersSize),
+        "Response Redirect URL": entry.response.redirectURL,
+        "Response Comment": entry.response.comment
+    };
+}
+function createRowInfoOverlay(requestID, barX, y, block, unit) {
+    var holder = createHolder(y);
+    var html = svg_1.default.newEl("foreignObject", {
+        width: "60%",
+        height: 200,
+        x: "20%",
+        y: y
+    });
+    var closeBtn = createCloseButtonSvg(y);
+    closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });
+    var body = document.createElement("body");
+    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    //TODO: dodgy casting - will not work for other adapters
+    var entry = block.rawResource;
+    console.log(entry);
+    var dlKeyValues = getKeys(entry);
+    var dlData = Object.keys(dlKeyValues)
+        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1); })
+        .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
+    // entry.request.httpVersion
+    body.innerHTML = "\n    <h3>#" + requestID + " " + block.name + "</h3>\n    <dl>\n      " + dlData + "\n    </dl>";
+    html.appendChild(body);
+    holder.appendChild(closeBtn);
+    holder.appendChild(html);
+    return holder;
+}
+exports.createRowInfoOverlay = createRowInfoOverlay;
 
 },{"../helpers/svg":2}]},{},[3]);
