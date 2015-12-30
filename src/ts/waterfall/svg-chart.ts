@@ -56,21 +56,21 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
 
   //Main holder
   let timeLineHolder = svg.newEl("svg:svg", {
-    height: Math.floor(chartHolderHeight),
-    class: "water-fall-chart"
+    "height": Math.floor(chartHolderHeight),
+    "class": "water-fall-chart"
   }) as SVGSVGElement
 
 
   let timeLineLabelHolder = svg.newEl("g", {
-    class: "labels"
+    "class": "labels"
   }) as SVGGElement
 
   let hoverOverlayHolder = svg.newEl("g", {
-    class: "hover-overlays"
+    "class": "hover-overlays"
   }) as SVGGElement
 
   let overlayHolder = svg.newEl("g", {
-    class: "overlays"
+    "class": "overlays"
   }) as SVGGElement
 
 
@@ -96,19 +96,24 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     let y = requestBarHeight * i
     let x = block.start || 0.001
 
+    let row = svg.newEl("g", {
+      "class": "row"
+    }) as SVGGElement
+
     let rectData = {
-      width: blockWidth,
-      height: requestBarHeight,
-      x: x,
-      y: y,
-      cssClass: block.cssClass,
-      label: block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
-      unit: unit,
-      showOverlay: mouseListeners.onMouseEnterPartial,
-      hideOverlay: mouseListeners.onMouseLeavePartial
+      "width": blockWidth,
+      "height": requestBarHeight,
+      "x": x,
+      "y": y,
+      "cssClass": block.cssClass,
+      "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+      "unit": unit,
+      "showOverlay": mouseListeners.onMouseEnterPartial,
+      "hideOverlay": mouseListeners.onMouseLeavePartial
     } as RectData
 
     let rect = createRect(rectData, block.segments)
+    let label = createRequestLabel(block, blockWidth, y, unit)
 
     let infoOverlay = createRowInfoOverlay(i+1, x, y + requestBarHeight, block, unit)
     rect.addEventListener('click', (evt) => {
@@ -117,10 +122,24 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     })
 
     //create and attach request block
-    timeLineHolder.appendChild(rect)
+    row.appendChild(rect)
+    row.appendChild(label)
+
+
+    //TODO: Add indicators / Warnings
+    row.appendChild(svg.newEl("rect", {
+      "width": 15,
+      "height": 5,
+      "x": 0,
+      "y": y,
+      "fill": "#f00",
+      "class": "will-be-indicator"
+    }))
+
+    timeLineHolder.appendChild(row)
 
     //create and attach request label
-    timeLineLabelHolder.appendChild(createRequestLabel(block, blockWidth, y, unit))
+    // timeLineLabelHolder.appendChild(label)
   })
 
   timeLineHolder.appendChild(timeLineLabelHolder)

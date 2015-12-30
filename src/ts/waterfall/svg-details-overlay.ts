@@ -8,34 +8,30 @@ import {Entry} from "../typing/har"
 
 function createCloseButtonSvg(y): SVGGElement {
   let closeBtn = svg.newEl("g", {
-    width: 25,
-    height: 25,
-    x: "80%",
-    y: y,
-    class: "info-overlay-close-btn"
+    "class": "info-overlay-close-btn"
   }) as SVGGElement
   
   closeBtn.appendChild(svg.newEl("rect", {
-    width: 25,
-    height: 25,
-    x: "80%",
-    y: y,
+    "width": 25,
+    "height": 25,
+    "x": "80%",
+    "y": y,
   }))
 
   closeBtn.appendChild(svg.newEl("text", {
-    width: 25,
-    height: 25,
-    x: "80%",
-    y: y,
-    dx: 9,
-    dy: 17,
-    fill: "#111",
-    text: "X",
-    textAnchor: "middle"
+    "width": 25,
+    "height": 25,
+    "x": "80%",
+    "y": y,
+    "dx": 9,
+    "dy": 17,
+    "fill": "#111",
+    "text": "X",
+    "textAnchor": "middle"
   }))
 
   closeBtn.appendChild(svg.newEl("title", {
-    text: "Close Overlay"
+    "text": "Close Overlay"
   }))
 
   // closeBtn.appendChild(svg.newTextEl("X", y + 17, "71%", "pointer-events: none;"))
@@ -50,11 +46,11 @@ function createHolder(y): SVGGElement{
   }) as SVGGElement
 
   let bg = svg.newEl("rect", {
-    width: "60%",
-    height: 200,
-    x: "20%",
-    y: y,
-    class: "info-overlay"
+    "width": "60%",
+    "height": 200,
+    "x": "20%",
+    "y": y,
+    "class": "info-overlay"
   })
 
   holder.appendChild(bg)
@@ -100,10 +96,10 @@ export function createRowInfoOverlay(requestID: number, barX: number, y: number,
   let holder = createHolder(y)
 
   let html = svg.newEl("foreignObject", {
-    width: "60%",
-    height: 200,
-    x: "20%",
-    y: y
+    "width": "60%",
+    "height": 200,
+    "x": "20%",
+    "y": y
   }) as SVGForeignObjectElement
 
   let closeBtn = createCloseButtonSvg(y)

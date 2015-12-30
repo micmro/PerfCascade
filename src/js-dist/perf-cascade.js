@@ -1,4 +1,4 @@
-/*PerfCascade build:30/12/2015 */
+/*PerfCascade build:31/12/2015 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -268,17 +268,17 @@ function createWaterfallSvg(data) {
     var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
     //Main holder
     var timeLineHolder = svg_1.default.newEl("svg:svg", {
-        height: Math.floor(chartHolderHeight),
-        class: "water-fall-chart"
+        "height": Math.floor(chartHolderHeight),
+        "class": "water-fall-chart"
     });
     var timeLineLabelHolder = svg_1.default.newEl("g", {
-        class: "labels"
+        "class": "labels"
     });
     var hoverOverlayHolder = svg_1.default.newEl("g", {
-        class: "hover-overlays"
+        "class": "hover-overlays"
     });
     var overlayHolder = svg_1.default.newEl("g", {
-        class: "overlays"
+        "class": "overlays"
     });
     var hoverEl = svg_components_1.createAlignmentLines(diagramHeight);
     hoverOverlayHolder.appendChild(hoverEl.startline);
@@ -295,27 +295,42 @@ function createWaterfallSvg(data) {
         var blockWidth = block.total || 1;
         var y = requestBarHeight * i;
         var x = block.start || 0.001;
+        var row = svg_1.default.newEl("g", {
+            "class": "row"
+        });
         var rectData = {
-            width: blockWidth,
-            height: requestBarHeight,
-            x: x,
-            y: y,
-            cssClass: block.cssClass,
-            label: block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
-            unit: unit,
-            showOverlay: mouseListeners.onMouseEnterPartial,
-            hideOverlay: mouseListeners.onMouseLeavePartial
+            "width": blockWidth,
+            "height": requestBarHeight,
+            "x": x,
+            "y": y,
+            "cssClass": block.cssClass,
+            "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+            "unit": unit,
+            "showOverlay": mouseListeners.onMouseEnterPartial,
+            "hideOverlay": mouseListeners.onMouseLeavePartial
         };
         var rect = svg_components_1.createRect(rectData, block.segments);
+        var label = svg_components_1.createRequestLabel(block, blockWidth, y, unit);
         var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, unit);
         rect.addEventListener('click', function (evt) {
             dom_1.default.removeAllChildren(overlayHolder);
             overlayHolder.appendChild(infoOverlay);
         });
         //create and attach request block
-        timeLineHolder.appendChild(rect);
+        row.appendChild(rect);
+        row.appendChild(label);
+        //TODO: Add indicators / Warnings
+        row.appendChild(svg_1.default.newEl("rect", {
+            "width": 15,
+            "height": 5,
+            "x": 0,
+            "y": y,
+            "fill": "#f00",
+            "class": "will-be-indicator"
+        }));
+        timeLineHolder.appendChild(row);
         //create and attach request label
-        timeLineLabelHolder.appendChild(svg_components_1.createRequestLabel(block, blockWidth, y, unit));
+        // timeLineLabelHolder.appendChild(label)
     });
     timeLineHolder.appendChild(timeLineLabelHolder);
     timeLineHolder.appendChild(hoverOverlayHolder);
@@ -336,18 +351,18 @@ var svg_1 = require("../helpers/svg");
 function createAlignmentLines(diagramHeight) {
     return {
         endline: svg_1.default.newEl("line", {
-            x1: "0",
-            y1: "0",
-            x2: "0",
-            y2: diagramHeight,
-            class: "line-end"
+            "x1": "0",
+            "y1": "0",
+            "x2": "0",
+            "y2": diagramHeight,
+            "class": "line-end"
         }),
         startline: svg_1.default.newEl("line", {
-            x1: "0",
-            y1: "0",
-            x2: "0",
-            y2: diagramHeight,
-            class: "line-start"
+            "x1": "0",
+            "y1": "0",
+            "x2": "0",
+            "y2": diagramHeight,
+            "class": "line-start"
         })
     };
 }
@@ -396,36 +411,38 @@ function createRect(rectData, segments) {
     var blockHeight = rectData.height - 1;
     var rectHolder;
     var rect = svg_1.default.newEl("rect", {
-        width: (rectData.width / rectData.unit) + "%",
-        height: blockHeight,
-        x: Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
-        y: rectData.y,
-        class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
+        "width": (rectData.width / rectData.unit) + "%",
+        "height": blockHeight,
+        "x": Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
+        "y": rectData.y,
+        "class": ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
             + (rectData.cssClass || "block-other")
     });
     if (rectData.label) {
         rect.appendChild(svg_1.default.newEl("title", {
-            text: rectData.label
+            "text": rectData.label
         })); // Add tile to wedge path
     }
     rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
     rect.addEventListener("mouseleave", rectData.hideOverlay(rectData));
     if (segments && segments.length > 0) {
-        rectHolder = svg_1.default.newEl("g");
+        rectHolder = svg_1.default.newEl("g", {
+            "class": "rect-holder"
+        });
         rectHolder.appendChild(rect);
         segments.forEach(function (segment) {
             if (segment.total > 0 && typeof segment.start === "number") {
                 var childRectData = {
-                    width: segment.total,
-                    height: (blockHeight - 5),
-                    x: segment.start || 0.001,
-                    y: rectData.y,
-                    cssClass: segment.cssClass,
-                    label: segment.name + " (" + Math.round(segment.start) + "ms - "
+                    "width": segment.total,
+                    "height": (blockHeight - 5),
+                    "x": segment.start || 0.001,
+                    "y": rectData.y,
+                    "cssClass": segment.cssClass,
+                    "label": segment.name + " (" + Math.round(segment.start) + "ms - "
                         + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
-                    unit: rectData.unit,
-                    showOverlay: rectData.showOverlay,
-                    hideOverlay: rectData.hideOverlay
+                    "unit": rectData.unit,
+                    "showOverlay": rectData.showOverlay,
+                    "hideOverlay": rectData.hideOverlay
                 };
                 rectHolder.appendChild(createRect(childRectData));
             }
@@ -450,7 +467,7 @@ function createRequestLabel(block, blockWidth, blockY, unit) {
     var blockName = (clipName) ? block.name.split("?")[0] + "?…" : block.name;
     var blockLabel = svg_1.default.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (blockY + 14));
     blockLabel.appendChild(svg_1.default.newEl("title", {
-        text: block.name
+        "text": block.name
     }));
     if (((block.total || 1) / unit) > 10 && svg_1.default.getNodeTextWidth(blockLabel) < 200) {
         //position label within block
@@ -487,10 +504,10 @@ function createTimeWrapper(durationMs, diagramHeight) {
             lineLabel.setAttribute("x", secPerc * i + 0.5 + "%");
         }
         var lineEl = svg_1.default.newEl("line", {
-            x1: secPerc * i + "%",
-            y1: "0",
-            x2: secPerc * i + "%",
-            y2: diagramHeight
+            "x1": secPerc * i + "%",
+            "y1": "0",
+            "x2": secPerc * i + "%",
+            "y2": diagramHeight
         });
         timeHolder.appendChild(lineEl);
         timeHolder.appendChild(lineLabel);
@@ -501,14 +518,14 @@ exports.createTimeWrapper = createTimeWrapper;
 //TODO: Implement - data for this not parsed yet
 function createBgRect(block, unit, diagramHeight) {
     var rect = svg_1.default.newEl("rect", {
-        width: ((block.total || 1) / unit) + "%",
-        height: diagramHeight,
-        x: ((block.start || 0.001) / unit) + "%",
-        y: 0,
-        class: block.cssClass || "block-other"
+        "width": ((block.total || 1) / unit) + "%",
+        "height": diagramHeight,
+        "x": ((block.start || 0.001) / unit) + "%",
+        "y": 0,
+        "class": block.cssClass || "block-other"
     });
     rect.appendChild(svg_1.default.newEl("title", {
-        text: block.name
+        "text": block.name
     })); // Add tile to wedge path
     return rect;
 }
@@ -521,20 +538,20 @@ exports.createBgRect = createBgRect;
  */
 function renderMarks(marks, unit, diagramHeight) {
     var marksHolder = svg_1.default.newEl("g", {
-        transform: "scale(1, 1)",
-        class: "marker-holder"
+        "transform": "scale(1, 1)",
+        "class": "marker-holder"
     });
     marks.forEach(function (mark, i) {
         var x = mark.startTime / unit;
         var markHolder = svg_1.default.newEl("g", {
-            class: "mark-holder"
+            "class": "mark-holder type-" + mark.name.toLowerCase()
         });
         var lineHolder = svg_1.default.newEl("g", {
-            class: "line-holder"
+            "class": "line-holder"
         });
         var lineLabelHolder = svg_1.default.newEl("g", {
-            class: "line-label-holder",
-            x: x + "%"
+            "class": "line-label-holder",
+            "x": x + "%"
         });
         mark.x = x;
         var lineLabel = svg_1.default.newTextEl(mark.name, diagramHeight + 25);
@@ -542,10 +559,10 @@ function renderMarks(marks, unit, diagramHeight) {
         lineLabel.setAttribute("x", x + "%");
         lineLabel.setAttribute("stroke", "");
         lineHolder.appendChild(svg_1.default.newEl("line", {
-            x1: x + "%",
-            y1: 0,
-            x2: x + "%",
-            y2: diagramHeight
+            "x1": x + "%",
+            "y1": 0,
+            "x2": x + "%",
+            "y2": diagramHeight
         }));
         var lastMark = marks[i - 1];
         if (lastMark && mark.x - lastMark.x < 1) {
@@ -554,10 +571,10 @@ function renderMarks(marks, unit, diagramHeight) {
         }
         //would use polyline but can't use percentage for points 
         lineHolder.appendChild(svg_1.default.newEl("line", {
-            x1: x + "%",
-            y1: diagramHeight,
-            x2: mark.x + "%",
-            y2: diagramHeight + 23
+            "x1": x + "%",
+            "y1": diagramHeight,
+            "x2": mark.x + "%",
+            "y2": diagramHeight + 23
         }));
         var isActive = false;
         var onLableMouseEnter = function (evt) {
@@ -576,11 +593,11 @@ function renderMarks(marks, unit, diagramHeight) {
         lineLabel.addEventListener("mouseleave", onLableMouseLeave);
         lineLabelHolder.appendChild(lineLabel);
         markHolder.appendChild(svg_1.default.newEl("title", {
-            text: mark.name + " (" + Math.round(mark.startTime) + "ms)",
+            "text": mark.name + " (" + Math.round(mark.startTime) + "ms)",
         }));
         markHolder.appendChild(lineHolder);
-        marksHolder.appendChild(markHolder);
         markHolder.appendChild(lineLabelHolder);
+        marksHolder.appendChild(markHolder);
     });
     return marksHolder;
 }
@@ -590,31 +607,27 @@ exports.renderMarks = renderMarks;
 var svg_1 = require("../helpers/svg");
 function createCloseButtonSvg(y) {
     var closeBtn = svg_1.default.newEl("g", {
-        width: 25,
-        height: 25,
-        x: "80%",
-        y: y,
-        class: "info-overlay-close-btn"
+        "class": "info-overlay-close-btn"
     });
     closeBtn.appendChild(svg_1.default.newEl("rect", {
-        width: 25,
-        height: 25,
-        x: "80%",
-        y: y,
+        "width": 25,
+        "height": 25,
+        "x": "80%",
+        "y": y,
     }));
     closeBtn.appendChild(svg_1.default.newEl("text", {
-        width: 25,
-        height: 25,
-        x: "80%",
-        y: y,
-        dx: 9,
-        dy: 17,
-        fill: "#111",
-        text: "X",
-        textAnchor: "middle"
+        "width": 25,
+        "height": 25,
+        "x": "80%",
+        "y": y,
+        "dx": 9,
+        "dy": 17,
+        "fill": "#111",
+        "text": "X",
+        "textAnchor": "middle"
     }));
     closeBtn.appendChild(svg_1.default.newEl("title", {
-        text: "Close Overlay"
+        "text": "Close Overlay"
     }));
     // closeBtn.appendChild(svg.newTextEl("X", y + 17, "71%", "pointer-events: none;"))
     return closeBtn;
@@ -624,11 +637,11 @@ function createHolder(y) {
         "class": "info-overlay-holder"
     });
     var bg = svg_1.default.newEl("rect", {
-        width: "60%",
-        height: 200,
-        x: "20%",
-        y: y,
-        class: "info-overlay"
+        "width": "60%",
+        "height": 200,
+        "x": "20%",
+        "y": y,
+        "class": "info-overlay"
     });
     holder.appendChild(bg);
     return holder;
@@ -667,10 +680,10 @@ function getKeys(entry) {
 function createRowInfoOverlay(requestID, barX, y, block, unit) {
     var holder = createHolder(y);
     var html = svg_1.default.newEl("foreignObject", {
-        width: "60%",
-        height: 200,
-        x: "20%",
-        y: y
+        "width": "60%",
+        "height": 200,
+        "x": "20%",
+        "y": y
     });
     var closeBtn = createCloseButtonSvg(y);
     closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });

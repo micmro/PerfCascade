@@ -37,19 +37,19 @@ export interface HoverElements{
 export function createAlignmentLines(diagramHeight: number): HoverElements {
   return {
     endline: svg.newEl("line", {
-      x1: "0",
-      y1: "0",
-      x2: "0",
-      y2: diagramHeight,
-      class: "line-end"
+      "x1": "0",
+      "y1": "0",
+      "x2": "0",
+      "y2": diagramHeight,
+      "class": "line-end"
     }) as SVGLineElement,
 
     startline: svg.newEl("line", {
-      x1: "0",
-      y1: "0",
-      x2: "0",
-      y2: diagramHeight,
-      class: "line-start"
+      "x1": "0",
+      "y1": "0",
+      "x2": "0",
+      "y2": diagramHeight,
+      "class": "line-start"
     }) as SVGLineElement
   }
 }
@@ -106,16 +106,16 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
   const blockHeight = rectData.height - 1
   let rectHolder
   let rect = svg.newEl("rect", {
-    width: (rectData.width / rectData.unit) + "%",
-    height: blockHeight,
-    x: Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
-    y: rectData.y,
-    class: ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
+    "width": (rectData.width / rectData.unit) + "%",
+    "height": blockHeight,
+    "x": Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
+    "y": rectData.y,
+    "class": ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
     + (rectData.cssClass || "block-other")
   })
   if (rectData.label) {
     rect.appendChild(svg.newEl("title", {
-      text: rectData.label
+      "text": rectData.label
     })) // Add tile to wedge path
   }
 
@@ -123,21 +123,23 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
   rect.addEventListener("mouseleave", rectData.hideOverlay(rectData))
 
   if (segments && segments.length > 0) {
-    rectHolder = svg.newEl("g")
+    rectHolder = svg.newEl("g", {
+      "class" : "rect-holder"
+    })
     rectHolder.appendChild(rect)
     segments.forEach((segment) => {
       if (segment.total > 0 && typeof segment.start === "number") {
         let childRectData = {
-          width: segment.total,
-          height: (blockHeight - 5),
-          x: segment.start || 0.001,
-          y: rectData.y,
-          cssClass: segment.cssClass,
-          label: segment.name + " (" + Math.round(segment.start) + "ms - " 
+          "width": segment.total,
+          "height": (blockHeight - 5),
+          "x": segment.start || 0.001,
+          "y": rectData.y,
+          "cssClass": segment.cssClass,
+          "label": segment.name + " (" + Math.round(segment.start) + "ms - " 
              + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
-          unit: rectData.unit,
-          showOverlay: rectData.showOverlay,
-          hideOverlay: rectData.hideOverlay
+          "unit": rectData.unit,
+          "showOverlay": rectData.showOverlay,
+          "hideOverlay": rectData.hideOverlay
         } as RectData
 
         rectHolder.appendChild(createRect(childRectData))
@@ -165,7 +167,7 @@ export function createRequestLabel(block: TimeBlock, blockWidth: number, blockY:
   let blockLabel = svg.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (blockY + 14))
 
   blockLabel.appendChild(svg.newEl("title", {
-    text: block.name
+    "text": block.name
   }))
 
   if (((block.total || 1) / unit) > 10 && svg.getNodeTextWidth(blockLabel) < 200) {
@@ -204,10 +206,10 @@ export function createTimeWrapper(durationMs: number, diagramHeight: number) {
     }
 
     var lineEl = svg.newEl("line", {
-      x1: secPerc * i + "%",
-      y1: "0",
-      x2: secPerc * i + "%",
-      y2: diagramHeight
+      "x1": secPerc * i + "%",
+      "y1": "0",
+      "x2": secPerc * i + "%",
+      "y2": diagramHeight
     })
     timeHolder.appendChild(lineEl)
     timeHolder.appendChild(lineLabel)
@@ -220,15 +222,15 @@ export function createTimeWrapper(durationMs: number, diagramHeight: number) {
 //TODO: Implement - data for this not parsed yet
 export function createBgRect(block: TimeBlock, unit: number, diagramHeight: number) {
   let rect = svg.newEl("rect", {
-    width: ((block.total || 1) / unit) + "%",
-    height: diagramHeight,
-    x: ((block.start || 0.001) / unit) + "%",
-    y: 0,
-    class: block.cssClass || "block-other"
+    "width": ((block.total || 1) / unit) + "%",
+    "height": diagramHeight,
+    "x": ((block.start || 0.001) / unit) + "%",
+    "y": 0,
+    "class": block.cssClass || "block-other"
   })
 
   rect.appendChild(svg.newEl("title", {
-    text: block.name
+    "text": block.name
   })) // Add tile to wedge path
   return rect
 }
@@ -243,21 +245,21 @@ export function createBgRect(block: TimeBlock, unit: number, diagramHeight: numb
  */
 export function renderMarks(marks: Array<Mark>, unit: number, diagramHeight: number) {
   var marksHolder = svg.newEl("g", {
-    transform: "scale(1, 1)",
-    class: "marker-holder"
+    "transform": "scale(1, 1)",
+    "class": "marker-holder"
   })
 
   marks.forEach((mark, i) => {
     var x = mark.startTime / unit
     var markHolder = svg.newEl("g", {
-      class: "mark-holder"
+      "class": "mark-holder type-" + mark.name.toLowerCase()
     })
     var lineHolder = svg.newEl("g", {
-      class: "line-holder"
+      "class": "line-holder"
     })
     var lineLabelHolder = svg.newEl("g", {
-      class: "line-label-holder",
-      x: x + "%"
+      "class": "line-label-holder",
+      "x": x + "%"
     })
     mark.x = x
     var lineLabel = svg.newTextEl(mark.name, diagramHeight + 25)
@@ -267,10 +269,10 @@ export function renderMarks(marks: Array<Mark>, unit: number, diagramHeight: num
 
 
     lineHolder.appendChild(svg.newEl("line", {
-      x1: x + "%",
-      y1: 0,
-      x2: x + "%",
-      y2: diagramHeight
+      "x1": x + "%",
+      "y1": 0,
+      "x2": x + "%",
+      "y2": diagramHeight
     }))
 
     const lastMark = marks[i - 1]
@@ -281,10 +283,10 @@ export function renderMarks(marks: Array<Mark>, unit: number, diagramHeight: num
 
     //would use polyline but can't use percentage for points 
     lineHolder.appendChild(svg.newEl("line", {
-      x1: x + "%",
-      y1: diagramHeight,
-      x2: mark.x + "%",
-      y2: diagramHeight + 23
+      "x1": x + "%",
+      "y1": diagramHeight,
+      "x2": mark.x + "%",
+      "y2": diagramHeight + 23
     }))
 
     var isActive = false
@@ -307,11 +309,11 @@ export function renderMarks(marks: Array<Mark>, unit: number, diagramHeight: num
     lineLabelHolder.appendChild(lineLabel)
 
     markHolder.appendChild(svg.newEl("title", {
-      text: mark.name + " (" + Math.round(mark.startTime) + "ms)",
+      "text": mark.name + " (" + Math.round(mark.startTime) + "ms)",
     }))
     markHolder.appendChild(lineHolder)
-    marksHolder.appendChild(markHolder)
     markHolder.appendChild(lineLabelHolder)
+    marksHolder.appendChild(markHolder)
   })
 
   return marksHolder
