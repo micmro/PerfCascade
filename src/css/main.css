@@ -134,25 +134,23 @@ textarea {
 .block-receive {fill: #1977dd;}
 
 
-.info-overlay-holder {fill: #f00;}
+.info-overlay-holder {fill: #a00;}
 .info-overlay {fill: #fff;}
-.info-overlay-close-btn {fill: #faa;}
+.info-overlay-close-btn {fill: #fdd;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}
 
-.info-overlay-holder body {padding:2px 10px; overflow: scroll; height: 200px;}
+.info-overlay-holder body { position: relative;}
+.info-overlay-holder body .wrapper { position: absolute; top: 5px; bottom: 5px; left: 15px; right: 15px; height: 190px; overflow: scroll;}
 .info-overlay-holder h3 {font-size: 12px;}
-.info-overlay-holder dt {float: left; clear: left; width: 25%; text-align: right; font-weight: bold; }
-.info-overlay-holder dd { margin: 0 0 0 26%; padding: 0 0 0.5em 0;}
-.info-overlay-holder dt:after {
-    content: ":";
-  }
+.info-overlay-holder dt {float: left; clear: both; margin-top: 5px; width: 25%; text-align: right; font-weight: bold; }
+.info-overlay-holder dd {float: left; margin: 5px 0 0 2%; padding: 0 0 0.5em 0;}
+.info-overlay-holder dt:after { content: ":"; }
 
 /* ==========================================================================
    Media Queries
    ========================================================================== */
 
 @media only screen and (min-width: 35em) {
-
 }
 
 @media print,

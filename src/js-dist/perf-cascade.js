@@ -1,4 +1,4 @@
-/*PerfCascade build:28/12/2015 */
+/*PerfCascade build:30/12/2015 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -607,11 +607,14 @@ function createCloseButtonSvg(y) {
         height: 25,
         x: "80%",
         y: y,
-        dx: 25 / 2,
-        dy: 25 / 2,
+        dx: 9,
+        dy: 17,
         fill: "#111",
         text: "X",
         textAnchor: "middle"
+    }));
+    closeBtn.appendChild(svg_1.default.newEl("title", {
+        text: "Close Overlay"
     }));
     // closeBtn.appendChild(svg.newTextEl("X", y + 17, "71%", "pointer-events: none;"))
     return closeBtn;
@@ -678,10 +681,10 @@ function createRowInfoOverlay(requestID, barX, y, block, unit) {
     console.log(entry);
     var dlKeyValues = getKeys(entry);
     var dlData = Object.keys(dlKeyValues)
-        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1); })
+        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""); })
         .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
     // entry.request.httpVersion
-    body.innerHTML = "\n    <h3>#" + requestID + " " + block.name + "</h3>\n    <dl>\n      " + dlData + "\n    </dl>";
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <dl>\n        " + dlData + "\n      </dl>\n    </div>\n    ";
     html.appendChild(body);
     holder.appendChild(closeBtn);
     holder.appendChild(html);

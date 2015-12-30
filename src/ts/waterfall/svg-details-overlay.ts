@@ -27,11 +27,15 @@ function createCloseButtonSvg(y): SVGGElement {
     height: 25,
     x: "80%",
     y: y,
-    dx: 25/2,
-    dy: 25/2,
+    dx: 9,
+    dy: 17,
     fill: "#111",
     text: "X",
     textAnchor: "middle"
+  }))
+
+  closeBtn.appendChild(svg.newEl("title", {
+    text: "Close Overlay"
   }))
 
   // closeBtn.appendChild(svg.newTextEl("X", y + 17, "71%", "pointer-events: none;"))
@@ -115,7 +119,7 @@ export function createRowInfoOverlay(requestID: number, barX: number, y: number,
   const dlKeyValues = getKeys(entry)
 
   const dlData = Object.keys(dlKeyValues)
-    .filter(key => (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1))
+    .filter(key => (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""))
     .map(key => `
       <dt>${key}</dt>
       <dd>${dlKeyValues[key]}</dd>
@@ -124,10 +128,13 @@ export function createRowInfoOverlay(requestID: number, barX: number, y: number,
   // entry.request.httpVersion
 
   body.innerHTML = `
-    <h3>#${requestID} ${block.name}</h3>
-    <dl>
-      ${dlData}
-    </dl>`
+    <div class="wrapper">
+      <h3>#${requestID} ${block.name}</h3>
+      <dl>
+        ${dlData}
+      </dl>
+    </div>
+    `
 
   html.appendChild(body)
 
