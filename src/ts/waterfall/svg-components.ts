@@ -194,7 +194,7 @@ export function createRequestLabel(block: TimeBlock, blockWidth: number, blockY:
  * @param {number} durationMs    Full duration of the waterfall
  * @param {number} diagramHeight Full height of SVG in px
  */
-export function createTimeWrapper(durationMs: number, diagramHeight: number) {
+export function createTimeScale(durationMs: number, diagramHeight: number) {
   var timeHolder = svg.newEl("g", { class: "time-scale full-width" })
   for (let i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
     var lineLabel = svg.newTextEl(i + "sec", diagramHeight)
@@ -243,7 +243,7 @@ export function createBgRect(block: TimeBlock, unit: number, diagramHeight: numb
  * @param {number}      unit          horizontal unit (duration in ms of 1%)
  * @param {number}      diagramHeight Full height of SVG in px
  */
-export function renderMarks(marks: Array<Mark>, unit: number, diagramHeight: number) {
+export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: number) {
   var marksHolder = svg.newEl("g", {
     "transform": "scale(1, 1)",
     "class": "marker-holder"

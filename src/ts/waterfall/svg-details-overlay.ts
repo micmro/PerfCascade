@@ -58,7 +58,9 @@ function createHolder(y): SVGGElement{
 }
 
 
-function getKeys(entry: Entry): Object{
+function getKeys(block: TimeBlock): Object {
+  //TODO: dodgy casting - will not work for other adapters
+  let entry = block.rawResource as Entry
 
   let ifValueDefined = (value: number, fn: (number) => any) => {
     if (typeof value !== "number" || value <= 0) {
@@ -73,7 +75,7 @@ function getKeys(entry: Entry): Object{
     `${size}ms`)
 
   return {
-    "Started": new Date(entry.startedDateTime).toLocaleString(),
+    "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
     "Duration": formatTime(entry.time),
     "Server IPAddress": entry.serverIPAddress,
     "Connection": entry.connection,
@@ -88,8 +90,7 @@ function getKeys(entry: Entry): Object{
     "Response Header Size": formatBytes(entry.response.headersSize),
     "Response Redirect URL": entry.response.redirectURL,
     "Response Comment": entry.response.comment
-  }
-  
+  } 
 }
 
 export function createRowInfoOverlay(requestID: number, barX: number, y: number, block: TimeBlock, unit: number): SVGGElement {
@@ -108,11 +109,8 @@ export function createRowInfoOverlay(requestID: number, barX: number, y: number,
 
   let body = document.createElement("body");
   body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-  //TODO: dodgy casting - will not work for other adapters
 
-  let entry = block.rawResource as Entry
-  console.log(entry)
-  const dlKeyValues = getKeys(entry)
+  const dlKeyValues = getKeys(block)
 
   const dlData = Object.keys(dlKeyValues)
     .filter(key => (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""))

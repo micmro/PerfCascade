@@ -1,4 +1,4 @@
-/*PerfCascade build:31/12/2015 */
+/*PerfCascade build:05/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -16,6 +16,21 @@ exports.default = dom;
 
 },{}],2:[function(require,module,exports){
 /**
+ *  SVG Icons
+ */
+var icons = {
+    lock: function (x, y, width, height) {
+        var parser = new DOMParser();
+        var template = "\n    <svg xmlns=\"http://www.w3.org/2000/svg\" style=\"overflow:visible\" x=\"" + x + "\" y=\"" + y + "\" width=\"" + width + "\" height=\"" + height + "\">\n      <g transform=\"translate(6,-1036.3622)\">\n        <path style=\"fill:#999;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0\"\n           d=\"M 10 0 C 6.6862915 0 4 2.6862915 4 6 L 4 9 L 3 9 L 3 20 L 17 20 L 17 9 L 16 9 L 16 6 C 16 2.6862915 13.313708 0 10 0 z M 10 2 C 12.209139 2 14 3.7908602 14 6 L 14 9 L 6 9 L 6 6 C 6 3.7908602 7.790861 2 10 2 z \"\n           transform=\"translate(-6,1036.3622)\" />\n      </g>\n    </svg>\n    ";
+        var doc = parser.parseFromString(template, "image/svg+xml");
+        return doc.firstChild;
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = icons;
+
+},{}],3:[function(require,module,exports){
+/**
  *  SVG Helpers
  */
 var svg = {
@@ -28,7 +43,9 @@ var svg = {
             }
         }
         el.textContent = settings.text || "";
-        el.style.cssText = css || "";
+        if (el.style) {
+            el.style.cssText = css || "";
+        }
         return el;
     },
     newTextEl: function (text, y, x, css) {
@@ -76,7 +93,7 @@ var svg = {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = svg;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var svg_chart_1 = require("./waterfall/svg-chart");
 var dom_1 = require('./helpers/dom');
 var har_1 = require('./transformers/har');
@@ -114,7 +131,7 @@ document.getElementById('fileinput').addEventListener('change', onFileSubmit, fa
 //TODO: remove Dev/Test only - load test file
 window["fetch"]("test-data/github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 
-},{"./helpers/dom":1,"./transformers/har":4,"./waterfall/svg-chart":7}],4:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":5,"./waterfall/svg-chart":8}],5:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
 var styling_converters_1 = require('./styling-converters');
 var HarTransformer = (function () {
@@ -179,7 +196,7 @@ var HarTransformer = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = HarTransformer;
 
-},{"../typing/time-block":6,"./styling-converters":5}],5:[function(require,module,exports){
+},{"../typing/time-block":7,"./styling-converters":6}],6:[function(require,module,exports){
 /**
  * Convert a MIME type into a CSS class
  * @param {string} mimeType
@@ -214,7 +231,7 @@ function mimeToCssClass(mimeType) {
 }
 exports.mimeToCssClass = mimeToCssClass;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var TimeBlock = (function () {
     function TimeBlock(name, start, end, cssClass, segments, rawResource) {
         if (cssClass === void 0) { cssClass = ""; }
@@ -232,8 +249,9 @@ var TimeBlock = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
+var icons_1 = require("../helpers/icons");
 var svg_components_1 = require("./svg-components");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var dom_1 = require('../helpers/dom');
@@ -271,6 +289,14 @@ function createWaterfallSvg(data) {
         "height": Math.floor(chartHolderHeight),
         "class": "water-fall-chart"
     });
+    var leftFixedHolder = svg_1.default.newEl("svg", {
+        "class": "left-fixed-holder",
+        "x": "-100",
+        "width": "100"
+    });
+    var flexScaleHolder = svg_1.default.newEl("svg", {
+        "class": "flex-scale-waterfall",
+    });
     var timeLineLabelHolder = svg_1.default.newEl("g", {
         "class": "labels"
     });
@@ -285,8 +311,8 @@ function createWaterfallSvg(data) {
     hoverOverlayHolder.appendChild(hoverEl.endline);
     var mouseListeners = svg_components_1.makeHoverEvtListeners(hoverEl);
     //Start appending SVG elements to the holder element (timeLineHolder)
-    timeLineHolder.appendChild(svg_components_1.createTimeWrapper(data.durationMs, diagramHeight));
-    timeLineHolder.appendChild(svg_components_1.renderMarks(data.marks, unit, diagramHeight));
+    flexScaleHolder.appendChild(svg_components_1.createTimeScale(data.durationMs, diagramHeight));
+    flexScaleHolder.appendChild(svg_components_1.createMarks(data.marks, unit, diagramHeight));
     data.lines.forEach(function (block, i) {
         timeLineHolder.appendChild(svg_components_1.createBgRect(block, unit, diagramHeight));
     });
@@ -294,7 +320,7 @@ function createWaterfallSvg(data) {
     barsToShow.forEach(function (block, i) {
         var blockWidth = block.total || 1;
         var y = requestBarHeight * i;
-        var x = block.start || 0.001;
+        var x = (block.start || 0.001);
         var row = svg_1.default.newEl("g", {
             "class": "row"
         });
@@ -320,26 +346,33 @@ function createWaterfallSvg(data) {
         row.appendChild(rect);
         row.appendChild(label);
         //TODO: Add indicators / Warnings
-        row.appendChild(svg_1.default.newEl("rect", {
-            "width": 15,
-            "height": 5,
-            "x": 0,
-            "y": y,
-            "fill": "#f00",
-            "class": "will-be-indicator"
-        }));
-        timeLineHolder.appendChild(row);
+        var isSecure = block.name.indexOf("https://") === 0;
+        if (isSecure) {
+            // leftFixedHolder.appendChild(svg.newEl("rect", {
+            //   "width": 15,
+            //   "height": 10,
+            //   "x": 0,
+            //   "y": y,
+            //   "fill": "#f00",
+            //   "class": "will-be-indicator"
+            // }))
+            leftFixedHolder.appendChild(icons_1.default.lock(0, y, 10, 10));
+        }
+        flexScaleHolder.appendChild(row);
         //create and attach request label
         // timeLineLabelHolder.appendChild(label)
     });
-    timeLineHolder.appendChild(timeLineLabelHolder);
-    timeLineHolder.appendChild(hoverOverlayHolder);
+    flexScaleHolder.appendChild(timeLineLabelHolder);
+    flexScaleHolder.appendChild(hoverOverlayHolder);
+    timeLineHolder.appendChild(leftFixedHolder);
+    timeLineHolder.appendChild(flexScaleHolder);
+    console.log(leftFixedHolder.x);
     timeLineHolder.appendChild(overlayHolder);
     return timeLineHolder;
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/dom":1,"../helpers/svg":2,"./svg-components":8,"./svg-details-overlay":9}],8:[function(require,module,exports){
+},{"../helpers/dom":1,"../helpers/icons":2,"../helpers/svg":3,"./svg-components":9,"./svg-details-overlay":10}],9:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -492,7 +525,7 @@ exports.createRequestLabel = createRequestLabel;
  * @param {number} durationMs    Full duration of the waterfall
  * @param {number} diagramHeight Full height of SVG in px
  */
-function createTimeWrapper(durationMs, diagramHeight) {
+function createTimeScale(durationMs, diagramHeight) {
     var timeHolder = svg_1.default.newEl("g", { class: "time-scale full-width" });
     for (var i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
         var lineLabel = svg_1.default.newTextEl(i + "sec", diagramHeight);
@@ -514,7 +547,7 @@ function createTimeWrapper(durationMs, diagramHeight) {
     }
     return timeHolder;
 }
-exports.createTimeWrapper = createTimeWrapper;
+exports.createTimeScale = createTimeScale;
 //TODO: Implement - data for this not parsed yet
 function createBgRect(block, unit, diagramHeight) {
     var rect = svg_1.default.newEl("rect", {
@@ -536,7 +569,7 @@ exports.createBgRect = createBgRect;
  * @param {number}      unit          horizontal unit (duration in ms of 1%)
  * @param {number}      diagramHeight Full height of SVG in px
  */
-function renderMarks(marks, unit, diagramHeight) {
+function createMarks(marks, unit, diagramHeight) {
     var marksHolder = svg_1.default.newEl("g", {
         "transform": "scale(1, 1)",
         "class": "marker-holder"
@@ -601,9 +634,9 @@ function renderMarks(marks, unit, diagramHeight) {
     });
     return marksHolder;
 }
-exports.renderMarks = renderMarks;
+exports.createMarks = createMarks;
 
-},{"../helpers/svg":2}],9:[function(require,module,exports){
+},{"../helpers/svg":3}],10:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 function createCloseButtonSvg(y) {
     var closeBtn = svg_1.default.newEl("g", {
@@ -646,7 +679,9 @@ function createHolder(y) {
     holder.appendChild(bg);
     return holder;
 }
-function getKeys(entry) {
+function getKeys(block) {
+    //TODO: dodgy casting - will not work for other adapters
+    var entry = block.rawResource;
     var ifValueDefined = function (value, fn) {
         if (typeof value !== "number" || value <= 0) {
             return undefined;
@@ -660,7 +695,7 @@ function getKeys(entry) {
         return (size + "ms");
     }); };
     return {
-        "Started": new Date(entry.startedDateTime).toLocaleString(),
+        "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
         "Duration": formatTime(entry.time),
         "Server IPAddress": entry.serverIPAddress,
         "Connection": entry.connection,
@@ -689,10 +724,7 @@ function createRowInfoOverlay(requestID, barX, y, block, unit) {
     closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });
     var body = document.createElement("body");
     body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-    //TODO: dodgy casting - will not work for other adapters
-    var entry = block.rawResource;
-    console.log(entry);
-    var dlKeyValues = getKeys(entry);
+    var dlKeyValues = getKeys(block);
     var dlData = Object.keys(dlKeyValues)
         .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""); })
         .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
@@ -705,4 +737,4 @@ function createRowInfoOverlay(requestID, barX, y, block, unit) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../helpers/svg":2}]},{},[3]);
+},{"../helpers/svg":3}]},{},[4]);

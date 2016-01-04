@@ -65,7 +65,9 @@ textarea {
 
 .water-fall-holder {fill:#ccc;}
 
-.water-fall-chart {width:100%; background:#f0f5f0;}
+svg.water-fall-chart {width:100%; padding-left: 100px; background:#f0f5f0; overflow: visible;}
+.water-fall-chart .left-fixed-holder {overflow: visible;}
+/*.water-fall-chart .flex-scale-waterfall {overflow: visible;}*/
 .water-fall-chart .marker-holder {width:100%;}
 .water-fall-chart .line-holder {stroke-width:1; stroke: #ccc; stroke-opacity:0.5;}
 .water-fall-chart .line-holder.active {stroke: #69009e; stroke-width:2; stroke-opacity:1;}
@@ -143,8 +145,8 @@ textarea {
 .info-overlay-close-btn {fill: #fdd;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}
 
-.info-overlay-holder body { position: relative;}
-.info-overlay-holder body .wrapper { position: absolute; top: 5px; bottom: 5px; left: 15px; right: 15px; height: 190px; overflow: scroll;}
+.info-overlay-holder body { position: relative; height: 200px; background: #fff;}
+.info-overlay-holder body .wrapper { position: absolute; top: 5px; bottom: 5px; left: 15px; right: 15px; overflow: scroll;}
 .info-overlay-holder h3 {font-size: 12px;}
 .info-overlay-holder dt {float: left; clear: both; margin-top: 5px; width: 25%; text-align: right; font-weight: bold; }
 .info-overlay-holder dd {float: left; margin: 5px 0 0 2%; padding: 0 0 0.5em 0;}

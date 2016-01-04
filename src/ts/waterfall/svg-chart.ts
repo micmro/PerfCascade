@@ -1,13 +1,14 @@
 import TimeBlock from "../typing/time-block"
 import {WaterfallData} from "../typing/waterfall-data"
 import svg from "../helpers/svg"
+import icons from "../helpers/icons"
 import {
   RectData,
   createRect,
   createRequestLabel,
   createBgRect,
-  createTimeWrapper,
-  renderMarks,
+  createTimeScale,
+  createMarks,
   makeHoverEvtListeners,
   createAlignmentLines
 } from "./svg-components"
@@ -60,6 +61,19 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     "class": "water-fall-chart"
   }) as SVGSVGElement
 
+  let leftFixedHolder = svg.newEl("svg", {
+    "class": "left-fixed-holder",
+    "x" : "-100",
+    "width" : "100"
+    // "viewBox": `0 0 750 ${diagramHeight}`,
+    // "preserveAspectRatio": "xMinYMin meeet" 
+  }) as SVGSVGElement
+
+  let flexScaleHolder = svg.newEl("svg", {
+    "class": "flex-scale-waterfall",
+    // "viewBox": `0 100 650 ${diagramHeight}`,
+    // "preserveAspectRatio": "xMaxYMin meeet" 
+  }) as SVGSVGElement
 
   let timeLineLabelHolder = svg.newEl("g", {
     "class": "labels"
@@ -82,8 +96,8 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
 
   //Start appending SVG elements to the holder element (timeLineHolder)
 
-  timeLineHolder.appendChild(createTimeWrapper(data.durationMs, diagramHeight))
-  timeLineHolder.appendChild(renderMarks(data.marks, unit, diagramHeight))
+  flexScaleHolder.appendChild(createTimeScale(data.durationMs, diagramHeight))
+  flexScaleHolder.appendChild(createMarks(data.marks, unit, diagramHeight))
 
   data.lines.forEach((block, i) => {
     timeLineHolder.appendChild(createBgRect(block, unit, diagramHeight))
@@ -94,7 +108,7 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   barsToShow.forEach((block, i) => {
     let blockWidth = block.total || 1
     let y = requestBarHeight * i
-    let x = block.start || 0.001
+    let x = (block.start || 0.001)
 
     let row = svg.newEl("g", {
       "class": "row"
@@ -127,24 +141,31 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
 
 
     //TODO: Add indicators / Warnings
-    row.appendChild(svg.newEl("rect", {
-      "width": 15,
-      "height": 5,
-      "x": 0,
-      "y": y,
-      "fill": "#f00",
-      "class": "will-be-indicator"
-    }))
+    const isSecure = block.name.indexOf("https://") === 0
+    if (isSecure) {
+      // leftFixedHolder.appendChild(svg.newEl("rect", {
+      //   "width": 15,
+      //   "height": 10,
+      //   "x": 0,
+      //   "y": y,
+      //   "fill": "#f00",
+      //   "class": "will-be-indicator"
+      // }))
+       leftFixedHolder.appendChild(icons.lock(0, y, 10, 10))
+    }
 
-    timeLineHolder.appendChild(row)
+    flexScaleHolder.appendChild(row)
 
     //create and attach request label
     // timeLineLabelHolder.appendChild(label)
   })
 
-  timeLineHolder.appendChild(timeLineLabelHolder)
-  
-  timeLineHolder.appendChild(hoverOverlayHolder)
+  flexScaleHolder.appendChild(timeLineLabelHolder)
+  flexScaleHolder.appendChild(hoverOverlayHolder)
+  timeLineHolder.appendChild(leftFixedHolder)
+  timeLineHolder.appendChild(flexScaleHolder)
+
+  console.log(leftFixedHolder.x)
   timeLineHolder.appendChild(overlayHolder)
 
 

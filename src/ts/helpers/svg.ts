@@ -12,7 +12,9 @@ var svg = {
       }
     }
     el.textContent = settings.text || ""
-    el.style.cssText = css || ""
+    if (el.style) {
+      el.style.cssText = css || ""
+    }
     return el
   },
 
