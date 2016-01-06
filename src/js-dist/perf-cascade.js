@@ -1,4 +1,4 @@
-/*PerfCascade build:05/01/2016 */
+/*PerfCascade build:06/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -19,10 +19,10 @@ exports.default = dom;
  *  SVG Icons
  */
 var icons = {
-    lock: function (x, y, width, height) {
+    lock: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
         var parser = new DOMParser();
-        var template = "\n    <svg xmlns=\"http://www.w3.org/2000/svg\" style=\"overflow:visible\" x=\"" + x + "\" y=\"" + y + "\" width=\"" + width + "\" height=\"" + height + "\">\n      <g transform=\"translate(6,-1036.3622)\">\n        <path style=\"fill:#999;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0\"\n           d=\"M 10 0 C 6.6862915 0 4 2.6862915 4 6 L 4 9 L 3 9 L 3 20 L 17 20 L 17 9 L 16 9 L 16 6 C 16 2.6862915 13.313708 0 10 0 z M 10 2 C 12.209139 2 14 3.7908602 14 6 L 14 9 L 6 9 L 6 6 C 6 3.7908602 7.790861 2 10 2 z \"\n           transform=\"translate(-6,1036.3622)\" />\n      </g>\n    </svg>\n    ";
-        var doc = parser.parseFromString(template, "image/svg+xml");
+        var doc = parser.parseFromString("\n    <svg x=\"" + x + "\" y=\"" + y + "\" xmlns=\"http://www.w3.org/2000/svg\">\n      <g class=\"icon icon-lock\" transform=\"scale(" + scale + ")\">\n        <g transform=\"scale(0.833333)\">\n          <path stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M9 8v-4c0-1.7-1.3-3-3-3s-3 1.3-3 3v2\" fill=\"none\"></path>\n          <path d=\"M0 6h12v8h-12z\"></path>\n          <title>" + title + "</title>\n        </g>\n      </g>\n    </svg>\n    ", "image/svg+xml");
         return doc.firstChild;
     }
 };
@@ -291,20 +291,20 @@ function createWaterfallSvg(data) {
     });
     var leftFixedHolder = svg_1.default.newEl("svg", {
         "class": "left-fixed-holder",
-        "x": "-100",
-        "width": "100"
+        "x": "-70",
+        "width": "70"
     });
     var flexScaleHolder = svg_1.default.newEl("svg", {
-        "class": "flex-scale-waterfall",
-    });
-    var timeLineLabelHolder = svg_1.default.newEl("g", {
-        "class": "labels"
+        "class": "flex-scale-waterfall"
     });
     var hoverOverlayHolder = svg_1.default.newEl("g", {
         "class": "hover-overlays"
     });
     var overlayHolder = svg_1.default.newEl("g", {
         "class": "overlays"
+    });
+    var bgStripesHolder = svg_1.default.newEl("g", {
+        "class": "bg-stripes"
     });
     var hoverEl = svg_components_1.createAlignmentLines(diagramHeight);
     hoverOverlayHolder.appendChild(hoverEl.startline);
@@ -348,25 +348,15 @@ function createWaterfallSvg(data) {
         //TODO: Add indicators / Warnings
         var isSecure = block.name.indexOf("https://") === 0;
         if (isSecure) {
-            // leftFixedHolder.appendChild(svg.newEl("rect", {
-            //   "width": 15,
-            //   "height": 10,
-            //   "x": 0,
-            //   "y": y,
-            //   "fill": "#f00",
-            //   "class": "will-be-indicator"
-            // }))
-            leftFixedHolder.appendChild(icons_1.default.lock(0, y, 10, 10));
+            leftFixedHolder.appendChild(icons_1.default.lock(5, y + 3, "Secure Connection", 1.2));
         }
         flexScaleHolder.appendChild(row);
-        //create and attach request label
-        // timeLineLabelHolder.appendChild(label)
+        bgStripesHolder.appendChild(svg_components_1.createBgStripe(y, requestBarHeight, (i % 2 === 0)));
     });
-    flexScaleHolder.appendChild(timeLineLabelHolder);
     flexScaleHolder.appendChild(hoverOverlayHolder);
+    timeLineHolder.appendChild(bgStripesHolder);
     timeLineHolder.appendChild(leftFixedHolder);
     timeLineHolder.appendChild(flexScaleHolder);
-    console.log(leftFixedHolder.x);
     timeLineHolder.appendChild(overlayHolder);
     return timeLineHolder;
 }
@@ -563,6 +553,27 @@ function createBgRect(block, unit, diagramHeight) {
     return rect;
 }
 exports.createBgRect = createBgRect;
+function createBgStripe(y, height, isEven) {
+    var stripeHolder = svg_1.default.newEl("g", {
+        "class": isEven ? "even" : "odd"
+    });
+    stripeHolder.appendChild(svg_1.default.newEl("rect", {
+        "width": "100%",
+        "height": height,
+        "x": 0,
+        "y": y,
+        "class": "flex"
+    }));
+    stripeHolder.appendChild(svg_1.default.newEl("rect", {
+        "width": "70",
+        "height": height,
+        "x": -70,
+        "y": y,
+        "class": "fixed"
+    }));
+    return stripeHolder;
+}
+exports.createBgStripe = createBgStripe;
 /**
  * Renders global markes for events like the onLoad event etc
  * @param {Array<Mark>} marks         [description]

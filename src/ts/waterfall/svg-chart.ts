@@ -10,7 +10,8 @@ import {
   createTimeScale,
   createMarks,
   makeHoverEvtListeners,
-  createAlignmentLines
+  createAlignmentLines,
+  createBgStripe
 } from "./svg-components"
 import {createRowInfoOverlay} from "./svg-details-overlay"
 import dom from '../helpers/dom'
@@ -63,21 +64,13 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
 
   let leftFixedHolder = svg.newEl("svg", {
     "class": "left-fixed-holder",
-    "x" : "-100",
-    "width" : "100"
-    // "viewBox": `0 0 750 ${diagramHeight}`,
-    // "preserveAspectRatio": "xMinYMin meeet" 
+    "x" : "-70",
+    "width" : "70"
   }) as SVGSVGElement
 
   let flexScaleHolder = svg.newEl("svg", {
-    "class": "flex-scale-waterfall",
-    // "viewBox": `0 100 650 ${diagramHeight}`,
-    // "preserveAspectRatio": "xMaxYMin meeet" 
+    "class": "flex-scale-waterfall"
   }) as SVGSVGElement
-
-  let timeLineLabelHolder = svg.newEl("g", {
-    "class": "labels"
-  }) as SVGGElement
 
   let hoverOverlayHolder = svg.newEl("g", {
     "class": "hover-overlays"
@@ -85,6 +78,10 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
 
   let overlayHolder = svg.newEl("g", {
     "class": "overlays"
+  }) as SVGGElement
+
+  let bgStripesHolder = svg.newEl("g", {
+    "class": "bg-stripes"
   }) as SVGGElement
 
 
@@ -143,29 +140,17 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     //TODO: Add indicators / Warnings
     const isSecure = block.name.indexOf("https://") === 0
     if (isSecure) {
-      // leftFixedHolder.appendChild(svg.newEl("rect", {
-      //   "width": 15,
-      //   "height": 10,
-      //   "x": 0,
-      //   "y": y,
-      //   "fill": "#f00",
-      //   "class": "will-be-indicator"
-      // }))
-       leftFixedHolder.appendChild(icons.lock(0, y, 10, 10))
+       leftFixedHolder.appendChild(icons.lock(5, y+3, "Secure Connection", 1.2))
     }
 
     flexScaleHolder.appendChild(row)
-
-    //create and attach request label
-    // timeLineLabelHolder.appendChild(label)
+    bgStripesHolder.appendChild(createBgStripe(y, requestBarHeight, (i%2 === 0)))
   })
 
-  flexScaleHolder.appendChild(timeLineLabelHolder)
   flexScaleHolder.appendChild(hoverOverlayHolder)
+  timeLineHolder.appendChild(bgStripesHolder)
   timeLineHolder.appendChild(leftFixedHolder)
   timeLineHolder.appendChild(flexScaleHolder)
-
-  console.log(leftFixedHolder.x)
   timeLineHolder.appendChild(overlayHolder)
 
 

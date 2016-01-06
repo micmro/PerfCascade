@@ -194,8 +194,8 @@ export function createRequestLabel(block: TimeBlock, blockWidth: number, blockY:
  * @param {number} durationMs    Full duration of the waterfall
  * @param {number} diagramHeight Full height of SVG in px
  */
-export function createTimeScale(durationMs: number, diagramHeight: number) {
-  var timeHolder = svg.newEl("g", { class: "time-scale full-width" })
+export function createTimeScale(durationMs: number, diagramHeight: number): SVGGElement {
+  var timeHolder = svg.newEl("g", { class: "time-scale full-width" }) as SVGGElement
   for (let i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
     var lineLabel = svg.newTextEl(i + "sec", diagramHeight)
     if (i > secs - 0.2) {
@@ -220,19 +220,44 @@ export function createTimeScale(durationMs: number, diagramHeight: number) {
 
 
 //TODO: Implement - data for this not parsed yet
-export function createBgRect(block: TimeBlock, unit: number, diagramHeight: number) {
+export function createBgRect(block: TimeBlock, unit: number, diagramHeight: number): SVGRectElement {
   let rect = svg.newEl("rect", {
     "width": ((block.total || 1) / unit) + "%",
     "height": diagramHeight,
     "x": ((block.start || 0.001) / unit) + "%",
     "y": 0,
     "class": block.cssClass || "block-other"
-  })
+  }) as SVGRectElement
 
   rect.appendChild(svg.newEl("title", {
     "text": block.name
   })) // Add tile to wedge path
   return rect
+}
+
+
+
+export function createBgStripe(y: number, height: number, isEven: boolean): SVGGElement{
+  let stripeHolder = svg.newEl("g", {
+    "class": isEven ? "even" : "odd"
+  }) as SVGGElement
+
+  stripeHolder.appendChild(svg.newEl("rect", {
+    "width": "100%", //make up for the spacing
+    "height": height,
+    "x": 0,
+    "y": y,
+    "class": "flex"
+  }))
+  stripeHolder.appendChild(svg.newEl("rect", {
+    "width": "70", //make up for the spacing
+    "height": height,
+    "x": -70,
+    "y": y,
+    "class": "fixed"
+  }))
+
+  return stripeHolder
 }
 
 
