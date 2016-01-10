@@ -8,7 +8,7 @@ import {
   createMarks,
   makeHoverEvtListeners,
   createAlignmentLines,
-} from "./svg-components"
+} from "./svg-general-components"
 
 import {
   RectData,

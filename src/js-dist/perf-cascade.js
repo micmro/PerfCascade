@@ -259,7 +259,7 @@ exports.default = TimeBlock;
 },{}],8:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var icons_1 = require("../helpers/icons");
-var svg_components_1 = require("./svg-components");
+var svg_general_components_1 = require("./svg-general-components");
 var svg_row_components_1 = require("./svg-row-components");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var dom_1 = require('../helpers/dom');
@@ -321,15 +321,15 @@ function createWaterfallSvg(data) {
     var bgStripesHolder = svg_1.default.newEl("g", {
         "class": "bg-stripes"
     });
-    var hoverEl = svg_components_1.createAlignmentLines(diagramHeight);
+    var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
     hoverOverlayHolder.appendChild(hoverEl.startline);
     hoverOverlayHolder.appendChild(hoverEl.endline);
-    var mouseListeners = svg_components_1.makeHoverEvtListeners(hoverEl);
+    var mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
     //Start appending SVG elements to the holder element (timeLineHolder)
-    flexScaleHolder.appendChild(svg_components_1.createTimeScale(data.durationMs, diagramHeight));
-    flexScaleHolder.appendChild(svg_components_1.createMarks(data.marks, unit, diagramHeight));
+    flexScaleHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
+    flexScaleHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
     data.lines.forEach(function (block, i) {
-        timeLineHolder.appendChild(svg_components_1.createBgRect(block, unit, diagramHeight));
+        timeLineHolder.appendChild(svg_general_components_1.createBgRect(block, unit, diagramHeight));
     });
     //Main loop to render rows with blocks
     barsToShow.forEach(function (block, i) {
@@ -378,7 +378,107 @@ function createWaterfallSvg(data) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/dom":1,"../helpers/icons":2,"../helpers/svg":3,"./svg-components":9,"./svg-details-overlay":10,"./svg-row-components":11}],9:[function(require,module,exports){
+},{"../helpers/dom":1,"../helpers/icons":2,"../helpers/svg":3,"./svg-details-overlay":9,"./svg-general-components":10,"./svg-row-components":11}],9:[function(require,module,exports){
+var svg_1 = require("../helpers/svg");
+function createCloseButtonSvg(y) {
+    var closeBtn = svg_1.default.newEl("g", {
+        "class": "info-overlay-close-btn"
+    });
+    closeBtn.appendChild(svg_1.default.newEl("rect", {
+        "width": 25,
+        "height": 25,
+        "x": "80%",
+        "y": y,
+    }));
+    closeBtn.appendChild(svg_1.default.newEl("text", {
+        "width": 25,
+        "height": 25,
+        "x": "80%",
+        "y": y,
+        "dx": 9,
+        "dy": 17,
+        "fill": "#111",
+        "text": "X",
+        "textAnchor": "middle"
+    }));
+    closeBtn.appendChild(svg_1.default.newEl("title", {
+        "text": "Close Overlay"
+    }));
+    return closeBtn;
+}
+function createHolder(y) {
+    var holder = svg_1.default.newEl("g", {
+        "class": "info-overlay-holder"
+    });
+    var bg = svg_1.default.newEl("rect", {
+        "width": "60%",
+        "height": 200,
+        "x": "20%",
+        "y": y,
+        "class": "info-overlay"
+    });
+    holder.appendChild(bg);
+    return holder;
+}
+function getKeys(block) {
+    //TODO: dodgy casting - will not work for other adapters
+    var entry = block.rawResource;
+    var ifValueDefined = function (value, fn) {
+        if (typeof value !== "number" || value <= 0) {
+            return undefined;
+        }
+        return fn(value);
+    };
+    var formatBytes = function (size) { return ifValueDefined(size, function (size) {
+        return (size + " byte (~" + Math.round(size / 1024 * 10) / 10 + "kb)");
+    }); };
+    var formatTime = function (size) { return ifValueDefined(size, function (size) {
+        return (size + "ms");
+    }); };
+    return {
+        "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
+        "Duration": formatTime(entry.time),
+        "Server IPAddress": entry.serverIPAddress,
+        "Connection": entry.connection,
+        "Request HTTP Version": entry.request.httpVersion,
+        "Request Headers Size": formatBytes(entry.request.headersSize),
+        "Request Body Size": formatBytes(entry.request.bodySize),
+        "Request Comment": entry.request.comment,
+        "Request Method": entry.request.method,
+        "Response Status": entry.response.status + " " + entry.response.statusText,
+        "Response HTTP Version": entry.response.httpVersion,
+        "Response Body Size": formatBytes(entry.response.bodySize),
+        "Response Header Size": formatBytes(entry.response.headersSize),
+        "Response Redirect URL": entry.response.redirectURL,
+        "Response Comment": entry.response.comment
+    };
+}
+function createRowInfoOverlay(requestID, barX, y, block, unit) {
+    var holder = createHolder(y);
+    var html = svg_1.default.newEl("foreignObject", {
+        "width": "60%",
+        "height": 200,
+        "x": "20%",
+        "y": y
+    });
+    var closeBtn = createCloseButtonSvg(y);
+    closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });
+    var body = document.createElement("body");
+    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    var dlKeyValues = getKeys(block);
+    var dlData = Object.keys(dlKeyValues)
+        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""); })
+        .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
+    // entry.request.httpVersion
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <dl>\n        " + dlData + "\n      </dl>\n    </div>\n    ";
+    html.appendChild(body);
+    holder.appendChild(closeBtn);
+    holder.appendChild(html);
+    return holder;
+}
+exports.createRowInfoOverlay = createRowInfoOverlay;
+
+},{"../helpers/svg":3}],10:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -553,106 +653,6 @@ function createMarks(marks, unit, diagramHeight) {
     return marksHolder;
 }
 exports.createMarks = createMarks;
-
-},{"../helpers/svg":3}],10:[function(require,module,exports){
-var svg_1 = require("../helpers/svg");
-function createCloseButtonSvg(y) {
-    var closeBtn = svg_1.default.newEl("g", {
-        "class": "info-overlay-close-btn"
-    });
-    closeBtn.appendChild(svg_1.default.newEl("rect", {
-        "width": 25,
-        "height": 25,
-        "x": "80%",
-        "y": y,
-    }));
-    closeBtn.appendChild(svg_1.default.newEl("text", {
-        "width": 25,
-        "height": 25,
-        "x": "80%",
-        "y": y,
-        "dx": 9,
-        "dy": 17,
-        "fill": "#111",
-        "text": "X",
-        "textAnchor": "middle"
-    }));
-    closeBtn.appendChild(svg_1.default.newEl("title", {
-        "text": "Close Overlay"
-    }));
-    return closeBtn;
-}
-function createHolder(y) {
-    var holder = svg_1.default.newEl("g", {
-        "class": "info-overlay-holder"
-    });
-    var bg = svg_1.default.newEl("rect", {
-        "width": "60%",
-        "height": 200,
-        "x": "20%",
-        "y": y,
-        "class": "info-overlay"
-    });
-    holder.appendChild(bg);
-    return holder;
-}
-function getKeys(block) {
-    //TODO: dodgy casting - will not work for other adapters
-    var entry = block.rawResource;
-    var ifValueDefined = function (value, fn) {
-        if (typeof value !== "number" || value <= 0) {
-            return undefined;
-        }
-        return fn(value);
-    };
-    var formatBytes = function (size) { return ifValueDefined(size, function (size) {
-        return (size + " byte (~" + Math.round(size / 1024 * 10) / 10 + "kb)");
-    }); };
-    var formatTime = function (size) { return ifValueDefined(size, function (size) {
-        return (size + "ms");
-    }); };
-    return {
-        "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
-        "Duration": formatTime(entry.time),
-        "Server IPAddress": entry.serverIPAddress,
-        "Connection": entry.connection,
-        "Request HTTP Version": entry.request.httpVersion,
-        "Request Headers Size": formatBytes(entry.request.headersSize),
-        "Request Body Size": formatBytes(entry.request.bodySize),
-        "Request Comment": entry.request.comment,
-        "Request Method": entry.request.method,
-        "Response Status": entry.response.status + " " + entry.response.statusText,
-        "Response HTTP Version": entry.response.httpVersion,
-        "Response Body Size": formatBytes(entry.response.bodySize),
-        "Response Header Size": formatBytes(entry.response.headersSize),
-        "Response Redirect URL": entry.response.redirectURL,
-        "Response Comment": entry.response.comment
-    };
-}
-function createRowInfoOverlay(requestID, barX, y, block, unit) {
-    var holder = createHolder(y);
-    var html = svg_1.default.newEl("foreignObject", {
-        "width": "60%",
-        "height": 200,
-        "x": "20%",
-        "y": y
-    });
-    var closeBtn = createCloseButtonSvg(y);
-    closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });
-    var body = document.createElement("body");
-    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-    var dlKeyValues = getKeys(block);
-    var dlData = Object.keys(dlKeyValues)
-        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""); })
-        .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
-    // entry.request.httpVersion
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <dl>\n        " + dlData + "\n      </dl>\n    </div>\n    ";
-    html.appendChild(body);
-    holder.appendChild(closeBtn);
-    holder.appendChild(html);
-    return holder;
-}
-exports.createRowInfoOverlay = createRowInfoOverlay;
 
 },{"../helpers/svg":3}],11:[function(require,module,exports){
 /**
