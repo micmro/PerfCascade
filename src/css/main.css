@@ -65,8 +65,8 @@ textarea {
 
 .water-fall-holder {fill:#ccc;}
 
-svg.water-fall-chart {width:100%; padding-left: 70px; background:#f0f5f0; overflow: visible;}
-.water-fall-chart .left-fixed-holder {overflow: visible;}
+svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
+/*.water-fall-chart .left-fixed-holder {overflow: visible;}*/
 .water-fall-chart .marker-holder {width:100%;}
 .water-fall-chart .line-holder {stroke-width:1; stroke: #ccc; stroke-opacity:0.5;}
 .water-fall-chart .line-holder.active {stroke: #69009e; stroke-width:2; stroke-opacity:1;}
@@ -88,6 +88,10 @@ svg.water-fall-chart {width:100%; padding-left: 70px; background:#f0f5f0; overfl
 .bg-stripes .odd rect {fill: #000; opacity: 0.05;}
 .bg-stripes
 .bg-stripes g:hover rect {fill: #000; opacity: 0.2}
+
+.lables {
+    overflow: hidden;
+}
 
 /*block colours*/
 .block-css {fill: #a6d18f;}

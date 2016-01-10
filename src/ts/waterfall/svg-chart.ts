@@ -3,16 +3,21 @@ import {WaterfallData} from "../typing/waterfall-data"
 import svg from "../helpers/svg"
 import icons from "../helpers/icons"
 import {
-  RectData,
-  createRect,
-  createRequestLabel,
   createBgRect,
   createTimeScale,
   createMarks,
   makeHoverEvtListeners,
   createAlignmentLines,
-  createBgStripe
 } from "./svg-components"
+
+import {
+  RectData,
+  createRect,
+  createRequestLabel,
+  createBgStripe,
+  createFixedRow,
+  createFlexRow
+} from "./svg-row-components"
 import {createRowInfoOverlay} from "./svg-details-overlay"
 import dom from '../helpers/dom'
 
@@ -42,9 +47,10 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   
   /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100
+  const leftFixedWidth: number = 250
 
   /** height of every request bar block plus spacer pixel */
-  const requestBarHeight: number = 21
+  const requestBarHeight: number = 25
 
   const barsToShow = data.blocks
     .filter((block) => (typeof block.start == "number" && typeof block.total == "number"))
@@ -60,12 +66,15 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   let timeLineHolder = svg.newEl("svg:svg", {
     "height": Math.floor(chartHolderHeight),
     "class": "water-fall-chart"
+  }, {
+    paddingLeft: leftFixedWidth + "px"
   }) as SVGSVGElement
 
+  //Other holder elements
   let leftFixedHolder = svg.newEl("svg", {
     "class": "left-fixed-holder",
-    "x" : "-70",
-    "width" : "70"
+    "x": "-" + leftFixedWidth,
+    "width": leftFixedWidth
   }) as SVGSVGElement
 
   let flexScaleHolder = svg.newEl("svg", {
@@ -78,6 +87,10 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
 
   let overlayHolder = svg.newEl("g", {
     "class": "overlays"
+  }) as SVGGElement
+
+  let lableHolder = svg.newEl("g", {
+    "class": "lables"
   }) as SVGGElement
 
   let bgStripesHolder = svg.newEl("g", {
@@ -103,15 +116,11 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   //Main loop to render rows with blocks
 
   barsToShow.forEach((block, i) => {
-    let blockWidth = block.total || 1
-    let y = requestBarHeight * i
-    let x = (block.start || 0.001)
+    const blockWidth = block.total || 1
+    const y = requestBarHeight * i
+    const x = (block.start || 0.001)
 
-    let row = svg.newEl("g", {
-      "class": "row"
-    }) as SVGGElement
-
-    let rectData = {
+    const rectData = {
       "width": blockWidth,
       "height": requestBarHeight,
       "x": x,
@@ -124,29 +133,34 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     } as RectData
 
     let rect = createRect(rectData, block.segments)
-    let label = createRequestLabel(block, blockWidth, y, unit)
-
+    let label = createRequestLabel(25, y, block, leftFixedWidth, requestBarHeight)
     let infoOverlay = createRowInfoOverlay(i+1, x, y + requestBarHeight, block, unit)
-    rect.addEventListener('click', (evt) => {
+
+    let showOverlay = (evt) => {
       dom.removeAllChildren(overlayHolder)
       overlayHolder.appendChild(infoOverlay)
-    })
+    }
+
+    let rowFixed = createFixedRow(y, requestBarHeight, showOverlay, leftFixedWidth)
+    let rowFlex = createFlexRow(y, requestBarHeight, showOverlay)
+
+    rowFixed.appendChild(label)
 
     //create and attach request block
-    row.appendChild(rect)
-    row.appendChild(label)
-
+    rowFlex.appendChild(rect)
 
     //TODO: Add indicators / Warnings
     const isSecure = block.name.indexOf("https://") === 0
     if (isSecure) {
-       leftFixedHolder.appendChild(icons.lock(5, y+3, "Secure Connection", 1.2))
+      rowFixed.appendChild(icons.lock(5, y + 3, "Secure Connection", 1.2))
     }
 
-    flexScaleHolder.appendChild(row)
-    bgStripesHolder.appendChild(createBgStripe(y, requestBarHeight, (i%2 === 0)))
+    flexScaleHolder.appendChild(rowFlex)
+    leftFixedHolder.appendChild(rowFixed)
+    bgStripesHolder.appendChild(createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0)))
   })
-
+  
+  leftFixedHolder.appendChild(lableHolder)
   flexScaleHolder.appendChild(hoverOverlayHolder)
   timeLineHolder.appendChild(bgStripesHolder)
   timeLineHolder.appendChild(leftFixedHolder)

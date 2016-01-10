@@ -6,7 +6,7 @@ import TimeBlock from "../typing/time-block"
 import {Entry} from "../typing/har"
 
 
-function createCloseButtonSvg(y): SVGGElement {
+function createCloseButtonSvg(y: number): SVGGElement {
   let closeBtn = svg.newEl("g", {
     "class": "info-overlay-close-btn"
   }) as SVGGElement
@@ -34,13 +34,11 @@ function createCloseButtonSvg(y): SVGGElement {
     "text": "Close Overlay"
   }))
 
-  // closeBtn.appendChild(svg.newTextEl("X", y + 17, "71%", "pointer-events: none;"))
-
   return closeBtn
 }
 
 
-function createHolder(y): SVGGElement{
+function createHolder(y: number): SVGGElement {
   let holder = svg.newEl("g", {
     "class": "info-overlay-holder"
   }) as SVGGElement
