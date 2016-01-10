@@ -20,6 +20,18 @@ var svg = {
     return el
   },
 
+  newSvg: function(cssClass: string, settings?: Object, css?: Object): SVGSVGElement {
+    settings = settings || {}
+    settings["class"] = cssClass
+    return svg.newEl("svg:svg", settings, css) as SVGSVGElement
+  },
+
+  newG: function(cssClass: string, settings?: Object, css?: Object): SVGGElement {
+    settings = settings || {}
+    settings["class"] = cssClass
+    return svg.newEl("g", settings, css) as SVGGElement
+  },
+
   newTextEl: function(text: string, y: number, x?: number, css?: Object): SVGTextElement {
     css = css||{}
     let opt = {

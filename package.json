@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node_modules/.bin/live-server --wait=50 --open=src/index.html --ignore=src/ts/",
     "watch": "npm start & Grunt",
+    "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
     "build": "Grunt dist"
   },
   "author": {

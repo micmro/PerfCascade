@@ -2,6 +2,7 @@ import TimeBlock from "../typing/time-block"
 import {WaterfallData} from "../typing/waterfall-data"
 import svg from "../helpers/svg"
 import icons from "../helpers/icons"
+import misc from "../helpers/misc"
 import {
   createBgRect,
   createTimeScale,
@@ -13,7 +14,8 @@ import {
 import {
   RectData,
   createRect,
-  createRequestLabel,
+  createRequestLabelFull,
+  createRequestLabelClipped,
   createBgStripe,
   createFixedRow,
   createFlexRow
@@ -21,6 +23,29 @@ import {
 import {createRowInfoOverlay} from "./svg-details-overlay"
 import dom from '../helpers/dom'
 
+
+
+/**
+ * Function to format the shortened URL
+ * @param  {string} url       URL of ressource
+ * @param  {number} maxLength maximal 
+ * @return {string}           [description]
+ */
+function ressourceUrlFormater(url: string): string {
+  const maxLength = 40
+  if (url.length < maxLength) {
+    return url.replace(/http[s]\:\/\//, "")
+  }
+
+  let matches = misc.parseUrl(url)
+
+  if ((matches.authority + matches.path).length < maxLength){
+    return matches.authority + matches.path
+  }
+
+  let p = matches.path.split("/")
+  return matches.authority + "…/" + p[p.length - 1]
+}
 
 
 /**
@@ -47,10 +72,10 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   
   /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100
-  const leftFixedWidth: number = 250
-
   /** height of every request bar block plus spacer pixel */
-  const requestBarHeight: number = 25
+  const requestBarHeight: number = 23
+  /** width of the url and highlight rule column in pixel */
+  const leftFixedWidth: number = 250
 
   const barsToShow = data.blocks
     .filter((block) => (typeof block.start == "number" && typeof block.total == "number"))
@@ -63,40 +88,32 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   const chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight)
 
   //Main holder
-  let timeLineHolder = svg.newEl("svg:svg", {
-    "height": Math.floor(chartHolderHeight),
-    "class": "water-fall-chart"
-  }, {
-    paddingLeft: leftFixedWidth + "px"
-  }) as SVGSVGElement
+  let timeLineHolder = svg.newSvg("water-fall-chart", {
+    "height": Math.floor(chartHolderHeight)
+    }, {
+    "paddingLeft": leftFixedWidth + "px"
+  })
 
   //Other holder elements
-  let leftFixedHolder = svg.newEl("svg", {
-    "class": "left-fixed-holder",
+  let leftFixedHolder = svg.newSvg("left-fixed-holder",{
     "x": "-" + leftFixedWidth,
     "width": leftFixedWidth
-  }) as SVGSVGElement
+  })
+  let flexScaleHolder = svg.newSvg("flex-scale-waterfall")
 
-  let flexScaleHolder = svg.newEl("svg", {
-    "class": "flex-scale-waterfall"
-  }) as SVGSVGElement
+  let hoverOverlayHolder = svg.newG("hover-overlays")
+  let overlayHolder = svg.newG("overlays")
+  let bgStripesHolder = svg.newG("bg-stripes")
 
-  let hoverOverlayHolder = svg.newEl("g", {
-    "class": "hover-overlays"
-  }) as SVGGElement
+  let clipPathEl = svg.newEl("clipPath", {
+    "id": "titleClipPath"
+  }) as SVGClipPathElement
+  clipPathEl.appendChild(svg.newEl("rect", {
+    "width": leftFixedWidth,
+    "height": "100%"
+  }))
 
-  let overlayHolder = svg.newEl("g", {
-    "class": "overlays"
-  }) as SVGGElement
-
-  let lableHolder = svg.newEl("g", {
-    "class": "lables"
-  }) as SVGGElement
-
-  let bgStripesHolder = svg.newEl("g", {
-    "class": "bg-stripes"
-  }) as SVGGElement
-
+  leftFixedHolder.appendChild(clipPathEl)
 
   let hoverEl = createAlignmentLines(diagramHeight)
   hoverOverlayHolder.appendChild(hoverEl.startline)
@@ -133,18 +150,17 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     } as RectData
 
     let rect = createRect(rectData, block.segments)
-    let label = createRequestLabel(25, y, block, leftFixedWidth, requestBarHeight)
+    let shortLabel = createRequestLabelClipped(25, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath")
+    let fullLabel = createRequestLabelFull(25, y, block.name, requestBarHeight)
+
     let infoOverlay = createRowInfoOverlay(i+1, x, y + requestBarHeight, block, unit)
 
     let showOverlay = (evt) => {
       dom.removeAllChildren(overlayHolder)
       overlayHolder.appendChild(infoOverlay)
     }
-
     let rowFixed = createFixedRow(y, requestBarHeight, showOverlay, leftFixedWidth)
     let rowFlex = createFlexRow(y, requestBarHeight, showOverlay)
-
-    rowFixed.appendChild(label)
 
     //create and attach request block
     rowFlex.appendChild(rect)
@@ -155,18 +171,31 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
       rowFixed.appendChild(icons.lock(5, y + 3, "Secure Connection", 1.2))
     }
 
+    fullLabel.style.visibility = "hidden"
+    rowFixed.appendChild(shortLabel)
+    rowFixed.appendChild(fullLabel)
+    rowFixed.addEventListener("mouseenter", () => {
+      fullLabel.style.visibility = "visible"
+      shortLabel.style.visibility = "hidden"
+    })
+    rowFixed.addEventListener("mouseleave", () => {
+      shortLabel.style.visibility = "visible"
+      fullLabel.style.visibility = "hidden"
+      let bg = fullLabel.getElementsByClassName("label-full-bg")[0] as SVGRectElement
+      bg.style.width = ((fullLabel.getElementsByTagName("text")[0] as SVGTextElement).clientWidth + 10).toString()
+    })
+
     flexScaleHolder.appendChild(rowFlex)
     leftFixedHolder.appendChild(rowFixed)
     bgStripesHolder.appendChild(createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0)))
   })
   
-  leftFixedHolder.appendChild(lableHolder)
   flexScaleHolder.appendChild(hoverOverlayHolder)
-  timeLineHolder.appendChild(bgStripesHolder)
-  timeLineHolder.appendChild(leftFixedHolder)
-  timeLineHolder.appendChild(flexScaleHolder)
-  timeLineHolder.appendChild(overlayHolder)
 
+  timeLineHolder.appendChild(bgStripesHolder)
+  timeLineHolder.appendChild(flexScaleHolder)
+  timeLineHolder.appendChild(leftFixedHolder)
+  timeLineHolder.appendChild(overlayHolder)
 
   return timeLineHolder
 }

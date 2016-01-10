@@ -83,24 +83,41 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
  * Create a new SVG Text element to label a request block
  * @param  {number}         x                horizontal position (in px)
  * @param  {number}         y                vertical position of related request block (in px)
- * @param  {TimeBlock}      block            Ressource Request
- * @param  {number}         leftFixedWidth   Width of fixed name and highlight column
+ * @param  {string}         name              URL
  * @param  {number}         height           height of row
  * @return {SVGTextElement}                  lable SVG element
  */
-export function createRequestLabel(x: number, y: number, block: TimeBlock, leftFixedWidth: number, height: number): SVGTextElement {
-  //crop name if longer than 30 characters
-  let clipName = (block.name.length > 30 && block.name.indexOf("?") > 0)
-  let blockName = (clipName) ? block.name.split("?")[0] + "?…" : block.name
+export function createRequestLabelClipped(x: number, y: number, name: string, height: number, clipPathId?: string) {
 
-  let blockLabel = svg.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + Math.round(height / 2) + 5))
+  let blockLabel = createRequestLabel(x, y, name, height)
+  blockLabel.style.clipPath = `url(#titleClipPath)`
+  return blockLabel
+}
+
+export function createRequestLabelFull(x: number, y: number, name: string, height: number){
+  let blockLabel = createRequestLabel(x, y, name, height)
+  let lableHolder = svg.newG("full-lable")
+  lableHolder.appendChild(svg.newEl("rect", {
+    "class": "label-full-bg",
+    "x": x,
+    "y": y,
+    "width": svg.getNodeTextWidth(blockLabel),
+    "height": height,
+    "fill": "#fff"
+  }))
+  lableHolder.appendChild(blockLabel)
+  return lableHolder
+}
+function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
+  const blockName = name.replace(/http[s]\:\/\//, "")
+  let blockLabel = svg.newTextEl(blockName, (y + Math.round(height / 2) + 5))
 
   blockLabel.appendChild(svg.newEl("title", {
-    "text": block.name
+    "text": name
   }))
 
   blockLabel.setAttribute("x", x.toString())
-  blockLabel.style.opacity = block.name.match(/js.map$/) ? "0.5" : "1"
+  blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1"
 
   return blockLabel
 }
@@ -157,6 +174,8 @@ export function createFixedRow(y: number, requestBarHeight: number, onClick: Eve
 
   return rowFixed
 }
+
+
 
 export function createFlexRow(y: number, requestBarHeight: number, onClick: EventListener): SVGGElement {
   let rowFixed = svg.newEl("g", {

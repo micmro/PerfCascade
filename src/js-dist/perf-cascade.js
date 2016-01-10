@@ -31,6 +31,26 @@ exports.default = icons;
 
 },{}],3:[function(require,module,exports){
 /**
+ *  Misc Helpers
+ */
+var misc = {
+    parseUrl: function (url) {
+        var pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
+        var matches = url.match(pattern);
+        return {
+            scheme: matches[2],
+            authority: matches[4],
+            path: matches[5],
+            query: matches[7],
+            fragment: matches[9]
+        };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = misc;
+
+},{}],4:[function(require,module,exports){
+/**
  *  SVG Helpers
  */
 var svg = {
@@ -49,6 +69,16 @@ var svg = {
             });
         }
         return el;
+    },
+    newSvg: function (cssClass, settings, css) {
+        settings = settings || {};
+        settings["class"] = cssClass;
+        return svg.newEl("svg:svg", settings, css);
+    },
+    newG: function (cssClass, settings, css) {
+        settings = settings || {};
+        settings["class"] = cssClass;
+        return svg.newEl("g", settings, css);
     },
     newTextEl: function (text, y, x, css) {
         css = css || {};
@@ -101,7 +131,7 @@ var svg = {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = svg;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var svg_chart_1 = require("./waterfall/svg-chart");
 var dom_1 = require('./helpers/dom');
 var har_1 = require('./transformers/har');
@@ -139,7 +169,7 @@ document.getElementById('fileinput').addEventListener('change', onFileSubmit, fa
 //TODO: remove Dev/Test only - load test file
 window["fetch"]("test-data/github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 
-},{"./helpers/dom":1,"./transformers/har":5,"./waterfall/svg-chart":8}],5:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":9}],6:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
 var styling_converters_1 = require('./styling-converters');
 var HarTransformer = (function () {
@@ -203,7 +233,7 @@ var HarTransformer = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = HarTransformer;
 
-},{"../typing/time-block":7,"./styling-converters":6}],6:[function(require,module,exports){
+},{"../typing/time-block":8,"./styling-converters":7}],7:[function(require,module,exports){
 /**
  * Convert a MIME type into a CSS class
  * @param {string} mimeType
@@ -238,7 +268,7 @@ function mimeToCssClass(mimeType) {
 }
 exports.mimeToCssClass = mimeToCssClass;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var TimeBlock = (function () {
     function TimeBlock(name, start, end, cssClass, segments, rawResource) {
         if (cssClass === void 0) { cssClass = ""; }
@@ -256,13 +286,32 @@ var TimeBlock = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var icons_1 = require("../helpers/icons");
+var misc_1 = require("../helpers/misc");
 var svg_general_components_1 = require("./svg-general-components");
 var svg_row_components_1 = require("./svg-row-components");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var dom_1 = require('../helpers/dom');
+/**
+ * Function to format the shortened URL
+ * @param  {string} url       URL of ressource
+ * @param  {number} maxLength maximal
+ * @return {string}           [description]
+ */
+function ressourceUrlFormater(url) {
+    var maxLength = 40;
+    if (url.length < maxLength) {
+        return url.replace(/http[s]\:\/\//, "");
+    }
+    var matches = misc_1.default.parseUrl(url);
+    if ((matches.authority + matches.path).length < maxLength) {
+        return matches.authority + matches.path;
+    }
+    var p = matches.path.split("/");
+    return matches.authority + "…/" + p[p.length - 1];
+}
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
@@ -283,9 +332,10 @@ function createWaterfallSvg(data) {
     //constants
     /** horizontal unit (duration in ms of 1%) */
     var unit = data.durationMs / 100;
-    var leftFixedWidth = 250;
     /** height of every request bar block plus spacer pixel */
-    var requestBarHeight = 25;
+    var requestBarHeight = 23;
+    /** width of the url and highlight rule column in pixel */
+    var leftFixedWidth = 250;
     var barsToShow = data.blocks
         .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
         .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
@@ -294,33 +344,28 @@ function createWaterfallSvg(data) {
     /** full height of the SVG chart in px */
     var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
     //Main holder
-    var timeLineHolder = svg_1.default.newEl("svg:svg", {
-        "height": Math.floor(chartHolderHeight),
-        "class": "water-fall-chart"
+    var timeLineHolder = svg_1.default.newSvg("water-fall-chart", {
+        "height": Math.floor(chartHolderHeight)
     }, {
-        paddingLeft: leftFixedWidth + "px"
+        "paddingLeft": leftFixedWidth + "px"
     });
     //Other holder elements
-    var leftFixedHolder = svg_1.default.newEl("svg", {
-        "class": "left-fixed-holder",
+    var leftFixedHolder = svg_1.default.newSvg("left-fixed-holder", {
         "x": "-" + leftFixedWidth,
         "width": leftFixedWidth
     });
-    var flexScaleHolder = svg_1.default.newEl("svg", {
-        "class": "flex-scale-waterfall"
+    var flexScaleHolder = svg_1.default.newSvg("flex-scale-waterfall");
+    var hoverOverlayHolder = svg_1.default.newG("hover-overlays");
+    var overlayHolder = svg_1.default.newG("overlays");
+    var bgStripesHolder = svg_1.default.newG("bg-stripes");
+    var clipPathEl = svg_1.default.newEl("clipPath", {
+        "id": "titleClipPath"
     });
-    var hoverOverlayHolder = svg_1.default.newEl("g", {
-        "class": "hover-overlays"
-    });
-    var overlayHolder = svg_1.default.newEl("g", {
-        "class": "overlays"
-    });
-    var lableHolder = svg_1.default.newEl("g", {
-        "class": "lables"
-    });
-    var bgStripesHolder = svg_1.default.newEl("g", {
-        "class": "bg-stripes"
-    });
+    clipPathEl.appendChild(svg_1.default.newEl("rect", {
+        "width": leftFixedWidth,
+        "height": "100%"
+    }));
+    leftFixedHolder.appendChild(clipPathEl);
     var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
     hoverOverlayHolder.appendChild(hoverEl.startline);
     hoverOverlayHolder.appendChild(hoverEl.endline);
@@ -348,7 +393,8 @@ function createWaterfallSvg(data) {
             "hideOverlay": mouseListeners.onMouseLeavePartial
         };
         var rect = svg_row_components_1.createRect(rectData, block.segments);
-        var label = svg_row_components_1.createRequestLabel(25, y, block, leftFixedWidth, requestBarHeight);
+        var shortLabel = svg_row_components_1.createRequestLabelClipped(25, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
+        var fullLabel = svg_row_components_1.createRequestLabelFull(25, y, block.name, requestBarHeight);
         var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, unit);
         var showOverlay = function (evt) {
             dom_1.default.removeAllChildren(overlayHolder);
@@ -356,7 +402,6 @@ function createWaterfallSvg(data) {
         };
         var rowFixed = svg_row_components_1.createFixedRow(y, requestBarHeight, showOverlay, leftFixedWidth);
         var rowFlex = svg_row_components_1.createFlexRow(y, requestBarHeight, showOverlay);
-        rowFixed.appendChild(label);
         //create and attach request block
         rowFlex.appendChild(rect);
         //TODO: Add indicators / Warnings
@@ -364,21 +409,33 @@ function createWaterfallSvg(data) {
         if (isSecure) {
             rowFixed.appendChild(icons_1.default.lock(5, y + 3, "Secure Connection", 1.2));
         }
+        fullLabel.style.visibility = "hidden";
+        rowFixed.appendChild(shortLabel);
+        rowFixed.appendChild(fullLabel);
+        rowFixed.addEventListener("mouseenter", function () {
+            fullLabel.style.visibility = "visible";
+            shortLabel.style.visibility = "hidden";
+        });
+        rowFixed.addEventListener("mouseleave", function () {
+            shortLabel.style.visibility = "visible";
+            fullLabel.style.visibility = "hidden";
+            var bg = fullLabel.getElementsByClassName("label-full-bg")[0];
+            bg.style.width = (fullLabel.getElementsByTagName("text")[0].clientWidth + 10).toString();
+        });
         flexScaleHolder.appendChild(rowFlex);
         leftFixedHolder.appendChild(rowFixed);
         bgStripesHolder.appendChild(svg_row_components_1.createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0)));
     });
-    leftFixedHolder.appendChild(lableHolder);
     flexScaleHolder.appendChild(hoverOverlayHolder);
     timeLineHolder.appendChild(bgStripesHolder);
-    timeLineHolder.appendChild(leftFixedHolder);
     timeLineHolder.appendChild(flexScaleHolder);
+    timeLineHolder.appendChild(leftFixedHolder);
     timeLineHolder.appendChild(overlayHolder);
     return timeLineHolder;
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/dom":1,"../helpers/icons":2,"../helpers/svg":3,"./svg-details-overlay":9,"./svg-general-components":10,"./svg-row-components":11}],9:[function(require,module,exports){
+},{"../helpers/dom":1,"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-details-overlay":10,"./svg-general-components":11,"./svg-row-components":12}],10:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 function createCloseButtonSvg(y) {
     var closeBtn = svg_1.default.newEl("g", {
@@ -478,7 +535,7 @@ function createRowInfoOverlay(requestID, barX, y, block, unit) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../helpers/svg":3}],10:[function(require,module,exports){
+},{"../helpers/svg":4}],11:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -654,7 +711,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../helpers/svg":3}],11:[function(require,module,exports){
+},{"../helpers/svg":4}],12:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -716,24 +773,41 @@ exports.createRect = createRect;
  * Create a new SVG Text element to label a request block
  * @param  {number}         x                horizontal position (in px)
  * @param  {number}         y                vertical position of related request block (in px)
- * @param  {TimeBlock}      block            Ressource Request
- * @param  {number}         leftFixedWidth   Width of fixed name and highlight column
+ * @param  {string}         name              URL
  * @param  {number}         height           height of row
  * @return {SVGTextElement}                  lable SVG element
  */
-function createRequestLabel(x, y, block, leftFixedWidth, height) {
-    //crop name if longer than 30 characters
-    var clipName = (block.name.length > 30 && block.name.indexOf("?") > 0);
-    var blockName = (clipName) ? block.name.split("?")[0] + "?…" : block.name;
-    var blockLabel = svg_1.default.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (y + Math.round(height / 2) + 5));
-    blockLabel.appendChild(svg_1.default.newEl("title", {
-        "text": block.name
-    }));
-    blockLabel.setAttribute("x", x.toString());
-    blockLabel.style.opacity = block.name.match(/js.map$/) ? "0.5" : "1";
+function createRequestLabelClipped(x, y, name, height, clipPathId) {
+    var blockLabel = createRequestLabel(x, y, name, height);
+    blockLabel.style.clipPath = "url(#titleClipPath)";
     return blockLabel;
 }
-exports.createRequestLabel = createRequestLabel;
+exports.createRequestLabelClipped = createRequestLabelClipped;
+function createRequestLabelFull(x, y, name, height) {
+    var blockLabel = createRequestLabel(x, y, name, height);
+    var lableHolder = svg_1.default.newG("full-lable");
+    lableHolder.appendChild(svg_1.default.newEl("rect", {
+        "class": "label-full-bg",
+        "x": x,
+        "y": y,
+        "width": svg_1.default.getNodeTextWidth(blockLabel),
+        "height": height,
+        "fill": "#fff"
+    }));
+    lableHolder.appendChild(blockLabel);
+    return lableHolder;
+}
+exports.createRequestLabelFull = createRequestLabelFull;
+function createRequestLabel(x, y, name, height) {
+    var blockName = name.replace(/http[s]\:\/\//, "");
+    var blockLabel = svg_1.default.newTextEl(blockName, (y + Math.round(height / 2) + 5));
+    blockLabel.appendChild(svg_1.default.newEl("title", {
+        "text": name
+    }));
+    blockLabel.setAttribute("x", x.toString());
+    blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1";
+    return blockLabel;
+}
 /**
  * Stripe for BG
  * @param  {number}      y              [description]
@@ -794,4 +868,4 @@ function createFlexRow(y, requestBarHeight, onClick) {
 }
 exports.createFlexRow = createFlexRow;
 
-},{"../helpers/svg":3}]},{},[4]);
+},{"../helpers/svg":4}]},{},[5]);
