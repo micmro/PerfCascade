@@ -1,4 +1,4 @@
-/*PerfCascade build:10/01/2016 */
+/*PerfCascade build:11/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -142,7 +142,7 @@ var outputHolder = document.getElementById("output");
 function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
     dom_1.default.removeAllChildren(outputHolder);
-    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data));
+    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, (window.innerWidth > 920 ? 250 : 200), 23));
 }
 function onFileSubmit(evt) {
     var files = evt.target.files;
@@ -326,16 +326,16 @@ function getSvgHeight(marks, barsToShow, diagramHeight) {
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
- * @return {SVGSVGElement}      SVG Element ready to render
+ * @param {leftFixedWidth} number     Width of the url and highlight rule column in pixel
+ * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
+ * @return {SVGSVGElement}            SVG Element ready to render
  */
-function createWaterfallSvg(data) {
+function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
     //constants
+    if (leftFixedWidth === void 0) { leftFixedWidth = 250; }
+    if (requestBarHeight === void 0) { requestBarHeight = 23; }
     /** horizontal unit (duration in ms of 1%) */
     var unit = data.durationMs / 100;
-    /** height of every request bar block plus spacer pixel */
-    var requestBarHeight = 23;
-    /** width of the url and highlight rule column in pixel */
-    var leftFixedWidth = 250;
     var barsToShow = data.blocks
         .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
         .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
@@ -409,18 +409,23 @@ function createWaterfallSvg(data) {
         if (isSecure) {
             rowFixed.appendChild(icons_1.default.lock(5, y + 3, "Secure Connection", 1.2));
         }
+        var lableFullBg = fullLabel.getElementsByClassName("label-full-bg")[0];
+        var fullLableText = fullLabel.getElementsByTagName("text")[0];
+        //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
+        fullLabel.style.display = "none";
         fullLabel.style.visibility = "hidden";
         rowFixed.appendChild(shortLabel);
         rowFixed.appendChild(fullLabel);
         rowFixed.addEventListener("mouseenter", function () {
+            fullLabel.style.display = "block";
+            shortLabel.style.display = "none";
             fullLabel.style.visibility = "visible";
-            shortLabel.style.visibility = "hidden";
+            lableFullBg.style.width = (fullLableText.clientWidth + 10).toString();
         });
         rowFixed.addEventListener("mouseleave", function () {
-            shortLabel.style.visibility = "visible";
+            shortLabel.style.display = "block";
+            fullLabel.style.display = "none";
             fullLabel.style.visibility = "hidden";
-            var bg = fullLabel.getElementsByClassName("label-full-bg")[0];
-            bg.style.width = (fullLabel.getElementsByTagName("text")[0].clientWidth + 10).toString();
         });
         flexScaleHolder.appendChild(rowFlex);
         leftFixedHolder.appendChild(rowFixed);
@@ -788,11 +793,12 @@ function createRequestLabelFull(x, y, name, height) {
     var lableHolder = svg_1.default.newG("full-lable");
     lableHolder.appendChild(svg_1.default.newEl("rect", {
         "class": "label-full-bg",
-        "x": x,
-        "y": y,
+        "x": x - 3,
+        "y": y + 3,
         "width": svg_1.default.getNodeTextWidth(blockLabel),
-        "height": height,
-        "fill": "#fff"
+        "height": height - 4,
+        "rx": 5,
+        "ry": 5
     }));
     lableHolder.appendChild(blockLabel);
     return lableHolder;

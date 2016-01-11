@@ -81,6 +81,8 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 
 .water-fall-chart .mark-holder text {-webkit-writing-mode: tb; writing-mode:vertical-lr; writing-mode: tb;}
 
+.left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9}
+
 .time-scale line {stroke:#0cc; stroke-width:1;}
 .time-scale text {font-weight:bold;}
 
@@ -89,9 +91,8 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .bg-stripes
 .bg-stripes g:hover rect {fill: #000; opacity: 0.2}
 
-.lables {
-    overflow: hidden;
-}
+
+.lables { overflow: hidden;}
 
 /*block colours*/
 .block-css {fill: #a6d18f;}

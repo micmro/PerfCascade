@@ -64,18 +64,16 @@ function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: numb
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
- * @return {SVGSVGElement}      SVG Element ready to render
+ * @param {leftFixedWidth} number     Width of the url and highlight rule column in pixel
+ * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
+ * @return {SVGSVGElement}            SVG Element ready to render
  */
-export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
+export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number = 250, requestBarHeight: number = 23): SVGSVGElement {
 
   //constants
   
   /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100
-  /** height of every request bar block plus spacer pixel */
-  const requestBarHeight: number = 23
-  /** width of the url and highlight rule column in pixel */
-  const leftFixedWidth: number = 250
 
   const barsToShow = data.blocks
     .filter((block) => (typeof block.start == "number" && typeof block.total == "number"))
@@ -171,18 +169,24 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
       rowFixed.appendChild(icons.lock(5, y + 3, "Secure Connection", 1.2))
     }
 
+    let lableFullBg = fullLabel.getElementsByClassName("label-full-bg")[0] as SVGRectElement
+    let fullLableText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement
+
+    //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
+    fullLabel.style.display = "none"
     fullLabel.style.visibility = "hidden"
     rowFixed.appendChild(shortLabel)
     rowFixed.appendChild(fullLabel)
     rowFixed.addEventListener("mouseenter", () => {
+      fullLabel.style.display = "block"
+      shortLabel.style.display = "none"
       fullLabel.style.visibility = "visible"
-      shortLabel.style.visibility = "hidden"
+      lableFullBg.style.width = (fullLableText.clientWidth + 10).toString()
     })
     rowFixed.addEventListener("mouseleave", () => {
-      shortLabel.style.visibility = "visible"
+      shortLabel.style.display = "block"
+      fullLabel.style.display = "none"
       fullLabel.style.visibility = "hidden"
-      let bg = fullLabel.getElementsByClassName("label-full-bg")[0] as SVGRectElement
-      bg.style.width = ((fullLabel.getElementsByTagName("text")[0] as SVGTextElement).clientWidth + 10).toString()
     })
 
     flexScaleHolder.appendChild(rowFlex)

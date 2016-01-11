@@ -99,11 +99,12 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
   let lableHolder = svg.newG("full-lable")
   lableHolder.appendChild(svg.newEl("rect", {
     "class": "label-full-bg",
-    "x": x,
-    "y": y,
+    "x": x - 3,
+    "y": y+3,
     "width": svg.getNodeTextWidth(blockLabel),
-    "height": height,
-    "fill": "#fff"
+    "height": height-4,
+    "rx": 5,
+    "ry": 5
   }))
   lableHolder.appendChild(blockLabel)
   return lableHolder
