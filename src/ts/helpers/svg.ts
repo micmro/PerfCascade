@@ -3,7 +3,7 @@
  */
 
 var svg = {
-  newEl : function(tagName: string, settings?, css?): SVGElement{
+  newEl : function(tagName: string, settings?: Object, css?: Object): SVGElement{
     var el = document.createElementNS("http://www.w3.org/2000/svg", tagName) as SVGGElement;
     settings = settings || {};
     for (let attr in settings) {
@@ -11,14 +11,29 @@ var svg = {
         el.setAttributeNS(null, attr, settings[attr])
       }
     }
-    el.textContent = settings.text || ""
-    if (el.style) {
-      el.style.cssText = css || ""
+    el.textContent = settings["text"] || ""
+    if (css && el.style) {
+      Object.keys(css).forEach(key => {
+        el.style[key] = css[key]
+      })
     }
     return el
   },
 
-  newTextEl: function(text: string, y: number, x?, css?): SVGTextElement {
+  newSvg: function(cssClass: string, settings?: Object, css?: Object): SVGSVGElement {
+    settings = settings || {}
+    settings["class"] = cssClass
+    return svg.newEl("svg:svg", settings, css) as SVGSVGElement
+  },
+
+  newG: function(cssClass: string, settings?: Object, css?: Object): SVGGElement {
+    settings = settings || {}
+    settings["class"] = cssClass
+    return svg.newEl("g", settings, css) as SVGGElement
+  },
+
+  newTextEl: function(text: string, y: number, x?: number, css?: Object): SVGTextElement {
+    css = css||{}
     let opt = {
       fill: "#111",
       y: y.toString(),
@@ -27,13 +42,18 @@ var svg = {
     if(x !== undefined){
       opt["x"] = x
     }
-    return svg.newEl("text", opt, ((css || "") + " text-shadow:0 0 4px #fff;")) as SVGTextElement
+    if (css["textShadow"] === undefined) {
+      css["textShadow"] = "0 0 4px #fff"
+    }
+    return svg.newEl("text", opt, css) as SVGTextElement
   },
 
   //needs access to body to measure size
   //TODO: refactor for server side use
   getNodeTextWidth: function(textNode: SVGTextElement): number {
-    var tmp = svg.newEl("svg:svg", {}, "visibility:hidden;")
+    var tmp = svg.newEl("svg:svg", {}, {
+      "visibility": "hidden"
+    }) as SVGSVGElement
     tmp.appendChild(textNode)
     window.document.body.appendChild(tmp)
 

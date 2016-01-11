@@ -55,8 +55,7 @@ export default class HarTransformer{
       .filter(k => (data.pages[currentPageIndex].pageTimings[k] != undefined && data.pages[currentPageIndex].pageTimings[k] >= 0))
       .map(k => {
         const startRelative = currPage.pageTimings[k]
-
-        console.log(currPage.pageTimings[k])
+        
         return {
           "name": k,
           "startTime": startRelative

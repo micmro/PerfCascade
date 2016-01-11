@@ -7,23 +7,6 @@ import TimeBlock from "../typing/time-block"
 import {Mark} from "../typing/waterfall-data"
 
 
-/**
- * Interface for `createRect` parameter
- */
-export interface RectData {
-  width: number
-  height: number
-  x: number
-  y: number
-  cssClass: string
-  label?: string
-  unit: number
-  /** @type {Function} Partially appliable function (to capture row data) that return an event listener */
-  showOverlay: Function
-  /** @type {Function} Partially appliable function (to capture row data) that return an event listener */
-  hideOverlay: Function
-}
-
 
 export interface HoverElements{
   endline: SVGLineElement,
@@ -62,8 +45,7 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
  */
 export function makeHoverEvtListeners(hoverEl: HoverElements) {
   return {
-    onMouseEnterPartial: function(rectData: RectData) {
-      //capture rectData
+    onMouseEnterPartial: function() {
       return function(evt: MouseEvent) {
         const targetRect = evt.target as SVGRectElement
         svg.addClass(targetRect, "active")
@@ -80,8 +62,7 @@ export function makeHoverEvtListeners(hoverEl: HoverElements) {
         svg.addClass(hoverEl.startline, "active")
       }
     },
-    onMouseLeavePartial: function(rectData: RectData) {
-      //capture rectData
+    onMouseLeavePartial: function() {
       return function(evt: MouseEvent) {
         const targetRect = evt.target as SVGRectElement
         svg.removeClass(targetRect, "active")
@@ -90,101 +71,6 @@ export function makeHoverEvtListeners(hoverEl: HoverElements) {
       }
     }
   }
-}
-
-
-
-
-
-/**
- * Render the block and timings for a request
- * @param  {RectData}         rectData Basic dependencys and globals
- * @param  {Array<TimeBlock>} segments Request and Timing Data
- * @return {SVGElement}                Renerated SVG (rect or g element)
- */
-export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVGElement {
-  const blockHeight = rectData.height - 1
-  let rectHolder
-  let rect = svg.newEl("rect", {
-    "width": (rectData.width / rectData.unit) + "%",
-    "height": blockHeight,
-    "x": Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
-    "y": rectData.y,
-    "class": ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
-    + (rectData.cssClass || "block-other")
-  })
-  if (rectData.label) {
-    rect.appendChild(svg.newEl("title", {
-      "text": rectData.label
-    })) // Add tile to wedge path
-  }
-
-  rect.addEventListener("mouseenter", rectData.showOverlay(rectData))
-  rect.addEventListener("mouseleave", rectData.hideOverlay(rectData))
-
-  if (segments && segments.length > 0) {
-    rectHolder = svg.newEl("g", {
-      "class" : "rect-holder"
-    })
-    rectHolder.appendChild(rect)
-    segments.forEach((segment) => {
-      if (segment.total > 0 && typeof segment.start === "number") {
-        let childRectData = {
-          "width": segment.total,
-          "height": (blockHeight - 5),
-          "x": segment.start || 0.001,
-          "y": rectData.y,
-          "cssClass": segment.cssClass,
-          "label": segment.name + " (" + Math.round(segment.start) + "ms - " 
-             + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
-          "unit": rectData.unit,
-          "showOverlay": rectData.showOverlay,
-          "hideOverlay": rectData.hideOverlay
-        } as RectData
-
-        rectHolder.appendChild(createRect(childRectData))
-      }
-    })
-    return rectHolder
-  } else {
-    return rect
-  }
-}
-
-
-/**
- * Create a new SVG Text element to label a request block
- * @param {TimeBlock} block      Asset Request
- * @param {number}    blockWidth Width of request block
- * @param {number}    blockY     vertical postion of request block (in px)
- * @param {number}    unit       horizontal unit (duration in ms of 1%)
- */
-export function createRequestLabel(block: TimeBlock, blockWidth: number, blockY: number, unit: number): SVGTextElement {
-  //crop name if longer than 30 characters
-  let clipName = (block.name.length > 30 && block.name.indexOf("?") > 0)
-  let blockName = (clipName) ? block.name.split("?")[0] + "?…" : block.name
-  
-  let blockLabel = svg.newTextEl(blockName + " (" + Math.round(block.total) + "ms)", (blockY + 14))
-
-  blockLabel.appendChild(svg.newEl("title", {
-    "text": block.name
-  }))
-
-  if (((block.total || 1) / unit) > 10 && svg.getNodeTextWidth(blockLabel) < 200) {
-    //position label within block
-    blockLabel.setAttribute("class", "inner-label")
-    blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + 0.5 + "%")
-    blockLabel.setAttribute("width", (blockWidth / unit) + "%")
-  } else if (((block.start || 0.001) / unit) + (blockWidth / unit) < 80) {
-    //position label
-    blockLabel.setAttribute("x", ((block.start || 0.001) / unit) + (blockWidth / unit) + 0.5 + "%")
-  } else {
-    blockLabel.setAttribute("x", (block.start || 0.001) / unit - 0.5 + "%")
-    blockLabel.setAttribute("text-anchor", "end")
-  }
-  blockLabel.style.opacity = block.name.match(/js.map$/) ? "0.5" : "1"
-  
-  return blockLabel
 }
 
 
@@ -233,31 +119,6 @@ export function createBgRect(block: TimeBlock, unit: number, diagramHeight: numb
     "text": block.name
   })) // Add tile to wedge path
   return rect
-}
-
-
-
-export function createBgStripe(y: number, height: number, isEven: boolean): SVGGElement{
-  let stripeHolder = svg.newEl("g", {
-    "class": isEven ? "even" : "odd"
-  }) as SVGGElement
-
-  stripeHolder.appendChild(svg.newEl("rect", {
-    "width": "100%", //make up for the spacing
-    "height": height,
-    "x": 0,
-    "y": y,
-    "class": "flex"
-  }))
-  stripeHolder.appendChild(svg.newEl("rect", {
-    "width": "70", //make up for the spacing
-    "height": height,
-    "x": -70,
-    "y": y,
-    "class": "fixed"
-  }))
-
-  return stripeHolder
 }
 
 
