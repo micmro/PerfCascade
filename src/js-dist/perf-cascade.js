@@ -409,24 +409,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
         if (isSecure) {
             rowFixed.appendChild(icons_1.default.lock(5, y + 3, "Secure Connection", 1.2));
         }
-        var lableFullBg = fullLabel.getElementsByClassName("label-full-bg")[0];
-        var fullLableText = fullLabel.getElementsByTagName("text")[0];
-        //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
-        fullLabel.style.display = "none";
-        fullLabel.style.visibility = "hidden";
-        rowFixed.appendChild(shortLabel);
-        rowFixed.appendChild(fullLabel);
-        rowFixed.addEventListener("mouseenter", function () {
-            fullLabel.style.display = "block";
-            shortLabel.style.display = "none";
-            fullLabel.style.visibility = "visible";
-            lableFullBg.style.width = (fullLableText.clientWidth + 10).toString();
-        });
-        rowFixed.addEventListener("mouseleave", function () {
-            shortLabel.style.display = "block";
-            fullLabel.style.display = "none";
-            fullLabel.style.visibility = "hidden";
-        });
+        svg_row_components_1.appendRequestLabels(rowFixed, shortLabel, fullLabel);
         flexScaleHolder.appendChild(rowFlex);
         leftFixedHolder.appendChild(rowFixed);
         bgStripesHolder.appendChild(svg_row_components_1.createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0)));
@@ -775,10 +758,10 @@ function createRect(rectData, segments) {
 }
 exports.createRect = createRect;
 /**
- * Create a new SVG Text element to label a request block
+ * Create a new clipper SVG Text element to label a request block to fit the left panel width
  * @param  {number}         x                horizontal position (in px)
  * @param  {number}         y                vertical position of related request block (in px)
- * @param  {string}         name              URL
+ * @param  {string}         name             URL
  * @param  {number}         height           height of row
  * @return {SVGTextElement}                  lable SVG element
  */
@@ -788,6 +771,13 @@ function createRequestLabelClipped(x, y, name, height, clipPathId) {
     return blockLabel;
 }
 exports.createRequestLabelClipped = createRequestLabelClipped;
+/**
+ * Create a new full width SVG Text element to label a request block
+ * @param  {number}         x                horizontal position (in px)
+ * @param  {number}         y                vertical position of related request block (in px)
+ * @param  {string}         name             URL
+ * @param  {number}         height           height of row
+ */
 function createRequestLabelFull(x, y, name, height) {
     var blockLabel = createRequestLabel(x, y, name, height);
     var lableHolder = svg_1.default.newG("full-lable");
@@ -804,6 +794,7 @@ function createRequestLabelFull(x, y, name, height) {
     return lableHolder;
 }
 exports.createRequestLabelFull = createRequestLabelFull;
+// private helper
 function createRequestLabel(x, y, name, height) {
     var blockName = name.replace(/http[s]\:\/\//, "");
     var blockLabel = svg_1.default.newTextEl(blockName, (y + Math.round(height / 2) + 5));
@@ -814,6 +805,33 @@ function createRequestLabel(x, y, name, height) {
     blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1";
     return blockLabel;
 }
+/**
+ * Appends the labels to `rowFixed` - TODO: see if this can be done more elegant
+ * @param {SVGGElement}    rowFixed   [description]
+ * @param {SVGTextElement} shortLabel [description]
+ * @param {SVGGElement}    fullLabel  [description]
+ */
+function appendRequestLabels(rowFixed, shortLabel, fullLabel) {
+    var lableFullBg = fullLabel.getElementsByClassName("label-full-bg")[0];
+    var fullLableText = fullLabel.getElementsByTagName("text")[0];
+    //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
+    fullLabel.style.display = "none";
+    fullLabel.style.visibility = "hidden";
+    rowFixed.appendChild(shortLabel);
+    rowFixed.appendChild(fullLabel);
+    rowFixed.addEventListener("mouseenter", function () {
+        fullLabel.style.display = "block";
+        shortLabel.style.display = "none";
+        fullLabel.style.visibility = "visible";
+        lableFullBg.style.width = (fullLableText.clientWidth + 10).toString();
+    });
+    rowFixed.addEventListener("mouseleave", function () {
+        shortLabel.style.display = "block";
+        fullLabel.style.display = "none";
+        fullLabel.style.visibility = "hidden";
+    });
+}
+exports.appendRequestLabels = appendRequestLabels;
 /**
  * Stripe for BG
  * @param  {number}      y              [description]

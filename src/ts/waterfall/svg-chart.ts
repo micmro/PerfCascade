@@ -16,6 +16,7 @@ import {
   createRect,
   createRequestLabelFull,
   createRequestLabelClipped,
+  appendRequestLabels,
   createBgStripe,
   createFixedRow,
   createFlexRow
@@ -169,25 +170,7 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
       rowFixed.appendChild(icons.lock(5, y + 3, "Secure Connection", 1.2))
     }
 
-    let lableFullBg = fullLabel.getElementsByClassName("label-full-bg")[0] as SVGRectElement
-    let fullLableText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement
-
-    //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
-    fullLabel.style.display = "none"
-    fullLabel.style.visibility = "hidden"
-    rowFixed.appendChild(shortLabel)
-    rowFixed.appendChild(fullLabel)
-    rowFixed.addEventListener("mouseenter", () => {
-      fullLabel.style.display = "block"
-      shortLabel.style.display = "none"
-      fullLabel.style.visibility = "visible"
-      lableFullBg.style.width = (fullLableText.clientWidth + 10).toString()
-    })
-    rowFixed.addEventListener("mouseleave", () => {
-      shortLabel.style.display = "block"
-      fullLabel.style.display = "none"
-      fullLabel.style.visibility = "hidden"
-    })
+    appendRequestLabels(rowFixed, shortLabel, fullLabel)
 
     flexScaleHolder.appendChild(rowFlex)
     leftFixedHolder.appendChild(rowFixed)

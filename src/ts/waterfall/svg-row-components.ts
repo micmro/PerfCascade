@@ -80,10 +80,10 @@ export function createRect(rectData: RectData, segments?: Array<TimeBlock>): SVG
 
 
 /**
- * Create a new SVG Text element to label a request block
+ * Create a new clipper SVG Text element to label a request block to fit the left panel width
  * @param  {number}         x                horizontal position (in px)
  * @param  {number}         y                vertical position of related request block (in px)
- * @param  {string}         name              URL
+ * @param  {string}         name             URL
  * @param  {number}         height           height of row
  * @return {SVGTextElement}                  lable SVG element
  */
@@ -94,7 +94,15 @@ export function createRequestLabelClipped(x: number, y: number, name: string, he
   return blockLabel
 }
 
-export function createRequestLabelFull(x: number, y: number, name: string, height: number){
+
+/**
+ * Create a new full width SVG Text element to label a request block
+ * @param  {number}         x                horizontal position (in px)
+ * @param  {number}         y                vertical position of related request block (in px)
+ * @param  {string}         name             URL
+ * @param  {number}         height           height of row
+ */
+export function createRequestLabelFull(x: number, y: number, name: string, height: number) {
   let blockLabel = createRequestLabel(x, y, name, height)
   let lableHolder = svg.newG("full-lable")
   lableHolder.appendChild(svg.newEl("rect", {
@@ -109,6 +117,10 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
   lableHolder.appendChild(blockLabel)
   return lableHolder
 }
+
+
+
+// private helper
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
   const blockName = name.replace(/http[s]\:\/\//, "")
   let blockLabel = svg.newTextEl(blockName, (y + Math.round(height / 2) + 5))
@@ -121,6 +133,37 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
   blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1"
 
   return blockLabel
+}
+
+
+
+/**
+ * Appends the labels to `rowFixed` - TODO: see if this can be done more elegant  
+ * @param {SVGGElement}    rowFixed   [description]
+ * @param {SVGTextElement} shortLabel [description]
+ * @param {SVGGElement}    fullLabel  [description]
+ */
+export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextElement, fullLabel: SVGGElement) {
+  let lableFullBg = fullLabel.getElementsByClassName("label-full-bg")[0] as SVGRectElement
+  let fullLableText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement
+
+  //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
+  fullLabel.style.display = "none"
+  fullLabel.style.visibility = "hidden"
+  rowFixed.appendChild(shortLabel)
+  rowFixed.appendChild(fullLabel)
+
+  rowFixed.addEventListener("mouseenter", () => {
+    fullLabel.style.display = "block"
+    shortLabel.style.display = "none"
+    fullLabel.style.visibility = "visible"
+    lableFullBg.style.width = (fullLableText.clientWidth + 10).toString()
+  })
+  rowFixed.addEventListener("mouseleave", () => {
+    shortLabel.style.display = "block"
+    fullLabel.style.display = "none"
+    fullLabel.style.visibility = "hidden"
+  })
 }
 
 
