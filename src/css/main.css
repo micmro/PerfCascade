@@ -1,0 +1,289 @@
+/*! HTML5 Boilerplate v5.0 | MIT License | http://h5bp.com/ */
+
+html {
+    color: #333;
+    background: #fafafa;
+    font-size: 1em;
+    line-height: 1.4;
+    font-family: sans-serif;
+    padding: 2em 5em;
+}
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+    vertical-align: middle;
+}
+
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.browserupgrade {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+* {box-sizing: border-box;}
+
+#output {margin: 2em 0; font-size: 12px; line-height: 1em;}
+
+.water-fall-holder {fill:#ccc;}
+
+svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
+.water-fall-chart .left-fixed-holder {overflow: visible;}
+.water-fall-chart .marker-holder {width:100%;}
+.water-fall-chart .line-holder {stroke-width:1; stroke: #ccc; stroke-opacity:0.5;}
+.water-fall-chart .line-holder.active {stroke: #69009e; stroke-width:2; stroke-opacity:1;}
+.water-fall-chart .type-onload .line-holder  {stroke: #c0c0ff;}
+.water-fall-chart .type-oncontentload .line-holder  {stroke: #d888df;}
+
+.water-fall-chart .labels {width:100%;}
+.water-fall-chart .labels .inner-label {pointer-events: none;}
+.water-fall-chart .time-block.active {opacity: 0.8;}
+.water-fall-chart .line-end, .water-fall-chart .line-start {display: none; stroke-width:1; stroke-opacity:0.5; stroke: #000;}
+.water-fall-chart .line-end.active, .water-fall-chart .line-start.active {display: block;}
+
+.water-fall-chart .mark-holder text {-webkit-writing-mode: tb; writing-mode:vertical-lr; writing-mode: tb;}
+
+.left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9}
+
+.time-scale line {stroke:#0cc; stroke-width:1;}
+.time-scale text {font-weight:bold;}
+
+.bg-stripes .even rect {fill: #ccc; opacity: 0.05;}
+.bg-stripes .odd rect {fill: #000; opacity: 0.05;}
+.bg-stripes
+.bg-stripes g:hover rect {fill: #000; opacity: 0.2}
+
+
+.lables { overflow: hidden;}
+
+/*block colours*/
+.block-css {fill: #a6d18f;}
+.block-iframe,
+.block-html,
+.block-internal {fill: #82a8de;}
+.block-img,
+.block-image {fill: #b394cf;}
+.block-script,
+.block-javascript,
+.block-js {fill: #e0b483;}
+.block-link {fill: #89afe6;}
+.block-swf,
+.block-flash {fill: #42aab1;}
+.block-font {fill: #e15d4e;}
+.block-xmlhttprequest,
+.block-ajax {fill: #f00;} /*remove?*/
+.block-other {fill: #b3b3b3;}
+
+.block-total {fill: #ccc;}
+.block-unload {fill: #909;}
+.block-redirect {fill: #ffff60;}
+.block-appcache {fill: #1f831f;}
+.block-dns {fill: #1f7c83;}
+.block-tcp {fill: #e58226;}
+.block-ttfb {fill: #1fe11f;}
+.block-response {fill: #1977dd;}
+.block-dom {fill: #9cc;}
+.block-dom-content-loaded {fill: #d888df;}
+.block-onload {fill: #c0c0ff;}
+
+.block-ssl {fill: #c141cd; }
+.block-ms-first-paint-event {fill: #8fbc83; }
+.block-dom-interactive-event {fill: #d888df; }
+.block-network-server {fill: #8cd18c; }
+.block-custom-measure {fill: #f00; }
+
+.block-navigation-api-total {fill: #ccc;}
+.block-blocking, 
+.block-blocked {fill: #cdcdcd;}
+
+.block-undefined {fill: #0f0;} 
+
+
+.block-blocked {fill: #ccc;} /*TODO: define colour*/
+.block-dns {fill: #1f7c83;}
+.block-connect {fill: #e58226;}
+.block-ssl {fill:#c141cd;}
+.block-send {fill: #1fe110;} /*TODO: define colour*/
+.block-wait {fill: #1fe11f;} /*TODO: define colour*/
+.block-receive {fill: #1977dd;}
+
+
+.info-overlay-holder {fill: #a00;}
+.info-overlay {fill: #fff;}
+.info-overlay-close-btn {fill: #fdd;}
+.info-overlay-close-btn text {fill: #111; pointer-events: none;}
+
+.info-overlay-holder body { position: relative; height: 200px; background: #fff;}
+.info-overlay-holder body .wrapper { position: absolute; top: 5px; bottom: 5px; left: 15px; right: 15px; overflow: scroll;}
+.info-overlay-holder h3 {font-size: 12px;}
+.info-overlay-holder dt {float: left; clear: both; margin-top: 5px; width: 25%; text-align: right; font-weight: bold; }
+.info-overlay-holder dd {float: left; margin: 5px 0 0 2%; padding: 0 0 0.5em 0;}
+.info-overlay-holder dt:after { content: ":"; }
+
+
+.left-fixed-holder .icon {fill:#777; stroke:#777;}
+
+
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+
+@media only screen and (min-width: 35em) {
+}
+
+@media print,
+       (-o-min-device-pixel-ratio: 5/4),
+       (-webkit-min-device-pixel-ratio: 1.25),
+       (min-resolution: 120dpi) {
+
+}
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.clearfix {
+    *zoom: 1;
+}
+
+/* ==========================================================================
+   Print styles
+   ========================================================================== */
+
+@media print {
+    *,
+    *:before,
+    *:after {
+        background: transparent !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    a[href^="#"]:after,
+    a[href^="javascript:"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
