@@ -1,7 +1,8 @@
-*Under development - check again later*
+*Under active development*
 
 # PerfCascase
 Extensible waterfall-viewer that works with HAR and other formats.
+Exampe at: https://micmro.github.io/PerfCascade/
 
 ## Dev
 - Start live-reload server `npm start`
