@@ -25,8 +25,15 @@
         <h1>
 <a id="perfcascase" class="anchor" href="#perfcascase" aria-hidden="true"><span class="octicon octicon-link"></span></a>PerfCascase</h1>
         <p>Extensible waterfall-viewer that works with HAR and other formats.</p>
-        <h2>
-<a id="specs-and-ressources" class="anchor" href="#specs-and-ressources" aria-hidden="true"><span class="octicon octicon-link"></span></a>Specs and ressources</h2>
+        
+        <h2>Try it</h2>
+        <fieldset>
+            <input type="file" id="fileinput" />
+            <div id="output"></div>
+        </fieldset>
+
+        <h2><a id="specs-and-ressources" class="anchor" href="#specs-and-ressources" aria-hidden="true"><span class="octicon octicon-link"></span></a>Specs and ressources
+        </h2>
         <ul>
             <li><a href="https://w3c.github.io/web-performance/specs/HAR/Overview.html">W3C HAR Spec</a></li>
             <li><a href="http://www.softwareishard.com/blog/har-12-spec">HAR 1.2 Spec</a></li>
@@ -36,12 +43,8 @@
             <span class="site-footer-owner"><a href="https://github.com/micmro/PerfCascade">PerfCascade</a> is maintained by <a href="https://github.com/micmro">micmro</a>.</span>
         </footer>
     </section>
-    <fieldset>
-        <input type="file" id="fileinput" />
-        <div id="output"></div>
-    </fieldset>
 
-    <scrip src="src/js-dist/perf-cascade.js"></scrip>
+    <script src="src/js-dist/perf-cascade.js"></script>
     <script type="text/javascript">
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
