@@ -6,6 +6,7 @@ temp/
 # Editor Project Files
 *.sublime-project
 *.sublime-workspace
+.vscode/
 
 # Runtime data
 pids

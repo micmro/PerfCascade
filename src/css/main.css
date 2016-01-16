@@ -146,13 +146,13 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .block-receive {fill: #1977dd;}
 
 
-.info-overlay-holder {fill: #a00;}
 .info-overlay {fill: #fff;}
-.info-overlay-close-btn {fill: #fdd;}
+.info-overlay-close-btn {fill: #cdcdcd;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}
 
-.info-overlay-holder body { position: relative; height: 200px; background: #fff;}
-.info-overlay-holder body .wrapper { position: absolute; top: 5px; bottom: 5px; left: 15px; right: 15px; overflow: scroll;}
+
+.info-overlay-holder body { position: relative; /*transform: translate(170px);*/ height: 250px; width:100%;}
+.info-overlay-holder body .wrapper { position: absolute; top: 5px; bottom: 5px; left: 15px; right: 20px; overflow: scroll;}
 .info-overlay-holder h3 {font-size: 12px;}
 .info-overlay-holder dt {float: left; clear: both; margin-top: 5px; width: 25%; text-align: right; font-weight: bold; }
 .info-overlay-holder dd {float: left; margin: 5px 0 0 2%; padding: 0 0 0.5em 0;}

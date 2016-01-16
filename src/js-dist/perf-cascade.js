@@ -1,4 +1,4 @@
-/*PerfCascade build:11/01/2016 */
+/*PerfCascade build:17/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -427,18 +427,21 @@ exports.createWaterfallSvg = createWaterfallSvg;
 var svg_1 = require("../helpers/svg");
 function createCloseButtonSvg(y) {
     var closeBtn = svg_1.default.newEl("g", {
-        "class": "info-overlay-close-btn"
+        "class": "info-overlay-close-btn",
+        "transform": "translate(-15, -10)"
     });
     closeBtn.appendChild(svg_1.default.newEl("rect", {
         "width": 25,
         "height": 25,
-        "x": "80%",
+        "x": "100%",
         "y": y,
+        "rx": 5,
+        "ry": 5
     }));
     closeBtn.appendChild(svg_1.default.newEl("text", {
         "width": 25,
         "height": 25,
-        "x": "80%",
+        "x": "100%",
         "y": y,
         "dx": 9,
         "dy": 17,
@@ -453,12 +456,13 @@ function createCloseButtonSvg(y) {
 }
 function createHolder(y) {
     var holder = svg_1.default.newEl("g", {
-        "class": "info-overlay-holder"
+        "class": "info-overlay-holder",
+        "transform": "translate(-200)"
     });
     var bg = svg_1.default.newEl("rect", {
-        "width": "60%",
-        "height": 200,
-        "x": "20%",
+        "width": "100%",
+        "height": 250,
+        "x": "0",
         "y": y,
         "class": "info-overlay"
     });
@@ -501,9 +505,9 @@ function getKeys(block) {
 function createRowInfoOverlay(requestID, barX, y, block, unit) {
     var holder = createHolder(y);
     var html = svg_1.default.newEl("foreignObject", {
-        "width": "60%",
-        "height": 200,
-        "x": "20%",
+        "width": "98%",
+        "height": 250,
+        "x": "0",
         "y": y
     });
     var closeBtn = createCloseButtonSvg(y);
@@ -517,8 +521,8 @@ function createRowInfoOverlay(requestID, barX, y, block, unit) {
     // entry.request.httpVersion
     body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <dl>\n        " + dlData + "\n      </dl>\n    </div>\n    ";
     html.appendChild(body);
-    holder.appendChild(closeBtn);
     holder.appendChild(html);
+    holder.appendChild(closeBtn);
     return holder;
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;

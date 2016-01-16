@@ -5,8 +5,8 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node_modules/.bin/live-server --wait=50 --open=src/index.html --ignore=src/ts/",
-    "watch": "npm start & Grunt",
+    "start": "live-server --wait=50 --open=src/index.html --ignore=src/ts/",
+    "watch": "npm run start & Grunt",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
     "build": "Grunt dist"
   },
@@ -18,6 +18,7 @@
   "license": "MIT",
   "devDependencies": {
     "babelify": "^7.2.0",
+    "grunt": "^0.4.5",
     "grunt-banner": "^0.6.0",
     "grunt-browserify": "^4.0.1",
     "grunt-contrib-clean": "^0.7.0",
