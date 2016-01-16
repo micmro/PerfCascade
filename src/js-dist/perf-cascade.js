@@ -166,8 +166,6 @@ function onFileSubmit(evt) {
     reader.readAsText(files[0]);
 }
 document.getElementById('fileinput').addEventListener('change', onFileSubmit, false);
-//TODO: remove Dev/Test only - load test file
-window["fetch"]("test-data/github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 
 },{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":9}],6:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
