@@ -5,7 +5,7 @@ fieldset {border-radius: 0.3rem; font-size: 2em;}
 fieldset label {display: block; font-size: 0.5em;;}
 #fileinput {display: block; padding: 2em 1em; font-size: 0.3em;;}
 #fileinput::-webkit-file-upload-button { padding: 1em; }
-#output {margin: 2em 0; font-size: 2em; line-height: 1em;}
+#output {margin: 2em 0; font-size: 10px; line-height: 1em;}
 
 .water-fall-holder {fill:#ccc;}
 
