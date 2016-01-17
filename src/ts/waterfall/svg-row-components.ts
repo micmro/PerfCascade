@@ -144,7 +144,7 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
  * @param {SVGGElement}    fullLabel  [description]
  */
 export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextElement, fullLabel: SVGGElement) {
-  let lableFullBg = fullLabel.getElementsByClassName("label-full-bg")[0] as SVGRectElement
+  let lableFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement
   let fullLableText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement
 
   //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)

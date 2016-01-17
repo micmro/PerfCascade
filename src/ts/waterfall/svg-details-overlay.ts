@@ -17,8 +17,8 @@ function createCloseButtonSvg(y: number): SVGGElement {
     "height": 25,
     "x": "100%",
     "y": y,
-    "rx": 5,
-    "ry": 5 
+    "rx": 25,
+    "ry": 25 
   }))
 
   closeBtn.appendChild(svg.newEl("text", {
@@ -41,10 +41,10 @@ function createCloseButtonSvg(y: number): SVGGElement {
 }
 
 
-function createHolder(y: number): SVGGElement {
+function createHolder(y: number, leftFixedWidth: number): SVGGElement {
   let holder = svg.newEl("g", {
     "class": "info-overlay-holder",
-     "transform": "translate(-200)"
+     "transform": `translate(-${leftFixedWidth})`
   }) as SVGGElement
 
   let bg = svg.newEl("rect", {
@@ -95,8 +95,8 @@ function getKeys(block: TimeBlock): Object {
   } 
 }
 
-export function createRowInfoOverlay(requestID: number, barX: number, y: number, block: TimeBlock, unit: number): SVGGElement {
-  let holder = createHolder(y)
+export function createRowInfoOverlay(requestID: number, barX: number, y: number, block: TimeBlock, leftFixedWidth: number, unit: number): SVGGElement {
+  let holder = createHolder(y, leftFixedWidth)
 
   let html = svg.newEl("foreignObject", {
     "width": "98%",

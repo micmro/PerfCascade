@@ -152,7 +152,7 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
     let shortLabel = createRequestLabelClipped(25, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath")
     let fullLabel = createRequestLabelFull(25, y, block.name, requestBarHeight)
 
-    let infoOverlay = createRowInfoOverlay(i+1, x, y + requestBarHeight, block, unit)
+    let infoOverlay = createRowInfoOverlay(i+1, x, y + requestBarHeight, block, leftFixedWidth, unit)
 
     let showOverlay = (evt) => {
       dom.removeAllChildren(overlayHolder)

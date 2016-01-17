@@ -395,7 +395,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
         var rect = svg_row_components_1.createRect(rectData, block.segments);
         var shortLabel = svg_row_components_1.createRequestLabelClipped(25, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
         var fullLabel = svg_row_components_1.createRequestLabelFull(25, y, block.name, requestBarHeight);
-        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, unit);
+        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, leftFixedWidth, unit);
         var showOverlay = function (evt) {
             dom_1.default.removeAllChildren(overlayHolder);
             overlayHolder.appendChild(infoOverlay);
@@ -435,8 +435,8 @@ function createCloseButtonSvg(y) {
         "height": 25,
         "x": "100%",
         "y": y,
-        "rx": 5,
-        "ry": 5
+        "rx": 25,
+        "ry": 25
     }));
     closeBtn.appendChild(svg_1.default.newEl("text", {
         "width": 25,
@@ -454,10 +454,10 @@ function createCloseButtonSvg(y) {
     }));
     return closeBtn;
 }
-function createHolder(y) {
+function createHolder(y, leftFixedWidth) {
     var holder = svg_1.default.newEl("g", {
         "class": "info-overlay-holder",
-        "transform": "translate(-200)"
+        "transform": "translate(-" + leftFixedWidth + ")"
     });
     var bg = svg_1.default.newEl("rect", {
         "width": "100%",
@@ -502,8 +502,8 @@ function getKeys(block) {
         "Response Comment": entry.response.comment
     };
 }
-function createRowInfoOverlay(requestID, barX, y, block, unit) {
-    var holder = createHolder(y);
+function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
+    var holder = createHolder(y, leftFixedWidth);
     var html = svg_1.default.newEl("foreignObject", {
         "width": "98%",
         "height": 250,
@@ -816,7 +816,7 @@ function createRequestLabel(x, y, name, height) {
  * @param {SVGGElement}    fullLabel  [description]
  */
 function appendRequestLabels(rowFixed, shortLabel, fullLabel) {
-    var lableFullBg = fullLabel.getElementsByClassName("label-full-bg")[0];
+    var lableFullBg = fullLabel.getElementsByTagName("rect")[0];
     var fullLableText = fullLabel.getElementsByTagName("text")[0];
     //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
     fullLabel.style.display = "none";
