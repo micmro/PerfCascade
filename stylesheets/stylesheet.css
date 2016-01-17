@@ -15,6 +15,10 @@ a {
   a:hover {
     text-decoration: underline; }
 
+#output .wrapper {font-size: 12px;}
+
+#fileinput {display: block; margin:2em 1em;}
+
 .btn {
   display: inline-block;
   margin-bottom: 1rem;
@@ -110,11 +114,6 @@ a {
   margin-top: 0; }
 .main-content img {
   max-width: 100%; }
-.main-content h1, .main-content h2, .main-content h3, .main-content h4, .main-content h5, .main-content h6 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  font-weight: normal;
-  color: #159957; }
 .main-content p {
   margin-bottom: 1em; }
 .main-content code {
@@ -177,27 +176,6 @@ a {
     margin-top: 0; }
   .main-content blockquote > :last-child {
     margin-bottom: 0; }
-.main-content table {
-  display: block;
-  width: 100%;
-  overflow: auto;
-  word-break: normal;
-  word-break: keep-all; }
-  .main-content table th {
-    font-weight: bold; }
-  .main-content table th, .main-content table td {
-    padding: 0.5rem 1rem;
-    border: 1px solid #e9ebec; }
-.main-content dl {
-  padding: 0; }
-  .main-content dl dt {
-    padding: 0;
-    margin-top: 1rem;
-    font-size: 1rem;
-    font-weight: bold; }
-  .main-content dl dd {
-    padding: 0;
-    margin-bottom: 1rem; }
 .main-content hr {
   height: 2px;
   padding: 0;

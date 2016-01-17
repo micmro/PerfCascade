@@ -1,4 +1,4 @@
-/*PerfCascade build:11/01/2016 */
+/*PerfCascade build:17/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -166,7 +166,6 @@ function onFileSubmit(evt) {
     reader.readAsText(files[0]);
 }
 document.getElementById('fileinput').addEventListener('change', onFileSubmit, false);
-
 },{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":9}],6:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
 var styling_converters_1 = require('./styling-converters');
@@ -393,7 +392,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
         var rect = svg_row_components_1.createRect(rectData, block.segments);
         var shortLabel = svg_row_components_1.createRequestLabelClipped(25, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
         var fullLabel = svg_row_components_1.createRequestLabelFull(25, y, block.name, requestBarHeight);
-        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, unit);
+        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, leftFixedWidth, unit);
         var showOverlay = function (evt) {
             dom_1.default.removeAllChildren(overlayHolder);
             overlayHolder.appendChild(infoOverlay);
@@ -425,18 +424,21 @@ exports.createWaterfallSvg = createWaterfallSvg;
 var svg_1 = require("../helpers/svg");
 function createCloseButtonSvg(y) {
     var closeBtn = svg_1.default.newEl("g", {
-        "class": "info-overlay-close-btn"
+        "class": "info-overlay-close-btn",
+        "transform": "translate(-15, -10)"
     });
     closeBtn.appendChild(svg_1.default.newEl("rect", {
         "width": 25,
         "height": 25,
-        "x": "80%",
+        "x": "100%",
         "y": y,
+        "rx": 25,
+        "ry": 25
     }));
     closeBtn.appendChild(svg_1.default.newEl("text", {
         "width": 25,
         "height": 25,
-        "x": "80%",
+        "x": "100%",
         "y": y,
         "dx": 9,
         "dy": 17,
@@ -449,14 +451,15 @@ function createCloseButtonSvg(y) {
     }));
     return closeBtn;
 }
-function createHolder(y) {
+function createHolder(y, leftFixedWidth) {
     var holder = svg_1.default.newEl("g", {
-        "class": "info-overlay-holder"
+        "class": "info-overlay-holder",
+        "transform": "translate(-" + leftFixedWidth + ")"
     });
     var bg = svg_1.default.newEl("rect", {
-        "width": "60%",
-        "height": 200,
-        "x": "20%",
+        "width": "100%",
+        "height": 250,
+        "x": "0",
         "y": y,
         "class": "info-overlay"
     });
@@ -496,12 +499,12 @@ function getKeys(block) {
         "Response Comment": entry.response.comment
     };
 }
-function createRowInfoOverlay(requestID, barX, y, block, unit) {
-    var holder = createHolder(y);
+function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
+    var holder = createHolder(y, leftFixedWidth);
     var html = svg_1.default.newEl("foreignObject", {
-        "width": "60%",
-        "height": 200,
-        "x": "20%",
+        "width": "98%",
+        "height": 250,
+        "x": "0",
         "y": y
     });
     var closeBtn = createCloseButtonSvg(y);
@@ -515,8 +518,8 @@ function createRowInfoOverlay(requestID, barX, y, block, unit) {
     // entry.request.httpVersion
     body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <dl>\n        " + dlData + "\n      </dl>\n    </div>\n    ";
     html.appendChild(body);
-    holder.appendChild(closeBtn);
     holder.appendChild(html);
+    holder.appendChild(closeBtn);
     return holder;
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
@@ -810,7 +813,7 @@ function createRequestLabel(x, y, name, height) {
  * @param {SVGGElement}    fullLabel  [description]
  */
 function appendRequestLabels(rowFixed, shortLabel, fullLabel) {
-    var lableFullBg = fullLabel.getElementsByClassName("label-full-bg")[0];
+    var lableFullBg = fullLabel.getElementsByTagName("rect")[0];
     var fullLableText = fullLabel.getElementsByTagName("text")[0];
     //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
     fullLabel.style.display = "none";
