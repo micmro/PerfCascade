@@ -1,4 +1,4 @@
-/*PerfCascade build:17/01/2016 */
+/*PerfCascade build:18/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -9,6 +9,12 @@ var dom = {
         while (el.childNodes.length > 0) {
             el.removeChild(el.childNodes[0]);
         }
+    },
+    forEach: function (els, fn) {
+        Array.prototype.forEach.call(els, fn);
+    },
+    filter: function (els, predicat) {
+        return Array.prototype.filter.call(els, predicat);
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -425,18 +431,18 @@ exports.createWaterfallSvg = createWaterfallSvg;
 
 },{"../helpers/dom":1,"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-details-overlay":10,"./svg-general-components":11,"./svg-row-components":12}],10:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
+var dom_1 = require("../helpers/dom");
 function createCloseButtonSvg(y) {
     var closeBtn = svg_1.default.newEl("g", {
-        "class": "info-overlay-close-btn",
-        "transform": "translate(-15, -10)"
+        "class": "info-overlay-close-btn"
     });
     closeBtn.appendChild(svg_1.default.newEl("rect", {
         "width": 25,
         "height": 25,
         "x": "100%",
         "y": y,
-        "rx": 25,
-        "ry": 25
+        "rx": 5,
+        "ry": 5
     }));
     closeBtn.appendChild(svg_1.default.newEl("text", {
         "width": 25,
@@ -461,9 +467,11 @@ function createHolder(y, leftFixedWidth) {
     });
     var bg = svg_1.default.newEl("rect", {
         "width": "100%",
-        "height": 250,
+        "height": 350,
         "x": "0",
         "y": y,
+        "rx": 2,
+        "ry": 2,
         "class": "info-overlay"
     });
     holder.appendChild(bg);
@@ -505,7 +513,7 @@ function getKeys(block) {
 function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
     var holder = createHolder(y, leftFixedWidth);
     var html = svg_1.default.newEl("foreignObject", {
-        "width": "98%",
+        "width": "100%",
         "height": 250,
         "x": "0",
         "y": y
@@ -518,8 +526,19 @@ function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
     var dlData = Object.keys(dlKeyValues)
         .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""); })
         .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
-    // entry.request.httpVersion
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <dl>\n        " + dlData + "\n      </dl>\n    </div>\n    ";
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      <div class=\"tab\">\n        <dl>\n          " + dlData + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
+    var buttons = body.getElementsByClassName("tab-button");
+    var tabs = body.getElementsByClassName("tab");
+    var setTabStatus = function (index) {
+        dom_1.default.forEach(tabs, function (tab, j) {
+            tab.style.display = (index === j) ? "block" : "none";
+            buttons.item(j).classList.toggle("active", (index === j));
+        });
+    };
+    dom_1.default.forEach(buttons, function (btn, i) {
+        btn.addEventListener("click", function () { setTabStatus(i); });
+    });
+    setTabStatus(0);
     html.appendChild(body);
     holder.appendChild(html);
     holder.appendChild(closeBtn);
@@ -527,7 +546,7 @@ function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../helpers/svg":4}],11:[function(require,module,exports){
+},{"../helpers/dom":1,"../helpers/svg":4}],11:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
