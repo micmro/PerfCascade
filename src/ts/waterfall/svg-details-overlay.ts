@@ -62,7 +62,7 @@ function createHolder(y: number, leftFixedWidth: number): SVGGElement {
 }
 
 
-function getKeys(block: TimeBlock): Object {
+function getKeys(block: TimeBlock) {
   //TODO: dodgy casting - will not work for other adapters
   let entry = block.rawResource as Entry
 
@@ -77,24 +77,96 @@ function getKeys(block: TimeBlock): Object {
     `${size} byte (~${Math.round(size / 1024 * 10) / 10}kb)`)
   let formatTime = (size?: number) => ifValueDefined(size, size =>
     `${size}ms`)
-
-  return {
-    "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
-    "Duration": formatTime(entry.time),
-    "Server IPAddress": entry.serverIPAddress,
-    "Connection": entry.connection,
-    "Request HTTP Version": entry.request.httpVersion,
-    "Request Headers Size": formatBytes(entry.request.headersSize),
-    "Request Body Size": formatBytes(entry.request.bodySize),
-    "Request Comment": entry.request.comment,
-    "Request Method": entry.request.method,
-    "Response Status": entry.response.status + " " + entry.response.statusText,
-    "Response HTTP Version": entry.response.httpVersion,
-    "Response Body Size": formatBytes(entry.response.bodySize),
-    "Response Header Size": formatBytes(entry.response.headersSize),
-    "Response Redirect URL": entry.response.redirectURL,
-    "Response Comment": entry.response.comment
+  
+  let getRequestHeader = (name: string): string => {
+    let header = entry.request.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
+    return header ? header.value : ""
   }
+  
+  const emptyHeader = {"value": ""}
+  return {
+    "general": {
+      "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
+      "Duration": formatTime(entry.time),
+      "Server IPAddress": entry.serverIPAddress,
+      "Connection": entry.connection,
+    },
+    "request": {
+      "HTTP Version": entry.request.httpVersion,
+      "Headers Size": formatBytes(entry.request.headersSize),
+      "Body Size": formatBytes(entry.request.bodySize),
+      "Comment": entry.request.comment,
+      "Method": entry.request.method,
+      "User-Agent": getRequestHeader("User-Agent"),
+      "Host": getRequestHeader("Host"),
+      "Connection": getRequestHeader("Connection"),
+      "Accept": getRequestHeader("Accept"),
+      "Accept-Encoding": getRequestHeader("Accept-Encoding")
+    },
+    "response": {
+      "Response Status": entry.response.status + " " + entry.response.statusText,
+      "Response HTTP Version": entry.response.httpVersion,
+      "Response Body Size": formatBytes(entry.response.bodySize),
+      "Response Header Size": formatBytes(entry.response.headersSize),
+      "Response Redirect URL": entry.response.redirectURL,
+      "Response Comment": entry.response.comment
+    }
+  }
+}
+
+
+function makeDefinitionList(dlKeyValues) {
+  return Object.keys(dlKeyValues)
+    .filter(key => (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""))
+    .map(key => `
+      <dt>${key}</dt>
+      <dd>${dlKeyValues[key]}</dd>
+    `).join("")
+}
+
+function createBody(requestID: number, block: TimeBlock){
+    let body = document.createElement("body");
+    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    
+    const tabsData = getKeys(block) 
+    const generalDl = makeDefinitionList(tabsData.general)
+    const requestDl = makeDefinitionList(tabsData.request)
+    const responseDl = makeDefinitionList(tabsData.response)
+    
+    body.innerHTML = `
+    <div class="wrapper">
+      <h3>#${requestID} ${block.name}</h3>
+      <nav class="tab-nav">
+      <ul>
+        <li><button class="tab-button">General</button></li>
+        <li><button class="tab-button">Request</button></li>
+        <li><button class="tab-button">Response</button></li>
+        <li><button class="tab-button">Raw Data</button></li>
+      </ul>
+      </nav>
+      <div class="tab">
+        <dl>
+          ${generalDl}
+        </dl>
+      </div>
+      <div class="tab">
+        <dl>
+          ${requestDl}
+        </dl>
+      </div>
+      <div class="tab">
+        <dl>
+          ${responseDl}
+        </dl>
+      </div>
+      <div class="tab">
+        <code>
+          <pre>${JSON.stringify(block.rawResource, null, 2)}</pre>
+        </code>
+      </div>
+    </div>
+    `
+    return body
 }
 
 export function createRowInfoOverlay(requestID: number, barX: number, y: number, block: TimeBlock, leftFixedWidth: number, unit: number): SVGGElement {
@@ -110,41 +182,8 @@ export function createRowInfoOverlay(requestID: number, barX: number, y: number,
 
   let closeBtn = createCloseButtonSvg(y)
   closeBtn.addEventListener('click', evt => holder.parentElement.removeChild(holder))
-
-
-  let body = document.createElement("body");
-  body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-
-  const dlKeyValues = getKeys(block)
-
-  const dlData = Object.keys(dlKeyValues)
-    .filter(key => (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""))
-    .map(key => `
-      <dt>${key}</dt>
-      <dd>${dlKeyValues[key]}</dd>
-    `).join("")
-
-  body.innerHTML = `
-    <div class="wrapper">
-      <h3>#${requestID} ${block.name}</h3>
-      <nav class="tab-nav">
-      <ul>
-        <li><button class="tab-button">Request</button></li>
-        <li><button class="tab-button">Raw Data</button></li>
-      </ul>
-      </nav>
-      <div class="tab">
-        <dl>
-          ${dlData}
-        </dl>
-      </div>
-      <div class="tab">
-        <code>
-          <pre>${JSON.stringify(block.rawResource, null, 2)}</pre>
-        </code>
-      </div>
-    </div>
-    `
+  
+  let body = createBody(requestID, block)
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>
   let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>
 
@@ -158,7 +197,7 @@ export function createRowInfoOverlay(requestID: number, barX: number, y: number,
   dom.forEach(buttons, (btn, i) => {
     btn.addEventListener("click", () => { setTabStatus(i) })
   })
-  
+
   setTabStatus(0)
 
   html.appendChild(body)

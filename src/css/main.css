@@ -166,6 +166,7 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .info-overlay-holder button.active {background: #f6f6f6; cursor: default;} 
 
 .info-overlay-holder .tab {background: #f6f6f6; padding:0.5em; float: left; width:100%; }
+.info-overlay-holder .tab pre {overflow-y: hidden;}
 
 /* ==========================================================================
    Media Queries

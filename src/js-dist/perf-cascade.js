@@ -1,4 +1,4 @@
-/*PerfCascade build:18/01/2016 */
+/*PerfCascade build:19/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -492,23 +492,54 @@ function getKeys(block) {
     var formatTime = function (size) { return ifValueDefined(size, function (size) {
         return (size + "ms");
     }); };
-    return {
-        "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
-        "Duration": formatTime(entry.time),
-        "Server IPAddress": entry.serverIPAddress,
-        "Connection": entry.connection,
-        "Request HTTP Version": entry.request.httpVersion,
-        "Request Headers Size": formatBytes(entry.request.headersSize),
-        "Request Body Size": formatBytes(entry.request.bodySize),
-        "Request Comment": entry.request.comment,
-        "Request Method": entry.request.method,
-        "Response Status": entry.response.status + " " + entry.response.statusText,
-        "Response HTTP Version": entry.response.httpVersion,
-        "Response Body Size": formatBytes(entry.response.bodySize),
-        "Response Header Size": formatBytes(entry.response.headersSize),
-        "Response Redirect URL": entry.response.redirectURL,
-        "Response Comment": entry.response.comment
+    var getRequestHeader = function (name) {
+        var header = entry.request.headers.filter(function (h) { return h.name.toLowerCase() === name.toLowerCase(); })[0];
+        return header ? header.value : "";
     };
+    var emptyHeader = { "value": "" };
+    return {
+        "general": {
+            "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
+            "Duration": formatTime(entry.time),
+            "Server IPAddress": entry.serverIPAddress,
+            "Connection": entry.connection,
+        },
+        "request": {
+            "HTTP Version": entry.request.httpVersion,
+            "Headers Size": formatBytes(entry.request.headersSize),
+            "Body Size": formatBytes(entry.request.bodySize),
+            "Comment": entry.request.comment,
+            "Method": entry.request.method,
+            "User-Agent": getRequestHeader("User-Agent"),
+            "Host": getRequestHeader("Host"),
+            "Connection": getRequestHeader("Connection"),
+            "Accept": getRequestHeader("Accept"),
+            "Accept-Encoding": getRequestHeader("Accept-Encoding")
+        },
+        "response": {
+            "Response Status": entry.response.status + " " + entry.response.statusText,
+            "Response HTTP Version": entry.response.httpVersion,
+            "Response Body Size": formatBytes(entry.response.bodySize),
+            "Response Header Size": formatBytes(entry.response.headersSize),
+            "Response Redirect URL": entry.response.redirectURL,
+            "Response Comment": entry.response.comment
+        }
+    };
+}
+function makeDefinitionList(dlKeyValues) {
+    return Object.keys(dlKeyValues)
+        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""); })
+        .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
+}
+function createBody(requestID, block) {
+    var body = document.createElement("body");
+    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    var tabsData = getKeys(block);
+    var generalDl = makeDefinitionList(tabsData.general);
+    var requestDl = makeDefinitionList(tabsData.request);
+    var responseDl = makeDefinitionList(tabsData.response);
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        <li><button class=\"tab-button\">General</button></li>\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      <div class=\"tab\">\n        <dl>\n          " + generalDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
+    return body;
 }
 function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
     var holder = createHolder(y, leftFixedWidth);
@@ -520,13 +551,7 @@ function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
     });
     var closeBtn = createCloseButtonSvg(y);
     closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });
-    var body = document.createElement("body");
-    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-    var dlKeyValues = getKeys(block);
-    var dlData = Object.keys(dlKeyValues)
-        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""); })
-        .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      <div class=\"tab\">\n        <dl>\n          " + dlData + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
+    var body = createBody(requestID, block);
     var buttons = body.getElementsByClassName("tab-button");
     var tabs = body.getElementsByClassName("tab");
     var setTabStatus = function (index) {
