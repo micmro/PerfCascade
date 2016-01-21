@@ -83,6 +83,16 @@ function getKeys(block: TimeBlock) {
     return header ? header.value : ""
   }
   
+  let getResponseHeader = (name: string): string => {
+    let header = entry.response.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
+    return header ? header.value : ""
+  }
+  
+  /** get experimental feature */ 
+  let getExp = (name: string): string => {
+   return entry["name"]||"" 
+  }
+  
   const emptyHeader = {"value": ""}
   return {
     "general": {
@@ -90,26 +100,51 @@ function getKeys(block: TimeBlock) {
       "Duration": formatTime(entry.time),
       "Server IPAddress": entry.serverIPAddress,
       "Connection": entry.connection,
+      "Initiator": getExp("_initiator"),
+      "Initiator Line": getExp("_initiator_line"),
+      "Expires": getExp("_expires"),
+      "Cache Time": getExp("_cache_time"),
+      "CDN Provider": getExp("_cdn_provider"),
+      "Gzip Total": getExp("_gzip_total"),
+      "Minify Total": getExp("_minify_total"),
+      "Minify Save": getExp("_minify_save"),
+      "Image Total": getExp("_image_total"),
+      "Image Save": getExp("_image_save")
     },
     "request": {
+      "Method": entry.request.method,
       "HTTP Version": entry.request.httpVersion,
       "Headers Size": formatBytes(entry.request.headersSize),
       "Body Size": formatBytes(entry.request.bodySize),
       "Comment": entry.request.comment,
-      "Method": entry.request.method,
       "User-Agent": getRequestHeader("User-Agent"),
       "Host": getRequestHeader("Host"),
       "Connection": getRequestHeader("Connection"),
       "Accept": getRequestHeader("Accept"),
-      "Accept-Encoding": getRequestHeader("Accept-Encoding")
+      "Accept-Encoding": getRequestHeader("Accept-Encoding"),
+      "Accept-Language": getRequestHeader("Accept-Language"),
+      "Querystring parameters count": entry.request.queryString.length,
+      "Cookies count": entry.request.cookies.length
     },
     "response": {
-      "Response Status": entry.response.status + " " + entry.response.statusText,
-      "Response HTTP Version": entry.response.httpVersion,
-      "Response Body Size": formatBytes(entry.response.bodySize),
-      "Response Header Size": formatBytes(entry.response.headersSize),
-      "Response Redirect URL": entry.response.redirectURL,
-      "Response Comment": entry.response.comment
+      "Status": entry.response.status + " " + entry.response.statusText,
+      "HTTP Version": entry.response.httpVersion,
+      "Header Size": formatBytes(entry.response.headersSize),
+      "Body Size": formatBytes(entry.response.bodySize),
+      "Content-Type": getResponseHeader("Content-Type"),
+      "Cache-Control": getResponseHeader("Cache-Control"),
+      "Expires": getResponseHeader("Expires"),
+      "Last-Modified": getResponseHeader("Last-Modified"),
+      "Server": getResponseHeader("Server"),
+      "Timing-Allow-Origin": getResponseHeader("Timing-Allow-Origin"),
+      "Content-Length": getResponseHeader("Content-Length"),
+      "Content Size": entry.response.content.size,
+      "Content Compression": entry.response.content.compression,
+      "Connection": getResponseHeader("Connection"),
+      "X-Served-By": getResponseHeader("X-Served-By"),
+      "Vary": getResponseHeader("Vary"),
+      "Redirect URL": entry.response.redirectURL,
+      "Comment": entry.response.comment
     }
   }
 }
@@ -117,7 +152,7 @@ function getKeys(block: TimeBlock) {
 
 function makeDefinitionList(dlKeyValues) {
   return Object.keys(dlKeyValues)
-    .filter(key => (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""))
+    .filter(key => (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""))
     .map(key => `
       <dt>${key}</dt>
       <dd>${dlKeyValues[key]}</dd>

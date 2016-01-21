@@ -1,4 +1,4 @@
-/*PerfCascade build:19/01/2016 */
+/*PerfCascade build:22/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -496,6 +496,14 @@ function getKeys(block) {
         var header = entry.request.headers.filter(function (h) { return h.name.toLowerCase() === name.toLowerCase(); })[0];
         return header ? header.value : "";
     };
+    var getResponseHeader = function (name) {
+        var header = entry.response.headers.filter(function (h) { return h.name.toLowerCase() === name.toLowerCase(); })[0];
+        return header ? header.value : "";
+    };
+    /** get experimental feature */
+    var getExp = function (name) {
+        return entry["name"] || "";
+    };
     var emptyHeader = { "value": "" };
     return {
         "general": {
@@ -503,32 +511,57 @@ function getKeys(block) {
             "Duration": formatTime(entry.time),
             "Server IPAddress": entry.serverIPAddress,
             "Connection": entry.connection,
+            "Initiator": getExp("_initiator"),
+            "Initiator Line": getExp("_initiator_line"),
+            "Expires": getExp("_expires"),
+            "Cache Time": getExp("_cache_time"),
+            "CDN Provider": getExp("_cdn_provider"),
+            "Gzip Total": getExp("_gzip_total"),
+            "Minify Total": getExp("_minify_total"),
+            "Minify Save": getExp("_minify_save"),
+            "Image Total": getExp("_image_total"),
+            "Image Save": getExp("_image_save")
         },
         "request": {
+            "Method": entry.request.method,
             "HTTP Version": entry.request.httpVersion,
             "Headers Size": formatBytes(entry.request.headersSize),
             "Body Size": formatBytes(entry.request.bodySize),
             "Comment": entry.request.comment,
-            "Method": entry.request.method,
             "User-Agent": getRequestHeader("User-Agent"),
             "Host": getRequestHeader("Host"),
             "Connection": getRequestHeader("Connection"),
             "Accept": getRequestHeader("Accept"),
-            "Accept-Encoding": getRequestHeader("Accept-Encoding")
+            "Accept-Encoding": getRequestHeader("Accept-Encoding"),
+            "Accept-Language": getRequestHeader("Accept-Language"),
+            "Querystring parameters count": entry.request.queryString.length,
+            "Cookies count": entry.request.cookies.length
         },
         "response": {
-            "Response Status": entry.response.status + " " + entry.response.statusText,
-            "Response HTTP Version": entry.response.httpVersion,
-            "Response Body Size": formatBytes(entry.response.bodySize),
-            "Response Header Size": formatBytes(entry.response.headersSize),
-            "Response Redirect URL": entry.response.redirectURL,
-            "Response Comment": entry.response.comment
+            "Status": entry.response.status + " " + entry.response.statusText,
+            "HTTP Version": entry.response.httpVersion,
+            "Header Size": formatBytes(entry.response.headersSize),
+            "Body Size": formatBytes(entry.response.bodySize),
+            "Content-Type": getResponseHeader("Content-Type"),
+            "Cache-Control": getResponseHeader("Cache-Control"),
+            "Expires": getResponseHeader("Expires"),
+            "Last-Modified": getResponseHeader("Last-Modified"),
+            "Server": getResponseHeader("Server"),
+            "Timing-Allow-Origin": getResponseHeader("Timing-Allow-Origin"),
+            "Content-Length": getResponseHeader("Content-Length"),
+            "Content Size": entry.response.content.size,
+            "Content Compression": entry.response.content.compression,
+            "Connection": getResponseHeader("Connection"),
+            "X-Served-By": getResponseHeader("X-Served-By"),
+            "Vary": getResponseHeader("Vary"),
+            "Redirect URL": entry.response.redirectURL,
+            "Comment": entry.response.comment
         }
     };
 }
 function makeDefinitionList(dlKeyValues) {
     return Object.keys(dlKeyValues)
-        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== ""); })
+        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""); })
         .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
 }
 function createBody(requestID, block) {
