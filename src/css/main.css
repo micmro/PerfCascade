@@ -150,22 +150,23 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .info-overlay {fill: #fff; stroke: #cdcdcd; }
 .info-overlay-close-btn {fill: #cdcdcd; transform: translate(-4px, -4px); cursor: pointer;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}
+.info-overlay-close-btn:focus {border: solid 1px red;}
 
-
-.info-overlay-holder body { position: relative; height: 350px; width:100%; }
+.info-overlay-holder body { position: relative; height: 350px; width:100%; background: #e0e0e0;}
 .info-overlay-holder body .wrapper { position: absolute; top: 0; bottom: 0; left: 0; right: 0px; overflow: scroll;}
-.info-overlay-holder h3 {font-size: 12px; padding: 0 1em;}
+.info-overlay-holder h3 {font-size: 12px; padding: 1em; margin:0; background: #f9f9f9;}
 .info-overlay-holder dt {float: left; clear: both; margin-top: 5px; width: 25%; text-align: right; font-weight: bold; }
 .info-overlay-holder dd {float: left; margin: 5px 0 0 2%; padding: 0 0 0.5em 0;}
 .info-overlay-holder dt:after { content: ":"; }
 
-
+.info-overlay-holder .tab-nav {background: #f9f9f9;}
 .info-overlay-holder .tab-nav ul {margin: 0; padding: 0;}
 .info-overlay-holder .tab-nav li {margin: 0; padding: 0; display: inline-block;}
-.info-overlay-holder button {background: #82a8de; padding: 0.5em 1em; border:0; margin:0.5em 0 0 0.5em; border-top-right-radius: 3px; border-top-left-radius: 3px; border: solid 1px #f6f6f6; border-bottom-width: 0;}
-.info-overlay-holder button.active {background: #f6f6f6; cursor: default;} 
+.info-overlay-holder button {background: #82a8de; outline:0; border:solid 1px transparent; border-bottom-width: 0; padding: 0.5em 1em; border:0; margin:0.5em 0 0 0.5em; border-top-right-radius: 3px; border-top-left-radius: 3px; border: solid 1px #e0e0e0; border-bottom-width: 0;}
+.info-overlay-holder button:focus,.info-overlay-holder button:hover {border-color: #36c;} 
+.info-overlay-holder button.active {background: #e0e0e0; cursor: default;} 
 
-.info-overlay-holder .tab {background: #f6f6f6; padding:0.5em; float: left; width:100%; }
+.info-overlay-holder .tab { padding:12px 12px 24px; float: left; width:100%; }
 .info-overlay-holder .tab pre {overflow-y: hidden;}
 
 /* ==========================================================================

@@ -1,4 +1,4 @@
-/*PerfCascade build:22/01/2016 */
+/*PerfCascade build:23/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -433,16 +433,18 @@ exports.createWaterfallSvg = createWaterfallSvg;
 var svg_1 = require("../helpers/svg");
 var dom_1 = require("../helpers/dom");
 function createCloseButtonSvg(y) {
-    var closeBtn = svg_1.default.newEl("g", {
-        "class": "info-overlay-close-btn"
+    var closeBtn = svg_1.default.newEl("a", {
+        "class": "info-overlay-close-btn",
+        "focusable": true,
     });
     closeBtn.appendChild(svg_1.default.newEl("rect", {
         "width": 25,
         "height": 25,
         "x": "100%",
         "y": y,
+        "focusable": true,
         "rx": 5,
-        "ry": 5
+        "ry": 5,
     }));
     closeBtn.appendChild(svg_1.default.newEl("text", {
         "width": 25,
@@ -477,7 +479,7 @@ function createHolder(y, leftFixedWidth) {
     holder.appendChild(bg);
     return holder;
 }
-function getKeys(block) {
+function getKeys(requestID, block) {
     //TODO: dodgy casting - will not work for other adapters
     var entry = block.rawResource;
     var ifValueDefined = function (value, fn) {
@@ -507,8 +509,10 @@ function getKeys(block) {
     var emptyHeader = { "value": "" };
     return {
         "general": {
+            "Request Number": "#" + requestID,
             "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
             "Duration": formatTime(entry.time),
+            "Status": entry.response.status + " " + entry.response.statusText,
             "Server IPAddress": entry.serverIPAddress,
             "Connection": entry.connection,
             "Initiator": getExp("_initiator"),
@@ -567,7 +571,7 @@ function makeDefinitionList(dlKeyValues) {
 function createBody(requestID, block) {
     var body = document.createElement("body");
     body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-    var tabsData = getKeys(block);
+    var tabsData = getKeys(requestID, block);
     var generalDl = makeDefinitionList(tabsData.general);
     var requestDl = makeDefinitionList(tabsData.request);
     var responseDl = makeDefinitionList(tabsData.response);
@@ -580,7 +584,9 @@ function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
         "width": "100%",
         "height": 250,
         "x": "0",
-        "y": y
+        "y": y,
+        "dy": "5",
+        "dx": "5"
     });
     var closeBtn = createCloseButtonSvg(y);
     closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });

@@ -8,8 +8,10 @@ import {Entry} from "../typing/har"
 
 
 function createCloseButtonSvg(y: number): SVGGElement {
-  let closeBtn = svg.newEl("g", {
-    "class": "info-overlay-close-btn"
+  let closeBtn = svg.newEl("a", {
+    "class": "info-overlay-close-btn",
+    "focusable": true,
+    // "xlink:href": "#0"
   }) as SVGGElement
 
   closeBtn.appendChild(svg.newEl("rect", {
@@ -17,8 +19,10 @@ function createCloseButtonSvg(y: number): SVGGElement {
     "height": 25,
     "x": "100%",
     "y": y,
+    "focusable": true,
     "rx": 5,
-    "ry": 5
+    "ry": 5,
+    // "data-tabindex": "0"
   }))
 
   closeBtn.appendChild(svg.newEl("text", {
@@ -62,7 +66,7 @@ function createHolder(y: number, leftFixedWidth: number): SVGGElement {
 }
 
 
-function getKeys(block: TimeBlock) {
+function getKeys(requestID: number, block: TimeBlock) {
   //TODO: dodgy casting - will not work for other adapters
   let entry = block.rawResource as Entry
 
@@ -96,8 +100,10 @@ function getKeys(block: TimeBlock) {
   const emptyHeader = {"value": ""}
   return {
     "general": {
+      "Request Number": `#${requestID}`,
       "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
       "Duration": formatTime(entry.time),
+      "Status": entry.response.status + " " + entry.response.statusText,
       "Server IPAddress": entry.serverIPAddress,
       "Connection": entry.connection,
       "Initiator": getExp("_initiator"),
@@ -163,7 +169,7 @@ function createBody(requestID: number, block: TimeBlock){
     let body = document.createElement("body");
     body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
     
-    const tabsData = getKeys(block) 
+    const tabsData = getKeys(requestID, block) 
     const generalDl = makeDefinitionList(tabsData.general)
     const requestDl = makeDefinitionList(tabsData.request)
     const responseDl = makeDefinitionList(tabsData.response)
@@ -211,7 +217,9 @@ export function createRowInfoOverlay(requestID: number, barX: number, y: number,
     "width": "100%",
     "height": 250,
     "x": "0",
-    "y": y
+    "y": y,
+    "dy": "5",
+    "dx": "5"
   }) as SVGForeignObjectElement
 
 
