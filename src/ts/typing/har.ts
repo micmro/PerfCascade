@@ -55,6 +55,61 @@ export interface Entry {
   serverIPAddress?: string
   connection?: string
   comment?: string
+  
+  //WPT specific settings
+  _ip_addr?: string
+  _load_ms?: string
+  _ttfb_ms?: string
+  _load_start?: string
+  _bytesOut?: string
+  _bytesIn?: string
+  _objectSize?: string
+  _contentType?: string
+  _type?: string
+  _socket?: string
+  _score_cache?: string
+  _score_cdn?: string
+  _score_gzip?: string
+  _score_cookies?: string
+  "_score_keep-alive"?: string
+  _score_minify?: string
+  _score_combine?: string
+  _score_compress?: string
+  _score_etags?: string
+  _is_secure?: string  
+  _dns_ms?: number
+  _connect_ms?: number
+  _ssl_ms?: string
+  _gzip_total?: string
+  _gzip_save?: string
+  _minify_total?: string
+  _minify_save?: string
+  _image_total?: string
+  _image_save?: string
+  _cache_time?: string
+  _dns_start?: string
+  _dns_end?: string
+  _connect_start?: string
+  _connect_end?: string
+  _ssl_start?: string
+  _ssl_end?: string
+  _server_count?: string
+  _server_rtt?: string
+  _client_port?: string
+  _jpeg_scan_count?: string
+  _full_url?: string
+  _score_progressive_jpeg?: string
+  _load_end?: string
+  _ttfb_start?: string
+  _ttfb_end?: string
+  _download_start?: string
+  _download_end?: string
+  _download_ms?: string
+  _all_start?: string
+  _all_end?: string
+  _all_ms?: string
+  _index?: string
+  _number?: string
 }
 
 //http://www.softwareishard.com/blog/har-12-spec/#request

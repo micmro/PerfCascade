@@ -9,9 +9,7 @@ import {Entry} from "../typing/har"
 
 function createCloseButtonSvg(y: number): SVGGElement {
   let closeBtn = svg.newEl("a", {
-    "class": "info-overlay-close-btn",
-    "focusable": true,
-    // "xlink:href": "#0"
+    "class": "info-overlay-close-btn"
   }) as SVGGElement
 
   closeBtn.appendChild(svg.newEl("rect", {
@@ -19,10 +17,8 @@ function createCloseButtonSvg(y: number): SVGGElement {
     "height": 25,
     "x": "100%",
     "y": y,
-    "focusable": true,
     "rx": 5,
-    "ry": 5,
-    // "data-tabindex": "0"
+    "ry": 5
   }))
 
   closeBtn.appendChild(svg.newEl("text", {
@@ -101,7 +97,7 @@ function getKeys(requestID: number, block: TimeBlock) {
   return {
     "general": {
       "Request Number": `#${requestID}`,
-      "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
+      "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page reqest started)",
       "Duration": formatTime(entry.time),
       "Status": entry.response.status + " " + entry.response.statusText,
       "Server IPAddress": entry.serverIPAddress,

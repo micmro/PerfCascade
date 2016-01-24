@@ -1,4 +1,4 @@
-/*PerfCascade build:23/01/2016 */
+/*PerfCascade build:24/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -173,7 +173,10 @@ function onFileSubmit(evt) {
 }
 document.getElementById('fileinput').addEventListener('change', onFileSubmit, false);
 //TODO: remove Dev/Test only - load test file
-window["fetch"]("test-data/github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
+if (location.host.indexOf("127.0.0.1") === 0) {
+    //http://www.webpagetest.org/result/160124_RJ_a94a7e404ab82dbc67bb8dd90a112c44/1/details/
+    window["fetch"]("test-data/michaelmrowetz.com.160124_RJ_a94a7e404ab82dbc67bb8dd90a112c44.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
+}
 
 },{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":9}],6:[function(require,module,exports){
 var time_block_1 = require('../typing/time-block');
@@ -190,6 +193,7 @@ var HarTransformer = (function () {
         var currentPageIndex = 0;
         var currPage = data.pages[currentPageIndex];
         var pageStartTime = new Date(currPage.startedDateTime).getTime();
+        var pageTimings = currPage.pageTimings;
         var doneTime = 0;
         var blocks = data.entries
             .filter(function (entry) { return entry.pageref === currPage.id; })
@@ -199,14 +203,15 @@ var HarTransformer = (function () {
                 doneTime = startRelative + entry.time;
             }
             var subModules = entry.timings;
-            return new time_block_1.default(entry.request.url, startRelative, startRelative + entry.time, styling_converters_1.mimeToCssClass(entry.response.content.mimeType), _this.buildDetailTimingBlocks(startRelative, entry.timings), entry);
+            return new time_block_1.default(entry.request.url, startRelative, parseInt(entry._all_end) || (startRelative + entry.time), styling_converters_1.mimeToCssClass(entry.response.content.mimeType), _this.buildDetailTimingBlocks(startRelative, entry), entry);
         });
-        var marks = ["onContentLoad", "onLoad"]
-            .filter(function (k) { return (data.pages[currentPageIndex].pageTimings[k] != undefined && data.pages[currentPageIndex].pageTimings[k] >= 0); })
+        var marks = Object.keys(pageTimings)
+            .filter(function (k) { return (pageTimings[k] != undefined && pageTimings[k] >= 0); })
+            .sort(function (a, b) { return pageTimings[a] > pageTimings[b] ? 1 : -1; })
             .map(function (k) {
-            var startRelative = currPage.pageTimings[k];
+            var startRelative = pageTimings[k];
             return {
-                "name": k,
+                "name": k.replace(/^[_]/, ""),
                 "startTime": startRelative
             };
         });
@@ -217,21 +222,46 @@ var HarTransformer = (function () {
             lines: [],
         };
     };
-    HarTransformer.buildDetailTimingBlocks = function (startRelative, t) {
+    HarTransformer.getTimePair = function (key, entry, collect, startRelative) {
+        var wptKey;
+        switch (key) {
+            case "wait":
+                wptKey = "ttfb";
+                break;
+            case "receive":
+                wptKey = "download";
+                break;
+            default: wptKey = key;
+        }
+        var preciseStart = parseInt(entry[("_" + wptKey + "_start")]);
+        var preciseEnd = parseInt(entry[("_" + wptKey + "_end")]);
+        var start = preciseStart || ((collect.length > 0) ? collect[collect.length - 1].end : startRelative);
+        var end = preciseEnd || (start + entry.timings[key]);
+        return {
+            "start": start,
+            "end": end
+        };
+    };
+    HarTransformer.buildDetailTimingBlocks = function (startRelative, entry) {
+        var _this = this;
+        var t = entry.timings;
         // var timings = []
         return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce(function (collect, key) {
-            if (t[key] && t[key] !== -1) {
-                var start = (collect.length > 0) ? collect[collect.length - 1].end : startRelative;
-                //special case for 'connect' && 'ssl' since they share time
-                //http://www.softwareishard.com/blog/har-12-spec/#timings
-                if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
-                    return collect
-                        .concat([new time_block_1.default("ssl", start, start + t.ssl, "block-ssl")])
-                        .concat([new time_block_1.default(key, start + t.ssl, start + t[key], "block-" + key)]);
-                }
-                return collect.concat([new time_block_1.default(key, start, start + t[key], "block-" + key)]);
+            var time = _this.getTimePair(key, entry, collect, startRelative);
+            if (time.end && time.start >= time.end) {
+                return collect;
             }
-            return collect;
+            //special case for 'connect' && 'ssl' since they share time
+            //http://www.softwareishard.com/blog/har-12-spec/#timings
+            if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
+                var sslStart = parseInt(entry["_ssl_start"]) || time.start;
+                var sslEnd = parseInt(entry["_ssl_end"]) || time.start + t.ssl;
+                var connectStart = (!!parseInt(entry["_ssl_start"])) ? time.start : sslEnd;
+                return collect
+                    .concat([new time_block_1.default("ssl", sslStart, sslEnd, "block-ssl")])
+                    .concat([new time_block_1.default(key, connectStart, time.end, "block-" + key)]);
+            }
+            return collect.concat([new time_block_1.default(key, time.start, time.end, "block-" + key)]);
         }, []);
     };
     return HarTransformer;
@@ -434,17 +464,15 @@ var svg_1 = require("../helpers/svg");
 var dom_1 = require("../helpers/dom");
 function createCloseButtonSvg(y) {
     var closeBtn = svg_1.default.newEl("a", {
-        "class": "info-overlay-close-btn",
-        "focusable": true,
+        "class": "info-overlay-close-btn"
     });
     closeBtn.appendChild(svg_1.default.newEl("rect", {
         "width": 25,
         "height": 25,
         "x": "100%",
         "y": y,
-        "focusable": true,
         "rx": 5,
-        "ry": 5,
+        "ry": 5
     }));
     closeBtn.appendChild(svg_1.default.newEl("text", {
         "width": 25,
@@ -510,7 +538,7 @@ function getKeys(requestID, block) {
     return {
         "general": {
             "Request Number": "#" + requestID,
-            "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + ")",
+            "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page reqest started)",
             "Duration": formatTime(entry.time),
             "Status": entry.response.status + " " + entry.response.statusText,
             "Server IPAddress": entry.serverIPAddress,

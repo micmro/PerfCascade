@@ -56,4 +56,7 @@ document.getElementById('fileinput').addEventListener('change', onFileSubmit, fa
 
 
 //TODO: remove Dev/Test only - load test file
-window["fetch"]("test-data/github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(f => f.json().then(j => renderHar(j.log)))
+if(location.host.indexOf("127.0.0.1") === 0){
+  //http://www.webpagetest.org/result/151226_X7_b43d35e592fab70e0ba012fe11a41020/
+  window["fetch"]("test-data/github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(f => f.json().then(j => renderHar(j.log)))
+}
