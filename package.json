@@ -15,6 +15,10 @@
     "email": "me@michaelmrowetz.com",
     "url": "https://github.com/micmro"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/micmro/PerfCascade.git"
+  },
   "license": "MIT",
   "devDependencies": {
     "babelify": "^7.2.0",
@@ -22,9 +26,11 @@
     "grunt-banner": "^0.6.0",
     "grunt-browserify": "^4.0.1",
     "grunt-contrib-clean": "^0.7.0",
+    "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-copy": "^0.8.2",
     "grunt-contrib-uglify": "^0.11.0",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-gh-pages": "^1.0.0",
     "live-server": "^0.9.0",
     "load-grunt-tasks": "^3.3.0",
     "tsify": "^0.13.1",

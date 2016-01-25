@@ -3,6 +3,10 @@
 #Temp files
 temp/
 
+#GH page dist
+gh-pages/
+src/dist/perf-cascade-gh-page.css
+
 # Editor Project Files
 *.sublime-project
 *.sublime-workspace

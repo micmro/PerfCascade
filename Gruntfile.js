@@ -7,8 +7,20 @@ module.exports = function( grunt ) {
 
   grunt.initConfig({
     clean : {
-      dist: ["temp/", "src/js-dist"],
+      dist: ["temp/", "src/dist/"],
+      pages: ["gh-pages/"],
       js: ["src/ts/**/*.js", "src/ts/**/*.js.map"]
+    },
+    concat: {
+      dist: {
+        src: ["src/css-raw/normalize.css", "src/css-raw/page.css", "src/css-raw/main.css"],
+        dest: "src/dist/perf-cascade-full.css",
+      },
+      pages: {
+        src: ["src/css-raw/normalize.css", "src/css-raw/gh-page.css", "src/css-raw/main.css"],
+        dest: "src/dist/perf-cascade-gh-page.css",
+      }
+      
     },
     browserify: {
       options: {
@@ -17,7 +29,7 @@ module.exports = function( grunt ) {
       },
       dist: {
         files: {
-          "src/js-dist/perf-cascade.js": ["src/ts/main.ts"],
+          "src/dist/perf-cascade.js": ["src/ts/main.ts"],
         }
       }
     },
@@ -33,7 +45,7 @@ module.exports = function( grunt ) {
       },
       dist: {
         files: {
-          "src/js-dist/perf-cascade.min.js": ["src/js-dist/perf-cascade.js"]
+          "src/dist/perf-cascade.min.js": ["src/dist/perf-cascade.js"]
         }
       }
     },
@@ -46,11 +58,28 @@ module.exports = function( grunt ) {
           interrupt: true
         },
       }
-    }
+    },
+    copy: {
+      pages: {
+        expand: true,
+        flatten: true,
+        src: ["src/dist/perf-cascade-gh-page.css", "src/dist/perf-cascade.min.js"],
+        dest: "gh-pages/src/",
+        filter: "isFile",
+      },
+    },
+    "gh-pages": {
+      options: {
+        base: "gh-pages",
+        add: true
+      },
+      src: ["**/*"]
+    },
   });
 
-  grunt.registerTask("distBase", ["clean:dist", "browserify:dist"]);
+  grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist"]);
   grunt.registerTask("dist", ["distBase", "uglify:dist"]);
+  grunt.registerTask("ghPages", ["clean:pages", "dist", "concat:pages", "copy:pages", "gh-pages"]);
 
   grunt.registerTask("default", ["distBase", "watch"]);
 };
