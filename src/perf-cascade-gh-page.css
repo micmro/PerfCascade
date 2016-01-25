@@ -428,9 +428,10 @@ th {
 
 fieldset {border-radius: 0.3rem; font-size: 2em;}
 fieldset label {display: block; font-size: 0.5em;;}
-#fileinput {display: block; padding: 2em 1em; font-size: 0.3em;;}
-#fileinput::-webkit-file-upload-button { padding: 1em; }
+#fileinput {display: block; padding: 2em 1em; font-size: 0.3em; width: 100%;}
+#fileinput::-webkit-file-upload-button { padding: 1em; font-size: 16px; }
 
+#output .wrapper {font-size: 12px;}
 
 /*GH page sbase styles*/
 
@@ -450,9 +451,6 @@ a {
   text-decoration: none; }
   a:hover {
     text-decoration: underline; }
-
-#output .wrapper {font-size: 12px;}
-
 
 
 .btn {
@@ -751,9 +749,9 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .info-overlay {fill: #fff; stroke: #cdcdcd; }
 .info-overlay-close-btn {fill: #cdcdcd; transform: translate(-4px, -4px); cursor: pointer;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}
-.info-overlay-close-btn:focus {border: solid 1px red;}
+.info-overlay-close-btn:focus {border: solid 1px #36c;}
 
-.info-overlay-holder body { position: relative; height: 350px; width:100%; background: #e0e0e0;}
+.info-overlay-holder body { position: relative; height: 350px; width:100%; background: #e0e0e0; color: #333;}
 .info-overlay-holder body .wrapper { position: absolute; top: 0; bottom: 0; left: 0; right: 0px; overflow: scroll;}
 .info-overlay-holder h3 {font-size: 12px; padding: 1em; margin:0; background: #f9f9f9;}
 .info-overlay-holder dt {float: left; clear: both; margin-top: 5px; width: 25%; text-align: right; font-weight: bold; }
