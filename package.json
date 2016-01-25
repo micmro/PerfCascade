@@ -8,7 +8,8 @@
     "start": "live-server --wait=50 --open=src/index.html --ignore=src/ts/",
     "watch": "npm run start & Grunt",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
-    "build": "Grunt dist"
+    "ghPages": "grunt ghPages",
+    "build": "grunt dist"
   },
   "author": {
     "name": "Michael Mrowetz",
