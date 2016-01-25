@@ -1,8 +1,9 @@
 fieldset {border-radius: 0.3rem; font-size: 2em;}
 fieldset label {display: block; font-size: 0.5em;;}
-#fileinput {display: block; padding: 2em 1em; font-size: 0.3em;;}
-#fileinput::-webkit-file-upload-button { padding: 1em; }
+#fileinput {display: block; padding: 2em 1em; font-size: 0.3em; width: 100%;}
+#fileinput::-webkit-file-upload-button { padding: 1em; font-size: 16px; }
 
+#output .wrapper {font-size: 12px;}
 
 /*GH page sbase styles*/
 
@@ -22,9 +23,6 @@ a {
   text-decoration: none; }
   a:hover {
     text-decoration: underline; }
-
-#output .wrapper {font-size: 12px;}
-
 
 
 .btn {
