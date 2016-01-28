@@ -1,4 +1,4 @@
-/*PerfCascade build:25/01/2016 */
+/*PerfCascade build:28/01/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -543,7 +543,7 @@ function getKeys(requestID, block) {
             "Status": entry.response.status + " " + entry.response.statusText,
             "Server IPAddress": entry.serverIPAddress,
             "Connection": entry.connection,
-            "Priority": getExp("_priority"),
+            "Browser Priority": getExp("_priority"),
             "Initiator": getExp("_initiator"),
             "Initiator Line": getExp("_initiator_line"),
             "Expires": getExp("_expires"),
@@ -781,7 +781,7 @@ function createMarks(marks, unit, diagramHeight) {
             lineLabel.setAttribute("x", lastMark.x + 1 + "%");
             mark.x = lastMark.x + 1;
         }
-        //would use polyline but can't use percentage for points
+        //would use polyline but can't use percentage for points 
         lineHolder.appendChild(svg_1.default.newEl("line", {
             "x1": x + "%",
             "y1": diagramHeight,
