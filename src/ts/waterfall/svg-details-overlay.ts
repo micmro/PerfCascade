@@ -77,22 +77,22 @@ function getKeys(requestID: number, block: TimeBlock) {
     `${size} byte (~${Math.round(size / 1024 * 10) / 10}kb)`)
   let formatTime = (size?: number) => ifValueDefined(size, size =>
     `${size}ms`)
-  
+
   let getRequestHeader = (name: string): string => {
     let header = entry.request.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
     return header ? header.value : ""
   }
-  
+
   let getResponseHeader = (name: string): string => {
     let header = entry.response.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
     return header ? header.value : ""
   }
-  
-  /** get experimental feature */ 
+
+  /** get experimental feature */
   let getExp = (name: string): string => {
-   return entry["name"]||"" 
+   return entry[name]||""
   }
-  
+
   const emptyHeader = {"value": ""}
   return {
     "general": {
@@ -102,6 +102,7 @@ function getKeys(requestID: number, block: TimeBlock) {
       "Status": entry.response.status + " " + entry.response.statusText,
       "Server IPAddress": entry.serverIPAddress,
       "Connection": entry.connection,
+      "Browser Priority": getExp("_priority"),
       "Initiator": getExp("_initiator"),
       "Initiator Line": getExp("_initiator_line"),
       "Expires": getExp("_expires"),
@@ -164,12 +165,12 @@ function makeDefinitionList(dlKeyValues) {
 function createBody(requestID: number, block: TimeBlock){
     let body = document.createElement("body");
     body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-    
-    const tabsData = getKeys(requestID, block) 
+
+    const tabsData = getKeys(requestID, block)
     const generalDl = makeDefinitionList(tabsData.general)
     const requestDl = makeDefinitionList(tabsData.request)
     const responseDl = makeDefinitionList(tabsData.response)
-    
+
     body.innerHTML = `
     <div class="wrapper">
       <h3>#${requestID} ${block.name}</h3>
@@ -221,7 +222,7 @@ export function createRowInfoOverlay(requestID: number, barX: number, y: number,
 
   let closeBtn = createCloseButtonSvg(y)
   closeBtn.addEventListener('click', evt => holder.parentElement.removeChild(holder))
-  
+
   let body = createBody(requestID, block)
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>
   let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>
