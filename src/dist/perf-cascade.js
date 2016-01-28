@@ -532,7 +532,7 @@ function getKeys(requestID, block) {
     };
     /** get experimental feature */
     var getExp = function (name) {
-        return entry["name"] || "";
+        return entry[name] || "";
     };
     var emptyHeader = { "value": "" };
     return {
@@ -543,6 +543,7 @@ function getKeys(requestID, block) {
             "Status": entry.response.status + " " + entry.response.statusText,
             "Server IPAddress": entry.serverIPAddress,
             "Connection": entry.connection,
+            "Priority": getExp("_priority"),
             "Initiator": getExp("_initiator"),
             "Initiator Line": getExp("_initiator_line"),
             "Expires": getExp("_expires"),
@@ -780,7 +781,7 @@ function createMarks(marks, unit, diagramHeight) {
             lineLabel.setAttribute("x", lastMark.x + 1 + "%");
             mark.x = lastMark.x + 1;
         }
-        //would use polyline but can't use percentage for points 
+        //would use polyline but can't use percentage for points
         lineHolder.appendChild(svg_1.default.newEl("line", {
             "x1": x + "%",
             "y1": diagramHeight,
