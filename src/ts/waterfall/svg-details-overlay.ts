@@ -90,7 +90,7 @@ function getKeys(requestID: number, block: TimeBlock) {
   
   /** get experimental feature */ 
   let getExp = (name: string): string => {
-   return entry["name"]||"" 
+   return entry[name]||"" 
   }
   
   const emptyHeader = {"value": ""}
@@ -102,6 +102,7 @@ function getKeys(requestID: number, block: TimeBlock) {
       "Status": entry.response.status + " " + entry.response.statusText,
       "Server IPAddress": entry.serverIPAddress,
       "Connection": entry.connection,
+      "Browser Priority": getExp("_priority"),
       "Initiator": getExp("_initiator"),
       "Initiator Line": getExp("_initiator_line"),
       "Expires": getExp("_expires"),
