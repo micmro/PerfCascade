@@ -38,6 +38,7 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .block-css {fill: #a6d18f;}
 .block-iframe,
 .block-html,
+.block-svg,
 .block-internal {fill: #82a8de;}
 .block-img,
 .block-image {fill: #b394cf;}
@@ -50,6 +51,7 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .block-font {fill: #e15d4e;}
 .block-xmlhttprequest,
 .block-ajax {fill: #f00;} /*remove?*/
+.block-plain,
 .block-other {fill: #b3b3b3;}
 
 .block-total {fill: #ccc;}

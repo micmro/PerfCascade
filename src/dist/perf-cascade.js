@@ -1,4 +1,4 @@
-/*PerfCascade build:13/02/2016 */
+/*PerfCascade build:14/02/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -46,7 +46,7 @@ var icons = {
         if (scale === void 0) { scale = 1; }
         return toSvg(x, y, title, "icon-other", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n          C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#B3B4B4\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <g>\n        <path fill=\"#414042\" d=\"M11.8,7c0,0.4-0.1,0.7-0.2,1c-0.1,0.3-0.3,0.5-0.4,0.7C11,8.8,10.8,9,10.5,9.2C10.3,9.3,10,9.5,9.6,9.6\n          v1.2H7.8V9.1C8,9,8.2,8.9,8.5,8.8c0.2-0.1,0.5-0.2,0.6-0.3C9.3,8.3,9.5,8.2,9.6,8c0.1-0.2,0.2-0.4,0.2-0.7c0-0.4-0.1-0.6-0.3-0.8\n          S8.9,6.3,8.5,6.3c-0.3,0-0.6,0.1-1,0.2C7.2,6.7,6.9,6.8,6.8,6.9H6.6V5.3c0.2-0.1,0.6-0.2,1-0.3S8.5,4.8,9,4.8\n          c0.5,0,0.8,0.1,1.2,0.2c0.3,0.1,0.6,0.3,0.9,0.4c0.2,0.2,0.4,0.4,0.5,0.7C11.8,6.4,11.8,6.6,11.8,7z M9.8,13H7.7v-1.4h2.1V13z\"/>\n      </g>\n    </g>");
     },
-    js: function (x, y, title, scale) {
+    javascript: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
         return toSvg(x, y, title, "icon-js", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5\n          L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E0B483\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <g>\n        <path fill=\"#414042\" d=\"M7.6,11.8c0,0.3-0.1,0.6-0.2,0.9s-0.3,0.5-0.5,0.7c-0.2,0.2-0.5,0.4-0.8,0.5S5.4,13.9,5,13.9\n          c-0.3,0-0.6,0-0.9,0s-0.5-0.1-0.7-0.1v-1.4h0.2c0.1,0.1,0.3,0.1,0.4,0.2c0.2,0,0.4,0.1,0.6,0.1c0.3,0,0.5,0,0.7-0.1\n          c0.2-0.1,0.3-0.2,0.4-0.4c0.1-0.2,0.1-0.3,0.1-0.5s0-0.4,0-0.7V8.1H4.2V6.8h3.4V11.8z\"/>\n        <path fill=\"#414042\" d=\"M11.1,13.9c-0.5,0-1-0.1-1.4-0.2c-0.4-0.1-0.8-0.2-1.1-0.4v-1.7h0.2c0.4,0.3,0.7,0.5,1.2,0.7\n          c0.4,0.2,0.8,0.2,1.2,0.2c0.1,0,0.2,0,0.4,0s0.3-0.1,0.4-0.1c0.1-0.1,0.2-0.1,0.3-0.2c0.1-0.1,0.1-0.2,0.1-0.4\n          c0-0.2-0.1-0.3-0.2-0.4s-0.3-0.2-0.5-0.2c-0.2-0.1-0.5-0.1-0.8-0.2c-0.3-0.1-0.5-0.1-0.8-0.2c-0.5-0.2-0.9-0.4-1.2-0.8\n          S8.6,9.4,8.6,8.9c0-0.7,0.3-1.2,0.8-1.6c0.6-0.4,1.2-0.6,2.1-0.6c0.4,0,0.8,0,1.2,0.1c0.4,0.1,0.8,0.2,1.1,0.3v1.6h-0.2\n          c-0.3-0.2-0.6-0.4-0.9-0.6C12.4,8,12,8,11.6,8c-0.2,0-0.3,0-0.4,0c-0.1,0-0.2,0.1-0.4,0.1c-0.1,0.1-0.2,0.1-0.3,0.2\n          s-0.1,0.2-0.1,0.3c0,0.2,0.1,0.3,0.2,0.4c0.1,0.1,0.4,0.2,0.7,0.3c0.2,0.1,0.5,0.1,0.7,0.2s0.4,0.1,0.7,0.2\n          c0.5,0.2,0.8,0.4,1.1,0.7c0.2,0.3,0.4,0.7,0.4,1.2c0,0.7-0.3,1.3-0.8,1.7S12,13.9,11.1,13.9z\"/>\n      </g>\n    </g>");
     },
@@ -60,7 +60,7 @@ var icons = {
     },
     css: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
-        return toSvg(x, y, title, "icon-css", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5\n          L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#81A5D6\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <path fill=\"none\" stroke=\"#000000\" stroke-miterlimit=\"10\" d=\"M4.2,14.6\"/>\n      <path fill=\"none\" stroke=\"#414042\" stroke-width=\"0.5\" stroke-miterlimit=\"10\" d=\"M14,5c0,0,0,4-5,4s-5,5-5,5\"/>\n      <rect x=\"3\" y=\"13\" fill=\"#414042\" width=\"2\" height=\"2\"/>\n      <rect x=\"8\" y=\"8\" fill=\"#414042\" width=\"2\" height=\"2\"/>\n      <rect x=\"13\" y=\"4\" fill=\"#414042\" width=\"2\" height=\"2\"/>\n    </g>");
+        return toSvg(x, y, title, "icon-css", scale, "<g>\n      <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n        C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      <path fill=\"none\" stroke=\"#A6D08E\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n        C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n    </g>\n    <g>\n      <path d=\"M7.8,13.7h-1c-0.5,0-0.9-0.1-1.2-0.4c-0.3-0.3-0.4-0.6-0.4-1.1v-0.6c0-0.4-0.1-0.8-0.3-0.9s-0.5-0.3-1-0.3H3.6V9.5h0.3\n        c0.5,0,0.8-0.1,1-0.3C5.1,9,5.2,8.7,5.2,8.2V7.6c0-0.5,0.1-0.9,0.4-1.1c0.3-0.3,0.7-0.4,1.2-0.4h1V7H7.4C7.3,7,7.1,7,7,7\n        C6.9,7,6.8,7.1,6.7,7.1C6.6,7.2,6.5,7.3,6.5,7.4c0,0.1-0.1,0.3-0.1,0.5v0.4c0,0.4-0.1,0.7-0.3,0.9S5.6,9.8,5.2,9.9V10\n        c0.4,0.1,0.6,0.3,0.9,0.6s0.3,0.6,0.3,0.9v0.4c0,0.2,0,0.4,0.1,0.5c0,0.1,0.1,0.2,0.2,0.3c0.1,0.1,0.2,0.1,0.3,0.1\n        c0.1,0,0.3,0,0.4,0h0.4V13.7z\"/>\n      <path d=\"M14.3,10.4h-0.3c-0.5,0-0.8,0.1-1,0.3c-0.2,0.2-0.3,0.5-0.3,0.9v0.6c0,0.5-0.1,0.9-0.4,1.1c-0.3,0.3-0.7,0.4-1.2,0.4h-1\n        v-0.9h0.4c0.2,0,0.3,0,0.4,0c0.1,0,0.2-0.1,0.3-0.1c0.1-0.1,0.2-0.2,0.2-0.3c0-0.1,0.1-0.3,0.1-0.5v-0.4c0-0.4,0.1-0.7,0.3-0.9\n        s0.5-0.4,0.9-0.6V9.9c-0.4-0.1-0.6-0.3-0.9-0.6s-0.3-0.6-0.3-0.9V7.9c0-0.2,0-0.4-0.1-0.5c0-0.1-0.1-0.2-0.2-0.3\n        C11.2,7.1,11.1,7,10.9,7c-0.1,0-0.3,0-0.4,0h-0.4V6.1h1c0.5,0,0.9,0.1,1.2,0.4c0.3,0.3,0.4,0.6,0.4,1.1v0.6c0,0.4,0.1,0.8,0.3,0.9\n        c0.2,0.2,0.5,0.3,1,0.3h0.3V10.4z\"/>\n    </g>");
     },
     warning: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
@@ -214,7 +214,7 @@ document.getElementById('fileinput').addEventListener('change', onFileSubmit, fa
 //TODO: remove Dev/Test only - load test file
 if (location.host.indexOf("127.0.0.1") === 0) {
     //http://www.webpagetest.org/result/151226_X7_b43d35e592fab70e0ba012fe11a41020/
-    window["fetch"]("test-data/github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
+    window["fetch"]("test-data/github.com.MODIFIED.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 }
 
 },{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":9}],6:[function(require,module,exports){
@@ -242,7 +242,7 @@ var HarTransformer = (function () {
                 doneTime = startRelative + entry.time;
             }
             var subModules = entry.timings;
-            return new time_block_1.default(entry.request.url, startRelative, parseInt(entry._all_end) || (startRelative + entry.time), styling_converters_1.mimeToCssClass(entry.response.content.mimeType), _this.buildDetailTimingBlocks(startRelative, entry), entry);
+            return new time_block_1.default(entry.request.url, startRelative, parseInt(entry._all_end) || (startRelative + entry.time), styling_converters_1.mimeToCssClass(entry.response.content.mimeType), _this.buildDetailTimingBlocks(startRelative, entry), entry, styling_converters_1.mimeToRequestType(entry.response.content.mimeType));
         });
         var marks = Object.keys(pageTimings)
             .filter(function (k) { return (pageTimings[k] != undefined && pageTimings[k] >= 0); })
@@ -310,42 +310,47 @@ exports.default = HarTransformer;
 
 },{"../typing/time-block":8,"./styling-converters":7}],7:[function(require,module,exports){
 /**
+ * Convert a MIME type into it's WPT style request type (font, script etc)
+ * @param {string} mimeType
+ */
+function mimeToRequestType(mimeType) {
+    var types = mimeType.split("/");
+    switch (types[0]) {
+        case "image": return "image";
+        case "font": return "font";
+    }
+    switch (types[1]) {
+        case "svg+xml": return "svg";
+        case "html": return "html";
+        case "plain": return "plain";
+        case "css": return "css";
+        case "vnd.ms-fontobject":
+        case "font-woff":
+        case "font-woff2":
+        case "x-font-truetype":
+        case "x-font-opentype":
+        case "x-font-woff": return "font";
+        case "javascript":
+        case "x-javascript":
+        case "script":
+        case "json": return "javascript";
+        case "x-shockwave-flash": return "flash";
+    }
+    return "other";
+}
+exports.mimeToRequestType = mimeToRequestType;
+/**
  * Convert a MIME type into a CSS class
  * @param {string} mimeType
  */
 function mimeToCssClass(mimeType) {
-    var mimeCssClass = function (mimeType) {
-        //TODO: can we make this more elegant?
-        var types = mimeType.split("/");
-        switch (types[0]) {
-            case "image": return "image";
-            case "font": return "font";
-        }
-        switch (types[1]) {
-            case "svg+xml": //TODO: perhaps we can setup a new colour for SVG
-            case "html": return "html";
-            case "css": return "css";
-            case "vnd.ms-fontobject":
-            case "font-woff":
-            case "font-woff2":
-            case "x-font-truetype":
-            case "x-font-opentype":
-            case "x-font-woff": return "font";
-            case "javascript":
-            case "x-javascript":
-            case "script":
-            case "json": return "javascript";
-            case "x-shockwave-flash": return "flash";
-        }
-        return "other";
-    };
-    return "block-" + mimeCssClass(mimeType);
+    return "block-" + mimeToRequestType(mimeType);
 }
 exports.mimeToCssClass = mimeToCssClass;
 
 },{}],8:[function(require,module,exports){
 var TimeBlock = (function () {
-    function TimeBlock(name, start, end, cssClass, segments, rawResource) {
+    function TimeBlock(name, start, end, cssClass, segments, rawResource, requestType) {
         if (cssClass === void 0) { cssClass = ""; }
         if (segments === void 0) { segments = []; }
         this.name = name;
@@ -354,6 +359,7 @@ var TimeBlock = (function () {
         this.cssClass = cssClass;
         this.segments = segments;
         this.rawResource = rawResource;
+        this.requestType = requestType;
         this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
     }
     return TimeBlock;
@@ -867,14 +873,18 @@ var makeIcon = function (type, x, title) {
 };
 function getIndicators(block, docIsSsl) {
     var isSecure = block.name.indexOf("https://") === 0;
+    var iconWidth = 25;
     var output = [];
     var xPos = 3;
+    console.log(block.requestType);
+    output.push(makeIcon(block.requestType, xPos, block.requestType));
+    xPos += iconWidth;
     if (!docIsSsl && isSecure) {
-        output.push(makeIcon("lock", xPos, "Secure Connection"));
-        xPos += 10;
+        xPos += iconWidth;
     }
     else if (docIsSsl && !isSecure) {
         output.push(makeIcon("warning", xPos, "Insecure Connection"));
+        xPos += iconWidth;
     }
     return output;
 }

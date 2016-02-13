@@ -21,14 +21,19 @@ const makeIcon = function( type: string, x: number, title: string) {
 
 export function getIndicators(block: TimeBlock, docIsSsl: boolean): Icon[] {
   const isSecure = block.name.indexOf("https://") === 0
+  const iconWidth = 25
   var output = []
   var xPos = 3
-  
+  console.log(block.requestType)
+  output.push(makeIcon( block.requestType, xPos,  block.requestType))
+  xPos += iconWidth
+   
   if(!docIsSsl && isSecure){
-    output.push(makeIcon("lock", xPos, "Secure Connection"))
-    xPos += 10
+    
+    xPos += iconWidth
   } else if(docIsSsl && !isSecure){
     output.push(makeIcon("warning", xPos, "Insecure Connection"))
+    xPos += iconWidth
   }
   
   return output

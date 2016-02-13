@@ -14,7 +14,10 @@ import {
   WaterfallData,
   Mark
 } from '../typing/waterfall-data'
-import {mimeToCssClass} from './styling-converters'
+import {
+  mimeToCssClass,
+  mimeToRequestType
+} from './styling-converters'
 
 
 export default class HarTransformer{
@@ -48,7 +51,8 @@ export default class HarTransformer{
           parseInt(entry._all_end) || (startRelative + entry.time),
           mimeToCssClass(entry.response.content.mimeType),
           this.buildDetailTimingBlocks(startRelative, entry),
-          entry
+          entry,
+          mimeToRequestType(entry.response.content.mimeType)
         )
     })
     
