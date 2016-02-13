@@ -553,8 +553,6 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .block-wait {fill: #1fe11f;} /*TODO: define colour*/
 .block-receive {fill: #1977dd;}
 
-.left-fixed-holder .icon {fill:#777; stroke:#777;}
-
 .info-overlay {fill: #fff; stroke: #cdcdcd; }
 .info-overlay-close-btn {fill: #cdcdcd; transform: translate(-4px, -4px); cursor: pointer;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}

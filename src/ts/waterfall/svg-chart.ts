@@ -22,6 +22,10 @@ import {
   createFlexRow
 } from "./svg-row-components"
 import {createRowInfoOverlay} from "./svg-details-overlay"
+import {
+  Icon,
+  getIndicators
+} from "./svg-indicators"
 import dom from '../helpers/dom'
 
 
@@ -85,6 +89,8 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
 
   /** full height of the SVG chart in px */
   const chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight)
+  
+  const docIsSsl = (data.blocks[0].name.indexOf("https://") === 0)
 
   //Main holder
   let timeLineHolder = svg.newSvg("water-fall-chart", {
@@ -128,6 +134,12 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
   data.lines.forEach((block, i) => {
     timeLineHolder.appendChild(createBgRect(block, unit, diagramHeight))
   })
+  
+  
+  
+  const labelXPos = barsToShow.reduce((prev: number, curr: TimeBlock) => {
+    return Math.max(prev, getIndicators(curr, docIsSsl).length  * 25)
+  }, 5)
 
   //Main loop to render rows with blocks
 
@@ -149,8 +161,8 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
     } as RectData
 
     let rect = createRect(rectData, block.segments)
-    let shortLabel = createRequestLabelClipped(25, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath")
-    let fullLabel = createRequestLabelFull(25, y, block.name, requestBarHeight)
+    let shortLabel = createRequestLabelClipped(labelXPos, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath")
+    let fullLabel = createRequestLabelFull(labelXPos, y, block.name, requestBarHeight)
 
     let infoOverlay = createRowInfoOverlay(i+1, x, y + requestBarHeight, block, leftFixedWidth, unit)
 
@@ -163,12 +175,11 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
 
     //create and attach request block
     rowFlex.appendChild(rect)
-
-    //TODO: Add indicators / Warnings
-    const isSecure = block.name.indexOf("https://") === 0
-    if (isSecure) {
-      rowFixed.appendChild(icons.lock(5, y + 3, "Secure Connection", 1.2))
-    }
+	  
+    //Add create and add warnings 
+    getIndicators(block, docIsSsl).forEach((value: Icon) => {
+      rowFixed.appendChild(icons[value.type](value.x, y + 3, value.title))
+    })
 
     appendRequestLabels(rowFixed, shortLabel, fullLabel)
 

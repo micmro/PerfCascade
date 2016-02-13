@@ -6,7 +6,8 @@ export default class TimeBlock{
   		public end: number,
   		public cssClass: string = "",
   		public segments: Array<TimeBlock> = [],
-  		public rawResource?: Object) {
+  		public rawResource?: Object,
+      public requestType?: string) {
     this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
   }
 }

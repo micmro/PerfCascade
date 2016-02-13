@@ -1,4 +1,4 @@
-/*PerfCascade build:30/01/2016 */
+/*PerfCascade build:13/02/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -24,12 +24,51 @@ exports.default = dom;
 /**
  *  SVG Icons
  */
+var toSvg = function (x, y, title, className, scale, svgDoc) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString("<svg x=\"" + x + "\" y=\"" + y + "\" xmlns=\"http://www.w3.org/2000/svg\">\n    <g class=\"icon " + className + "\" transform=\"scale(" + scale + ")\">\n      " + svgDoc + "\n      <title>" + title + "</title>\n    </g>\n  </svg>", "image/svg+xml");
+    return doc.firstChild;
+};
 var icons = {
     lock: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
-        var parser = new DOMParser();
-        var doc = parser.parseFromString("\n    <svg x=\"" + x + "\" y=\"" + y + "\" xmlns=\"http://www.w3.org/2000/svg\">\n      <g class=\"icon icon-lock\" transform=\"scale(" + scale + ")\">\n        <g transform=\"scale(0.833333)\">\n          <path stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M9 8v-4c0-1.7-1.3-3-3-3s-3 1.3-3 3v2\" fill=\"none\"></path>\n          <path d=\"M0 6h12v8h-12z\"></path>\n          <title>" + title + "</title>\n        </g>\n      </g>\n    </svg>\n    ", "image/svg+xml");
-        return doc.firstChild;
+        return toSvg(x, y, title, "icon-lock", scale, "<g>\n\t\t<path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n\t\t\tC16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n\t\t<path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n\t\t\tC1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n\t</g>\n\t<path fill=\"#A452A0\" d=\"M13,8V6.5C13,5,12,3,9,3S5,5,5,6.5V8H4v7h10V8H13z M10,12.5c0,0.3-0.7,0.5-1,0.5s-1-0.2-1-0.5v-2\n\t\tC8,10.2,8.7,10,9,10s1,0.2,1,0.5V12.5z M11,8H7V6.5C7,5.7,7.5,5,9,5s2,0.7,2,1.5V8z\"/>");
+    },
+    redirect: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-redirect", scale, "<g>\n        <path fill=\"#F9EF66\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5\n          L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <polygon fill=\"#414042\" points=\"9,5 9,10 12,7.5 \"/>\n      <polyline fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" points=\"9,7.5 4.5,7.5 4.5,11.5 13,11.5 \"/>\n      <path fill=\"#414042\" d=\"M11,10\"/>");
+    },
+    plain: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-plain", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n          C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#414042\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"4.5\" x2=\"15\" y2=\"4.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"6.5\" x2=\"13\" y2=\"6.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"8.5\" x2=\"15\" y2=\"8.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"10.5\" x2=\"10\" y2=\"10.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"12.5\" x2=\"15\" y2=\"12.5\"/>\n    </g>");
+    },
+    other: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-other", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n          C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#B3B4B4\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <g>\n        <path fill=\"#414042\" d=\"M11.8,7c0,0.4-0.1,0.7-0.2,1c-0.1,0.3-0.3,0.5-0.4,0.7C11,8.8,10.8,9,10.5,9.2C10.3,9.3,10,9.5,9.6,9.6\n          v1.2H7.8V9.1C8,9,8.2,8.9,8.5,8.8c0.2-0.1,0.5-0.2,0.6-0.3C9.3,8.3,9.5,8.2,9.6,8c0.1-0.2,0.2-0.4,0.2-0.7c0-0.4-0.1-0.6-0.3-0.8\n          S8.9,6.3,8.5,6.3c-0.3,0-0.6,0.1-1,0.2C7.2,6.7,6.9,6.8,6.8,6.9H6.6V5.3c0.2-0.1,0.6-0.2,1-0.3S8.5,4.8,9,4.8\n          c0.5,0,0.8,0.1,1.2,0.2c0.3,0.1,0.6,0.3,0.9,0.4c0.2,0.2,0.4,0.4,0.5,0.7C11.8,6.4,11.8,6.6,11.8,7z M9.8,13H7.7v-1.4h2.1V13z\"/>\n      </g>\n    </g>");
+    },
+    js: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-js", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5\n          L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E0B483\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <g>\n        <path fill=\"#414042\" d=\"M7.6,11.8c0,0.3-0.1,0.6-0.2,0.9s-0.3,0.5-0.5,0.7c-0.2,0.2-0.5,0.4-0.8,0.5S5.4,13.9,5,13.9\n          c-0.3,0-0.6,0-0.9,0s-0.5-0.1-0.7-0.1v-1.4h0.2c0.1,0.1,0.3,0.1,0.4,0.2c0.2,0,0.4,0.1,0.6,0.1c0.3,0,0.5,0,0.7-0.1\n          c0.2-0.1,0.3-0.2,0.4-0.4c0.1-0.2,0.1-0.3,0.1-0.5s0-0.4,0-0.7V8.1H4.2V6.8h3.4V11.8z\"/>\n        <path fill=\"#414042\" d=\"M11.1,13.9c-0.5,0-1-0.1-1.4-0.2c-0.4-0.1-0.8-0.2-1.1-0.4v-1.7h0.2c0.4,0.3,0.7,0.5,1.2,0.7\n          c0.4,0.2,0.8,0.2,1.2,0.2c0.1,0,0.2,0,0.4,0s0.3-0.1,0.4-0.1c0.1-0.1,0.2-0.1,0.3-0.2c0.1-0.1,0.1-0.2,0.1-0.4\n          c0-0.2-0.1-0.3-0.2-0.4s-0.3-0.2-0.5-0.2c-0.2-0.1-0.5-0.1-0.8-0.2c-0.3-0.1-0.5-0.1-0.8-0.2c-0.5-0.2-0.9-0.4-1.2-0.8\n          S8.6,9.4,8.6,8.9c0-0.7,0.3-1.2,0.8-1.6c0.6-0.4,1.2-0.6,2.1-0.6c0.4,0,0.8,0,1.2,0.1c0.4,0.1,0.8,0.2,1.1,0.3v1.6h-0.2\n          c-0.3-0.2-0.6-0.4-0.9-0.6C12.4,8,12,8,11.6,8c-0.2,0-0.3,0-0.4,0c-0.1,0-0.2,0.1-0.4,0.1c-0.1,0.1-0.2,0.1-0.3,0.2\n          s-0.1,0.2-0.1,0.3c0,0.2,0.1,0.3,0.2,0.4c0.1,0.1,0.4,0.2,0.7,0.3c0.2,0.1,0.5,0.1,0.7,0.2s0.4,0.1,0.7,0.2\n          c0.5,0.2,0.8,0.4,1.1,0.7c0.2,0.3,0.4,0.7,0.4,1.2c0,0.7-0.3,1.3-0.8,1.7S12,13.9,11.1,13.9z\"/>\n      </g>\n    </g>");
+    },
+    image: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-image", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n          C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#B294C5\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <polygon points=\"2.6,14 8.2,9.9 12,11.4 15,8.2 15,14 \t\"/>\n      <circle cx=\"6.6\" cy=\"5.8\" r=\"1.8\"/>\n    </g>");
+    },
+    html: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-html", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5\n          L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#82A7D8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <g>\n        <path d=\"M7.9,6.5l-2.2,6.9H4.6l2.2-6.9H7.9z\"/>\n        <path d=\"M14,10.2l-4.7,2v-1l3.3-1.3L9.3,8.4v-1l4.7,2V10.2z\"/>\n      </g>\n    </g>");
+    },
+    css: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-css", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5\n          L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#81A5D6\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <path fill=\"none\" stroke=\"#000000\" stroke-miterlimit=\"10\" d=\"M4.2,14.6\"/>\n      <path fill=\"none\" stroke=\"#414042\" stroke-width=\"0.5\" stroke-miterlimit=\"10\" d=\"M14,5c0,0,0,4-5,4s-5,5-5,5\"/>\n      <rect x=\"3\" y=\"13\" fill=\"#414042\" width=\"2\" height=\"2\"/>\n      <rect x=\"8\" y=\"8\" fill=\"#414042\" width=\"2\" height=\"2\"/>\n      <rect x=\"13\" y=\"4\" fill=\"#414042\" width=\"2\" height=\"2\"/>\n    </g>");
+    },
+    warning: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-warning", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n          C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <path fill=\"#414042\" d=\"M9,3L3,14h12L9,3z M10,13H8v-1h2V13z M9.5,11h-1L8,10V7l0.5-1h1L10,7v3L9.5,11z\"/>\n    </g>");
+    },
+    font: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-font", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5\n          L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E15D4E\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <g>\n        <path fill=\"#414042\" d=\"M3.8,10l-0.6,0.6C3.1,10.3,3.1,10,3.1,9.8c0-0.6,0.3-1.2,0.8-1.6c0.5-0.3,1.3-0.5,2.4-0.5\n          c0.2,0,0.4,0,0.5,0c0.4,0,0.6,0,0.6,0h0.3c-0.2,0.3-0.3,1-0.3,1.9l0,0.2l0,0.4c0,0.5,0.1,1.1,0.2,1.7c0.1,0.2,0.1,0.4,0.2,0.4\n          c0,0.1,0.1,0.1,0.3,0.1c0.1,0,0.3,0,0.5-0.1c0,0,0,0.1,0,0.1c0,0.1-0.1,0.1-0.2,0.2l-0.2,0.1l-1,0.4c-0.2-0.7-0.3-1.3-0.4-2.1\n          l-0.3,0.2H5.2c-0.2,0.6-0.6,1-1,1.3l0.8,0l-0.4,0.4L3.1,13l0.5-0.5l0.4,0c0.2-0.1,0.3-0.3,0.5-0.5s0.3-0.7,0.6-1.4l0.1-0.3\n          c0.2-0.7,0.5-1.1,0.7-1.4s0.5-0.5,0.9-0.7C6.3,8.1,5.8,8.1,5.4,8.1c-1.2,0-1.7,0.4-1.7,1.2C3.7,9.5,3.7,9.7,3.8,10z M6.8,10.9\n          c0-0.5-0.1-0.8-0.1-1.1c0-0.1,0-0.3,0-0.4l0-0.5c0-0.3,0-0.5,0.1-0.7C6.4,8.6,6,9.2,5.6,10.2c-0.1,0.3-0.1,0.4-0.2,0.5l-0.1,0.2\n          H6.8z\"/>\n        <path fill=\"#414042\" d=\"M9.8,10.9c0.3-0.5,0.6-0.9,0.9-1.2s0.6-0.5,0.9-0.5c0.4,0,0.6,0.3,0.6,1c0,0.8-0.2,1.4-0.7,2\n          c-0.5,0.6-1.1,0.8-1.8,0.8c-0.1,0-0.2,0-0.2,0l-0.3,0c0,0-0.1,0-0.1,0C9,12.8,9,12.6,9,12.4L9.4,9c0.1-0.8,0.4-1.5,0.9-2.1\n          s1.1-0.9,1.7-0.9c0.1,0,0.3,0,0.4,0l-0.6,0.6c-0.1,0-0.3-0.1-0.4-0.1c-0.8,0-1.2,0.6-1.4,1.8L9.8,10.9z M9.6,12.5\n          c0.2,0.1,0.5,0.2,0.7,0.2c0.4,0,0.6-0.2,0.9-0.6c0.2-0.4,0.3-1,0.3-1.6c0-0.4-0.1-0.6-0.3-0.6c-0.2,0-0.5,0.2-0.8,0.5\n          c-0.4,0.5-0.7,1-0.7,1.7L9.6,12.5z\"/>\n        <path fill=\"#414042\" d=\"M15.4,9.4l-0.4,0.5c-0.2-0.1-0.4-0.1-0.6-0.1c-0.3,0-0.6,0.1-0.8,0.4c-0.2,0.3-0.3,0.7-0.3,1.2\n          c0,0.4,0.1,0.6,0.2,0.9c0.1,0.2,0.3,0.3,0.6,0.3c0.4,0,0.7-0.3,0.9-0.8c0.1,0.1,0.1,0.1,0.1,0.2c0,0.2-0.2,0.5-0.5,0.7\n          c-0.3,0.3-0.6,0.4-0.9,0.4c-0.3,0-0.5-0.1-0.7-0.3c-0.2-0.2-0.3-0.5-0.3-0.8c0-0.7,0.2-1.3,0.7-1.8c0.5-0.6,1-0.8,1.5-0.8\n          C15,9.3,15.2,9.3,15.4,9.4z\"/>\n      </g>\n    </g>");
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -329,6 +368,7 @@ var misc_1 = require("../helpers/misc");
 var svg_general_components_1 = require("./svg-general-components");
 var svg_row_components_1 = require("./svg-row-components");
 var svg_details_overlay_1 = require("./svg-details-overlay");
+var svg_indicators_1 = require("./svg-indicators");
 var dom_1 = require('../helpers/dom');
 /**
  * Function to format the shortened URL
@@ -379,6 +419,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
     var diagramHeight = (barsToShow.length + 1) * requestBarHeight;
     /** full height of the SVG chart in px */
     var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
+    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
     //Main holder
     var timeLineHolder = svg_1.default.newSvg("water-fall-chart", {
         "height": Math.floor(chartHolderHeight)
@@ -412,6 +453,9 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
     data.lines.forEach(function (block, i) {
         timeLineHolder.appendChild(svg_general_components_1.createBgRect(block, unit, diagramHeight));
     });
+    var labelXPos = barsToShow.reduce(function (prev, curr) {
+        return Math.max(prev, svg_indicators_1.getIndicators(curr, docIsSsl).length * 25);
+    }, 5);
     //Main loop to render rows with blocks
     barsToShow.forEach(function (block, i) {
         var blockWidth = block.total || 1;
@@ -429,8 +473,8 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
             "hideOverlay": mouseListeners.onMouseLeavePartial
         };
         var rect = svg_row_components_1.createRect(rectData, block.segments);
-        var shortLabel = svg_row_components_1.createRequestLabelClipped(25, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
-        var fullLabel = svg_row_components_1.createRequestLabelFull(25, y, block.name, requestBarHeight);
+        var shortLabel = svg_row_components_1.createRequestLabelClipped(labelXPos, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
+        var fullLabel = svg_row_components_1.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
         var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, leftFixedWidth, unit);
         var showOverlay = function (evt) {
             dom_1.default.removeAllChildren(overlayHolder);
@@ -440,11 +484,10 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
         var rowFlex = svg_row_components_1.createFlexRow(y, requestBarHeight, showOverlay);
         //create and attach request block
         rowFlex.appendChild(rect);
-        //TODO: Add indicators / Warnings
-        var isSecure = block.name.indexOf("https://") === 0;
-        if (isSecure) {
-            rowFixed.appendChild(icons_1.default.lock(5, y + 3, "Secure Connection", 1.2));
-        }
+        //Add create and add warnings 
+        svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
+            rowFixed.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
+        });
         svg_row_components_1.appendRequestLabels(rowFixed, shortLabel, fullLabel);
         flexScaleHolder.appendChild(rowFlex);
         leftFixedHolder.appendChild(rowFixed);
@@ -459,7 +502,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/dom":1,"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-details-overlay":10,"./svg-general-components":11,"./svg-row-components":12}],10:[function(require,module,exports){
+},{"../helpers/dom":1,"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-details-overlay":10,"./svg-general-components":11,"./svg-indicators":12,"./svg-row-components":13}],10:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var dom_1 = require("../helpers/dom");
 function createCloseButtonSvg(y) {
@@ -816,6 +859,28 @@ function createMarks(marks, unit, diagramHeight) {
 exports.createMarks = createMarks;
 
 },{"../helpers/svg":4}],12:[function(require,module,exports){
+/**
+ * Creation of sub-components used in a ressource request row
+ */
+var makeIcon = function (type, x, title) {
+    return { "type": type, "x": x, "title": title };
+};
+function getIndicators(block, docIsSsl) {
+    var isSecure = block.name.indexOf("https://") === 0;
+    var output = [];
+    var xPos = 3;
+    if (!docIsSsl && isSecure) {
+        output.push(makeIcon("lock", xPos, "Secure Connection"));
+        xPos += 10;
+    }
+    else if (docIsSsl && !isSecure) {
+        output.push(makeIcon("warning", xPos, "Insecure Connection"));
+    }
+    return output;
+}
+exports.getIndicators = getIndicators;
+
+},{}],13:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */

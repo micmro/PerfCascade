@@ -5,7 +5,6 @@
  */
 export function mimeToCssClass(mimeType: string) {
   const mimeCssClass = function(mimeType: string) {
-    //TODO: can we make this more elegant?
     let types = mimeType.split("/");
     switch (types[0]) {
       case "image": return "image"
