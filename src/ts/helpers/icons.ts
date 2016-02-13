@@ -172,7 +172,20 @@ var icons = {
           C15,9.3,15.2,9.3,15.4,9.4z"/>
       </g>
     </g>`)
+  },
+  flash : function(x: number, y: number, title: string, scale: number = 1): SVGElement{
+    return toSvg(x, y, title, "icon-flash", scale, `<g>
+      <g>
+        <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
+          C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+        <path fill="none" stroke="#42AAB1" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
+          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+      </g>
+    </g>
+    <path fill="#414042" d="M13.1,6.2c-2.1-0.1-2.9,2.3-2.9,2.3h1.7l0,2.1l-2.5,0C8.8,11.9,7.6,15,4,15c0-0.1,0-1.8,0-2.1
+      c2.1-0.1,3.2-2.4,3.7-4.1c1.4-4.1,3.5-4.6,5.3-4.8V6.2z"/>`)
   }
+  
 }
 
 export default icons

@@ -69,6 +69,10 @@ var icons = {
     font: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
         return toSvg(x, y, title, "icon-font", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5\n          L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E15D4E\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <g>\n        <path fill=\"#414042\" d=\"M3.8,10l-0.6,0.6C3.1,10.3,3.1,10,3.1,9.8c0-0.6,0.3-1.2,0.8-1.6c0.5-0.3,1.3-0.5,2.4-0.5\n          c0.2,0,0.4,0,0.5,0c0.4,0,0.6,0,0.6,0h0.3c-0.2,0.3-0.3,1-0.3,1.9l0,0.2l0,0.4c0,0.5,0.1,1.1,0.2,1.7c0.1,0.2,0.1,0.4,0.2,0.4\n          c0,0.1,0.1,0.1,0.3,0.1c0.1,0,0.3,0,0.5-0.1c0,0,0,0.1,0,0.1c0,0.1-0.1,0.1-0.2,0.2l-0.2,0.1l-1,0.4c-0.2-0.7-0.3-1.3-0.4-2.1\n          l-0.3,0.2H5.2c-0.2,0.6-0.6,1-1,1.3l0.8,0l-0.4,0.4L3.1,13l0.5-0.5l0.4,0c0.2-0.1,0.3-0.3,0.5-0.5s0.3-0.7,0.6-1.4l0.1-0.3\n          c0.2-0.7,0.5-1.1,0.7-1.4s0.5-0.5,0.9-0.7C6.3,8.1,5.8,8.1,5.4,8.1c-1.2,0-1.7,0.4-1.7,1.2C3.7,9.5,3.7,9.7,3.8,10z M6.8,10.9\n          c0-0.5-0.1-0.8-0.1-1.1c0-0.1,0-0.3,0-0.4l0-0.5c0-0.3,0-0.5,0.1-0.7C6.4,8.6,6,9.2,5.6,10.2c-0.1,0.3-0.1,0.4-0.2,0.5l-0.1,0.2\n          H6.8z\"/>\n        <path fill=\"#414042\" d=\"M9.8,10.9c0.3-0.5,0.6-0.9,0.9-1.2s0.6-0.5,0.9-0.5c0.4,0,0.6,0.3,0.6,1c0,0.8-0.2,1.4-0.7,2\n          c-0.5,0.6-1.1,0.8-1.8,0.8c-0.1,0-0.2,0-0.2,0l-0.3,0c0,0-0.1,0-0.1,0C9,12.8,9,12.6,9,12.4L9.4,9c0.1-0.8,0.4-1.5,0.9-2.1\n          s1.1-0.9,1.7-0.9c0.1,0,0.3,0,0.4,0l-0.6,0.6c-0.1,0-0.3-0.1-0.4-0.1c-0.8,0-1.2,0.6-1.4,1.8L9.8,10.9z M9.6,12.5\n          c0.2,0.1,0.5,0.2,0.7,0.2c0.4,0,0.6-0.2,0.9-0.6c0.2-0.4,0.3-1,0.3-1.6c0-0.4-0.1-0.6-0.3-0.6c-0.2,0-0.5,0.2-0.8,0.5\n          c-0.4,0.5-0.7,1-0.7,1.7L9.6,12.5z\"/>\n        <path fill=\"#414042\" d=\"M15.4,9.4l-0.4,0.5c-0.2-0.1-0.4-0.1-0.6-0.1c-0.3,0-0.6,0.1-0.8,0.4c-0.2,0.3-0.3,0.7-0.3,1.2\n          c0,0.4,0.1,0.6,0.2,0.9c0.1,0.2,0.3,0.3,0.6,0.3c0.4,0,0.7-0.3,0.9-0.8c0.1,0.1,0.1,0.1,0.1,0.2c0,0.2-0.2,0.5-0.5,0.7\n          c-0.3,0.3-0.6,0.4-0.9,0.4c-0.3,0-0.5-0.1-0.7-0.3c-0.2-0.2-0.3-0.5-0.3-0.8c0-0.7,0.2-1.3,0.7-1.8c0.5-0.6,1-0.8,1.5-0.8\n          C15,9.3,15.2,9.3,15.4,9.4z\"/>\n      </g>\n    </g>");
+    },
+    flash: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-flash", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n          C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#42AAB1\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n    </g>\n    <path fill=\"#414042\" d=\"M13.1,6.2c-2.1-0.1-2.9,2.3-2.9,2.3h1.7l0,2.1l-2.5,0C8.8,11.9,7.6,15,4,15c0-0.1,0-1.8,0-2.1\n      c2.1-0.1,3.2-2.4,3.7-4.1c1.4-4.1,3.5-4.6,5.3-4.8V6.2z\"/>");
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -459,6 +463,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
     data.lines.forEach(function (block, i) {
         timeLineHolder.appendChild(svg_general_components_1.createBgRect(block, unit, diagramHeight));
     });
+    //calculate x position for label based on number of icons
     var labelXPos = barsToShow.reduce(function (prev, curr) {
         return Math.max(prev, svg_indicators_1.getIndicators(curr, docIsSsl).length * 25);
     }, 5);
@@ -868,9 +873,16 @@ exports.createMarks = createMarks;
 /**
  * Creation of sub-components used in a ressource request row
  */
+//helper to avoid typing out all key of the helper object
 var makeIcon = function (type, x, title) {
     return { "type": type, "x": x, "title": title };
 };
+/**
+ *
+ * @param  {TimeBlock} block
+ * @param  {boolean} docIsSsl
+ * @returns IconMetadata
+ */
 function getIndicators(block, docIsSsl) {
     var isSecure = block.name.indexOf("https://") === 0;
     var iconWidth = 25;
@@ -880,6 +892,7 @@ function getIndicators(block, docIsSsl) {
     output.push(makeIcon(block.requestType, xPos, block.requestType));
     xPos += iconWidth;
     if (!docIsSsl && isSecure) {
+        output.push(makeIcon("lock", xPos, "Secure Connection"));
         xPos += iconWidth;
     }
     else if (docIsSsl && !isSecure) {

@@ -23,7 +23,7 @@ import {
 } from "./svg-row-components"
 import {createRowInfoOverlay} from "./svg-details-overlay"
 import {
-  Icon,
+  Indicator,
   getIndicators
 } from "./svg-indicators"
 import dom from '../helpers/dom'
@@ -135,8 +135,7 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
     timeLineHolder.appendChild(createBgRect(block, unit, diagramHeight))
   })
   
-  
-  
+  //calculate x position for label based on number of icons
   const labelXPos = barsToShow.reduce((prev: number, curr: TimeBlock) => {
     return Math.max(prev, getIndicators(curr, docIsSsl).length  * 25)
   }, 5)
@@ -177,7 +176,7 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
     rowFlex.appendChild(rect)
 	  
     //Add create and add warnings 
-    getIndicators(block, docIsSsl).forEach((value: Icon) => {
+    getIndicators(block, docIsSsl).forEach((value: Indicator) => {
       rowFixed.appendChild(icons[value.type](value.x, y + 3, value.title))
     })
 
