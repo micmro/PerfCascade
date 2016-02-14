@@ -340,11 +340,16 @@ exports.default = HarTransformer;
  */
 function mimeToRequestType(mimeType) {
     var types = mimeType.split("/");
+    var part2 = types[1];
+    // take care of text/css; charset=UTF-8 etc
+    if (part2 !== undefined) {
+        part2 = part2.indexOf(";") > -1 ? part2.split(";")[0] : part2;
+    }
     switch (types[0]) {
         case "image": return "image";
         case "font": return "font";
     }
-    switch (types[1]) {
+    switch (part2) {
         case "svg+xml": return "svg";
         case "xml":
         case "html": return "html";
