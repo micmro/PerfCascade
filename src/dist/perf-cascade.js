@@ -34,13 +34,33 @@ var icons = {
         if (scale === void 0) { scale = 1; }
         return toSvg(x, y, title, "icon-lock", scale, "<g>\n    <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0 \n      C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n    <path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n      C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n  </g>\n  <path fill=\"#A452A0\" d=\"M13,8V6.5C13,5,12,3,9,3S5,5,5,6.5V8H4v7h10V8H13z M10,12.5c0,0.3-0.7,0.5-1,0.5s-1-0.2-1-0.5v-2\n    C8,10.2,8.7,10,9,10s1,0.2,1,0.5V12.5z M11,8H7V6.5C7,5.7,7.5,5,9,5s2,0.7,2,1.5V8z\"/>");
     },
-    redirect: function (x, y, title, scale) {
+    noTls: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
-        return toSvg(x, y, title, "icon-redirect", scale, "<g>\n        <path fill=\"#F9EF66\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5\n          L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <polygon fill=\"#414042\" points=\"9,5 9,10 12,7.5 \"/>\n      <polyline fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" points=\"9,7.5 4.5,7.5 4.5,11.5 13,11.5 \"/>\n      <path fill=\"#414042\" d=\"M11,10\"/>");
+        return toSvg(x, y, title, "icon-no-tls", scale, "<g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n            C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#CC6666\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n    </g>\n    <path fill=\"#414042\" d=\"M13,8V6.5C13,5,12,3,9,3S5,5,5,6.5V8H4v7h10V8H13z M10,12.5c0,0.3-0.7,0.5-1,0.5s-1-0.2-1-0.5v-2\n        C8,10.2,8.7,10,9,10s1,0.2,1,0.5V12.5z M11,8H7V6.5C7,5.7,7.5,5,9,5s2,0.7,2,1.5V8z\"/>\n    <line fill=\"#CC6666\" stroke=\"#CC6666\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"15\" x2=\"15\" y2=\"3\"/>");
+    },
+    err3xx: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-redirect", scale, "<g>\n        <path fill=\"#F9EF66\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5\n            L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n    </g>\n    <polygon fill=\"#414042\" points=\"9,5 9,10 12,7.5 \"/>\n    <polyline fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" points=\"9,7.5 4.5,7.5 4.5,11.5 13,11.5 \"/>\n    <path fill=\"#414042\" d=\"M11,10\"/>");
+    },
+    err4xx: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-4xx", scale, "<g>\n        <path fill=\"#F16062\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n            C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n    </g>\n    <g>\n        <path fill=\"#FFFFFF\" d=\"M5.6,14v-1.7H3.1v-0.8l2.6-4.6h0.6v4.6h0.8v0.8H6.3V14H5.6z M5.6,11.5V8.3l-1.8,3.2H5.6z\"/>\n        <path fill=\"#FFFFFF\" d=\"M7.5,14L9,11.3L7.6,8.8h0.9L9.1,10c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8l-1.4,2.4\n            l1.5,2.7h-0.9l-0.9-1.6L9.4,12l-1.1,2H7.5z\"/>\n        <path fill=\"#FFFFFF\" d=\"M11.5,14l1.5-2.7l-1.4-2.5h0.9l0.6,1.2c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8\n            l-1.4,2.4l1.5,2.7h-0.9l-0.9-1.6L13.4,12l-1.1,2H11.5z\"/>\n    </g>");
+    },
+    err5xx: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-5xx", scale, " <g>\n        <path fill=\"#F16061\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n            C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n    </g>\n    <g>\n        <path fill=\"#FFFFFF\" d=\"M3.3,12.1L4.1,12c0.1,0.4,0.2,0.8,0.4,1c0.2,0.2,0.4,0.3,0.7,0.3c0.3,0,0.6-0.2,0.9-0.5s0.4-0.7,0.4-1.3\n            c0-0.5-0.1-0.9-0.3-1.2S5.5,10,5.2,10c-0.2,0-0.4,0.1-0.6,0.2c-0.2,0.1-0.3,0.3-0.4,0.5l-0.7-0.1L4,6.9h2.8v0.8H4.6L4.3,9.7\n            C4.6,9.4,5,9.3,5.3,9.3c0.5,0,0.9,0.2,1.3,0.6c0.3,0.4,0.5,1,0.5,1.7c0,0.6-0.2,1.2-0.5,1.7c-0.4,0.6-0.9,0.9-1.5,0.9\n            c-0.5,0-0.9-0.2-1.3-0.5S3.4,12.7,3.3,12.1z\"/>\n        <path fill=\"#FFFFFF\" d=\"M7.5,14L9,11.3L7.6,8.8h0.9L9.1,10c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8l-1.4,2.4\n            l1.5,2.7h-0.9l-0.9-1.6L9.4,12l-1.1,2H7.5z\"/>\n        <path fill=\"#FFFFFF\" d=\"M11.5,14l1.5-2.7l-1.4-2.5h0.9l0.6,1.2c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8\n            l-1.4,2.4l1.5,2.7h-0.9l-0.9-1.6L13.4,12l-1.1,2H11.5z\"/>\n    </g>");
+    },
+    noCache: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-no-cache", scale, "<g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n            C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#CC6666\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n    </g>\n    <g>\n        <path fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" d=\"M5,7v4.5C5,12.3,6.8,13,9,13s4-0.7,4-1.5V7H5z\"/>\n        <path fill=\"#FFFFFF\" stroke=\"#414042\" stroke-miterlimit=\"10\" d=\"M9,8c1.7,0,3.2-0.4,3.8-1C12.9,6.8,13,6.7,13,6.5\n            C13,5.7,11.2,5,9,5S5,5.7,5,6.5C5,6.7,5.1,6.8,5.2,7C5.8,7.6,7.3,8,9,8z\"/>\n    </g>\n    <line fill=\"#CC6666\" stroke=\"#CC6666\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"15\" x2=\"15\" y2=\"3\"/>");
+    },
+    noGzip: function (x, y, title, scale) {
+        if (scale === void 0) { scale = 1; }
+        return toSvg(x, y, title, "icon-no-gzip", scale, "<g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n            C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#CC6666\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n    </g>\n    <rect x=\"7.5\" y=\"2\" fill=\"#414042\" width=\"1.5\" height=\"1\"/>\n    <rect x=\"9\" y=\"3\" fill=\"#414042\" width=\"1.5\" height=\"1\"/>\n    <rect x=\"7.5\" y=\"4\" fill=\"#414042\" width=\"1.5\" height=\"1\"/>\n    <rect x=\"9\" y=\"5\" fill=\"#414042\" width=\"1.5\" height=\"1\"/>\n    <rect x=\"7.5\" y=\"6\" fill=\"#414042\" width=\"1.5\" height=\"1\"/>\n    <polygon fill=\"#414042\" points=\"10,15 8,15 7,14 7,10 8,8 10,8 11,10 11,14   \"/>\n    <polygon fill=\"#FFFFFF\" points=\"9,13.5 9,13.5 8,13 8,11.5 10,11.5 10,13     \"/>\n    <rect x=\"9\" y=\"7\" fill=\"#414042\" width=\"1.5\" height=\"1\"/>\n    <line fill=\"#CC6666\" stroke=\"#CC6666\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"15\" x2=\"15\" y2=\"3\"/>");
     },
     plain: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
-        return toSvg(x, y, title, "icon-plain", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n          C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#414042\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"4.5\" x2=\"15\" y2=\"4.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"6.5\" x2=\"13\" y2=\"6.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"8.5\" x2=\"15\" y2=\"8.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"10.5\" x2=\"10\" y2=\"10.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"12.5\" x2=\"15\" y2=\"12.5\"/>\n    </g>");
+        return toSvg(x, y, title, "icon-plain", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n          C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#B3B4B4\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"4.5\" x2=\"15\" y2=\"4.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"6.5\" x2=\"13\" y2=\"6.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"8.5\" x2=\"15\" y2=\"8.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"10.5\" x2=\"10\" y2=\"10.5\"/>\n      <line fill=\"none\" stroke=\"#414042\" stroke-miterlimit=\"10\" x1=\"3\" y1=\"12.5\" x2=\"15\" y2=\"12.5\"/>\n    </g>");
     },
     other: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
@@ -64,7 +84,7 @@ var icons = {
     },
     warning: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
-        return toSvg(x, y, title, "icon-warning", scale, "<g>\n      <g>\n        <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n          C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n        <path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <path fill=\"#414042\" d=\"M9,3L3,14h12L9,3z M10,13H8v-1h2V13z M9.5,11h-1L8,10V7l0.5-1h1L10,7v3L9.5,11z\"/>\n    </g>");
+        return toSvg(x, y, title, "icon-warning", scale, "<g>\n          <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n              C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n          <path fill=\"none\" stroke=\"#CC6666\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n              C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n      </g>\n      <path fill=\"#414042\" d=\"M9,3L3,14h12L9,3z M10,13H8v-1h2V13z M9.5,11h-1L8,10V7l0.5-1h1L10,7v3L9.5,11z\"/>");
     },
     font: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
@@ -83,7 +103,7 @@ exports.default = icons;
  *  Misc Helpers
  */
 var misc = {
-    parseUrl: function (url) {
+    parseUrl: function parseUrl(url) {
         var pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
         var matches = url.match(pattern);
         return {
@@ -93,6 +113,9 @@ var misc = {
             query: matches[7],
             fragment: matches[9]
         };
+    },
+    contains: function contains(arr, item) {
+        return arr.filter(function (x) { return x === item; }).length > 0;
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -323,6 +346,7 @@ function mimeToRequestType(mimeType) {
     }
     switch (types[1]) {
         case "svg+xml": return "svg";
+        case "xml":
         case "html": return "html";
         case "plain": return "plain";
         case "css": return "css";
@@ -463,7 +487,10 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
     });
     //calculate x position for label based on number of icons
     var labelXPos = barsToShow.reduce(function (prev, curr) {
-        return Math.max(prev, svg_indicators_1.getIndicators(curr, docIsSsl).length * 25);
+        var i = svg_indicators_1.getIndicators(curr, docIsSsl);
+        var lastIndicator = i[i.length - 1];
+        var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
+        return Math.max(prev, x);
     }, 5);
     //Main loop to render rows with blocks
     barsToShow.forEach(function (block, i) {
@@ -618,6 +645,17 @@ function getKeys(requestID, block) {
             "Accept": getRequestHeader("Accept"),
             "Accept-Encoding": getRequestHeader("Accept-Encoding"),
             "Accept-Language": getRequestHeader("Accept-Language"),
+            "Authorization": getRequestHeader("Authorization"),
+            "Expect": getRequestHeader("Expect"),
+            "Forwarded": getRequestHeader("Forwarded"),
+            "If-Modified-Since": getRequestHeader("If-Modified-Since"),
+            "If-Range": getRequestHeader("If-Range"),
+            "If-Unmodified-Since": getRequestHeader("If-Unmodified-Since"),
+            "Via": getRequestHeader("Via"),
+            "Warning": getRequestHeader("Warning"),
+            "X-Forwarded-For	": getRequestHeader("X-Forwarded-For	"),
+            "X-Forwarded-Host": getRequestHeader("X-Forwarded-Host"),
+            "Front-End-Https": getRequestHeader("Front-End-Https"),
             "Querystring parameters count": entry.request.queryString.length,
             "Cookies count": entry.request.cookies.length
         },
@@ -628,8 +666,10 @@ function getKeys(requestID, block) {
             "Body Size": formatBytes(entry.response.bodySize),
             "Content-Type": getResponseHeader("Content-Type"),
             "Cache-Control": getResponseHeader("Cache-Control"),
+            "Content-Encoding": getResponseHeader("Content-Encoding"),
             "Expires": getResponseHeader("Expires"),
             "Last-Modified": getResponseHeader("Last-Modified"),
+            "Pragma": getResponseHeader("Pragma"),
             "Server": getResponseHeader("Server"),
             "Timing-Allow-Origin": getResponseHeader("Timing-Allow-Origin"),
             "Content-Length": getResponseHeader("Content-Length"),
@@ -637,8 +677,34 @@ function getKeys(requestID, block) {
             "Content Compression": entry.response.content.compression,
             "Connection": getResponseHeader("Connection"),
             "X-Served-By": getResponseHeader("X-Served-By"),
-            "Vary": getResponseHeader("Vary"),
             "Redirect URL": entry.response.redirectURL,
+            "ETag": getResponseHeader("ETag"),
+            "Date": getResponseHeader("Date"),
+            "Access-Control-Allow-Origin": getResponseHeader("Access-Control-Allow-Origin"),
+            "Accept-Patch": getResponseHeader("Accept-Patch"),
+            "Accept-Ranges": getResponseHeader("Accept-Ranges"),
+            "Age": getResponseHeader("Age"),
+            "Allow": getResponseHeader("Allow"),
+            "Content-Disposition": getResponseHeader("Content-Disposition"),
+            "Location": getResponseHeader("Location"),
+            "Proxy-Authenticate": getResponseHeader("Proxy-Authenticate"),
+            "Retry-After": getResponseHeader("Retry-After"),
+            "Set-Cookie": getResponseHeader("Set-Cookie"),
+            "Strict-Transport-Security": getResponseHeader("Strict-Transport-Security"),
+            "Trailer (for chunked transfer coding)": getResponseHeader("Trailer"),
+            "Transfer-Encoding": getResponseHeader("Transfer-Encoding"),
+            "TSV (Tracking Status Value)": getResponseHeader("TSV"),
+            "Upgrade": getResponseHeader("Upgrade"),
+            "Vary": getResponseHeader("Vary"),
+            "Via": getResponseHeader("Via"),
+            "Warning": getResponseHeader("Warning"),
+            "X-XSS-Protection": getResponseHeader("X-XSS-Protection"),
+            "Content-Security-Policy": getResponseHeader("Content-Security-Policy"),
+            "X-Content-Security-Policy": getResponseHeader("X-Content-Security-Policy"),
+            "X-WebKit-CSP": getResponseHeader("X-WebKit-CSP"),
+            "X-Content-Type-Options": getResponseHeader("X-Content-Type-Options"),
+            "X-UA-Compatible": getResponseHeader("X-UA-Compatible"),
+            "Upgrade-Insecure-Requests": getResponseHeader("Upgrade-Insecure-Requests"),
             "Comment": entry.response.comment
         }
     };
@@ -867,36 +933,101 @@ function createMarks(marks, unit, diagramHeight) {
 exports.createMarks = createMarks;
 
 },{"../helpers/svg":4}],12:[function(require,module,exports){
-// helper to avoid typing out all key of the helper object
-var makeIcon = function (type, x, title) {
-    return { "type": type, "x": x, "title": title };
-};
+var misc_1 = require("../helpers/misc");
+function getResponseHeader(entry, headerName) {
+    return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
+}
+function isCompressable(block) {
+    var entry = block.rawResource;
+    var minCompressionSize = 1000;
+    //ignore non GET and small responses
+    if (entry.request.method.toLocaleLowerCase() !== "get" || entry.response.bodySize < minCompressionSize) {
+        return false;
+    }
+    if (misc_1.default.contains(["html", "css", "javascript", "svg", "plain"], block.requestType)) {
+        return true;
+    }
+    var mime = entry.response.content.mimeType;
+    var compressableMimes = ["application/vnd.ms-fontobject",
+        "application/x-font-opentype",
+        "application/x-font-truetype",
+        "application/x-font-ttf",
+        "application/xml",
+        "font/eot",
+        "font/opentype",
+        "font/otf",
+        "image/vnd.microsoft.icon"];
+    if (misc_1.default.contains(["text"], mime.split("/")[0]) || misc_1.default.contains(compressableMimes, mime)) {
+        return true;
+    }
+    return false;
+}
 /**
- *
+ * Scan the request for errors or portential issues and highlight them
  * @param  {TimeBlock} block
  * @param  {boolean} docIsSsl
  * @returns IconMetadata
  */
 function getIndicators(block, docIsSsl) {
     var isSecure = block.name.indexOf("https://") === 0;
-    var iconWidth = 25;
+    var iconWidth = 20;
+    var entry = block.rawResource;
     var output = [];
     var xPos = 3;
-    output.push(makeIcon(block.requestType, xPos, block.requestType));
-    xPos += iconWidth;
-    if (!docIsSsl && isSecure) {
-        output.push(makeIcon("lock", xPos, "Secure Connection"));
+    // helper to avoid typing out all key of the helper object
+    var makeIcon = function (type, title) {
+        output.push({ "type": type, "x": xPos, "title": title });
         xPos += iconWidth;
+    };
+    var respHeader = function (headerName) {
+        return getResponseHeader(entry, headerName);
+    };
+    var respHeaderValue = function (headerName) {
+        var header = getResponseHeader(entry, headerName);
+        if (header !== undefined) {
+            return header.value;
+        }
+        else {
+            return "";
+        }
+    };
+    makeIcon(block.requestType, block.requestType);
+    //highlight redirects
+    if (!!entry.response.redirectURL) {
+        var url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
+        makeIcon("err3xx", entry.response.status + " response status: Redirect to " + url + "...");
+    }
+    if (!docIsSsl && isSecure) {
+        makeIcon("lock", "Secure Connection");
     }
     else if (docIsSsl && !isSecure) {
-        output.push(makeIcon("warning", xPos, "Insecure Connection"));
-        xPos += iconWidth;
+        makeIcon("noTls", "Insecure Connection");
+    }
+    if (entry.request.method.toLocaleLowerCase() === "get") {
+        if ((respHeader("Cache-Control") === undefined
+            && respHeader("Expires") === undefined)
+            || respHeaderValue("Cache-Control").indexOf("no-cache") > -1
+            || respHeaderValue("Pragma") === "no-cache") {
+            makeIcon("noCache", "Response not cached");
+        }
+    }
+    if (respHeader("Content-Encoding") === undefined && isCompressable(block)) {
+        makeIcon("noGzip", "no gzip");
+    }
+    if (entry.response.status > 399 && entry.response.status < 500) {
+        makeIcon("err4xx", entry.response.status + " response status: " + entry.response.statusText);
+    }
+    if (entry.response.status > 499 && entry.response.status < 600) {
+        makeIcon("err5xx", entry.response.status + " response status: " + entry.response.statusText);
+    }
+    if (!entry.response.content.mimeType) {
+        makeIcon("warning", "No MIME Type defined");
     }
     return output;
 }
 exports.getIndicators = getIndicators;
 
-},{}],13:[function(require,module,exports){
+},{"../helpers/misc":3}],13:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */

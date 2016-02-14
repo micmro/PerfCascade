@@ -24,23 +24,98 @@ let icons = {
   <path fill="#A452A0" d="M13,8V6.5C13,5,12,3,9,3S5,5,5,6.5V8H4v7h10V8H13z M10,12.5c0,0.3-0.7,0.5-1,0.5s-1-0.2-1-0.5v-2
     C8,10.2,8.7,10,9,10s1,0.2,1,0.5V12.5z M11,8H7V6.5C7,5.7,7.5,5,9,5s2,0.7,2,1.5V8z"/>`)
   },
-  redirect: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  noTls: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
+    return toSvg(x, y, title, "icon-no-tls", scale, `<g>
+        <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
+            C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+        <path fill="none" stroke="#CC6666" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
+            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+    </g>
+    <path fill="#414042" d="M13,8V6.5C13,5,12,3,9,3S5,5,5,6.5V8H4v7h10V8H13z M10,12.5c0,0.3-0.7,0.5-1,0.5s-1-0.2-1-0.5v-2
+        C8,10.2,8.7,10,9,10s1,0.2,1,0.5V12.5z M11,8H7V6.5C7,5.7,7.5,5,9,5s2,0.7,2,1.5V8z"/>
+    <line fill="#CC6666" stroke="#CC6666" stroke-miterlimit="10" x1="3" y1="15" x2="15" y2="3"/>`)
+  },
+  err3xx: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
     return toSvg(x, y, title, "icon-redirect", scale, `<g>
         <path fill="#F9EF66" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5
-          L17,15.5z"/>
+            L17,15.5z"/>
         <path fill="none" stroke="#E6E7E8" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
-          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
-      </g>
-      <polygon fill="#414042" points="9,5 9,10 12,7.5 "/>
-      <polyline fill="none" stroke="#414042" stroke-miterlimit="10" points="9,7.5 4.5,7.5 4.5,11.5 13,11.5 "/>
-      <path fill="#414042" d="M11,10"/>`)
+            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+    </g>
+    <polygon fill="#414042" points="9,5 9,10 12,7.5 "/>
+    <polyline fill="none" stroke="#414042" stroke-miterlimit="10" points="9,7.5 4.5,7.5 4.5,11.5 13,11.5 "/>
+    <path fill="#414042" d="M11,10"/>`)
+  },
+  err4xx : function(x: number, y: number, title: string, scale: number = 1): SVGElement {
+    return toSvg(x, y, title, "icon-4xx", scale, `<g>
+        <path fill="#F16062" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
+            C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+        <path fill="none" stroke="#E6E7E8" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
+            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+    </g>
+    <g>
+        <path fill="#FFFFFF" d="M5.6,14v-1.7H3.1v-0.8l2.6-4.6h0.6v4.6h0.8v0.8H6.3V14H5.6z M5.6,11.5V8.3l-1.8,3.2H5.6z"/>
+        <path fill="#FFFFFF" d="M7.5,14L9,11.3L7.6,8.8h0.9L9.1,10c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8l-1.4,2.4
+            l1.5,2.7h-0.9l-0.9-1.6L9.4,12l-1.1,2H7.5z"/>
+        <path fill="#FFFFFF" d="M11.5,14l1.5-2.7l-1.4-2.5h0.9l0.6,1.2c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8
+            l-1.4,2.4l1.5,2.7h-0.9l-0.9-1.6L13.4,12l-1.1,2H11.5z"/>
+    </g>`)
+  },
+  err5xx : function(x: number, y: number, title: string, scale: number = 1): SVGElement {
+    return toSvg(x, y, title, "icon-5xx", scale, ` <g>
+        <path fill="#F16061" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
+            C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+        <path fill="none" stroke="#E6E7E8" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
+            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+    </g>
+    <g>
+        <path fill="#FFFFFF" d="M3.3,12.1L4.1,12c0.1,0.4,0.2,0.8,0.4,1c0.2,0.2,0.4,0.3,0.7,0.3c0.3,0,0.6-0.2,0.9-0.5s0.4-0.7,0.4-1.3
+            c0-0.5-0.1-0.9-0.3-1.2S5.5,10,5.2,10c-0.2,0-0.4,0.1-0.6,0.2c-0.2,0.1-0.3,0.3-0.4,0.5l-0.7-0.1L4,6.9h2.8v0.8H4.6L4.3,9.7
+            C4.6,9.4,5,9.3,5.3,9.3c0.5,0,0.9,0.2,1.3,0.6c0.3,0.4,0.5,1,0.5,1.7c0,0.6-0.2,1.2-0.5,1.7c-0.4,0.6-0.9,0.9-1.5,0.9
+            c-0.5,0-0.9-0.2-1.3-0.5S3.4,12.7,3.3,12.1z"/>
+        <path fill="#FFFFFF" d="M7.5,14L9,11.3L7.6,8.8h0.9L9.1,10c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8l-1.4,2.4
+            l1.5,2.7h-0.9l-0.9-1.6L9.4,12l-1.1,2H7.5z"/>
+        <path fill="#FFFFFF" d="M11.5,14l1.5-2.7l-1.4-2.5h0.9l0.6,1.2c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8
+            l-1.4,2.4l1.5,2.7h-0.9l-0.9-1.6L13.4,12l-1.1,2H11.5z"/>
+    </g>`)
+  },
+  noCache : function(x: number, y: number, title: string, scale: number = 1): SVGElement {
+    return toSvg(x, y, title, "icon-no-cache", scale, `<g>
+        <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
+            C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+        <path fill="none" stroke="#CC6666" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
+            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+    </g>
+    <g>
+        <path fill="none" stroke="#414042" stroke-miterlimit="10" d="M5,7v4.5C5,12.3,6.8,13,9,13s4-0.7,4-1.5V7H5z"/>
+        <path fill="#FFFFFF" stroke="#414042" stroke-miterlimit="10" d="M9,8c1.7,0,3.2-0.4,3.8-1C12.9,6.8,13,6.7,13,6.5
+            C13,5.7,11.2,5,9,5S5,5.7,5,6.5C5,6.7,5.1,6.8,5.2,7C5.8,7.6,7.3,8,9,8z"/>
+    </g>
+    <line fill="#CC6666" stroke="#CC6666" stroke-miterlimit="10" x1="3" y1="15" x2="15" y2="3"/>`)
+  },
+  noGzip : function(x: number, y: number, title: string, scale: number = 1): SVGElement {
+    return toSvg(x, y, title, "icon-no-gzip", scale, `<g>
+        <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
+            C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+        <path fill="none" stroke="#CC6666" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
+            C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+    </g>
+    <rect x="7.5" y="2" fill="#414042" width="1.5" height="1"/>
+    <rect x="9" y="3" fill="#414042" width="1.5" height="1"/>
+    <rect x="7.5" y="4" fill="#414042" width="1.5" height="1"/>
+    <rect x="9" y="5" fill="#414042" width="1.5" height="1"/>
+    <rect x="7.5" y="6" fill="#414042" width="1.5" height="1"/>
+    <polygon fill="#414042" points="10,15 8,15 7,14 7,10 8,8 10,8 11,10 11,14   "/>
+    <polygon fill="#FFFFFF" points="9,13.5 9,13.5 8,13 8,11.5 10,11.5 10,13     "/>
+    <rect x="9" y="7" fill="#414042" width="1.5" height="1"/>
+    <line fill="#CC6666" stroke="#CC6666" stroke-miterlimit="10" x1="3" y1="15" x2="15" y2="3"/>`)
   },
   plain: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
     return toSvg(x, y, title, "icon-plain", scale, `<g>
       <g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
           C16.3,1,17,1.7,17,2.5L17,15.5z"/>
-        <path fill="none" stroke="#414042" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
+        <path fill="none" stroke="#B3B4B4" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
           C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
       </g>
       <line fill="none" stroke="#414042" stroke-miterlimit="10" x1="3" y1="4.5" x2="15" y2="4.5"/>
@@ -136,14 +211,12 @@ let icons = {
   },
   warning: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
     return toSvg(x, y, title, "icon-warning", scale, `<g>
-      <g>
-        <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
-          C16.3,1,17,1.7,17,2.5L17,15.5z"/>
-        <path fill="none" stroke="#E6E7E8" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
-          C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+          <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
+              C16.3,1,17,1.7,17,2.5L17,15.5z"/>
+          <path fill="none" stroke="#CC6666" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
+              C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
       </g>
-      <path fill="#414042" d="M9,3L3,14h12L9,3z M10,13H8v-1h2V13z M9.5,11h-1L8,10V7l0.5-1h1L10,7v3L9.5,11z"/>
-    </g>`)
+      <path fill="#414042" d="M9,3L3,14h12L9,3z M10,13H8v-1h2V13z M9.5,11h-1L8,10V7l0.5-1h1L10,7v3L9.5,11z"/>`)
   },
   font: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
     return toSvg(x, y, title, "icon-font", scale, `<g>

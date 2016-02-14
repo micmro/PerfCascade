@@ -10,6 +10,7 @@ export function mimeToRequestType(mimeType: string) {
   }
   switch (types[1]) {
     case "svg+xml": return "svg"
+    case "xml":
     case "html": return "html"
     case "plain": return "plain"
     case "css": return "css"

@@ -1,3 +1,5 @@
+import {Entry} from "./har.ts"
+
 export default class TimeBlock {
   public total: number
   constructor(
@@ -6,7 +8,7 @@ export default class TimeBlock {
       public end: number,
       public cssClass: string = "",
       public segments: Array<TimeBlock> = [],
-      public rawResource?: Object,
+      public rawResource?: Entry,
       public requestType?: string
     ) {
     this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)

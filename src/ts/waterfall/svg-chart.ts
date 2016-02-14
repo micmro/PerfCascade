@@ -137,7 +137,10 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
 
   //calculate x position for label based on number of icons
   const labelXPos = barsToShow.reduce((prev: number, curr: TimeBlock) => {
-    return Math.max(prev, getIndicators(curr, docIsSsl).length * 25)
+    const i = getIndicators(curr, docIsSsl)
+    const lastIndicator = i[i.length - 1]
+    const x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1))  : 0)
+    return Math.max(prev, x)
   }, 5)
 
   //Main loop to render rows with blocks
