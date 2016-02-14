@@ -22,11 +22,11 @@ function isCompressable(block: TimeBlock): boolean {
   const entry = block.rawResource
   const minCompressionSize = 1000
   //ignore non GET and small responses
-  if (entry.request.method.toLocaleLowerCase() !== "get" || entry.response.bodySize < minCompressionSize){
+  if (entry.request.method.toLocaleLowerCase() !== "get" || entry.response.bodySize < minCompressionSize) {
     return false
   }
 
-  if (misc.contains(["html", "css", "javascript", "svg", "plain"], block.requestType)){
+  if (misc.contains(["html", "css", "javascript", "svg", "plain"], block.requestType)) {
     return true
   }
   const mime = entry.response.content.mimeType
@@ -111,7 +111,7 @@ export function getIndicators(block: TimeBlock, docIsSsl: boolean): Indicator[] 
     makeIcon("err5xx", `${entry.response.status} response status: ${entry.response.statusText}`)
   }
 
-  if (!entry.response.content.mimeType){
+  if (!entry.response.content.mimeType) {
      makeIcon("warning", "No MIME Type defined")
   }
 
