@@ -55,7 +55,7 @@ export interface Entry {
   serverIPAddress?: string
   connection?: string
   comment?: string
-  
+
   //WPT specific settings
   _ip_addr?: string
   _load_ms?: string
@@ -76,7 +76,7 @@ export interface Entry {
   _score_combine?: string
   _score_compress?: string
   _score_etags?: string
-  _is_secure?: string  
+  _is_secure?: string
   _dns_ms?: number
   _connect_ms?: number
   _ssl_ms?: string
@@ -197,10 +197,10 @@ export interface Content {
 export interface Cache {
   beforeRequest?: CacheDetails
   afterRequest?: CacheDetails
-  comment ?: string
+  comment?: string
 }
 
-export interface CacheDetails{
+export interface CacheDetails {
   expires?: string
   lastAccess: string
   eTag: string
@@ -222,7 +222,8 @@ export interface Timings {
   wait: number
   /** Time required to read entire response from the server (or cache). */
   receive: number
-  /** Time required for SSL/TLS negotiation. If this field is defined then the time is also included in the connect field (to ensure backward compatibility with HAR 1.1). Use -1 if the timing does not apply to the current request. */
+  /** Time required for SSL/TLS negotiation. If this field is defined then the time is also included in the 
+   * connect field (to ensure backward compatibility with HAR 1.1). Use -1 if the timing does not apply to the current request. */
   ssl?: number
   comment?: string
 }

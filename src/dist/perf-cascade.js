@@ -32,7 +32,7 @@ var toSvg = function (x, y, title, className, scale, svgDoc) {
 var icons = {
     lock: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
-        return toSvg(x, y, title, "icon-lock", scale, "<g>\n\t\t<path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0\n\t\t\tC16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n\t\t<path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n\t\t\tC1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n\t</g>\n\t<path fill=\"#A452A0\" d=\"M13,8V6.5C13,5,12,3,9,3S5,5,5,6.5V8H4v7h10V8H13z M10,12.5c0,0.3-0.7,0.5-1,0.5s-1-0.2-1-0.5v-2\n\t\tC8,10.2,8.7,10,9,10s1,0.2,1,0.5V12.5z M11,8H7V6.5C7,5.7,7.5,5,9,5s2,0.7,2,1.5V8z\"/>");
+        return toSvg(x, y, title, "icon-lock", scale, "<g>\n    <path fill=\"#FFFFFF\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0 \n      C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n    <path fill=\"none\" stroke=\"#E6E7E8\" stroke-width=\"2\" stroke-miterlimit=\"10\" d=\"M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13\n      C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z\"/>\n  </g>\n  <path fill=\"#A452A0\" d=\"M13,8V6.5C13,5,12,3,9,3S5,5,5,6.5V8H4v7h10V8H13z M10,12.5c0,0.3-0.7,0.5-1,0.5s-1-0.2-1-0.5v-2\n    C8,10.2,8.7,10,9,10s1,0.2,1,0.5V12.5z M11,8H7V6.5C7,5.7,7.5,5,9,5s2,0.7,2,1.5V8z\"/>");
     },
     redirect: function (x, y, title, scale) {
         if (scale === void 0) { scale = 1; }
@@ -107,7 +107,7 @@ var svg = {
         var el = document.createElementNS("http://www.w3.org/2000/svg", tagName);
         settings = settings || {};
         for (var attr in settings) {
-            if (attr != "text") {
+            if (attr !== "text") {
                 el.setAttributeNS(null, attr, settings[attr]);
             }
         }
@@ -182,8 +182,8 @@ exports.default = svg;
 
 },{}],5:[function(require,module,exports){
 var svg_chart_1 = require("./waterfall/svg-chart");
-var dom_1 = require('./helpers/dom');
-var har_1 = require('./transformers/har');
+var dom_1 = require("./helpers/dom");
+var har_1 = require("./transformers/har");
 function showErrorMsg(msg) {
     alert(msg);
 }
@@ -214,24 +214,23 @@ function onFileSubmit(evt) {
     });
     reader.readAsText(files[0]);
 }
-document.getElementById('fileinput').addEventListener('change', onFileSubmit, false);
+document.getElementById("fileinput").addEventListener("change", onFileSubmit, false);
 //TODO: remove Dev/Test only - load test file
 if (location.host.indexOf("127.0.0.1") === 0) {
     //http://www.webpagetest.org/result/151226_X7_b43d35e592fab70e0ba012fe11a41020/
-    window["fetch"]("test-data/github.com.MODIFIED.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
+    window["fetch"]("test-data/github.com.MODIFIED.151226_X7_b43d35e592fab70e0ba012fe11a41020.har")
+        .then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 }
 
 },{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":9}],6:[function(require,module,exports){
-var time_block_1 = require('../typing/time-block');
-var styling_converters_1 = require('./styling-converters');
+var time_block_1 = require("../typing/time-block");
+var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
     function HarTransformer() {
     }
     HarTransformer.transfrom = function (data) {
         var _this = this;
         console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
-        //temp - TODO: remove
-        window["data"] = data;
         //only support one page (first) for now
         var currentPageIndex = 0;
         var currPage = data.pages[currentPageIndex];
@@ -245,11 +244,10 @@ var HarTransformer = (function () {
             if (doneTime < (startRelative + entry.time)) {
                 doneTime = startRelative + entry.time;
             }
-            var subModules = entry.timings;
-            return new time_block_1.default(entry.request.url, startRelative, parseInt(entry._all_end) || (startRelative + entry.time), styling_converters_1.mimeToCssClass(entry.response.content.mimeType), _this.buildDetailTimingBlocks(startRelative, entry), entry, styling_converters_1.mimeToRequestType(entry.response.content.mimeType));
+            return new time_block_1.default(entry.request.url, startRelative, parseInt(entry._all_end, 10) || (startRelative + entry.time), styling_converters_1.mimeToCssClass(entry.response.content.mimeType), _this.buildDetailTimingBlocks(startRelative, entry), entry, styling_converters_1.mimeToRequestType(entry.response.content.mimeType));
         });
         var marks = Object.keys(pageTimings)
-            .filter(function (k) { return (pageTimings[k] != undefined && pageTimings[k] >= 0); })
+            .filter(function (k) { return (pageTimings[k] !== undefined && pageTimings[k] >= 0); })
             .sort(function (a, b) { return pageTimings[a] > pageTimings[b] ? 1 : -1; })
             .map(function (k) {
             var startRelative = pageTimings[k];
@@ -265,26 +263,6 @@ var HarTransformer = (function () {
             lines: [],
         };
     };
-    HarTransformer.getTimePair = function (key, entry, collect, startRelative) {
-        var wptKey;
-        switch (key) {
-            case "wait":
-                wptKey = "ttfb";
-                break;
-            case "receive":
-                wptKey = "download";
-                break;
-            default: wptKey = key;
-        }
-        var preciseStart = parseInt(entry[("_" + wptKey + "_start")]);
-        var preciseEnd = parseInt(entry[("_" + wptKey + "_end")]);
-        var start = preciseStart || ((collect.length > 0) ? collect[collect.length - 1].end : startRelative);
-        var end = preciseEnd || (start + entry.timings[key]);
-        return {
-            "start": start,
-            "end": end
-        };
-    };
     HarTransformer.buildDetailTimingBlocks = function (startRelative, entry) {
         var _this = this;
         var t = entry.timings;
@@ -297,15 +275,35 @@ var HarTransformer = (function () {
             //special case for 'connect' && 'ssl' since they share time
             //http://www.softwareishard.com/blog/har-12-spec/#timings
             if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
-                var sslStart = parseInt(entry["_ssl_start"]) || time.start;
-                var sslEnd = parseInt(entry["_ssl_end"]) || time.start + t.ssl;
-                var connectStart = (!!parseInt(entry["_ssl_start"])) ? time.start : sslEnd;
+                var sslStart = parseInt(entry["_ssl_start"], 10) || time.start;
+                var sslEnd = parseInt(entry["_ssl_end"], 10) || time.start + t.ssl;
+                var connectStart = (!!parseInt(entry["_ssl_start"], 10)) ? time.start : sslEnd;
                 return collect
                     .concat([new time_block_1.default("ssl", sslStart, sslEnd, "block-ssl")])
                     .concat([new time_block_1.default(key, connectStart, time.end, "block-" + key)]);
             }
             return collect.concat([new time_block_1.default(key, time.start, time.end, "block-" + key)]);
         }, []);
+    };
+    HarTransformer.getTimePair = function (key, entry, collect, startRelative) {
+        var wptKey;
+        switch (key) {
+            case "wait":
+                wptKey = "ttfb";
+                break;
+            case "receive":
+                wptKey = "download";
+                break;
+            default: wptKey = key;
+        }
+        var preciseStart = parseInt(entry[("_" + wptKey + "_start")], 10);
+        var preciseEnd = parseInt(entry[("_" + wptKey + "_end")], 10);
+        var start = preciseStart || ((collect.length > 0) ? collect[collect.length - 1].end : startRelative);
+        var end = preciseEnd || (start + entry.timings[key]);
+        return {
+            "start": start,
+            "end": end
+        };
     };
     return HarTransformer;
 })();
@@ -379,7 +377,7 @@ var svg_general_components_1 = require("./svg-general-components");
 var svg_row_components_1 = require("./svg-row-components");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var svg_indicators_1 = require("./svg-indicators");
-var dom_1 = require('../helpers/dom');
+var dom_1 = require("../helpers/dom");
 /**
  * Function to format the shortened URL
  * @param  {string} url       URL of ressource
@@ -423,7 +421,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
     /** horizontal unit (duration in ms of 1%) */
     var unit = data.durationMs / 100;
     var barsToShow = data.blocks
-        .filter(function (block) { return (typeof block.start == "number" && typeof block.total == "number"); })
+        .filter(function (block) { return (typeof block.start === "number" && typeof block.total === "number"); })
         .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
     /** height of the requests part of the diagram in px */
     var diagramHeight = (barsToShow.length + 1) * requestBarHeight;
@@ -570,11 +568,11 @@ function getKeys(requestID, block) {
         }
         return fn(value);
     };
-    var formatBytes = function (size) { return ifValueDefined(size, function (size) {
-        return (size + " byte (~" + Math.round(size / 1024 * 10) / 10 + "kb)");
+    var formatBytes = function (size) { return ifValueDefined(size, function (s) {
+        return (s + " byte (~" + Math.round(s / 1024 * 10) / 10 + "kb)");
     }); };
-    var formatTime = function (size) { return ifValueDefined(size, function (size) {
-        return (size + "ms");
+    var formatTime = function (size) { return ifValueDefined(size, function (s) {
+        return (s + "ms");
     }); };
     var getRequestHeader = function (name) {
         var header = entry.request.headers.filter(function (h) { return h.name.toLowerCase() === name.toLowerCase(); })[0];
@@ -588,7 +586,6 @@ function getKeys(requestID, block) {
     var getExp = function (name) {
         return entry[name] || "";
     };
-    var emptyHeader = { "value": "" };
     return {
         "general": {
             "Request Number": "#" + requestID,
@@ -653,7 +650,7 @@ function makeDefinitionList(dlKeyValues) {
 }
 function createBody(requestID, block) {
     var body = document.createElement("body");
-    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     var tabsData = getKeys(requestID, block);
     var generalDl = makeDefinitionList(tabsData.general);
     var requestDl = makeDefinitionList(tabsData.request);
@@ -672,7 +669,7 @@ function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
         "dx": "5"
     });
     var closeBtn = createCloseButtonSvg(y);
-    closeBtn.addEventListener('click', function (evt) { return holder.parentElement.removeChild(holder); });
+    closeBtn.addEventListener("click", function (evt) { return holder.parentElement.removeChild(holder); });
     var body = createBody(requestID, block);
     var buttons = body.getElementsByClassName("tab-button");
     var tabs = body.getElementsByClassName("tab");
@@ -859,7 +856,7 @@ function createMarks(marks, unit, diagramHeight) {
         lineLabel.addEventListener("mouseleave", onLableMouseLeave);
         lineLabelHolder.appendChild(lineLabel);
         markHolder.appendChild(svg_1.default.newEl("title", {
-            "text": mark.name + " (" + Math.round(mark.startTime) + "ms)",
+            "text": mark.name + " (" + Math.round(mark.startTime) + "ms)"
         }));
         markHolder.appendChild(lineHolder);
         markHolder.appendChild(lineLabelHolder);
@@ -870,10 +867,7 @@ function createMarks(marks, unit, diagramHeight) {
 exports.createMarks = createMarks;
 
 },{"../helpers/svg":4}],12:[function(require,module,exports){
-/**
- * Creation of sub-components used in a ressource request row
- */
-//helper to avoid typing out all key of the helper object
+// helper to avoid typing out all key of the helper object
 var makeIcon = function (type, x, title) {
     return { "type": type, "x": x, "title": title };
 };
@@ -888,7 +882,6 @@ function getIndicators(block, docIsSsl) {
     var iconWidth = 25;
     var output = [];
     var xPos = 3;
-    console.log(block.requestType);
     output.push(makeIcon(block.requestType, xPos, block.requestType));
     xPos += iconWidth;
     if (!docIsSsl && isSecure) {
@@ -1076,7 +1069,7 @@ function createFixedRow(y, requestBarHeight, onClick, leftFixedWidth) {
         "y": y,
         "opacity": "0"
     }));
-    rowFixed.addEventListener('click', onClick);
+    rowFixed.addEventListener("click", onClick);
     return rowFixed;
 }
 exports.createFixedRow = createFixedRow;
@@ -1091,7 +1084,7 @@ function createFlexRow(y, requestBarHeight, onClick) {
         "y": y,
         "opacity": "0"
     }));
-    rowFixed.addEventListener('click', onClick);
+    rowFixed.addEventListener("click", onClick);
     return rowFixed;
 }
 exports.createFlexRow = createFlexRow;

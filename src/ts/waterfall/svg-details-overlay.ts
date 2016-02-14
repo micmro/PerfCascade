@@ -73,27 +73,26 @@ function getKeys(requestID: number, block: TimeBlock) {
     return fn(value)
   }
 
-  let formatBytes = (size?: number) => ifValueDefined(size, size =>
-    `${size} byte (~${Math.round(size / 1024 * 10) / 10}kb)`)
-  let formatTime = (size?: number) => ifValueDefined(size, size =>
-    `${size}ms`)
-  
+  let formatBytes = (size?: number) => ifValueDefined(size, s =>
+    `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
+  let formatTime = (size?: number) => ifValueDefined(size, s =>
+    `${s}ms`)
+
   let getRequestHeader = (name: string): string => {
     let header = entry.request.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
     return header ? header.value : ""
   }
-  
+
   let getResponseHeader = (name: string): string => {
     let header = entry.response.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
     return header ? header.value : ""
   }
-  
-  /** get experimental feature */ 
+
+  /** get experimental feature */
   let getExp = (name: string): string => {
-   return entry[name]||"" 
+    return entry[name] || ""
   }
-  
-  const emptyHeader = {"value": ""}
+
   return {
     "general": {
       "Request Number": `#${requestID}`,
@@ -162,16 +161,16 @@ function makeDefinitionList(dlKeyValues) {
     `).join("")
 }
 
-function createBody(requestID: number, block: TimeBlock){
-    let body = document.createElement("body");
-    body.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-    
-    const tabsData = getKeys(requestID, block) 
-    const generalDl = makeDefinitionList(tabsData.general)
-    const requestDl = makeDefinitionList(tabsData.request)
-    const responseDl = makeDefinitionList(tabsData.response)
-    
-    body.innerHTML = `
+function createBody(requestID: number, block: TimeBlock) {
+  let body = document.createElement("body");
+  body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+
+  const tabsData = getKeys(requestID, block)
+  const generalDl = makeDefinitionList(tabsData.general)
+  const requestDl = makeDefinitionList(tabsData.request)
+  const responseDl = makeDefinitionList(tabsData.response)
+
+  body.innerHTML = `
     <div class="wrapper">
       <h3>#${requestID} ${block.name}</h3>
       <nav class="tab-nav">
@@ -204,10 +203,11 @@ function createBody(requestID: number, block: TimeBlock){
       </div>
     </div>
     `
-    return body
+  return body
 }
 
-export function createRowInfoOverlay(requestID: number, barX: number, y: number, block: TimeBlock, leftFixedWidth: number, unit: number): SVGGElement {
+export function createRowInfoOverlay(requestID: number, barX: number, y: number, block: TimeBlock,
+  leftFixedWidth: number, unit: number): SVGGElement {
   let holder = createHolder(y, leftFixedWidth)
 
   let html = svg.newEl("foreignObject", {
@@ -221,8 +221,8 @@ export function createRowInfoOverlay(requestID: number, barX: number, y: number,
 
 
   let closeBtn = createCloseButtonSvg(y)
-  closeBtn.addEventListener('click', evt => holder.parentElement.removeChild(holder))
-  
+  closeBtn.addEventListener("click", evt => holder.parentElement.removeChild(holder))
+
   let body = createBody(requestID, block)
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>
   let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>

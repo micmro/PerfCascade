@@ -33,6 +33,17 @@ module.exports = function( grunt ) {
         }
       }
     },
+    tslint: {
+        options: {
+            // can be a configuration object or a filepath to tslint.json 
+            configuration: "tslint.json"
+        },
+        files: {
+            src: [
+                "src/ts/**/*.ts"
+            ]
+        }
+    },
     uglify : {
       options: {
         compress: {
@@ -78,7 +89,7 @@ module.exports = function( grunt ) {
   });
 
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist"]);
-  grunt.registerTask("dist", ["distBase", "uglify:dist"]);
+  grunt.registerTask("dist", ["tslint", "distBase", "uglify:dist"]);
   grunt.registerTask("ghPages", ["clean:pages", "dist", "concat:pages", "copy:pages", "gh-pages"]);
 
   grunt.registerTask("default", ["distBase", "watch"]);

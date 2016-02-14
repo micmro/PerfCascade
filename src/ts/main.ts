@@ -1,26 +1,14 @@
 import {createWaterfallSvg} from "./waterfall/svg-chart"
-import TimeBlock from './typing/time-block'
-import {Har,
-  Page,
-  PageTimings,
-  Creator,
-  Cookie,
-  Request,
-  Content,
-  Response,
-  Entry
-} from "./typing/har"
-import dom from './helpers/dom'
-import HarTransformer from './transformers/har'
+import {Har} from "./typing/har"
+import dom from "./helpers/dom"
+import HarTransformer from "./transformers/har"
 
 
-function showErrorMsg(msg){
+function showErrorMsg(msg) {
   alert(msg)
 }
 
-
 const outputHolder = document.getElementById("output")
-
 
 function renderHar(logData: Har) {
   const data = HarTransformer.transfrom(logData)
@@ -28,11 +16,10 @@ function renderHar(logData: Har) {
   outputHolder.appendChild(createWaterfallSvg(data, (window.innerWidth > 920 ? 250 : 200), 23))
 }
 
-
 function onFileSubmit(evt) {
-  let files = evt.target.files 
-  if(!files) {
-    showErrorMsg("Failed to load HAR file") 
+  let files = evt.target.files
+  if (!files) {
+    showErrorMsg("Failed to load HAR file")
     return
   }
 
@@ -51,12 +38,13 @@ function onFileSubmit(evt) {
   reader.readAsText(files[0])
 }
 
-document.getElementById('fileinput').addEventListener('change', onFileSubmit, false)
+document.getElementById("fileinput").addEventListener("change", onFileSubmit, false)
 
 
 
 //TODO: remove Dev/Test only - load test file
-if(location.host.indexOf("127.0.0.1") === 0){
+if (location.host.indexOf("127.0.0.1") === 0) {
   //http://www.webpagetest.org/result/151226_X7_b43d35e592fab70e0ba012fe11a41020/
-  window["fetch"]("test-data/github.com.MODIFIED.151226_X7_b43d35e592fab70e0ba012fe11a41020.har").then(f => f.json().then(j => renderHar(j.log)))
+  window["fetch"]("test-data/github.com.MODIFIED.151226_X7_b43d35e592fab70e0ba012fe11a41020.har")
+    .then(f => f.json().then(j => renderHar(j.log)))
 }

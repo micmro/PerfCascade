@@ -2,10 +2,10 @@
  *  Misc Helpers
  */
 
-var misc = {
+let misc = {
   parseUrl: function(url) {
-    var pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
-    var matches = url.match(pattern);
+    let pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
+    let matches = url.match(pattern);
     return {
       scheme: matches[2],
       authority: matches[4],

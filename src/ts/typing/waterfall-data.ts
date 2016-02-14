@@ -1,20 +1,20 @@
-import TimeBlock from '../typing/time-block'
+import TimeBlock from "../typing/time-block"
 
 interface UserTiming {
-	duration?: number
-	name: string
-	startTime: number
+  duration?: number
+  name: string
+  startTime: number
 }
 
 export interface Mark extends UserTiming {
-	/** custom data to store x position */
-	x? : number
+  /** custom data to store x position */
+  x?: number
 }
 
 
 export interface WaterfallData {
-	durationMs: number,
-	blocks: Array<TimeBlock>,
-	marks: Array<Mark>,
-	lines: Array<TimeBlock>
+  durationMs: number,
+  blocks: Array<TimeBlock>,
+  marks: Array<Mark>,
+  lines: Array<TimeBlock>
 }

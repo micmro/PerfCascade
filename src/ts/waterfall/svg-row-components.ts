@@ -4,7 +4,6 @@
 
 import svg from "../helpers/svg"
 import TimeBlock from "../typing/time-block"
-import {Mark} from "../typing/waterfall-data"
 
 /**
  * Interface for `createRect` parameter
@@ -108,9 +107,9 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
   lableHolder.appendChild(svg.newEl("rect", {
     "class": "label-full-bg",
     "x": x - 3,
-    "y": y+3,
+    "y": y + 3,
     "width": svg.getNodeTextWidth(blockLabel),
-    "height": height-4,
+    "height": height - 4,
     "rx": 5,
     "ry": 5
   }))
@@ -214,7 +213,7 @@ export function createFixedRow(y: number, requestBarHeight: number, onClick: Eve
     "opacity": "0"
   }))
 
-  rowFixed.addEventListener('click', onClick)
+  rowFixed.addEventListener("click", onClick)
 
   return rowFixed
 }
@@ -234,7 +233,7 @@ export function createFlexRow(y: number, requestBarHeight: number, onClick: Even
     "opacity": "0"
   }))
 
-  rowFixed.addEventListener('click', onClick)
+  rowFixed.addEventListener("click", onClick)
 
   return rowFixed
 }

@@ -28,7 +28,6 @@ export function mimeToRequestType(mimeType: string) {
   return "other"
 }
 
-  
 /**
  * Convert a MIME type into a CSS class
  * @param {string} mimeType 

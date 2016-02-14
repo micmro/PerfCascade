@@ -8,7 +8,7 @@ import {Mark} from "../typing/waterfall-data"
 
 
 
-export interface HoverElements{
+export interface HoverElements {
   endline: SVGLineElement,
   startline: SVGLineElement
 }
@@ -81,9 +81,9 @@ export function makeHoverEvtListeners(hoverEl: HoverElements) {
  * @param {number} diagramHeight Full height of SVG in px
  */
 export function createTimeScale(durationMs: number, diagramHeight: number): SVGGElement {
-  var timeHolder = svg.newEl("g", { class: "time-scale full-width" }) as SVGGElement
+  let timeHolder = svg.newEl("g", { class: "time-scale full-width" }) as SVGGElement
   for (let i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
-    var lineLabel = svg.newTextEl(i + "sec", diagramHeight)
+    let lineLabel = svg.newTextEl(i + "sec", diagramHeight)
     if (i > secs - 0.2) {
       lineLabel.setAttribute("x", secPerc * i - 0.5 + "%")
       lineLabel.setAttribute("text-anchor", "end")
@@ -91,7 +91,7 @@ export function createTimeScale(durationMs: number, diagramHeight: number): SVGG
       lineLabel.setAttribute("x", secPerc * i + 0.5 + "%")
     }
 
-    var lineEl = svg.newEl("line", {
+    let lineEl = svg.newEl("line", {
       "x1": secPerc * i + "%",
       "y1": "0",
       "x2": secPerc * i + "%",
@@ -130,25 +130,25 @@ export function createBgRect(block: TimeBlock, unit: number, diagramHeight: numb
  * @param {number}      diagramHeight Full height of SVG in px
  */
 export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: number) {
-  var marksHolder = svg.newEl("g", {
+  let marksHolder = svg.newEl("g", {
     "transform": "scale(1, 1)",
     "class": "marker-holder"
   })
 
   marks.forEach((mark, i) => {
-    var x = mark.startTime / unit
-    var markHolder = svg.newEl("g", {
+    let x = mark.startTime / unit
+    let markHolder = svg.newEl("g", {
       "class": "mark-holder type-" + mark.name.toLowerCase()
     })
-    var lineHolder = svg.newEl("g", {
+    let lineHolder = svg.newEl("g", {
       "class": "line-holder"
     })
-    var lineLabelHolder = svg.newEl("g", {
+    let lineLabelHolder = svg.newEl("g", {
       "class": "line-label-holder",
       "x": x + "%"
     })
     mark.x = x
-    var lineLabel = svg.newTextEl(mark.name, diagramHeight + 25)
+    let lineLabel = svg.newTextEl(mark.name, diagramHeight + 25)
     //lineLabel.setAttribute("writing-mode", "tb")
     lineLabel.setAttribute("x", x + "%")
     lineLabel.setAttribute("stroke", "")
@@ -175,8 +175,8 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       "y2": diagramHeight + 23
     }))
 
-    var isActive = false
-    var onLableMouseEnter = function(evt) {
+    let isActive = false
+    let onLableMouseEnter = function(evt) {
       if (!isActive) {
         isActive = true
         svg.addClass(lineHolder, "active")
@@ -185,7 +185,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       }
     }
 
-    var onLableMouseLeave = function(evt) {
+    let onLableMouseLeave = function(evt) {
       isActive = false
       svg.removeClass(lineHolder, "active")
     }
@@ -195,7 +195,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
     lineLabelHolder.appendChild(lineLabel)
 
     markHolder.appendChild(svg.newEl("title", {
-      "text": mark.name + " (" + Math.round(mark.startTime) + "ms)",
+      "text": mark.name + " (" + Math.round(mark.startTime) + "ms)"
     }))
     markHolder.appendChild(lineHolder)
     markHolder.appendChild(lineLabelHolder)

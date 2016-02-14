@@ -2,9 +2,9 @@
  *  DOM Helpers
  */
 
-var dom = {
+let dom = {
   removeAllChildren: function(el: HTMLElement | SVGElement){
-    while(el.childNodes.length > 0){
+    while (el.childNodes.length > 0) {
       el.removeChild(el.childNodes[0])
     }
   },

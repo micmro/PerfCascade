@@ -2,12 +2,12 @@
  *  SVG Helpers
  */
 
-var svg = {
-  newEl : function(tagName: string, settings?: Object, css?: Object): SVGElement{
-    var el = document.createElementNS("http://www.w3.org/2000/svg", tagName) as SVGGElement;
+let svg = {
+  newEl: function(tagName: string, settings?: Object, css?: Object): SVGElement {
+    let el = document.createElementNS("http://www.w3.org/2000/svg", tagName) as SVGGElement;
     settings = settings || {};
     for (let attr in settings) {
-      if (attr != "text") {
+      if (attr !== "text") {
         el.setAttributeNS(null, attr, settings[attr])
       }
     }
@@ -33,13 +33,13 @@ var svg = {
   },
 
   newTextEl: function(text: string, y: number, x?: number, css?: Object): SVGTextElement {
-    css = css||{}
+    css = css || {}
     let opt = {
       fill: "#111",
       y: y.toString(),
       text: text
     }
-    if(x !== undefined){
+    if (x !== undefined) {
       opt["x"] = x
     }
     if (css["textShadow"] === undefined) {
@@ -51,7 +51,7 @@ var svg = {
   //needs access to body to measure size
   //TODO: refactor for server side use
   getNodeTextWidth: function(textNode: SVGTextElement): number {
-    var tmp = svg.newEl("svg:svg", {}, {
+    let tmp = svg.newEl("svg:svg", {}, {
       "visibility": "hidden"
     }) as SVGSVGElement
     tmp.appendChild(textNode)

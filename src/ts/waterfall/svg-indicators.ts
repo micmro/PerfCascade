@@ -1,8 +1,6 @@
 /**
  * Creation of sub-components used in a ressource request row
  */
-
-import svg from "../helpers/svg"
 import TimeBlock from "../typing/time-block"
 
 
@@ -15,9 +13,9 @@ export interface Indicator {
   title: string
 }
 
-//helper to avoid typing out all key of the helper object
-const makeIcon = function( type: string, x: number, title: string) {
-  return {"type": type, "x": x, "title": title}
+// helper to avoid typing out all key of the helper object
+const makeIcon = function(type: string, x: number, title: string) {
+  return { "type": type, "x": x, "title": title }
 }
 
 /**
@@ -29,19 +27,19 @@ const makeIcon = function( type: string, x: number, title: string) {
 export function getIndicators(block: TimeBlock, docIsSsl: boolean): Indicator[] {
   const isSecure = block.name.indexOf("https://") === 0
   const iconWidth = 25
-  var output = []
-  var xPos = 3
-  console.log(block.requestType)
-  output.push(makeIcon( block.requestType, xPos,  block.requestType))
+  let output = []
+  let xPos = 3
+
+  output.push(makeIcon(block.requestType, xPos, block.requestType))
   xPos += iconWidth
-   
-  if(!docIsSsl && isSecure){
+
+  if (!docIsSsl && isSecure) {
     output.push(makeIcon("lock", xPos, "Secure Connection"))
     xPos += iconWidth
-  } else if(docIsSsl && !isSecure){
+  } else if (docIsSsl && !isSecure) {
     output.push(makeIcon("warning", xPos, "Insecure Connection"))
     xPos += iconWidth
   }
-  
+
   return output
 }
