@@ -1,4 +1,4 @@
-/*PerfCascade build:14/02/2016 */
+/*PerfCascade build:15/02/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -942,11 +942,23 @@ var misc_1 = require("../helpers/misc");
 function getResponseHeader(entry, headerName) {
     return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
 }
+function getResponseHeaderValue(entry, headerName) {
+    var header = getResponseHeader(entry, headerName);
+    if (header !== undefined) {
+        return header.value;
+    }
+    else {
+        return "";
+    }
+}
+function isInStatusCodeRange(entry, lowerBound, upperBound) {
+    return entry.response.status >= lowerBound && entry.response.status <= upperBound;
+}
 function isCompressable(block) {
     var entry = block.rawResource;
     var minCompressionSize = 1000;
-    //ignore non GET and small responses
-    if (entry.request.method.toLocaleLowerCase() !== "get" || entry.response.bodySize < minCompressionSize) {
+    //small responses
+    if (entry.response.bodySize < minCompressionSize) {
         return false;
     }
     if (misc_1.default.contains(["html", "css", "javascript", "svg", "plain"], block.requestType)) {
@@ -962,7 +974,25 @@ function isCompressable(block) {
         "font/opentype",
         "font/otf",
         "image/vnd.microsoft.icon"];
-    if (misc_1.default.contains(["text"], mime.split("/")[0]) || misc_1.default.contains(compressableMimes, mime)) {
+    if (misc_1.default.contains(["text"], mime.split("/")[0]) || misc_1.default.contains(compressableMimes, mime.split(";")[0])) {
+        return true;
+    }
+    return false;
+}
+function isCachable(block) {
+    var entry = block.rawResource;
+    //do not cache non-gets,204 and non 2xx status codes
+    if (entry.request.method.toLocaleLowerCase() !== "get" ||
+        entry.response.status === 204 ||
+        !isInStatusCodeRange(entry, 200, 299)) {
+        return false;
+    }
+    if (getResponseHeader(entry, "Cache-Control") === undefined
+        && getResponseHeader(entry, "Expires") === undefined) {
+        return true;
+    }
+    if (getResponseHeaderValue(entry, "Cache-Control").indexOf("no-cache") > -1
+        || getResponseHeaderValue(entry, "Pragma") === "no-cache") {
         return true;
     }
     return false;
@@ -984,18 +1014,6 @@ function getIndicators(block, docIsSsl) {
         output.push({ "type": type, "x": xPos, "title": title });
         xPos += iconWidth;
     };
-    var respHeader = function (headerName) {
-        return getResponseHeader(entry, headerName);
-    };
-    var respHeaderValue = function (headerName) {
-        var header = getResponseHeader(entry, headerName);
-        if (header !== undefined) {
-            return header.value;
-        }
-        else {
-            return "";
-        }
-    };
     makeIcon(block.requestType, block.requestType);
     //highlight redirects
     if (!!entry.response.redirectURL) {
@@ -1008,24 +1026,19 @@ function getIndicators(block, docIsSsl) {
     else if (docIsSsl && !isSecure) {
         makeIcon("noTls", "Insecure Connection");
     }
-    if (entry.request.method.toLocaleLowerCase() === "get") {
-        if ((respHeader("Cache-Control") === undefined
-            && respHeader("Expires") === undefined)
-            || respHeaderValue("Cache-Control").indexOf("no-cache") > -1
-            || respHeaderValue("Pragma") === "no-cache") {
-            makeIcon("noCache", "Response not cached");
-        }
+    if (getResponseHeader(entry, "Content-Encoding") === undefined && isCachable(block)) {
+        makeIcon("noCache", "Response not cached");
     }
-    if (respHeader("Content-Encoding") === undefined && isCompressable(block)) {
+    if (getResponseHeader(entry, "Content-Encoding") === undefined && isCompressable(block)) {
         makeIcon("noGzip", "no gzip");
     }
-    if (entry.response.status > 399 && entry.response.status < 500) {
+    if (isInStatusCodeRange(entry, 400, 499)) {
         makeIcon("err4xx", entry.response.status + " response status: " + entry.response.statusText);
     }
-    if (entry.response.status > 499 && entry.response.status < 600) {
+    if (isInStatusCodeRange(entry, 500, 599)) {
         makeIcon("err5xx", entry.response.status + " response status: " + entry.response.statusText);
     }
-    if (!entry.response.content.mimeType) {
+    if (!entry.response.content.mimeType && isInStatusCodeRange(entry, 200, 299)) {
         makeIcon("warning", "No MIME Type defined");
     }
     return output;
