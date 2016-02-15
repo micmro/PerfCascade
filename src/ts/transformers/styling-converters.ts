@@ -4,11 +4,11 @@
  */
 export function mimeToRequestType(mimeType: string) {
 
-  let types = mimeType.split("/");
-  let part2 = types[1];
+  let types = mimeType.split("/")
+  let part2 = types[1]
   // take care of text/css; charset=UTF-8 etc
   if (part2 !== undefined) {
-    part2 = part2.indexOf(";") > -1 ? part2.split(";")[0]: part2;
+    part2 = part2.indexOf(";") > -1 ? part2.split(";")[0] : part2
   }
   switch (types[0]) {
     case "image": return "image"

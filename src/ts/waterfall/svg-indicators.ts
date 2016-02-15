@@ -27,7 +27,7 @@ function getResponseHeaderValue(entry: Entry, headerName: string) {
   }
 }
 
-function isInStatusCodeRange(entry: Entry, lowerBound: number, upperBound: number){
+function isInStatusCodeRange(entry: Entry, lowerBound: number, upperBound: number) {
   return entry.response.status >= lowerBound && entry.response.status <= upperBound
 }
 
