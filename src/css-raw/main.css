@@ -98,7 +98,7 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .info-overlay-holder dt {float: left; clear: both; margin-top: 5px; width: 25%; text-align: right; font-weight: bold; }
 .info-overlay-holder dd {float: left; margin: 5px 0 0 2%; padding: 0 0 0.5em 0;}
 .info-overlay-holder dt:after { content: ":"; }
-.info-overlay-holder pre {font-size: 12px; border-radius: 0; background: #f6f3f3;}
+.info-overlay-holder pre {font-size: 11px; line-height: 23px;  border-radius: 0; background: #f6f3f3;}
 
 .info-overlay-holder .tab-nav {background: #f9f9f9;}
 .info-overlay-holder .tab-nav ul {margin: 0; padding: 0;}

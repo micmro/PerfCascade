@@ -321,8 +321,8 @@ var HarTransformer = (function () {
         }
         var preciseStart = parseInt(entry[("_" + wptKey + "_start")], 10);
         var preciseEnd = parseInt(entry[("_" + wptKey + "_end")], 10);
-        var start = preciseStart || ((collect.length > 0) ? collect[collect.length - 1].end : startRelative);
-        var end = preciseEnd || (start + entry.timings[key]);
+        var start = isNaN(preciseStart) ? ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart;
+        var end = isNaN(preciseEnd) ? (start + entry.timings[key]) : preciseEnd;
         return {
             "start": start,
             "end": end

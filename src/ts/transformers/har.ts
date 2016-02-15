@@ -99,8 +99,8 @@ export default class HarTransformer {
     }
     const preciseStart = parseInt(entry[`_${wptKey}_start`], 10)
     const preciseEnd = parseInt(entry[`_${wptKey}_end`], 10)
-    const start = preciseStart || ((collect.length > 0) ? collect[collect.length - 1].end : startRelative)
-    const end = preciseEnd || (start + entry.timings[key])
+    const start = isNaN(preciseStart) ? ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart
+    const end = isNaN(preciseEnd) ? (start + entry.timings[key]) : preciseEnd
 
     return {
       "start": start,
