@@ -724,3 +724,5 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 
 .info-overlay-holder .tab { padding:12px 12px 24px; float: left; width:100%; }
 .info-overlay-holder .tab pre {overflow-y: hidden;}
+.info-overlay-holder .tab dl:after {content: ""; display: table; clear: both;}
+.info-overlay-holder .tab h2 {font-size: 1.5em; margin:1em 0 0; padding: 0; clear: both;}
