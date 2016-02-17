@@ -90,28 +90,67 @@ function getKeys(requestID: number, block: TimeBlock) {
 
   /** get experimental feature */
   let getExp = (name: string): string => {
-    return entry[name] || ""
+    return entry[name] || entry["_" + name] || ""
+  }
+
+  let getExpNotNull = (name: string): string => {
+    let resp = getExp(name)
+    return  resp !== "0" ? resp : ""
+  }
+
+  let getExpAsByte = (name: string): string => {
+    let resp = parseInt(getExp(name), 10)
+    return  (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp)
+  }
+
+  let getExpTimeRange = (name: string): string => {
+    let ms = getExp(name + "_ms").toString()
+    let start = getExp(name + "_start")
+    let end = getExp(name + "_end")
+    let resp = []
+    if (start && end && start < end) {
+      resp.push(`${start}ms - ${end}ms`)
+    }
+    if (ms && ms !== "-1") {
+      resp.push(`(${ms}ms)`)
+    }
+    return resp.join(" ")
   }
 
   return {
     "general": {
-      "Request Number": `#${requestID}`,
+      "Request Number": `#${requestID} ${entry._index}`,
       "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page reqest started)",
       "Duration": formatTime(entry.time),
       "Status": entry.response.status + " " + entry.response.statusText,
       "Server IPAddress": entry.serverIPAddress,
       "Connection": entry.connection,
-      "Browser Priority": getExp("_priority"),
-      "Initiator": getExp("_initiator"),
-      "Initiator Line": getExp("_initiator_line"),
-      "Expires": getExp("_expires"),
-      "Cache Time": getExp("_cache_time"),
-      "CDN Provider": getExp("_cdn_provider"),
-      "Gzip Total": getExp("_gzip_total"),
-      "Minify Total": getExp("_minify_total"),
-      "Minify Save": getExp("_minify_save"),
-      "Image Total": getExp("_image_total"),
-      "Image Save": getExp("_image_save")
+      "Browser Priority": getExp("priority"),
+      "Initiator": getExp("initiator"),
+      "Initiator Line": getExp("initiator_line"),
+      "Expires": getExp("expires"),
+      "Cache Time": getExp("cache_time"),
+      "CDN Provider": getExp("cdn_provider"),
+      "Bytes In":  getExpAsByte("bytesIn"),
+      "Bytes Out":  getExpAsByte("bytesOut"),
+      "IP Address": getExp("ip_addr"),
+      "JPEG Scan Count": getExpNotNull("jpeg_scan_count"),
+      "Gzip Total": getExpAsByte("gzip_total"),
+      "Gzip Save": getExpAsByte("gzip_safe"),
+      "Minify Total": getExpAsByte("minify_total"),
+      "Minify Save": getExpAsByte("minify_save"),
+      "Image Total": getExpAsByte("image_total"),
+      "Image Save": getExpAsByte("image_save"),
+    },
+    "timings": {
+      "Server RTT": getExpTimeRange("server_rtt"),
+      "all (combined)": getExpTimeRange("all"),
+      "DNS": getExpTimeRange("dns"),
+      "Connect": getExpTimeRange("connect"),
+      "TLS/SSL": getExpTimeRange("ssl"),
+      "Load": getExpTimeRange("load"),
+      "TTFB": getExpTimeRange("ttfb"),
+      "Download": getExpTimeRange("download"),
     },
     "request": {
       "Method": entry.request.method,
@@ -124,18 +163,11 @@ function getKeys(requestID: number, block: TimeBlock) {
       "Connection": getRequestHeader("Connection"),
       "Accept": getRequestHeader("Accept"),
       "Accept-Encoding": getRequestHeader("Accept-Encoding"),
-      "Accept-Language": getRequestHeader("Accept-Language"),
-      "Authorization": getRequestHeader("Authorization"),
       "Expect": getRequestHeader("Expect"),
       "Forwarded": getRequestHeader("Forwarded"),
       "If-Modified-Since": getRequestHeader("If-Modified-Since"),
       "If-Range": getRequestHeader("If-Range"),
       "If-Unmodified-Since": getRequestHeader("If-Unmodified-Since"),
-      "Via": getRequestHeader("Via"),
-      "Warning": getRequestHeader("Warning"),
-      "X-Forwarded-For	": getRequestHeader("X-Forwarded-For	"),
-      "X-Forwarded-Host": getRequestHeader("X-Forwarded-Host"),
-      "Front-End-Https": getRequestHeader("Front-End-Https"),
       "Querystring parameters count": entry.request.queryString.length,
       "Cookies count": entry.request.cookies.length
     },
@@ -144,47 +176,29 @@ function getKeys(requestID: number, block: TimeBlock) {
       "HTTP Version": entry.response.httpVersion,
       "Header Size": formatBytes(entry.response.headersSize),
       "Body Size": formatBytes(entry.response.bodySize),
-      "Content-Type": getResponseHeader("Content-Type"),
+      "Content-Type": getResponseHeader("Content-Type") + " | " + entry._contentType,
       "Cache-Control": getResponseHeader("Cache-Control"),
       "Content-Encoding": getResponseHeader("Content-Encoding"),
       "Expires": getResponseHeader("Expires"),
       "Last-Modified": getResponseHeader("Last-Modified"),
       "Pragma": getResponseHeader("Pragma"),
-      "Server": getResponseHeader("Server"),
-      "Timing-Allow-Origin": getResponseHeader("Timing-Allow-Origin"),
       "Content-Length": getResponseHeader("Content-Length"),
       "Content Size": entry.response.content.size,
       "Content Compression": entry.response.content.compression,
       "Connection": getResponseHeader("Connection"),
-      "X-Served-By": getResponseHeader("X-Served-By"),
-      "Redirect URL": entry.response.redirectURL,
       "ETag": getResponseHeader("ETag"),
-      "Date": getResponseHeader("Date"),
-      "Access-Control-Allow-Origin": getResponseHeader("Access-Control-Allow-Origin"),
       "Accept-Patch": getResponseHeader("Accept-Patch"),
-      "Accept-Ranges": getResponseHeader("Accept-Ranges"),
       "Age": getResponseHeader("Age"),
       "Allow": getResponseHeader("Allow"),
       "Content-Disposition": getResponseHeader("Content-Disposition"),
       "Location": getResponseHeader("Location"),
-      "Proxy-Authenticate": getResponseHeader("Proxy-Authenticate"),
-      "Retry-After": getResponseHeader("Retry-After"),
-      "Set-Cookie": getResponseHeader("Set-Cookie"),
       "Strict-Transport-Security": getResponseHeader("Strict-Transport-Security"),
       "Trailer (for chunked transfer coding)": getResponseHeader("Trailer"),
       "Transfer-Encoding": getResponseHeader("Transfer-Encoding"),
-      "TSV (Tracking Status Value)": getResponseHeader("TSV"),
       "Upgrade": getResponseHeader("Upgrade"),
       "Vary": getResponseHeader("Vary"),
-      "Via": getResponseHeader("Via"),
-      "Warning": getResponseHeader("Warning"),
-      "X-XSS-Protection": getResponseHeader("X-XSS-Protection"),
-      "Content-Security-Policy": getResponseHeader("Content-Security-Policy"),
-      "X-Content-Security-Policy": getResponseHeader("X-Content-Security-Policy"),
-      "X-WebKit-CSP": getResponseHeader("X-WebKit-CSP"),
-      "X-Content-Type-Options": getResponseHeader("X-Content-Type-Options"),
-      "X-UA-Compatible": getResponseHeader("X-UA-Compatible"),
-      "Upgrade-Insecure-Requests": getResponseHeader("Upgrade-Insecure-Requests"),
+      "Timing-Allow-Origin": getResponseHeader("Timing-Allow-Origin"),
+      "Redirect URL": entry.response.redirectURL,
       "Comment": entry.response.comment
     }
   }
@@ -207,7 +221,16 @@ function createBody(requestID: number, block: TimeBlock) {
   const tabsData = getKeys(requestID, block)
   const generalDl = makeDefinitionList(tabsData.general)
   const requestDl = makeDefinitionList(tabsData.request)
+  const requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce((pre, curr) => {
+    pre[curr.name] = curr.value
+    return pre
+  }, {}))
   const responseDl = makeDefinitionList(tabsData.response)
+  const responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.reduce((pre, curr) => {
+    pre[curr.name] = curr.value
+    return pre
+  }, {}))
+  const timingsDl = makeDefinitionList(tabsData.timings)
 
   body.innerHTML = `
     <div class="wrapper">
@@ -217,6 +240,7 @@ function createBody(requestID: number, block: TimeBlock) {
         <li><button class="tab-button">General</button></li>
         <li><button class="tab-button">Request</button></li>
         <li><button class="tab-button">Response</button></li>
+        <li><button class="tab-button">Timings</button></li>
         <li><button class="tab-button">Raw Data</button></li>
       </ul>
       </nav>
@@ -229,10 +253,23 @@ function createBody(requestID: number, block: TimeBlock) {
         <dl>
           ${requestDl}
         </dl>
+        <h2>All Request Headers</h2>
+        <dl>
+          ${requestHeadersDl}
+        </dl>
       </div>
       <div class="tab">
         <dl>
           ${responseDl}
+        </dl>
+        <h2>All Response Headers</h2>
+        <dl>
+          ${responseHeadersDl}
+        </dl>
+      </div>
+      <div class="tab">
+        <dl>
+          ${timingsDl}
         </dl>
       </div>
       <div class="tab">

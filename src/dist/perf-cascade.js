@@ -1,4 +1,4 @@
-/*PerfCascade build:15/02/2016 */
+/*PerfCascade build:17/02/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -616,27 +616,63 @@ function getKeys(requestID, block) {
     };
     /** get experimental feature */
     var getExp = function (name) {
-        return entry[name] || "";
+        return entry[name] || entry["_" + name] || "";
+    };
+    var getExpNotNull = function (name) {
+        var resp = getExp(name);
+        return resp !== "0" ? resp : "";
+    };
+    var getExpAsByte = function (name) {
+        var resp = parseInt(getExp(name), 10);
+        return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
+    };
+    var getExpTimeRange = function (name) {
+        var ms = getExp(name + "_ms").toString();
+        var start = getExp(name + "_start");
+        var end = getExp(name + "_end");
+        var resp = [];
+        if (start && end && start < end) {
+            resp.push(start + "ms - " + end + "ms");
+        }
+        if (ms && ms !== "-1") {
+            resp.push("(" + ms + "ms)");
+        }
+        return resp.join(" ");
     };
     return {
         "general": {
-            "Request Number": "#" + requestID,
+            "Request Number": "#" + requestID + " " + entry._index,
             "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page reqest started)",
             "Duration": formatTime(entry.time),
             "Status": entry.response.status + " " + entry.response.statusText,
             "Server IPAddress": entry.serverIPAddress,
             "Connection": entry.connection,
-            "Browser Priority": getExp("_priority"),
-            "Initiator": getExp("_initiator"),
-            "Initiator Line": getExp("_initiator_line"),
-            "Expires": getExp("_expires"),
-            "Cache Time": getExp("_cache_time"),
-            "CDN Provider": getExp("_cdn_provider"),
-            "Gzip Total": getExp("_gzip_total"),
-            "Minify Total": getExp("_minify_total"),
-            "Minify Save": getExp("_minify_save"),
-            "Image Total": getExp("_image_total"),
-            "Image Save": getExp("_image_save")
+            "Browser Priority": getExp("priority"),
+            "Initiator": getExp("initiator"),
+            "Initiator Line": getExp("initiator_line"),
+            "Expires": getExp("expires"),
+            "Cache Time": getExp("cache_time"),
+            "CDN Provider": getExp("cdn_provider"),
+            "Bytes In": getExpAsByte("bytesIn"),
+            "Bytes Out": getExpAsByte("bytesOut"),
+            "IP Address": getExp("ip_addr"),
+            "JPEG Scan Count": getExpNotNull("jpeg_scan_count"),
+            "Gzip Total": getExpAsByte("gzip_total"),
+            "Gzip Save": getExpAsByte("gzip_safe"),
+            "Minify Total": getExpAsByte("minify_total"),
+            "Minify Save": getExpAsByte("minify_save"),
+            "Image Total": getExpAsByte("image_total"),
+            "Image Save": getExpAsByte("image_save"),
+        },
+        "timings": {
+            "Server RTT": getExpTimeRange("server_rtt"),
+            "all (combined)": getExpTimeRange("all"),
+            "DNS": getExpTimeRange("dns"),
+            "Connect": getExpTimeRange("connect"),
+            "TLS/SSL": getExpTimeRange("ssl"),
+            "Load": getExpTimeRange("load"),
+            "TTFB": getExpTimeRange("ttfb"),
+            "Download": getExpTimeRange("download"),
         },
         "request": {
             "Method": entry.request.method,
@@ -649,18 +685,11 @@ function getKeys(requestID, block) {
             "Connection": getRequestHeader("Connection"),
             "Accept": getRequestHeader("Accept"),
             "Accept-Encoding": getRequestHeader("Accept-Encoding"),
-            "Accept-Language": getRequestHeader("Accept-Language"),
-            "Authorization": getRequestHeader("Authorization"),
             "Expect": getRequestHeader("Expect"),
             "Forwarded": getRequestHeader("Forwarded"),
             "If-Modified-Since": getRequestHeader("If-Modified-Since"),
             "If-Range": getRequestHeader("If-Range"),
             "If-Unmodified-Since": getRequestHeader("If-Unmodified-Since"),
-            "Via": getRequestHeader("Via"),
-            "Warning": getRequestHeader("Warning"),
-            "X-Forwarded-For	": getRequestHeader("X-Forwarded-For	"),
-            "X-Forwarded-Host": getRequestHeader("X-Forwarded-Host"),
-            "Front-End-Https": getRequestHeader("Front-End-Https"),
             "Querystring parameters count": entry.request.queryString.length,
             "Cookies count": entry.request.cookies.length
         },
@@ -669,47 +698,29 @@ function getKeys(requestID, block) {
             "HTTP Version": entry.response.httpVersion,
             "Header Size": formatBytes(entry.response.headersSize),
             "Body Size": formatBytes(entry.response.bodySize),
-            "Content-Type": getResponseHeader("Content-Type"),
+            "Content-Type": getResponseHeader("Content-Type") + " | " + entry._contentType,
             "Cache-Control": getResponseHeader("Cache-Control"),
             "Content-Encoding": getResponseHeader("Content-Encoding"),
             "Expires": getResponseHeader("Expires"),
             "Last-Modified": getResponseHeader("Last-Modified"),
             "Pragma": getResponseHeader("Pragma"),
-            "Server": getResponseHeader("Server"),
-            "Timing-Allow-Origin": getResponseHeader("Timing-Allow-Origin"),
             "Content-Length": getResponseHeader("Content-Length"),
             "Content Size": entry.response.content.size,
             "Content Compression": entry.response.content.compression,
             "Connection": getResponseHeader("Connection"),
-            "X-Served-By": getResponseHeader("X-Served-By"),
-            "Redirect URL": entry.response.redirectURL,
             "ETag": getResponseHeader("ETag"),
-            "Date": getResponseHeader("Date"),
-            "Access-Control-Allow-Origin": getResponseHeader("Access-Control-Allow-Origin"),
             "Accept-Patch": getResponseHeader("Accept-Patch"),
-            "Accept-Ranges": getResponseHeader("Accept-Ranges"),
             "Age": getResponseHeader("Age"),
             "Allow": getResponseHeader("Allow"),
             "Content-Disposition": getResponseHeader("Content-Disposition"),
             "Location": getResponseHeader("Location"),
-            "Proxy-Authenticate": getResponseHeader("Proxy-Authenticate"),
-            "Retry-After": getResponseHeader("Retry-After"),
-            "Set-Cookie": getResponseHeader("Set-Cookie"),
             "Strict-Transport-Security": getResponseHeader("Strict-Transport-Security"),
             "Trailer (for chunked transfer coding)": getResponseHeader("Trailer"),
             "Transfer-Encoding": getResponseHeader("Transfer-Encoding"),
-            "TSV (Tracking Status Value)": getResponseHeader("TSV"),
             "Upgrade": getResponseHeader("Upgrade"),
             "Vary": getResponseHeader("Vary"),
-            "Via": getResponseHeader("Via"),
-            "Warning": getResponseHeader("Warning"),
-            "X-XSS-Protection": getResponseHeader("X-XSS-Protection"),
-            "Content-Security-Policy": getResponseHeader("Content-Security-Policy"),
-            "X-Content-Security-Policy": getResponseHeader("X-Content-Security-Policy"),
-            "X-WebKit-CSP": getResponseHeader("X-WebKit-CSP"),
-            "X-Content-Type-Options": getResponseHeader("X-Content-Type-Options"),
-            "X-UA-Compatible": getResponseHeader("X-UA-Compatible"),
-            "Upgrade-Insecure-Requests": getResponseHeader("Upgrade-Insecure-Requests"),
+            "Timing-Allow-Origin": getResponseHeader("Timing-Allow-Origin"),
+            "Redirect URL": entry.response.redirectURL,
             "Comment": entry.response.comment
         }
     };
@@ -725,8 +736,17 @@ function createBody(requestID, block) {
     var tabsData = getKeys(requestID, block);
     var generalDl = makeDefinitionList(tabsData.general);
     var requestDl = makeDefinitionList(tabsData.request);
+    var requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce(function (pre, curr) {
+        pre[curr.name] = curr.value;
+        return pre;
+    }, {}));
     var responseDl = makeDefinitionList(tabsData.response);
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        <li><button class=\"tab-button\">General</button></li>\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      <div class=\"tab\">\n        <dl>\n          " + generalDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
+    var responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.reduce(function (pre, curr) {
+        pre[curr.name] = curr.value;
+        return pre;
+    }, {}));
+    var timingsDl = makeDefinitionList(tabsData.timings);
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        <li><button class=\"tab-button\">General</button></li>\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        <li><button class=\"tab-button\">Timings</button></li>\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      <div class=\"tab\">\n        <dl>\n          " + generalDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + timingsDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
     return body;
 }
 function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
