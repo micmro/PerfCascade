@@ -231,12 +231,20 @@ function createBody(requestID: number, block: TimeBlock) {
     return pre
   }, {}))
   const timingsDl = makeDefinitionList(tabsData.timings)
+  const isImg = block.requestType === "image"
+  const imgTab = isImg ? `
+    <div class="tab">
+       <img class="preview" data-src="${block.rawResource.request.url}" /> 
+     </div>  
+  ` : ""
+  const imgBtn = isImg ? `<li><button class="tab-button">Preview</button></li>` : ""
 
   body.innerHTML = `
     <div class="wrapper">
       <h3>#${requestID} ${block.name}</h3>
       <nav class="tab-nav">
       <ul>
+        ${imgBtn}
         <li><button class="tab-button">General</button></li>
         <li><button class="tab-button">Request</button></li>
         <li><button class="tab-button">Response</button></li>
@@ -244,6 +252,7 @@ function createBody(requestID: number, block: TimeBlock) {
         <li><button class="tab-button">Raw Data</button></li>
       </ul>
       </nav>
+      ${imgTab}
       <div class="tab">
         <dl>
           ${generalDl}

@@ -170,6 +170,11 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
 
     let showOverlay = (evt) => {
       dom.removeAllChildren(overlayHolder)
+      //if overlay has a preview image show it
+      let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
+      if (previewImg && !previewImg.src) {
+        previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)
+      }
       overlayHolder.appendChild(infoOverlay)
     }
     let rowFixed = createFixedRow(y, requestBarHeight, showOverlay, leftFixedWidth)
