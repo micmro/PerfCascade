@@ -119,21 +119,24 @@ function getKeys(requestID: number, block: TimeBlock) {
 
   return {
     "general": {
-      "Request Number": `#${requestID} ${entry._index}`,
+      "Request Number": `#${requestID}`,
       "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page reqest started)",
       "Duration": formatTime(entry.time),
-      "Status": entry.response.status + " " + entry.response.statusText,
+      "Error/Status Code": entry.response.status + " " + entry.response.statusText,
       "Server IPAddress": entry.serverIPAddress,
       "Connection": entry.connection,
       "Browser Priority": getExp("priority"),
-      "Initiator": getExp("initiator"),
+      "Initiator (Loaded by)": getExp("initiator"),
       "Initiator Line": getExp("initiator_line"),
+      "Host": getRequestHeader("Host"),
+      "IP": getExp("ip_addr"),
+      "Client Port": getExpNotNull("client_port"),
       "Expires": getExp("expires"),
       "Cache Time": getExp("cache_time"),
       "CDN Provider": getExp("cdn_provider"),
-      "Bytes In":  getExpAsByte("bytesIn"),
-      "Bytes Out":  getExpAsByte("bytesOut"),
-      "IP Address": getExp("ip_addr"),
+      "ObjectSize": getExp("objectSize"),
+      "Bytes In (downloaded)":  getExpAsByte("bytesIn"),
+      "Bytes Out (uploaded)":  getExpAsByte("bytesOut"),
       "JPEG Scan Count": getExpNotNull("jpeg_scan_count"),
       "Gzip Total": getExpAsByte("gzip_total"),
       "Gzip Save": getExpAsByte("gzip_safe"),
@@ -291,8 +294,9 @@ function createBody(requestID: number, block: TimeBlock) {
   return body
 }
 
-export function createRowInfoOverlay(requestID: number, barX: number, y: number, block: TimeBlock,
+export function createRowInfoOverlay(indexBackup: number, barX: number, y: number, block: TimeBlock,
   leftFixedWidth: number, unit: number): SVGGElement {
+  const requestID =  parseInt(block.rawResource._index, 10) || indexBackup
   let holder = createHolder(y, leftFixedWidth)
 
   let html = svg.newEl("foreignObject", {

@@ -516,7 +516,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
         var rect = svg_row_components_1.createRect(rectData, block.segments);
         var shortLabel = svg_row_components_1.createRequestLabelClipped(labelXPos, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
         var fullLabel = svg_row_components_1.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
-        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i + 1, x, y + requestBarHeight, block, leftFixedWidth, unit);
+        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, block, leftFixedWidth, unit);
         var showOverlay = function (evt) {
             dom_1.default.removeAllChildren(overlayHolder);
             //if overlay has a preview image show it
@@ -646,21 +646,24 @@ function getKeys(requestID, block) {
     };
     return {
         "general": {
-            "Request Number": "#" + requestID + " " + entry._index,
+            "Request Number": "#" + requestID,
             "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page reqest started)",
             "Duration": formatTime(entry.time),
-            "Status": entry.response.status + " " + entry.response.statusText,
+            "Error/Status Code": entry.response.status + " " + entry.response.statusText,
             "Server IPAddress": entry.serverIPAddress,
             "Connection": entry.connection,
             "Browser Priority": getExp("priority"),
-            "Initiator": getExp("initiator"),
+            "Initiator (Loaded by)": getExp("initiator"),
             "Initiator Line": getExp("initiator_line"),
+            "Host": getRequestHeader("Host"),
+            "IP": getExp("ip_addr"),
+            "Client Port": getExpNotNull("client_port"),
             "Expires": getExp("expires"),
             "Cache Time": getExp("cache_time"),
             "CDN Provider": getExp("cdn_provider"),
-            "Bytes In": getExpAsByte("bytesIn"),
-            "Bytes Out": getExpAsByte("bytesOut"),
-            "IP Address": getExp("ip_addr"),
+            "ObjectSize": getExp("objectSize"),
+            "Bytes In (downloaded)": getExpAsByte("bytesIn"),
+            "Bytes Out (uploaded)": getExpAsByte("bytesOut"),
             "JPEG Scan Count": getExpNotNull("jpeg_scan_count"),
             "Gzip Total": getExpAsByte("gzip_total"),
             "Gzip Save": getExpAsByte("gzip_safe"),
@@ -757,7 +760,8 @@ function createBody(requestID, block) {
     body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        " + imgBtn + "\n        <li><button class=\"tab-button\">General</button></li>\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        <li><button class=\"tab-button\">Timings</button></li>\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      " + imgTab + "\n      <div class=\"tab\">\n        <dl>\n          " + generalDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + timingsDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
     return body;
 }
-function createRowInfoOverlay(requestID, barX, y, block, leftFixedWidth, unit) {
+function createRowInfoOverlay(indexBackup, barX, y, block, leftFixedWidth, unit) {
+    var requestID = parseInt(block.rawResource._index, 10) || indexBackup;
     var holder = createHolder(y, leftFixedWidth);
     var html = svg_1.default.newEl("foreignObject", {
         "width": "100%",
