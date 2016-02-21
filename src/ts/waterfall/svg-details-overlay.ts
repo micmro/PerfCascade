@@ -217,12 +217,28 @@ function makeDefinitionList(dlKeyValues) {
     `).join("")
 }
 
+function makeTab(innerHtml: string, renderDl: boolean = true) {
+  if (innerHtml.trim() === "") {
+    return ""
+  }
+  console.log(`"${innerHtml}"`)
+  let inner = renderDl ? `<dl>${innerHtml}</dl>` : innerHtml
+  return `<div class="tab">
+    ${inner}
+  </div>`
+}
+
+function makeTabBtn(name: string, tab: string) {
+  return !!tab ? `<li><button class="tab-button">${name}</button></li>` : ""
+}
+
 function createBody(requestID: number, block: TimeBlock) {
   let body = document.createElement("body");
   body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
 
   const tabsData = getKeys(requestID, block)
-  const generalDl = makeDefinitionList(tabsData.general)
+  const generalTab = makeTab(makeDefinitionList(tabsData.general))
+  const timingsTab = makeTab(makeDefinitionList(tabsData.timings))
   const requestDl = makeDefinitionList(tabsData.request)
   const requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce((pre, curr) => {
     pre[curr.name] = curr.value
@@ -233,34 +249,24 @@ function createBody(requestID: number, block: TimeBlock) {
     pre[curr.name] = curr.value
     return pre
   }, {}))
-  const timingsDl = makeDefinitionList(tabsData.timings)
   const isImg = block.requestType === "image"
-  const imgTab = isImg ? `
-    <div class="tab">
-       <img class="preview" data-src="${block.rawResource.request.url}" /> 
-     </div>  
-  ` : ""
-  const imgBtn = isImg ? `<li><button class="tab-button">Preview</button></li>` : ""
+  const imgTab = isImg ? makeTab(`<img class="preview" data-src="${block.rawResource.request.url}" />`, false) : ""
 
   body.innerHTML = `
     <div class="wrapper">
       <h3>#${requestID} ${block.name}</h3>
       <nav class="tab-nav">
       <ul>
-        ${imgBtn}
-        <li><button class="tab-button">General</button></li>
+        ${makeTabBtn("Preview", imgTab)}
+        ${makeTabBtn("General", generalTab)}
         <li><button class="tab-button">Request</button></li>
         <li><button class="tab-button">Response</button></li>
-        <li><button class="tab-button">Timings</button></li>
+        ${makeTabBtn("Timings", timingsTab)}
         <li><button class="tab-button">Raw Data</button></li>
       </ul>
       </nav>
       ${imgTab}
-      <div class="tab">
-        <dl>
-          ${generalDl}
-        </dl>
-      </div>
+      ${generalTab}
       <div class="tab">
         <dl>
           ${requestDl}
@@ -279,11 +285,7 @@ function createBody(requestID: number, block: TimeBlock) {
           ${responseHeadersDl}
         </dl>
       </div>
-      <div class="tab">
-        <dl>
-          ${timingsDl}
-        </dl>
-      </div>
+      ${timingsTab}
       <div class="tab">
         <code>
           <pre>${JSON.stringify(block.rawResource, null, 2)}</pre>

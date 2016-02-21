@@ -1,4 +1,4 @@
-/*PerfCascade build:18/02/2016 */
+/*PerfCascade build:21/02/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -738,11 +738,24 @@ function makeDefinitionList(dlKeyValues) {
         .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""); })
         .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
 }
+function makeTab(innerHtml, renderDl) {
+    if (renderDl === void 0) { renderDl = true; }
+    if (innerHtml.trim() === "") {
+        return "";
+    }
+    console.log("\"" + innerHtml + "\"");
+    var inner = renderDl ? "<dl>" + innerHtml + "</dl>" : innerHtml;
+    return "<div class=\"tab\">\n    " + inner + "\n  </div>";
+}
+function makeTabBtn(name, tab) {
+    return !!tab ? "<li><button class=\"tab-button\">" + name + "</button></li>" : "";
+}
 function createBody(requestID, block) {
     var body = document.createElement("body");
     body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     var tabsData = getKeys(requestID, block);
-    var generalDl = makeDefinitionList(tabsData.general);
+    var generalTab = makeTab(makeDefinitionList(tabsData.general));
+    var timingsTab = makeTab(makeDefinitionList(tabsData.timings));
     var requestDl = makeDefinitionList(tabsData.request);
     var requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce(function (pre, curr) {
         pre[curr.name] = curr.value;
@@ -753,11 +766,9 @@ function createBody(requestID, block) {
         pre[curr.name] = curr.value;
         return pre;
     }, {}));
-    var timingsDl = makeDefinitionList(tabsData.timings);
     var isImg = block.requestType === "image";
-    var imgTab = isImg ? "\n    <div class=\"tab\">\n       <img class=\"preview\" data-src=\"" + block.rawResource.request.url + "\" /> \n     </div>  \n  " : "";
-    var imgBtn = isImg ? "<li><button class=\"tab-button\">Preview</button></li>" : "";
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        " + imgBtn + "\n        <li><button class=\"tab-button\">General</button></li>\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        <li><button class=\"tab-button\">Timings</button></li>\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      " + imgTab + "\n      <div class=\"tab\">\n        <dl>\n          " + generalDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + timingsDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
+    var imgTab = isImg ? makeTab("<img class=\"preview\" data-src=\"" + block.rawResource.request.url + "\" />", false) : "";
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        " + makeTabBtn("Preview", imgTab) + "\n        " + makeTabBtn("General", generalTab) + "\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        " + makeTabBtn("Timings", timingsTab) + "\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      " + imgTab + "\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
     return body;
 }
 function createRowInfoOverlay(indexBackup, barX, y, block, leftFixedWidth, unit) {
