@@ -33,7 +33,7 @@ import dom from "../helpers/dom"
 /**
  * Function to format the shortened URL
  * @param  {string} url       URL of ressource
- * @param  {number} maxLength maximal 
+ * @param  {number} maxLength maximal
  * @return {string}           [description]
  */
 function ressourceUrlFormater(url: string): string {
@@ -48,13 +48,17 @@ function ressourceUrlFormater(url: string): string {
     return matches.authority + matches.path
   }
 
+  // maybe we could finetune these numbers
   let p = matches.path.split("/")
-  return matches.authority + "…/" + p[p.length - 1]
+  if (matches.authority.length > 17) {
+    return matches.authority.substr(0,17) + '...' + p[p.length - 1].substr(-15)
+  }
+  return   matches.authority + '...' + p[p.length - 1].substr(-15)
 }
 
 
 /**
- * Calculate the height of the SVG chart in px 
+ * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
  * @param {TimeBlock[]} barsToShow [description]
  */
@@ -183,7 +187,7 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
     //create and attach request block
     rowFlex.appendChild(rect)
 
-    //Add create and add warnings 
+    //Add create and add warnings
     getIndicators(block, docIsSsl).forEach((value: Indicator) => {
       rowFixed.appendChild(icons[value.type](value.x, y + 3, value.title))
     })
