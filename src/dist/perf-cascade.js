@@ -1,4 +1,4 @@
-/*PerfCascade build:21/02/2016 */
+/*PerfCascade build:28/02/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -422,19 +422,25 @@ function ressourceUrlFormater(url) {
     if ((matches.authority + matches.path).length < maxLength) {
         return matches.authority + matches.path;
     }
+    // maybe we could finetune these numbers
     var p = matches.path.split("/");
-    return matches.authority + "…/" + p[p.length - 1];
+    if (matches.authority.length > 17) {
+        return matches.authority.substr(0, 17) + '...' + p[p.length - 1].substr(-15);
+    }
+    return matches.authority + '...' + p[p.length - 1].substr(-15);
 }
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
  * @param {TimeBlock[]} barsToShow [description]
+ * @param  {number} diagramHeight
+ * @returns Number
  */
 function getSvgHeight(marks, barsToShow, diagramHeight) {
     var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
         return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
     }, 0);
-    return diagramHeight + maxMarkTextLength + 35;
+    return Math.floor(diagramHeight + maxMarkTextLength + 35);
 }
 /**
  * Entry point to start rendering the full waterfall SVG
@@ -459,7 +465,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
     var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
     //Main holder
     var timeLineHolder = svg_1.default.newSvg("water-fall-chart", {
-        "height": Math.floor(chartHolderHeight)
+        "height": chartHolderHeight
     }, {
         "paddingLeft": leftFixedWidth + "px"
     });
@@ -497,6 +503,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
         var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
         return Math.max(prev, x);
     }, 5);
+    var barData = [];
     //Main loop to render rows with blocks
     barsToShow.forEach(function (block, i) {
         var blockWidth = block.total || 1;
@@ -516,8 +523,18 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
         var rect = svg_row_components_1.createRect(rectData, block.segments);
         var shortLabel = svg_row_components_1.createRequestLabelClipped(labelXPos, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
         var fullLabel = svg_row_components_1.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
-        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, block, leftFixedWidth, unit);
-        var showOverlay = function (evt) {
+        var onOverlayClose = function (holder) {
+            overlayHolder.removeChild(holder);
+            timeLineHolder.style.height = chartHolderHeight.toString();
+            barData.forEach(function (siblingBar, j) {
+                barData[j].bgStripe.style.transform = "translate(0, 0)";
+                barData[j].leftFixedHolder.style.transform = "translate(0, 0)";
+                barData[j].rowFlex.style.transform = "translate(0, 0)";
+                barData[j].rowFixed.style.transform = "translate(0, 0)";
+            });
+        };
+        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, leftFixedWidth, unit);
+        var showDetailsOverlay = function (evt) {
             dom_1.default.removeAllChildren(overlayHolder);
             //if overlay has a preview image show it
             var previewImg = infoOverlay.querySelector("img.preview");
@@ -525,19 +542,34 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
                 previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
             }
             overlayHolder.appendChild(infoOverlay);
+            timeLineHolder.style.height = (chartHolderHeight + 350).toString();
+            barData.forEach(function (siblingBar, j) {
+                var translate = j <= i ? "translate(0, 0)" : "translate(0, 350px)";
+                barData[j].bgStripe.style.transform = translate;
+                barData[j].leftFixedHolder.style.transform = translate;
+                barData[j].rowFlex.style.transform = translate;
+                barData[j].rowFixed.style.transform = translate;
+            });
         };
-        var rowFixed = svg_row_components_1.createFixedRow(y, requestBarHeight, showOverlay, leftFixedWidth);
-        var rowFlex = svg_row_components_1.createFlexRow(y, requestBarHeight, showOverlay);
+        var rowFixed = svg_row_components_1.createFixedRow(y, requestBarHeight, showDetailsOverlay, leftFixedWidth);
+        var rowFlex = svg_row_components_1.createFlexRow(y, requestBarHeight, showDetailsOverlay);
+        var bgStripe = svg_row_components_1.createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0));
         //create and attach request block
         rowFlex.appendChild(rect);
-        //Add create and add warnings 
+        //Add create and add warnings
         svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
             rowFixed.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
         });
         svg_row_components_1.appendRequestLabels(rowFixed, shortLabel, fullLabel);
+        barData.push({
+            rowFlex: rowFlex,
+            rowFixed: rowFixed,
+            leftFixedHolder: leftFixedHolder,
+            bgStripe: bgStripe
+        });
         flexScaleHolder.appendChild(rowFlex);
         leftFixedHolder.appendChild(rowFixed);
-        bgStripesHolder.appendChild(svg_row_components_1.createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0)));
+        bgStripesHolder.appendChild(bgStripe);
     });
     flexScaleHolder.appendChild(hoverOverlayHolder);
     timeLineHolder.appendChild(bgStripesHolder);
@@ -621,7 +653,7 @@ function getKeys(requestID, block) {
     };
     /** get experimental feature */
     var getExp = function (name) {
-        return entry[name] || entry["_" + name] || "";
+        return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || "";
     };
     var getExpNotNull = function (name) {
         var resp = getExp(name);
@@ -652,7 +684,7 @@ function getKeys(requestID, block) {
             "Error/Status Code": entry.response.status + " " + entry.response.statusText,
             "Server IPAddress": entry.serverIPAddress,
             "Connection": entry.connection,
-            "Browser Priority": getExp("priority"),
+            "Browser Priority": getExp("priority") || getExp("initialPriority"),
             "Initiator (Loaded by)": getExp("initiator"),
             "Initiator Line": getExp("initiator_line"),
             "Host": getRequestHeader("Host"),
@@ -743,7 +775,6 @@ function makeTab(innerHtml, renderDl) {
     if (innerHtml.trim() === "") {
         return "";
     }
-    console.log("\"" + innerHtml + "\"");
     var inner = renderDl ? "<dl>" + innerHtml + "</dl>" : innerHtml;
     return "<div class=\"tab\">\n    " + inner + "\n  </div>";
 }
@@ -771,7 +802,7 @@ function createBody(requestID, block) {
     body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        " + makeTabBtn("Preview", imgTab) + "\n        " + makeTabBtn("General", generalTab) + "\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        " + makeTabBtn("Timings", timingsTab) + "\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      " + imgTab + "\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
     return body;
 }
-function createRowInfoOverlay(indexBackup, barX, y, block, leftFixedWidth, unit) {
+function createRowInfoOverlay(indexBackup, barX, y, block, onClose, leftFixedWidth, unit) {
     var requestID = parseInt(block.rawResource._index, 10) || indexBackup;
     var holder = createHolder(y, leftFixedWidth);
     var html = svg_1.default.newEl("foreignObject", {
@@ -783,7 +814,7 @@ function createRowInfoOverlay(indexBackup, barX, y, block, leftFixedWidth, unit)
         "dx": "5"
     });
     var closeBtn = createCloseButtonSvg(y);
-    closeBtn.addEventListener("click", function (evt) { return holder.parentElement.removeChild(holder); });
+    closeBtn.addEventListener("click", function (evt) { return onClose(holder); });
     var body = createBody(requestID, block);
     var buttons = body.getElementsByClassName("tab-button");
     var tabs = body.getElementsByClassName("tab");

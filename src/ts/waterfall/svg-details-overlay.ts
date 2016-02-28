@@ -221,7 +221,6 @@ function makeTab(innerHtml: string, renderDl: boolean = true) {
   if (innerHtml.trim() === "") {
     return ""
   }
-  console.log(`"${innerHtml}"`)
   let inner = renderDl ? `<dl>${innerHtml}</dl>` : innerHtml
   return `<div class="tab">
     ${inner}
@@ -297,7 +296,7 @@ function createBody(requestID: number, block: TimeBlock) {
 }
 
 export function createRowInfoOverlay(indexBackup: number, barX: number, y: number, block: TimeBlock,
-  leftFixedWidth: number, unit: number): SVGGElement {
+  onClose: Function, leftFixedWidth: number, unit: number): SVGGElement {
   const requestID =  parseInt(block.rawResource._index, 10) || indexBackup
   let holder = createHolder(y, leftFixedWidth)
 
@@ -312,7 +311,7 @@ export function createRowInfoOverlay(indexBackup: number, barX: number, y: numbe
 
 
   let closeBtn = createCloseButtonSvg(y)
-  closeBtn.addEventListener("click", evt => holder.parentElement.removeChild(holder))
+  closeBtn.addEventListener("click", evt => onClose(holder))
 
   let body = createBody(requestID, block)
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>

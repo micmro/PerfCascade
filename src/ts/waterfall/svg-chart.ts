@@ -61,13 +61,15 @@ function ressourceUrlFormater(url: string): string {
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
  * @param {TimeBlock[]} barsToShow [description]
+ * @param  {number} diagramHeight
+ * @returns Number
  */
-function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: number) {
+function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: number): number {
   const maxMarkTextLength = marks.reduce((currMax: number, currValue: TimeBlock) => {
     return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0)))
   }, 0)
 
-  return diagramHeight + maxMarkTextLength + 35
+  return Math.floor(diagramHeight + maxMarkTextLength + 35)
 }
 
 /**
@@ -98,10 +100,10 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
 
   //Main holder
   let timeLineHolder = svg.newSvg("water-fall-chart", {
-    "height": Math.floor(chartHolderHeight)
+    "height": chartHolderHeight
   }, {
       "paddingLeft": leftFixedWidth + "px"
-    })
+  })
 
   //Other holder elements
   let leftFixedHolder = svg.newSvg("left-fixed-holder", {
@@ -147,8 +149,14 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
     return Math.max(prev, x)
   }, 5)
 
-  //Main loop to render rows with blocks
+  let barData: {
+      rowFlex: SVGGElement,
+      rowFixed: SVGGElement,
+      leftFixedHolder: SVGSVGElement,
+      bgStripe: SVGGElement
+    }[] = [];
 
+  //Main loop to render rows with blocks
   barsToShow.forEach((block, i) => {
     const blockWidth = block.total || 1
     const y = requestBarHeight * i
@@ -170,9 +178,20 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
     let shortLabel = createRequestLabelClipped(labelXPos, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath")
     let fullLabel = createRequestLabelFull(labelXPos, y, block.name, requestBarHeight)
 
-    let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, block, leftFixedWidth, unit)
+    let onOverlayClose = (holder) => {
+      overlayHolder.removeChild(holder)
+      timeLineHolder.style.height = chartHolderHeight.toString()
+      barData.forEach((siblingBar, j) => {
+        barData[j].bgStripe.style.transform = "translate(0, 0)"
+        barData[j].leftFixedHolder.style.transform = "translate(0, 0)"
+        barData[j].rowFlex.style.transform = "translate(0, 0)"
+        barData[j].rowFixed.style.transform = "translate(0, 0)"
+      })
+    }
 
-    let showOverlay = (evt) => {
+    let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, leftFixedWidth, unit)
+
+    let showDetailsOverlay = (evt) => {
       dom.removeAllChildren(overlayHolder)
       //if overlay has a preview image show it
       let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
@@ -180,9 +199,19 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
         previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)
       }
       overlayHolder.appendChild(infoOverlay)
+
+      timeLineHolder.style.height = (chartHolderHeight + 350).toString()
+      barData.forEach((siblingBar, j) => {
+        let translate = j <= i ? "translate(0, 0)" : "translate(0, 350px)"
+        barData[j].bgStripe.style.transform = translate
+        barData[j].leftFixedHolder.style.transform = translate
+        barData[j].rowFlex.style.transform = translate
+        barData[j].rowFixed.style.transform = translate
+      })
     }
-    let rowFixed = createFixedRow(y, requestBarHeight, showOverlay, leftFixedWidth)
-    let rowFlex = createFlexRow(y, requestBarHeight, showOverlay)
+    let rowFixed = createFixedRow(y, requestBarHeight, showDetailsOverlay, leftFixedWidth)
+    let rowFlex = createFlexRow(y, requestBarHeight, showDetailsOverlay)
+    let bgStripe = createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0))
 
     //create and attach request block
     rowFlex.appendChild(rect)
@@ -194,9 +223,16 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
 
     appendRequestLabels(rowFixed, shortLabel, fullLabel)
 
+    barData.push({
+      rowFlex: rowFlex,
+      rowFixed: rowFixed,
+      leftFixedHolder: leftFixedHolder,
+      bgStripe: bgStripe
+    })
+
     flexScaleHolder.appendChild(rowFlex)
     leftFixedHolder.appendChild(rowFixed)
-    bgStripesHolder.appendChild(createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0)))
+    bgStripesHolder.appendChild(bgStripe)
   })
 
   flexScaleHolder.appendChild(hoverOverlayHolder)
