@@ -41,10 +41,9 @@ function createCloseButtonSvg(y: number): SVGGElement {
 }
 
 
-function createHolder(y: number, leftFixedWidth: number): SVGGElement {
+function createHolder(y: number): SVGGElement {
   let holder = svg.newEl("g", {
-    "class": "info-overlay-holder",
-    "transform": `translate(-${leftFixedWidth})`
+    "class": "info-overlay-holder"
   }) as SVGGElement
 
   let bg = svg.newEl("rect", {
@@ -296,9 +295,9 @@ function createBody(requestID: number, block: TimeBlock) {
 }
 
 export function createRowInfoOverlay(indexBackup: number, barX: number, y: number, block: TimeBlock,
-  onClose: Function, leftFixedWidth: number, unit: number): SVGGElement {
+  onClose: Function, unit: number): SVGGElement {
   const requestID =  parseInt(block.rawResource._index, 10) || indexBackup
-  let holder = createHolder(y, leftFixedWidth)
+  let holder = createHolder(y)
 
   let html = svg.newEl("foreignObject", {
     "width": "100%",

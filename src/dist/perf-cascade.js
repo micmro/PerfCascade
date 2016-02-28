@@ -116,6 +116,22 @@ var misc = {
     },
     contains: function contains(arr, item) {
         return arr.filter(function (x) { return x === item; }).length > 0;
+    },
+    ressourceUrlFormater: function ressourceUrlFormater(url) {
+        var maxLength = 40;
+        if (url.length < maxLength) {
+            return url.replace(/http[s]\:\/\//, "");
+        }
+        var matches = misc.parseUrl(url);
+        if ((matches.authority + matches.path).length < maxLength) {
+            return matches.authority + matches.path;
+        }
+        // maybe we could finetune these numbers
+        var p = matches.path.split("/");
+        if (matches.authority.length > 17) {
+            return matches.authority.substr(0, 17) + '...' + p[p.length - 1].substr(-15);
+        }
+        return matches.authority + '...' + p[p.length - 1].substr(-15);
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -214,7 +230,7 @@ var outputHolder = document.getElementById("output");
 function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
     dom_1.default.removeAllChildren(outputHolder);
-    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, (window.innerWidth > 920 ? 250 : 200), 23));
+    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, 23));
 }
 function onFileSubmit(evt) {
     var files = evt.target.files;
@@ -400,35 +416,11 @@ exports.default = TimeBlock;
 
 },{}],9:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
-var icons_1 = require("../helpers/icons");
-var misc_1 = require("../helpers/misc");
 var svg_general_components_1 = require("./svg-general-components");
-var svg_row_components_1 = require("./svg-row-components");
+var svg_row_1 = require("./svg-row");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var svg_indicators_1 = require("./svg-indicators");
 var dom_1 = require("../helpers/dom");
-/**
- * Function to format the shortened URL
- * @param  {string} url       URL of ressource
- * @param  {number} maxLength maximal
- * @return {string}           [description]
- */
-function ressourceUrlFormater(url) {
-    var maxLength = 40;
-    if (url.length < maxLength) {
-        return url.replace(/http[s]\:\/\//, "");
-    }
-    var matches = misc_1.default.parseUrl(url);
-    if ((matches.authority + matches.path).length < maxLength) {
-        return matches.authority + matches.path;
-    }
-    // maybe we could finetune these numbers
-    var p = matches.path.split("/");
-    if (matches.authority.length > 17) {
-        return matches.authority.substr(0, 17) + '...' + p[p.length - 1].substr(-15);
-    }
-    return matches.authority + '...' + p[p.length - 1].substr(-15);
-}
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
@@ -445,14 +437,15 @@ function getSvgHeight(marks, barsToShow, diagramHeight) {
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
- * @param {leftFixedWidth} number     Width of the url and highlight rule column in pixel
+
  * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
  * @return {SVGSVGElement}            SVG Element ready to render
  */
-function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
+function createWaterfallSvg(data, requestBarHeight) {
     //constants
-    if (leftFixedWidth === void 0) { leftFixedWidth = 250; }
     if (requestBarHeight === void 0) { requestBarHeight = 23; }
+    /** Width of bar on left in percentage */
+    var leftFixedWidthPerc = 25;
     /** horizontal unit (duration in ms of 1%) */
     var unit = data.durationMs / 100;
     var barsToShow = data.blocks
@@ -466,33 +459,21 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
     //Main holder
     var timeLineHolder = svg_1.default.newSvg("water-fall-chart", {
         "height": chartHolderHeight
-    }, {
-        "paddingLeft": leftFixedWidth + "px"
-    });
-    //Other holder elements
-    var leftFixedHolder = svg_1.default.newSvg("left-fixed-holder", {
-        "x": "-" + leftFixedWidth,
-        "width": leftFixedWidth
-    });
-    var flexScaleHolder = svg_1.default.newSvg("flex-scale-waterfall");
+    }, {});
     var hoverOverlayHolder = svg_1.default.newG("hover-overlays");
     var overlayHolder = svg_1.default.newG("overlays");
-    var bgStripesHolder = svg_1.default.newG("bg-stripes");
-    var clipPathEl = svg_1.default.newEl("clipPath", {
-        "id": "titleClipPath"
+    var scaleAndMarksHolder = svg_1.default.newSvg("scale-and-marks-holder", {
+        "x": leftFixedWidthPerc + "%",
+        "width": (100 - leftFixedWidthPerc) + "%"
     });
-    clipPathEl.appendChild(svg_1.default.newEl("rect", {
-        "width": leftFixedWidth,
-        "height": "100%"
-    }));
-    leftFixedHolder.appendChild(clipPathEl);
+    var rowHolder = svg_1.default.newG("rows-holder");
     var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
     hoverOverlayHolder.appendChild(hoverEl.startline);
     hoverOverlayHolder.appendChild(hoverEl.endline);
     var mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
     //Start appending SVG elements to the holder element (timeLineHolder)
-    flexScaleHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
-    flexScaleHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
+    scaleAndMarksHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
+    scaleAndMarksHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
     data.lines.forEach(function (block, i) {
         timeLineHolder.appendChild(svg_general_components_1.createBgRect(block, unit, diagramHeight));
     });
@@ -503,7 +484,6 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
         var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
         return Math.max(prev, x);
     }, 5);
-    var barData = [];
     //Main loop to render rows with blocks
     barsToShow.forEach(function (block, i) {
         var blockWidth = block.total || 1;
@@ -520,20 +500,10 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
             "showOverlay": mouseListeners.onMouseEnterPartial,
             "hideOverlay": mouseListeners.onMouseLeavePartial
         };
-        var rect = svg_row_components_1.createRect(rectData, block.segments);
-        var shortLabel = svg_row_components_1.createRequestLabelClipped(labelXPos, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
-        var fullLabel = svg_row_components_1.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
         var onOverlayClose = function (holder) {
             overlayHolder.removeChild(holder);
-            timeLineHolder.style.height = chartHolderHeight.toString();
-            barData.forEach(function (siblingBar, j) {
-                barData[j].bgStripe.style.transform = "translate(0, 0)";
-                barData[j].leftFixedHolder.style.transform = "translate(0, 0)";
-                barData[j].rowFlex.style.transform = "translate(0, 0)";
-                barData[j].rowFixed.style.transform = "translate(0, 0)";
-            });
         };
-        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, leftFixedWidth, unit);
+        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, unit);
         var showDetailsOverlay = function (evt) {
             dom_1.default.removeAllChildren(overlayHolder);
             //if overlay has a preview image show it
@@ -542,45 +512,19 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
                 previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
             }
             overlayHolder.appendChild(infoOverlay);
-            timeLineHolder.style.height = (chartHolderHeight + 350).toString();
-            barData.forEach(function (siblingBar, j) {
-                var translate = j <= i ? "translate(0, 0)" : "translate(0, 350px)";
-                barData[j].bgStripe.style.transform = translate;
-                barData[j].leftFixedHolder.style.transform = translate;
-                barData[j].rowFlex.style.transform = translate;
-                barData[j].rowFixed.style.transform = translate;
-            });
         };
-        var rowFixed = svg_row_components_1.createFixedRow(y, requestBarHeight, showDetailsOverlay, leftFixedWidth);
-        var rowFlex = svg_row_components_1.createFlexRow(y, requestBarHeight, showDetailsOverlay);
-        var bgStripe = svg_row_components_1.createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0));
-        //create and attach request block
-        rowFlex.appendChild(rect);
-        //Add create and add warnings
-        svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
-            rowFixed.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
-        });
-        svg_row_components_1.appendRequestLabels(rowFixed, shortLabel, fullLabel);
-        barData.push({
-            rowFlex: rowFlex,
-            rowFixed: rowFixed,
-            leftFixedHolder: leftFixedHolder,
-            bgStripe: bgStripe
-        });
-        flexScaleHolder.appendChild(rowFlex);
-        leftFixedHolder.appendChild(rowFixed);
-        bgStripesHolder.appendChild(bgStripe);
+        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay, onOverlayClose);
+        rowHolder.appendChild(rowItem);
     });
-    flexScaleHolder.appendChild(hoverOverlayHolder);
-    timeLineHolder.appendChild(bgStripesHolder);
-    timeLineHolder.appendChild(flexScaleHolder);
-    timeLineHolder.appendChild(leftFixedHolder);
+    scaleAndMarksHolder.appendChild(hoverOverlayHolder);
+    timeLineHolder.appendChild(scaleAndMarksHolder);
+    timeLineHolder.appendChild(rowHolder);
     timeLineHolder.appendChild(overlayHolder);
     return timeLineHolder;
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/dom":1,"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-details-overlay":10,"./svg-general-components":11,"./svg-indicators":12,"./svg-row-components":13}],10:[function(require,module,exports){
+},{"../helpers/dom":1,"../helpers/svg":4,"./svg-details-overlay":10,"./svg-general-components":11,"./svg-indicators":12,"./svg-row":14}],10:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var dom_1 = require("../helpers/dom");
 function createCloseButtonSvg(y) {
@@ -611,10 +555,9 @@ function createCloseButtonSvg(y) {
     }));
     return closeBtn;
 }
-function createHolder(y, leftFixedWidth) {
+function createHolder(y) {
     var holder = svg_1.default.newEl("g", {
-        "class": "info-overlay-holder",
-        "transform": "translate(-" + leftFixedWidth + ")"
+        "class": "info-overlay-holder"
     });
     var bg = svg_1.default.newEl("rect", {
         "width": "100%",
@@ -802,9 +745,9 @@ function createBody(requestID, block) {
     body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        " + makeTabBtn("Preview", imgTab) + "\n        " + makeTabBtn("General", generalTab) + "\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        " + makeTabBtn("Timings", timingsTab) + "\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      " + imgTab + "\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
     return body;
 }
-function createRowInfoOverlay(indexBackup, barX, y, block, onClose, leftFixedWidth, unit) {
+function createRowInfoOverlay(indexBackup, barX, y, block, onClose, unit) {
     var requestID = parseInt(block.rawResource._index, 10) || indexBackup;
-    var holder = createHolder(y, leftFixedWidth);
+    var holder = createHolder(y);
     var html = svg_1.default.newEl("foreignObject", {
         "width": "100%",
         "height": 250,
@@ -1256,37 +1199,25 @@ exports.appendRequestLabels = appendRequestLabels;
  * Stripe for BG
  * @param  {number}      y              [description]
  * @param  {number}      height         [description]
- * @param  {number}      leftFixedWidth [description]
  * @param  {boolean}     isEven         [description]
- * @return {SVGGElement}                [description]
+ * @return {SVGRectElement}                [description]
  */
-function createBgStripe(y, height, leftFixedWidth, isEven) {
-    var stripeHolder = svg_1.default.newEl("g", {
-        "class": isEven ? "even" : "odd"
-    });
-    stripeHolder.appendChild(svg_1.default.newEl("rect", {
+function createBgStripe(y, height, isEven) {
+    return svg_1.default.newEl("rect", {
         "width": "100%",
         "height": height,
         "x": 0,
         "y": y,
-        "class": "flex"
-    }));
-    stripeHolder.appendChild(svg_1.default.newEl("rect", {
-        "width": leftFixedWidth,
-        "height": height,
-        "x": "-" + leftFixedWidth,
-        "y": y,
-        "class": "fixed"
-    }));
-    return stripeHolder;
+        "class": isEven ? "even" : "odd"
+    });
 }
 exports.createBgStripe = createBgStripe;
-function createFixedRow(y, requestBarHeight, onClick, leftFixedWidth) {
+function createFixedRow(y, requestBarHeight, onClick, leftFixedWidthPerc) {
     var rowFixed = svg_1.default.newEl("g", {
         "class": "row row-fixed"
     });
     rowFixed.appendChild(svg_1.default.newEl("rect", {
-        "width": leftFixedWidth,
+        "width": "100%",
         "height": requestBarHeight,
         "x": "0",
         "y": y,
@@ -1312,4 +1243,59 @@ function createFlexRow(y, requestBarHeight, onClick) {
 }
 exports.createFlexRow = createFlexRow;
 
-},{"../helpers/svg":4}]},{},[5]);
+},{"../helpers/svg":4}],14:[function(require,module,exports){
+var svg_1 = require("../helpers/svg");
+var icons_1 = require("../helpers/icons");
+var misc_1 = require("../helpers/misc");
+var svg_row_components_1 = require("./svg-row-components");
+var svg_indicators_1 = require("./svg-indicators");
+//initial clip path
+var clipPathElProto = svg_1.default.newEl("clipPath", {
+    "id": "titleClipPath"
+});
+clipPathElProto.appendChild(svg_1.default.newEl("rect", {
+    "width": "100%",
+    // "width": `${leftFixedWidthPerc}%`,
+    "height": "100%"
+}));
+//Creates single reques's row
+function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, onDetailsOverlayShow, onOverlayClose) {
+    var y = rectData.y;
+    var requestBarHeight = rectData.height;
+    var rowItem = svg_1.default.newG("row-item");
+    var leftFixedHolder = svg_1.default.newSvg("left-fixed-holder", {
+        "x": "0",
+        "width": leftFixedWidthPerc + "%"
+    });
+    var flexScaleHolder = svg_1.default.newSvg("flex-scale-waterfall", {
+        "x": leftFixedWidthPerc + "%",
+        "width": (100 - leftFixedWidthPerc) + "%"
+    });
+    var rect = svg_row_components_1.createRect(rectData, block.segments);
+    var shortLabel = svg_row_components_1.createRequestLabelClipped(labelXPos, y, misc_1.default.ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
+    var fullLabel = svg_row_components_1.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
+    var rowFixed = svg_row_components_1.createFixedRow(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc);
+    var rowFlex = svg_row_components_1.createFlexRow(y, requestBarHeight, onDetailsOverlayShow);
+    var bgStripe = svg_row_components_1.createBgStripe(y, requestBarHeight, (index % 2 === 0));
+    //create and attach request block
+    rowFlex.appendChild(rect);
+    //Add create and add warnings
+    svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
+        rowFixed.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
+    });
+    //Add create and add warnings
+    svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
+        rowFixed.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
+    });
+    svg_row_components_1.appendRequestLabels(rowFixed, shortLabel, fullLabel);
+    flexScaleHolder.appendChild(rowFlex);
+    leftFixedHolder.appendChild(clipPathElProto.cloneNode(true));
+    leftFixedHolder.appendChild(rowFixed);
+    rowItem.appendChild(bgStripe);
+    rowItem.appendChild(flexScaleHolder);
+    rowItem.appendChild(leftFixedHolder);
+    return rowItem;
+}
+exports.createRow = createRow;
+
+},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":12,"./svg-row-components":13}]},{},[5]);

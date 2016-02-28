@@ -13,7 +13,7 @@ const outputHolder = document.getElementById("output")
 function renderHar(logData: Har) {
   const data = HarTransformer.transfrom(logData)
   dom.removeAllChildren(outputHolder)
-  outputHolder.appendChild(createWaterfallSvg(data, (window.innerWidth > 920 ? 250 : 200), 23))
+  outputHolder.appendChild(createWaterfallSvg(data, 23))
 }
 
 function onFileSubmit(evt) {

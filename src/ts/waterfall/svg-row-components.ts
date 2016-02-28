@@ -137,7 +137,7 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
 
 
 /**
- * Appends the labels to `rowFixed` - TODO: see if this can be done more elegant  
+ * Appends the labels to `rowFixed` - TODO: see if this can be done more elegant
  * @param {SVGGElement}    rowFixed   [description]
  * @param {SVGTextElement} shortLabel [description]
  * @param {SVGGElement}    fullLabel  [description]
@@ -171,42 +171,28 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
  * Stripe for BG
  * @param  {number}      y              [description]
  * @param  {number}      height         [description]
- * @param  {number}      leftFixedWidth [description]
  * @param  {boolean}     isEven         [description]
- * @return {SVGGElement}                [description]
+ * @return {SVGRectElement}                [description]
  */
-export function createBgStripe(y: number, height: number, leftFixedWidth: number, isEven: boolean): SVGGElement {
-  let stripeHolder = svg.newEl("g", {
-    "class": isEven ? "even" : "odd"
-  }) as SVGGElement
-
-  stripeHolder.appendChild(svg.newEl("rect", {
+export function createBgStripe(y: number, height: number, isEven: boolean): SVGRectElement {
+  return svg.newEl("rect", {
     "width": "100%", //make up for the spacing
     "height": height,
     "x": 0,
     "y": y,
-    "class": "flex"
-  }))
-  stripeHolder.appendChild(svg.newEl("rect", {
-    "width": leftFixedWidth, //make up for the spacing
-    "height": height,
-    "x": "-" + leftFixedWidth,
-    "y": y,
-    "class": "fixed"
-  }))
-
-  return stripeHolder
+    "class": isEven ? "even" : "odd"
+  }) as SVGRectElement
 }
 
 
 
-export function createFixedRow(y: number, requestBarHeight: number, onClick: EventListener, leftFixedWidth: number): SVGGElement {
+export function createFixedRow(y: number, requestBarHeight: number, onClick: EventListener, leftFixedWidthPerc: number): SVGGElement {
   let rowFixed = svg.newEl("g", {
     "class": "row row-fixed"
   }) as SVGGElement
 
   rowFixed.appendChild(svg.newEl("rect", {
-    "width": leftFixedWidth,
+    "width": "100%",//leftFixedWidthPerc
     "height": requestBarHeight,
     "x": "0",
     "y": y,
