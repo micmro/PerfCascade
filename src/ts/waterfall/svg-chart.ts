@@ -1,23 +1,17 @@
 import TimeBlock from "../typing/time-block"
 import {WaterfallData} from "../typing/waterfall-data"
+import {RectData} from "../typing/rect-data"
 import svg from "../helpers/svg"
-import misc from "../helpers/misc"
 import {
-createBgRect,
-createTimeScale,
-createMarks,
-makeHoverEvtListeners,
-createAlignmentLines,
+  createBgRect,
+  createTimeScale,
+  createMarks,
+  makeHoverEvtListeners,
+  createAlignmentLines
 } from "./svg-general-components"
-
-import {
-RectData
-} from "./svg-row-components"
 import {createRow} from "./svg-row"
 import {createRowInfoOverlay} from "./svg-details-overlay"
-import {
-getIndicators
-} from "./svg-indicators"
+import {getIndicators} from "./svg-indicators"
 import dom from "../helpers/dom"
 
 

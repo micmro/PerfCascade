@@ -261,7 +261,7 @@ if (location.host.indexOf("127.0.0.1") === 0) {
         .then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 }
 
-},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":9}],6:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":10}],6:[function(require,module,exports){
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
@@ -415,162 +415,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
 },{}],9:[function(require,module,exports){
-var svg_1 = require("../helpers/svg");
-var svg_general_components_1 = require("./svg-general-components");
-var svg_row_1 = require("./svg-row");
-var svg_details_overlay_1 = require("./svg-details-overlay");
-var svg_indicators_1 = require("./svg-indicators");
-var dom_1 = require("../helpers/dom");
-/**
- * Calculate the height of the SVG chart in px
- * @param {any[]}       marks      [description]
- * @param {TimeBlock[]} barsToShow [description]
- * @param  {number} diagramHeight
- * @returns Number
- */
-function getSvgHeight(marks, barsToShow, diagramHeight) {
-    var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
-        return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
-    }, 0);
-    return Math.floor(diagramHeight + maxMarkTextLength + 35);
-}
-/**
- * Entry point to start rendering the full waterfall SVG
- * @param {WaterfallData} data  Object containing the setup parameter
-
- * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
- * @return {SVGSVGElement}            SVG Element ready to render
- */
-function createWaterfallSvg(data, requestBarHeight) {
-    //constants
-    if (requestBarHeight === void 0) { requestBarHeight = 23; }
-    /** Width of bar on left in percentage */
-    var leftFixedWidthPerc = 25;
-    /** horizontal unit (duration in ms of 1%) */
-    var unit = data.durationMs / 100;
-    var barsToShow = data.blocks
-        .filter(function (block) { return (typeof block.start === "number" && typeof block.total === "number"); })
-        .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
-    /** height of the requests part of the diagram in px */
-    var diagramHeight = (barsToShow.length + 1) * requestBarHeight;
-    /** full height of the SVG chart in px */
-    var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
-    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
-    //Main holder
-    var timeLineHolder = svg_1.default.newSvg("water-fall-chart", {
-        "height": chartHolderHeight
-    }, {});
-    var hoverOverlayHolder = svg_1.default.newG("hover-overlays");
-    var overlayHolder = svg_1.default.newG("overlays");
-    var scaleAndMarksHolder = svg_1.default.newSvg("scale-and-marks-holder", {
-        "x": leftFixedWidthPerc + "%",
-        "width": (100 - leftFixedWidthPerc) + "%"
-    });
-    var rowHolder = svg_1.default.newG("rows-holder");
-    var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
-    hoverOverlayHolder.appendChild(hoverEl.startline);
-    hoverOverlayHolder.appendChild(hoverEl.endline);
-    var mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
-    //Start appending SVG elements to the holder element (timeLineHolder)
-    scaleAndMarksHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
-    scaleAndMarksHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
-    data.lines.forEach(function (block, i) {
-        timeLineHolder.appendChild(svg_general_components_1.createBgRect(block, unit, diagramHeight));
-    });
-    //calculate x position for label based on number of icons
-    var labelXPos = barsToShow.reduce(function (prev, curr) {
-        var i = svg_indicators_1.getIndicators(curr, docIsSsl);
-        var lastIndicator = i[i.length - 1];
-        var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
-        return Math.max(prev, x);
-    }, 5);
-    //Main loop to render rows with blocks
-    barsToShow.forEach(function (block, i) {
-        var blockWidth = block.total || 1;
-        var y = requestBarHeight * i;
-        var x = (block.start || 0.001);
-        var rectData = {
-            "width": blockWidth,
-            "height": requestBarHeight,
-            "x": x,
-            "y": y,
-            "cssClass": block.cssClass,
-            "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
-            "unit": unit,
-            "showOverlay": mouseListeners.onMouseEnterPartial,
-            "hideOverlay": mouseListeners.onMouseLeavePartial
-        };
-        var onOverlayClose = function (holder) {
-            overlayHolder.removeChild(holder);
-        };
-        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, unit);
-        var showDetailsOverlay = function (evt) {
-            dom_1.default.removeAllChildren(overlayHolder);
-            //if overlay has a preview image show it
-            var previewImg = infoOverlay.querySelector("img.preview");
-            if (previewImg && !previewImg.src) {
-                previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
-            }
-            overlayHolder.appendChild(infoOverlay);
-        };
-        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay, onOverlayClose);
-        rowHolder.appendChild(rowItem);
-    });
-    scaleAndMarksHolder.appendChild(hoverOverlayHolder);
-    timeLineHolder.appendChild(scaleAndMarksHolder);
-    timeLineHolder.appendChild(rowHolder);
-    timeLineHolder.appendChild(overlayHolder);
-    return timeLineHolder;
-}
-exports.createWaterfallSvg = createWaterfallSvg;
-
-},{"../helpers/dom":1,"../helpers/svg":4,"./svg-details-overlay":10,"./svg-general-components":11,"./svg-indicators":12,"./svg-row":14}],10:[function(require,module,exports){
-var svg_1 = require("../helpers/svg");
-var dom_1 = require("../helpers/dom");
-function createCloseButtonSvg(y) {
-    var closeBtn = svg_1.default.newEl("a", {
-        "class": "info-overlay-close-btn"
-    });
-    closeBtn.appendChild(svg_1.default.newEl("rect", {
-        "width": 25,
-        "height": 25,
-        "x": "100%",
-        "y": y,
-        "rx": 5,
-        "ry": 5
-    }));
-    closeBtn.appendChild(svg_1.default.newEl("text", {
-        "width": 25,
-        "height": 25,
-        "x": "100%",
-        "y": y,
-        "dx": 9,
-        "dy": 17,
-        "fill": "#111",
-        "text": "X",
-        "textAnchor": "middle"
-    }));
-    closeBtn.appendChild(svg_1.default.newEl("title", {
-        "text": "Close Overlay"
-    }));
-    return closeBtn;
-}
-function createHolder(y) {
-    var holder = svg_1.default.newEl("g", {
-        "class": "info-overlay-holder"
-    });
-    var bg = svg_1.default.newEl("rect", {
-        "width": "100%",
-        "height": 350,
-        "x": "0",
-        "y": y,
-        "rx": 2,
-        "ry": 2,
-        "class": "info-overlay"
-    });
-    holder.appendChild(bg);
-    return holder;
-}
 function getKeys(requestID, block) {
     //TODO: dodgy casting - will not work for other adapters
     var entry = block.rawResource;
@@ -708,6 +552,166 @@ function getKeys(requestID, block) {
         }
     };
 }
+exports.getKeys = getKeys;
+
+},{}],10:[function(require,module,exports){
+var svg_1 = require("../helpers/svg");
+var svg_general_components_1 = require("./svg-general-components");
+var svg_row_1 = require("./svg-row");
+var svg_details_overlay_1 = require("./svg-details-overlay");
+var svg_indicators_1 = require("./svg-indicators");
+var dom_1 = require("../helpers/dom");
+/**
+ * Calculate the height of the SVG chart in px
+ * @param {any[]}       marks      [description]
+ * @param {TimeBlock[]} barsToShow [description]
+ * @param  {number} diagramHeight
+ * @returns Number
+ */
+function getSvgHeight(marks, barsToShow, diagramHeight) {
+    var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
+        return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
+    }, 0);
+    return Math.floor(diagramHeight + maxMarkTextLength + 35);
+}
+/**
+ * Entry point to start rendering the full waterfall SVG
+ * @param {WaterfallData} data  Object containing the setup parameter
+
+ * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
+ * @return {SVGSVGElement}            SVG Element ready to render
+ */
+function createWaterfallSvg(data, requestBarHeight) {
+    //constants
+    if (requestBarHeight === void 0) { requestBarHeight = 23; }
+    /** Width of bar on left in percentage */
+    var leftFixedWidthPerc = 25;
+    /** horizontal unit (duration in ms of 1%) */
+    var unit = data.durationMs / 100;
+    var barsToShow = data.blocks
+        .filter(function (block) { return (typeof block.start === "number" && typeof block.total === "number"); })
+        .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
+    /** height of the requests part of the diagram in px */
+    var diagramHeight = (barsToShow.length + 1) * requestBarHeight;
+    /** full height of the SVG chart in px */
+    var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
+    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
+    //Main holder
+    var timeLineHolder = svg_1.default.newSvg("water-fall-chart", {
+        "height": chartHolderHeight
+    }, {});
+    var hoverOverlayHolder = svg_1.default.newG("hover-overlays");
+    var overlayHolder = svg_1.default.newG("overlays");
+    var scaleAndMarksHolder = svg_1.default.newSvg("scale-and-marks-holder", {
+        "x": leftFixedWidthPerc + "%",
+        "width": (100 - leftFixedWidthPerc) + "%"
+    });
+    var rowHolder = svg_1.default.newG("rows-holder");
+    var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
+    hoverOverlayHolder.appendChild(hoverEl.startline);
+    hoverOverlayHolder.appendChild(hoverEl.endline);
+    var mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
+    //Start appending SVG elements to the holder element (timeLineHolder)
+    scaleAndMarksHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
+    scaleAndMarksHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
+    data.lines.forEach(function (block, i) {
+        timeLineHolder.appendChild(svg_general_components_1.createBgRect(block, unit, diagramHeight));
+    });
+    //calculate x position for label based on number of icons
+    var labelXPos = barsToShow.reduce(function (prev, curr) {
+        var i = svg_indicators_1.getIndicators(curr, docIsSsl);
+        var lastIndicator = i[i.length - 1];
+        var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
+        return Math.max(prev, x);
+    }, 5);
+    //Main loop to render rows with blocks
+    barsToShow.forEach(function (block, i) {
+        var blockWidth = block.total || 1;
+        var y = requestBarHeight * i;
+        var x = (block.start || 0.001);
+        var rectData = {
+            "width": blockWidth,
+            "height": requestBarHeight,
+            "x": x,
+            "y": y,
+            "cssClass": block.cssClass,
+            "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+            "unit": unit,
+            "showOverlay": mouseListeners.onMouseEnterPartial,
+            "hideOverlay": mouseListeners.onMouseLeavePartial
+        };
+        var onOverlayClose = function (holder) {
+            overlayHolder.removeChild(holder);
+        };
+        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, unit);
+        var showDetailsOverlay = function (evt) {
+            dom_1.default.removeAllChildren(overlayHolder);
+            //if overlay has a preview image show it
+            var previewImg = infoOverlay.querySelector("img.preview");
+            if (previewImg && !previewImg.src) {
+                previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
+            }
+            overlayHolder.appendChild(infoOverlay);
+        };
+        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay, onOverlayClose);
+        rowHolder.appendChild(rowItem);
+    });
+    scaleAndMarksHolder.appendChild(hoverOverlayHolder);
+    timeLineHolder.appendChild(scaleAndMarksHolder);
+    timeLineHolder.appendChild(rowHolder);
+    timeLineHolder.appendChild(overlayHolder);
+    return timeLineHolder;
+}
+exports.createWaterfallSvg = createWaterfallSvg;
+
+},{"../helpers/dom":1,"../helpers/svg":4,"./svg-details-overlay":11,"./svg-general-components":12,"./svg-indicators":13,"./svg-row":15}],11:[function(require,module,exports){
+var svg_1 = require("../helpers/svg");
+var dom_1 = require("../helpers/dom");
+var extract_details_keys_1 = require("./extract-details-keys");
+function createCloseButtonSvg(y) {
+    var closeBtn = svg_1.default.newEl("a", {
+        "class": "info-overlay-close-btn"
+    });
+    closeBtn.appendChild(svg_1.default.newEl("rect", {
+        "width": 25,
+        "height": 25,
+        "x": "100%",
+        "y": y,
+        "rx": 5,
+        "ry": 5
+    }));
+    closeBtn.appendChild(svg_1.default.newEl("text", {
+        "width": 25,
+        "height": 25,
+        "x": "100%",
+        "y": y,
+        "dx": 9,
+        "dy": 17,
+        "fill": "#111",
+        "text": "X",
+        "textAnchor": "middle"
+    }));
+    closeBtn.appendChild(svg_1.default.newEl("title", {
+        "text": "Close Overlay"
+    }));
+    return closeBtn;
+}
+function createHolder(y) {
+    var holder = svg_1.default.newEl("g", {
+        "class": "info-overlay-holder"
+    });
+    var bg = svg_1.default.newEl("rect", {
+        "width": "100%",
+        "height": 350,
+        "x": "0",
+        "y": y,
+        "rx": 2,
+        "ry": 2,
+        "class": "info-overlay"
+    });
+    holder.appendChild(bg);
+    return holder;
+}
 function makeDefinitionList(dlKeyValues) {
     return Object.keys(dlKeyValues)
         .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""); })
@@ -727,7 +731,7 @@ function makeTabBtn(name, tab) {
 function createBody(requestID, block) {
     var body = document.createElement("body");
     body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-    var tabsData = getKeys(requestID, block);
+    var tabsData = extract_details_keys_1.getKeys(requestID, block);
     var generalTab = makeTab(makeDefinitionList(tabsData.general));
     var timingsTab = makeTab(makeDefinitionList(tabsData.timings));
     var requestDl = makeDefinitionList(tabsData.request);
@@ -778,7 +782,7 @@ function createRowInfoOverlay(indexBackup, barX, y, block, onClose, unit) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../helpers/dom":1,"../helpers/svg":4}],11:[function(require,module,exports){
+},{"../helpers/dom":1,"../helpers/svg":4,"./extract-details-keys":9}],12:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -954,7 +958,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../helpers/svg":4}],12:[function(require,module,exports){
+},{"../helpers/svg":4}],13:[function(require,module,exports){
 var misc_1 = require("../helpers/misc");
 function getResponseHeader(entry, headerName) {
     return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
@@ -1062,7 +1066,7 @@ function getIndicators(block, docIsSsl) {
 }
 exports.getIndicators = getIndicators;
 
-},{"../helpers/misc":3}],13:[function(require,module,exports){
+},{"../helpers/misc":3}],14:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1243,11 +1247,11 @@ function createFlexRow(y, requestBarHeight, onClick) {
 }
 exports.createFlexRow = createFlexRow;
 
-},{"../helpers/svg":4}],14:[function(require,module,exports){
+},{"../helpers/svg":4}],15:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var icons_1 = require("../helpers/icons");
 var misc_1 = require("../helpers/misc");
-var svg_row_components_1 = require("./svg-row-components");
+var svg_row_subcomponents_1 = require("./svg-row-subcomponents");
 var svg_indicators_1 = require("./svg-indicators");
 //initial clip path
 var clipPathElProto = svg_1.default.newEl("clipPath", {
@@ -1255,7 +1259,6 @@ var clipPathElProto = svg_1.default.newEl("clipPath", {
 });
 clipPathElProto.appendChild(svg_1.default.newEl("rect", {
     "width": "100%",
-    // "width": `${leftFixedWidthPerc}%`,
     "height": "100%"
 }));
 //Creates single reques's row
@@ -1271,12 +1274,12 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
         "x": leftFixedWidthPerc + "%",
         "width": (100 - leftFixedWidthPerc) + "%"
     });
-    var rect = svg_row_components_1.createRect(rectData, block.segments);
-    var shortLabel = svg_row_components_1.createRequestLabelClipped(labelXPos, y, misc_1.default.ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
-    var fullLabel = svg_row_components_1.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
-    var rowFixed = svg_row_components_1.createFixedRow(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc);
-    var rowFlex = svg_row_components_1.createFlexRow(y, requestBarHeight, onDetailsOverlayShow);
-    var bgStripe = svg_row_components_1.createBgStripe(y, requestBarHeight, (index % 2 === 0));
+    var rect = svg_row_subcomponents_1.createRect(rectData, block.segments);
+    var shortLabel = svg_row_subcomponents_1.createRequestLabelClipped(labelXPos, y, misc_1.default.ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
+    var fullLabel = svg_row_subcomponents_1.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
+    var rowFixed = svg_row_subcomponents_1.createFixedRow(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc);
+    var rowFlex = svg_row_subcomponents_1.createFlexRow(y, requestBarHeight, onDetailsOverlayShow);
+    var bgStripe = svg_row_subcomponents_1.createBgStripe(y, requestBarHeight, (index % 2 === 0));
     //create and attach request block
     rowFlex.appendChild(rect);
     //Add create and add warnings
@@ -1287,7 +1290,7 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
     svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
         rowFixed.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
     });
-    svg_row_components_1.appendRequestLabels(rowFixed, shortLabel, fullLabel);
+    svg_row_subcomponents_1.appendRequestLabels(rowFixed, shortLabel, fullLabel);
     flexScaleHolder.appendChild(rowFlex);
     leftFixedHolder.appendChild(clipPathElProto.cloneNode(true));
     leftFixedHolder.appendChild(rowFixed);
@@ -1298,4 +1301,4 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
 }
 exports.createRow = createRow;
 
-},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":12,"./svg-row-components":13}]},{},[5]);
+},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":13,"./svg-row-subcomponents":14}]},{},[5]);

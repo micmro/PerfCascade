@@ -1,17 +1,17 @@
 import TimeBlock from "../typing/time-block"
+import {RectData} from "../typing/rect-data"
 import svg from "../helpers/svg"
 import icons from "../helpers/icons"
 import misc from "../helpers/misc"
 import {
-RectData,
-createRect,
-createRequestLabelFull,
-createRequestLabelClipped,
-appendRequestLabels,
-createBgStripe,
-createFixedRow,
-createFlexRow
-} from "./svg-row-components"
+  createRect,
+  createRequestLabelFull,
+  createRequestLabelClipped,
+  appendRequestLabels,
+  createBgStripe,
+  createFixedRow,
+  createFlexRow
+} from "./svg-row-subcomponents"
 import {
 Indicator,
 getIndicators
@@ -24,7 +24,6 @@ let clipPathElProto = svg.newEl("clipPath", {
 }) as SVGClipPathElement
 clipPathElProto.appendChild(svg.newEl("rect", {
   "width": "100%",
-  // "width": `${leftFixedWidthPerc}%`,
   "height": "100%"
 }))
 
