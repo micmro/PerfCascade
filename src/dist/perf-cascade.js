@@ -1,4 +1,4 @@
-/*PerfCascade build:28/02/2016 */
+/*PerfCascade build:29/02/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -591,21 +591,25 @@ function createWaterfallSvg(data, requestBarHeight) {
     var barsToShow = data.blocks
         .filter(function (block) { return (typeof block.start === "number" && typeof block.total === "number"); })
         .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
+    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
     /** height of the requests part of the diagram in px */
     var diagramHeight = (barsToShow.length + 1) * requestBarHeight;
     /** full height of the SVG chart in px */
     var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
-    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
-    //Main holder
+    /** Main SVG Element that holds all data */
     var timeLineHolder = svg_1.default.newSvg("water-fall-chart", {
         "height": chartHolderHeight
-    }, {});
+    });
+    /** Holder for on-hover vertical comparison bars */
     var hoverOverlayHolder = svg_1.default.newG("hover-overlays");
+    /** Holder of request-details overlay */
     var overlayHolder = svg_1.default.newG("overlays");
+    /** Holder for scale, event and marks */
     var scaleAndMarksHolder = svg_1.default.newSvg("scale-and-marks-holder", {
         "x": leftFixedWidthPerc + "%",
         "width": (100 - leftFixedWidthPerc) + "%"
     });
+    /** Holds all rows */
     var rowHolder = svg_1.default.newG("rows-holder");
     var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
     hoverOverlayHolder.appendChild(hoverEl.startline);
@@ -624,8 +628,8 @@ function createWaterfallSvg(data, requestBarHeight) {
         var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
         return Math.max(prev, x);
     }, 5);
-    //Main loop to render rows with blocks
-    barsToShow.forEach(function (block, i) {
+    var barEls = [];
+    function renderRow(block, i) {
         var blockWidth = block.total || 1;
         var y = requestBarHeight * i;
         var x = (block.start || 0.001);
@@ -642,6 +646,10 @@ function createWaterfallSvg(data, requestBarHeight) {
         };
         var onOverlayClose = function (holder) {
             overlayHolder.removeChild(holder);
+            barEls.forEach(function (bar, j) {
+                bar.style.transform = "translate(0, 0)";
+            });
+            timeLineHolder.style.height = chartHolderHeight.toString() + "px";
         };
         var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, unit);
         var showDetailsOverlay = function (evt) {
@@ -652,10 +660,22 @@ function createWaterfallSvg(data, requestBarHeight) {
                 previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
             }
             overlayHolder.appendChild(infoOverlay);
+            timeLineHolder.style.height = (chartHolderHeight + 350).toString() + "px";
+            barEls.forEach(function (bar, j) {
+                if (i < j) {
+                    bar.style.transform = "translate(0, 350px)";
+                }
+                else {
+                    bar.style.transform = "translate(0, 0)";
+                }
+            });
         };
         var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay, onOverlayClose);
+        barEls.push(rowItem);
         rowHolder.appendChild(rowItem);
-    });
+    }
+    //Main loop to render rows with blocks
+    barsToShow.forEach(renderRow);
     scaleAndMarksHolder.appendChild(hoverOverlayHolder);
     timeLineHolder.appendChild(scaleAndMarksHolder);
     timeLineHolder.appendChild(rowHolder);

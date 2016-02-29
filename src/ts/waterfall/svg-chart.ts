@@ -45,40 +45,31 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
   /** Width of bar on left in percentage */
   const leftFixedWidthPerc: number = 25
-
   /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100
-
   const barsToShow = data.blocks
     .filter((block) => (typeof block.start === "number" && typeof block.total === "number"))
     .sort((a, b) => (a.start || 0) - (b.start || 0))
-
+  const docIsSsl = (data.blocks[0].name.indexOf("https://") === 0)
   /** height of the requests part of the diagram in px */
   const diagramHeight = (barsToShow.length + 1) * requestBarHeight
-
   /** full height of the SVG chart in px */
   const chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight)
 
-  const docIsSsl = (data.blocks[0].name.indexOf("https://") === 0)
-
-  //Main holder
+  /** Main SVG Element that holds all data */
   let timeLineHolder = svg.newSvg("water-fall-chart", {
     "height": chartHolderHeight
-  }, {
   })
-
-
-
+  /** Holder for on-hover vertical comparison bars */
   let hoverOverlayHolder = svg.newG("hover-overlays")
+  /** Holder of request-details overlay */
   let overlayHolder = svg.newG("overlays")
-
-
-
+  /** Holder for scale, event and marks */
   let scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
     "x": `${leftFixedWidthPerc}%`,
     "width": `${100 - leftFixedWidthPerc}%`
   })
-
+  /** Holds all rows */
   let rowHolder = svg.newG("rows-holder")
 
 
@@ -105,8 +96,9 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
     return Math.max(prev, x)
   }, 5)
 
-  //Main loop to render rows with blocks
-  barsToShow.forEach((block, i) => {
+  let barEls: SVGGElement[] = []
+
+  function renderRow(block, i) {
     const blockWidth = block.total || 1
     const y = requestBarHeight * i
     const x = (block.start || 0.001)
@@ -125,6 +117,10 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
     let onOverlayClose = (holder) => {
       overlayHolder.removeChild(holder)
+      barEls.forEach((bar, j) => {
+        bar.style.transform = "translate(0, 0)"
+      })
+      timeLineHolder.style.height = chartHolderHeight.toString() + "px"
     }
 
     let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, unit)
@@ -137,14 +133,29 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
         previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)
       }
       overlayHolder.appendChild(infoOverlay)
+
+      timeLineHolder.style.height = (chartHolderHeight + 350).toString() + "px"
+      barEls.forEach((bar, j) => {
+
+        if(i < j){
+          bar.style.transform = "translate(0, 350px)"
+        } else {
+          bar.style.transform = "translate(0, 0)"
+        }
+      })
+
     }
 
     let rowItem = createRow(i, rectData, block, labelXPos,
       leftFixedWidthPerc, docIsSsl,
       showDetailsOverlay, onOverlayClose)
 
+    barEls.push(rowItem)
     rowHolder.appendChild(rowItem)
-  })
+  }
+
+  //Main loop to render rows with blocks
+  barsToShow.forEach(renderRow)
 
   scaleAndMarksHolder.appendChild(hoverOverlayHolder)
   timeLineHolder.appendChild(scaleAndMarksHolder)

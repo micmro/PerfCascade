@@ -30,9 +30,9 @@ clipPathElProto.appendChild(svg.newEl("rect", {
 
 
 //Creates single reques's row
-export function createRow(index: number, rectData: RectData,
-  block: TimeBlock, labelXPos: number, leftFixedWidthPerc: number,
-  docIsSsl: boolean, onDetailsOverlayShow: EventListener, onOverlayClose: EventListener): SVGGElement {
+export function createRow(index: number, rectData: RectData, block: TimeBlock,
+  labelXPos: number, leftFixedWidthPerc: number, docIsSsl: boolean,
+  onDetailsOverlayShow: EventListener, onOverlayClose: EventListener): SVGGElement {
 
   const y = rectData.y
   const requestBarHeight = rectData.height
