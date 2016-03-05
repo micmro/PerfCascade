@@ -1,4 +1,4 @@
-/*PerfCascade build:29/02/2016 */
+/*PerfCascade build:05/03/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -633,6 +633,7 @@ function createWaterfallSvg(data, requestBarHeight) {
         var blockWidth = block.total || 1;
         var y = requestBarHeight * i;
         var x = (block.start || 0.001);
+        var accordeonHeight = 450;
         var rectData = {
             "width": blockWidth,
             "height": requestBarHeight,
@@ -651,7 +652,7 @@ function createWaterfallSvg(data, requestBarHeight) {
             });
             timeLineHolder.style.height = chartHolderHeight.toString() + "px";
         };
-        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, unit);
+        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, unit);
         var showDetailsOverlay = function (evt) {
             dom_1.default.removeAllChildren(overlayHolder);
             //if overlay has a preview image show it
@@ -660,10 +661,10 @@ function createWaterfallSvg(data, requestBarHeight) {
                 previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
             }
             overlayHolder.appendChild(infoOverlay);
-            timeLineHolder.style.height = (chartHolderHeight + 350).toString() + "px";
+            timeLineHolder.style.height = (chartHolderHeight + accordeonHeight).toString() + "px";
             barEls.forEach(function (bar, j) {
                 if (i < j) {
-                    bar.style.transform = "translate(0, 350px)";
+                    bar.style.transform = "translate(0, " + accordeonHeight + "px)";
                 }
                 else {
                     bar.style.transform = "translate(0, 0)";
@@ -716,13 +717,13 @@ function createCloseButtonSvg(y) {
     }));
     return closeBtn;
 }
-function createHolder(y) {
+function createHolder(y, accordeonHeight) {
     var holder = svg_1.default.newEl("g", {
         "class": "info-overlay-holder"
     });
     var bg = svg_1.default.newEl("rect", {
         "width": "100%",
-        "height": 350,
+        "height": accordeonHeight,
         "x": "0",
         "y": y,
         "rx": 2,
@@ -745,12 +746,20 @@ function makeTab(innerHtml, renderDl) {
     var inner = renderDl ? "<dl>" + innerHtml + "</dl>" : innerHtml;
     return "<div class=\"tab\">\n    " + inner + "\n  </div>";
 }
+function makeImgTab(accordeonHeight, block) {
+    if (block.requestType !== "image") {
+        return "";
+    }
+    var imgTag = "<img class=\"preview\" style=\"max-height:" + (accordeonHeight - 100) + "px\" data-src=\"" + block.rawResource.request.url + "\" />";
+    return makeTab(imgTag, false);
+}
 function makeTabBtn(name, tab) {
     return !!tab ? "<li><button class=\"tab-button\">" + name + "</button></li>" : "";
 }
-function createBody(requestID, block) {
+function createBody(requestID, block, accordeonHeight) {
     var body = document.createElement("body");
     body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    body.style.height = accordeonHeight + "px";
     var tabsData = extract_details_keys_1.getKeys(requestID, block);
     var generalTab = makeTab(makeDefinitionList(tabsData.general));
     var timingsTab = makeTab(makeDefinitionList(tabsData.timings));
@@ -764,17 +773,16 @@ function createBody(requestID, block) {
         pre[curr.name] = curr.value;
         return pre;
     }, {}));
-    var isImg = block.requestType === "image";
-    var imgTab = isImg ? makeTab("<img class=\"preview\" data-src=\"" + block.rawResource.request.url + "\" />", false) : "";
+    var imgTab = makeImgTab(accordeonHeight, block);
     body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        " + makeTabBtn("Preview", imgTab) + "\n        " + makeTabBtn("General", generalTab) + "\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        " + makeTabBtn("Timings", timingsTab) + "\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      " + imgTab + "\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
     return body;
 }
-function createRowInfoOverlay(indexBackup, barX, y, block, onClose, unit) {
+function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onClose, unit) {
     var requestID = parseInt(block.rawResource._index, 10) || indexBackup;
-    var holder = createHolder(y);
+    var holder = createHolder(y, accordeonHeight);
     var html = svg_1.default.newEl("foreignObject", {
         "width": "100%",
-        "height": 250,
+        "height": accordeonHeight - 100,
         "x": "0",
         "y": y,
         "dy": "5",
@@ -782,7 +790,7 @@ function createRowInfoOverlay(indexBackup, barX, y, block, onClose, unit) {
     });
     var closeBtn = createCloseButtonSvg(y);
     closeBtn.addEventListener("click", function (evt) { return onClose(holder); });
-    var body = createBody(requestID, block);
+    var body = createBody(requestID, block, accordeonHeight);
     var buttons = body.getElementsByClassName("tab-button");
     var tabs = body.getElementsByClassName("tab");
     var setTabStatus = function (index) {

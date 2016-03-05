@@ -39,14 +39,14 @@ function createCloseButtonSvg(y: number): SVGGElement {
 }
 
 
-function createHolder(y: number): SVGGElement {
+function createHolder(y: number, accordeonHeight: number): SVGGElement {
   let holder = svg.newEl("g", {
     "class": "info-overlay-holder"
   }) as SVGGElement
 
   let bg = svg.newEl("rect", {
     "width": "100%",
-    "height": 350,
+    "height": accordeonHeight,
     "x": "0",
     "y": y,
     "rx": 2,
@@ -79,13 +79,22 @@ function makeTab(innerHtml: string, renderDl: boolean = true) {
   </div>`
 }
 
+function makeImgTab(accordeonHeight: number, block: TimeBlock){
+  if (block.requestType !== "image") {
+    return ""
+  }
+  const imgTag = `<img class="preview" style="max-height:${(accordeonHeight - 100)}px" data-src="${block.rawResource.request.url}" />`
+  return makeTab(imgTag, false)
+}
+
 function makeTabBtn(name: string, tab: string) {
   return !!tab ? `<li><button class="tab-button">${name}</button></li>` : ""
 }
 
-function createBody(requestID: number, block: TimeBlock) {
+function createBody(requestID: number, block: TimeBlock, accordeonHeight: number) {
   let body = document.createElement("body");
   body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+  body.style.height = `${accordeonHeight}px`
 
   const tabsData = getKeys(requestID, block)
   const generalTab = makeTab(makeDefinitionList(tabsData.general))
@@ -100,8 +109,7 @@ function createBody(requestID: number, block: TimeBlock) {
     pre[curr.name] = curr.value
     return pre
   }, {}))
-  const isImg = block.requestType === "image"
-  const imgTab = isImg ? makeTab(`<img class="preview" data-src="${block.rawResource.request.url}" />`, false) : ""
+  const imgTab = makeImgTab(accordeonHeight, block)
 
   body.innerHTML = `
     <div class="wrapper">
@@ -147,14 +155,14 @@ function createBody(requestID: number, block: TimeBlock) {
   return body
 }
 
-export function createRowInfoOverlay(indexBackup: number, barX: number,   y: number, block: TimeBlock,
+export function createRowInfoOverlay(indexBackup: number, barX: number,  y: number, accordeonHeight: number, block: TimeBlock,
   onClose: Function, unit: number): SVGGElement {
   const requestID =  parseInt(block.rawResource._index, 10) || indexBackup
-  let holder = createHolder(y)
+  let holder = createHolder(y, accordeonHeight)
 
   let html = svg.newEl("foreignObject", {
     "width": "100%",
-    "height": 250,
+    "height": accordeonHeight - 100,
     "x": "0",
     "y": y,
     "dy": "5",
@@ -165,7 +173,7 @@ export function createRowInfoOverlay(indexBackup: number, barX: number,   y: num
   let closeBtn = createCloseButtonSvg(y)
   closeBtn.addEventListener("click", evt => onClose(holder))
 
-  let body = createBody(requestID, block)
+  let body = createBody(requestID, block, accordeonHeight)
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>
   let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>
 

@@ -102,6 +102,7 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
     const blockWidth = block.total || 1
     const y = requestBarHeight * i
     const x = (block.start || 0.001)
+    const accordeonHeight = 450
 
     const rectData = {
       "width": blockWidth,
@@ -123,7 +124,7 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
       timeLineHolder.style.height = chartHolderHeight.toString() + "px"
     }
 
-    let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, block, onOverlayClose, unit)
+    let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, unit)
 
     let showDetailsOverlay = (evt) => {
       dom.removeAllChildren(overlayHolder)
@@ -134,11 +135,11 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
       }
       overlayHolder.appendChild(infoOverlay)
 
-      timeLineHolder.style.height = (chartHolderHeight + 350).toString() + "px"
+      timeLineHolder.style.height = (chartHolderHeight + accordeonHeight).toString() + "px"
       barEls.forEach((bar, j) => {
 
-        if(i < j){
-          bar.style.transform = "translate(0, 350px)"
+        if (i < j) {
+          bar.style.transform = `translate(0, ${accordeonHeight}px)`
         } else {
           bar.style.transform = "translate(0, 0)"
         }
