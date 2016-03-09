@@ -90,7 +90,7 @@ function getKeys(requestID: number, block: TimeBlock) {
 
   /** get experimental feature */
   let getExp = (name: string): string => {
-    return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || ""
+    return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || ""
   }
 
   let getExpNotNull = (name: string): string => {
@@ -125,7 +125,7 @@ function getKeys(requestID: number, block: TimeBlock) {
       "Error/Status Code": entry.response.status + " " + entry.response.statusText,
       "Server IPAddress": entry.serverIPAddress,
       "Connection": entry.connection,
-      "Browser Priority": getExp("priority") || getExp("initialPriority"),
+      "Browser Priority": getExp("priority") || getExp("initialPriority"),
       "Initiator (Loaded by)": getExp("initiator"),
       "Initiator Line": getExp("initiator_line"),
       "Host": getRequestHeader("Host"),

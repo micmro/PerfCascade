@@ -1,4 +1,4 @@
-/*PerfCascade build:21/02/2016 */
+/*PerfCascade build:08/03/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -422,8 +422,12 @@ function ressourceUrlFormater(url) {
     if ((matches.authority + matches.path).length < maxLength) {
         return matches.authority + matches.path;
     }
+    // maybe we could finetune these numbers
     var p = matches.path.split("/");
-    return matches.authority + "…/" + p[p.length - 1];
+    if (matches.authority.length > 17) {
+        return matches.authority.substr(0, 17) + "..." + p[p.length - 1].substr(-15);
+    }
+    return matches.authority + "..." + p[p.length - 1].substr(-15);
 }
 /**
  * Calculate the height of the SVG chart in px
@@ -530,7 +534,7 @@ function createWaterfallSvg(data, leftFixedWidth, requestBarHeight) {
         var rowFlex = svg_row_components_1.createFlexRow(y, requestBarHeight, showOverlay);
         //create and attach request block
         rowFlex.appendChild(rect);
-        //Add create and add warnings 
+        //Add create and add warnings
         svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
             rowFixed.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
         });
@@ -621,7 +625,7 @@ function getKeys(requestID, block) {
     };
     /** get experimental feature */
     var getExp = function (name) {
-        return entry[name] || entry["_" + name] || "";
+        return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || "";
     };
     var getExpNotNull = function (name) {
         var resp = getExp(name);
@@ -652,7 +656,7 @@ function getKeys(requestID, block) {
             "Error/Status Code": entry.response.status + " " + entry.response.statusText,
             "Server IPAddress": entry.serverIPAddress,
             "Connection": entry.connection,
-            "Browser Priority": getExp("priority"),
+            "Browser Priority": getExp("priority") || getExp("initialPriority"),
             "Initiator (Loaded by)": getExp("initiator"),
             "Initiator Line": getExp("initiator_line"),
             "Host": getRequestHeader("Host"),
