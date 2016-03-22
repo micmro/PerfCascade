@@ -1,128 +1,77 @@
 import TimeBlock from "../typing/time-block"
 import {WaterfallData} from "../typing/waterfall-data"
+import {RectData} from "../typing/rect-data"
 import svg from "../helpers/svg"
-import icons from "../helpers/icons"
-import misc from "../helpers/misc"
 import {
-createBgRect,
-createTimeScale,
-createMarks,
-makeHoverEvtListeners,
-createAlignmentLines,
+  createBgRect,
+  createTimeScale,
+  createMarks,
+  makeHoverEvtListeners,
+  createAlignmentLines
 } from "./svg-general-components"
-
-import {
-RectData,
-createRect,
-createRequestLabelFull,
-createRequestLabelClipped,
-appendRequestLabels,
-createBgStripe,
-createFixedRow,
-createFlexRow
-} from "./svg-row-components"
+import {createRow} from "./svg-row"
 import {createRowInfoOverlay} from "./svg-details-overlay"
-import {
-Indicator,
-getIndicators
-} from "./svg-indicators"
+import {getIndicators} from "./svg-indicators"
 import dom from "../helpers/dom"
 
 
-
-/**
- * Function to format the shortened URL
- * @param  {string} url       URL of ressource
- * @param  {number} maxLength maximal
- * @return {string}           [description]
- */
-function ressourceUrlFormater(url: string): string {
-  const maxLength = 40
-  if (url.length < maxLength) {
-    return url.replace(/http[s]\:\/\//, "")
-  }
-
-  let matches = misc.parseUrl(url)
-
-  if ((matches.authority + matches.path).length < maxLength) {
-    return matches.authority + matches.path
-  }
-
-  // maybe we could finetune these numbers
-  let p = matches.path.split("/")
-  if (matches.authority.length > 17) {
-    return matches.authority.substr(0, 17) + "..." + p[p.length - 1].substr(-15)
-  }
-  return   matches.authority + "..." + p[p.length - 1].substr(-15)
-}
 
 
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
  * @param {TimeBlock[]} barsToShow [description]
+ * @param  {number} diagramHeight
+ * @returns Number
  */
-function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: number) {
+function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: number): number {
   const maxMarkTextLength = marks.reduce((currMax: number, currValue: TimeBlock) => {
     return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0)))
   }, 0)
 
-  return diagramHeight + maxMarkTextLength + 35
+  return Math.floor(diagramHeight + maxMarkTextLength + 35)
 }
 
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
- * @param {leftFixedWidth} number     Width of the url and highlight rule column in pixel
+
  * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
  * @return {SVGSVGElement}            SVG Element ready to render
  */
-export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number = 250, requestBarHeight: number = 23): SVGSVGElement {
+export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number = 23): SVGSVGElement {
 
   //constants
 
+  /** Width of bar on left in percentage */
+  const leftFixedWidthPerc: number = 25
   /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100
-
   const barsToShow = data.blocks
     .filter((block) => (typeof block.start === "number" && typeof block.total === "number"))
     .sort((a, b) => (a.start || 0) - (b.start || 0))
-
+  const docIsSsl = (data.blocks[0].name.indexOf("https://") === 0)
   /** height of the requests part of the diagram in px */
   const diagramHeight = (barsToShow.length + 1) * requestBarHeight
-
   /** full height of the SVG chart in px */
   const chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight)
 
-  const docIsSsl = (data.blocks[0].name.indexOf("https://") === 0)
-
-  //Main holder
+  /** Main SVG Element that holds all data */
   let timeLineHolder = svg.newSvg("water-fall-chart", {
-    "height": Math.floor(chartHolderHeight)
-  }, {
-      "paddingLeft": leftFixedWidth + "px"
-    })
-
-  //Other holder elements
-  let leftFixedHolder = svg.newSvg("left-fixed-holder", {
-    "x": "-" + leftFixedWidth,
-    "width": leftFixedWidth
+    "height": chartHolderHeight
   })
-  let flexScaleHolder = svg.newSvg("flex-scale-waterfall")
-
+  /** Holder for on-hover vertical comparison bars */
   let hoverOverlayHolder = svg.newG("hover-overlays")
+  /** Holder of request-details overlay */
   let overlayHolder = svg.newG("overlays")
-  let bgStripesHolder = svg.newG("bg-stripes")
+  /** Holder for scale, event and marks */
+  let scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
+    "x": `${leftFixedWidthPerc}%`,
+    "width": `${100 - leftFixedWidthPerc}%`
+  })
+  /** Holds all rows */
+  let rowHolder = svg.newG("rows-holder")
 
-  let clipPathEl = svg.newEl("clipPath", {
-    "id": "titleClipPath"
-  }) as SVGClipPathElement
-  clipPathEl.appendChild(svg.newEl("rect", {
-    "width": leftFixedWidth,
-    "height": "100%"
-  }))
-
-  leftFixedHolder.appendChild(clipPathEl)
 
   let hoverEl = createAlignmentLines(diagramHeight)
   hoverOverlayHolder.appendChild(hoverEl.startline)
@@ -132,8 +81,8 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
 
   //Start appending SVG elements to the holder element (timeLineHolder)
 
-  flexScaleHolder.appendChild(createTimeScale(data.durationMs, diagramHeight))
-  flexScaleHolder.appendChild(createMarks(data.marks, unit, diagramHeight))
+  scaleAndMarksHolder.appendChild(createTimeScale(data.durationMs, diagramHeight))
+  scaleAndMarksHolder.appendChild(createMarks(data.marks, unit, diagramHeight))
 
   data.lines.forEach((block, i) => {
     timeLineHolder.appendChild(createBgRect(block, unit, diagramHeight))
@@ -147,12 +96,13 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
     return Math.max(prev, x)
   }, 5)
 
-  //Main loop to render rows with blocks
+  let barEls: SVGGElement[] = []
 
-  barsToShow.forEach((block, i) => {
+  function renderRow(block, i) {
     const blockWidth = block.total || 1
     const y = requestBarHeight * i
     const x = (block.start || 0.001)
+    const accordeonHeight = 450
 
     const rectData = {
       "width": blockWidth,
@@ -166,13 +116,17 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
       "hideOverlay": mouseListeners.onMouseLeavePartial
     } as RectData
 
-    let rect = createRect(rectData, block.segments)
-    let shortLabel = createRequestLabelClipped(labelXPos, y, ressourceUrlFormater(block.name), requestBarHeight, "clipPath")
-    let fullLabel = createRequestLabelFull(labelXPos, y, block.name, requestBarHeight)
+    let onOverlayClose = (holder) => {
+      overlayHolder.removeChild(holder)
+      barEls.forEach((bar, j) => {
+        bar.style.transform = "translate(0, 0)"
+      })
+      timeLineHolder.style.height = chartHolderHeight.toString() + "px"
+    }
 
-    let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, block, leftFixedWidth, unit)
+    let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, unit)
 
-    let showOverlay = (evt) => {
+    let showDetailsOverlay = (evt) => {
       dom.removeAllChildren(overlayHolder)
       //if overlay has a preview image show it
       let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
@@ -180,30 +134,33 @@ export function createWaterfallSvg(data: WaterfallData, leftFixedWidth: number =
         previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)
       }
       overlayHolder.appendChild(infoOverlay)
+
+      timeLineHolder.style.height = (chartHolderHeight + accordeonHeight).toString() + "px"
+      barEls.forEach((bar, j) => {
+
+        if (i < j) {
+          bar.style.transform = `translate(0, ${accordeonHeight}px)`
+        } else {
+          bar.style.transform = "translate(0, 0)"
+        }
+      })
+
     }
-    let rowFixed = createFixedRow(y, requestBarHeight, showOverlay, leftFixedWidth)
-    let rowFlex = createFlexRow(y, requestBarHeight, showOverlay)
 
-    //create and attach request block
-    rowFlex.appendChild(rect)
+    let rowItem = createRow(i, rectData, block, labelXPos,
+      leftFixedWidthPerc, docIsSsl,
+      showDetailsOverlay, onOverlayClose)
 
-    //Add create and add warnings
-    getIndicators(block, docIsSsl).forEach((value: Indicator) => {
-      rowFixed.appendChild(icons[value.type](value.x, y + 3, value.title))
-    })
+    barEls.push(rowItem)
+    rowHolder.appendChild(rowItem)
+  }
 
-    appendRequestLabels(rowFixed, shortLabel, fullLabel)
+  //Main loop to render rows with blocks
+  barsToShow.forEach(renderRow)
 
-    flexScaleHolder.appendChild(rowFlex)
-    leftFixedHolder.appendChild(rowFixed)
-    bgStripesHolder.appendChild(createBgStripe(y, requestBarHeight, leftFixedWidth, (i % 2 === 0)))
-  })
-
-  flexScaleHolder.appendChild(hoverOverlayHolder)
-
-  timeLineHolder.appendChild(bgStripesHolder)
-  timeLineHolder.appendChild(flexScaleHolder)
-  timeLineHolder.appendChild(leftFixedHolder)
+  scaleAndMarksHolder.appendChild(hoverOverlayHolder)
+  timeLineHolder.appendChild(scaleAndMarksHolder)
+  timeLineHolder.appendChild(rowHolder)
   timeLineHolder.appendChild(overlayHolder)
 
   return timeLineHolder
