@@ -176,7 +176,7 @@ export function createFixedRow(y: number, requestBarHeight: number, onClick: Eve
   }) as SVGGElement
 
   rowFixed.appendChild(svg.newEl("rect", {
-    "width": "100%",//leftFixedWidthPerc
+    "width": "100%", //leftFixedWidthPerc
     "height": requestBarHeight,
     "x": "0",
     "y": y,

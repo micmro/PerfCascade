@@ -129,9 +129,9 @@ var misc = {
         // maybe we could finetune these numbers
         var p = matches.path.split("/");
         if (matches.authority.length > 17) {
-            return matches.authority.substr(0, 17) + '...' + p[p.length - 1].substr(-15);
+            return matches.authority.substr(0, 17) + "..." + p[p.length - 1].substr(-15);
         }
-        return matches.authority + '...' + p[p.length - 1].substr(-15);
+        return matches.authority + "..." + p[p.length - 1].substr(-15);
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });

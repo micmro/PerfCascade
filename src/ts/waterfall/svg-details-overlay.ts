@@ -77,7 +77,7 @@ function makeTab(innerHtml: string, renderDl: boolean = true) {
   </div>`
 }
 
-function makeImgTab(accordeonHeight: number, block: TimeBlock){
+function makeImgTab(accordeonHeight: number, block: TimeBlock) {
   if (block.requestType !== "image") {
     return ""
   }
