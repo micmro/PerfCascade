@@ -11,21 +11,19 @@ function createCloseButtonSvg(y: number): SVGGElement {
   }) as SVGGElement
 
   closeBtn.appendChild(svg.newEl("rect", {
-    "width": 25,
-    "height": 25,
+    "width": 23,
+    "height": 23,
     "x": "100%",
-    "y": y,
-    "rx": 5,
-    "ry": 5
+    "y": y
   }))
 
   closeBtn.appendChild(svg.newEl("text", {
-    "width": 25,
-    "height": 25,
+    "width": 23,
+    "height": 23,
     "x": "100%",
     "y": y,
-    "dx": 9,
-    "dy": 17,
+    "dx": 7,
+    "dy": 16,
     "fill": "#111",
     "text": "X",
     "textAnchor": "middle"
