@@ -2,7 +2,7 @@
  * Creation of sub-components used in a ressource request row
  */
 import TimeBlock from "../typing/time-block"
-import {Entry, Header} from "../typing/Har"
+import {Entry, Header} from "../typing/har"
 import misc from "../helpers/misc"
 
 /**
