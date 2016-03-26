@@ -1,4 +1,4 @@
-/*PerfCascade build:22/03/2016 */
+/*PerfCascade build:26/03/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -261,7 +261,7 @@ if (location.host.indexOf("127.0.0.1") === 0) {
         .then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 }
 
-},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":10}],6:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":12}],6:[function(require,module,exports){
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
@@ -555,10 +555,137 @@ function getKeys(requestID, block) {
 exports.getKeys = getKeys;
 
 },{}],10:[function(require,module,exports){
+var extract_details_keys_1 = require("./extract-details-keys");
+function makeDefinitionList(dlKeyValues) {
+    return Object.keys(dlKeyValues)
+        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""); })
+        .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
+}
+function makeTab(innerHtml, renderDl) {
+    if (renderDl === void 0) { renderDl = true; }
+    if (innerHtml.trim() === "") {
+        return "";
+    }
+    var inner = renderDl ? "<dl>" + innerHtml + "</dl>" : innerHtml;
+    return "<div class=\"tab\">\n    " + inner + "\n  </div>";
+}
+function makeImgTab(accordeonHeight, block) {
+    if (block.requestType !== "image") {
+        return "";
+    }
+    var imgTag = "<img class=\"preview\" style=\"max-height:" + (accordeonHeight - 100) + "px\" data-src=\"" + block.rawResource.request.url + "\" />";
+    return makeTab(imgTag, false);
+}
+function makeTabBtn(name, tab) {
+    return !!tab ? "<li><button class=\"tab-button\">" + name + "</button></li>" : "";
+}
+function createDetailsBody(requestID, block, accordeonHeight) {
+    var body = document.createElement("body");
+    body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    body.style.height = accordeonHeight + "px";
+    var tabsData = extract_details_keys_1.getKeys(requestID, block);
+    var generalTab = makeTab(makeDefinitionList(tabsData.general));
+    var timingsTab = makeTab(makeDefinitionList(tabsData.timings));
+    var requestDl = makeDefinitionList(tabsData.request);
+    var requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce(function (pre, curr) {
+        pre[curr.name] = curr.value;
+        return pre;
+    }, {}));
+    var responseDl = makeDefinitionList(tabsData.response);
+    var responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.reduce(function (pre, curr) {
+        pre[curr.name] = curr.value;
+        return pre;
+    }, {}));
+    var imgTab = makeImgTab(accordeonHeight, block);
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        " + makeTabBtn("Preview", imgTab) + "\n        " + makeTabBtn("General", generalTab) + "\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        " + makeTabBtn("Timings", timingsTab) + "\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      " + imgTab + "\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
+    return body;
+}
+exports.createDetailsBody = createDetailsBody;
+
+},{"./extract-details-keys":9}],11:[function(require,module,exports){
+var svg_1 = require("../../helpers/svg");
+var dom_1 = require("../../helpers/dom");
+var html_details_body_1 = require("./html-details-body");
+function createCloseButtonSvg(y) {
+    var closeBtn = svg_1.default.newEl("a", {
+        "class": "info-overlay-close-btn"
+    });
+    closeBtn.appendChild(svg_1.default.newEl("rect", {
+        "width": 23,
+        "height": 23,
+        "x": "100%",
+        "y": y
+    }));
+    closeBtn.appendChild(svg_1.default.newEl("text", {
+        "width": 23,
+        "height": 23,
+        "x": "100%",
+        "y": y,
+        "dx": 7,
+        "dy": 16,
+        "fill": "#111",
+        "text": "X",
+        "textAnchor": "middle"
+    }));
+    closeBtn.appendChild(svg_1.default.newEl("title", {
+        "text": "Close Overlay"
+    }));
+    return closeBtn;
+}
+function createHolder(y, accordeonHeight) {
+    var holder = svg_1.default.newEl("g", {
+        "class": "info-overlay-holder"
+    });
+    var bg = svg_1.default.newEl("rect", {
+        "width": "100%",
+        "height": accordeonHeight,
+        "x": "0",
+        "y": y,
+        "rx": 2,
+        "ry": 2,
+        "class": "info-overlay"
+    });
+    holder.appendChild(bg);
+    return holder;
+}
+function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onClose, unit) {
+    var requestID = parseInt(block.rawResource._index, 10) || indexBackup;
+    var holder = createHolder(y, accordeonHeight);
+    var html = svg_1.default.newEl("foreignObject", {
+        "width": "100%",
+        "height": accordeonHeight - 100,
+        "x": "0",
+        "y": y,
+        "dy": "5",
+        "dx": "5"
+    });
+    var closeBtn = createCloseButtonSvg(y);
+    closeBtn.addEventListener("click", function (evt) { return onClose(holder); });
+    var body = html_details_body_1.createDetailsBody(requestID, block, accordeonHeight);
+    var buttons = body.getElementsByClassName("tab-button");
+    var tabs = body.getElementsByClassName("tab");
+    var setTabStatus = function (index) {
+        dom_1.default.forEach(tabs, function (tab, j) {
+            tab.style.display = (index === j) ? "block" : "none";
+            buttons.item(j).classList.toggle("active", (index === j));
+        });
+    };
+    dom_1.default.forEach(buttons, function (btn, i) {
+        btn.addEventListener("click", function () { setTabStatus(i); });
+    });
+    setTabStatus(0);
+    html.appendChild(body);
+    holder.appendChild(html);
+    holder.appendChild(closeBtn);
+    return holder;
+}
+exports.createRowInfoOverlay = createRowInfoOverlay;
+
+},{"../../helpers/dom":1,"../../helpers/svg":4,"./html-details-body":10}],12:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var svg_general_components_1 = require("./svg-general-components");
 var svg_row_1 = require("./svg-row");
-var svg_details_overlay_1 = require("./svg-details-overlay");
+var svg_details_overlay_1 = require("./details-overlay/svg-details-overlay");
 var svg_indicators_1 = require("./svg-indicators");
 var dom_1 = require("../helpers/dom");
 /**
@@ -685,130 +812,7 @@ function createWaterfallSvg(data, requestBarHeight) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/dom":1,"../helpers/svg":4,"./svg-details-overlay":11,"./svg-general-components":12,"./svg-indicators":13,"./svg-row":15}],11:[function(require,module,exports){
-var svg_1 = require("../helpers/svg");
-var dom_1 = require("../helpers/dom");
-var extract_details_keys_1 = require("./extract-details-keys");
-function createCloseButtonSvg(y) {
-    var closeBtn = svg_1.default.newEl("a", {
-        "class": "info-overlay-close-btn"
-    });
-    closeBtn.appendChild(svg_1.default.newEl("rect", {
-        "width": 23,
-        "height": 23,
-        "x": "100%",
-        "y": y
-    }));
-    closeBtn.appendChild(svg_1.default.newEl("text", {
-        "width": 23,
-        "height": 23,
-        "x": "100%",
-        "y": y,
-        "dx": 7,
-        "dy": 16,
-        "fill": "#111",
-        "text": "X",
-        "textAnchor": "middle"
-    }));
-    closeBtn.appendChild(svg_1.default.newEl("title", {
-        "text": "Close Overlay"
-    }));
-    return closeBtn;
-}
-function createHolder(y, accordeonHeight) {
-    var holder = svg_1.default.newEl("g", {
-        "class": "info-overlay-holder"
-    });
-    var bg = svg_1.default.newEl("rect", {
-        "width": "100%",
-        "height": accordeonHeight,
-        "x": "0",
-        "y": y,
-        "rx": 2,
-        "ry": 2,
-        "class": "info-overlay"
-    });
-    holder.appendChild(bg);
-    return holder;
-}
-function makeDefinitionList(dlKeyValues) {
-    return Object.keys(dlKeyValues)
-        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""); })
-        .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
-}
-function makeTab(innerHtml, renderDl) {
-    if (renderDl === void 0) { renderDl = true; }
-    if (innerHtml.trim() === "") {
-        return "";
-    }
-    var inner = renderDl ? "<dl>" + innerHtml + "</dl>" : innerHtml;
-    return "<div class=\"tab\">\n    " + inner + "\n  </div>";
-}
-function makeImgTab(accordeonHeight, block) {
-    if (block.requestType !== "image") {
-        return "";
-    }
-    var imgTag = "<img class=\"preview\" style=\"max-height:" + (accordeonHeight - 100) + "px\" data-src=\"" + block.rawResource.request.url + "\" />";
-    return makeTab(imgTag, false);
-}
-function makeTabBtn(name, tab) {
-    return !!tab ? "<li><button class=\"tab-button\">" + name + "</button></li>" : "";
-}
-function createBody(requestID, block, accordeonHeight) {
-    var body = document.createElement("body");
-    body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-    body.style.height = accordeonHeight + "px";
-    var tabsData = extract_details_keys_1.getKeys(requestID, block);
-    var generalTab = makeTab(makeDefinitionList(tabsData.general));
-    var timingsTab = makeTab(makeDefinitionList(tabsData.timings));
-    var requestDl = makeDefinitionList(tabsData.request);
-    var requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce(function (pre, curr) {
-        pre[curr.name] = curr.value;
-        return pre;
-    }, {}));
-    var responseDl = makeDefinitionList(tabsData.response);
-    var responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.reduce(function (pre, curr) {
-        pre[curr.name] = curr.value;
-        return pre;
-    }, {}));
-    var imgTab = makeImgTab(accordeonHeight, block);
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        " + makeTabBtn("Preview", imgTab) + "\n        " + makeTabBtn("General", generalTab) + "\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        " + makeTabBtn("Timings", timingsTab) + "\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      " + imgTab + "\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
-    return body;
-}
-function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onClose, unit) {
-    var requestID = parseInt(block.rawResource._index, 10) || indexBackup;
-    var holder = createHolder(y, accordeonHeight);
-    var html = svg_1.default.newEl("foreignObject", {
-        "width": "100%",
-        "height": accordeonHeight - 100,
-        "x": "0",
-        "y": y,
-        "dy": "5",
-        "dx": "5"
-    });
-    var closeBtn = createCloseButtonSvg(y);
-    closeBtn.addEventListener("click", function (evt) { return onClose(holder); });
-    var body = createBody(requestID, block, accordeonHeight);
-    var buttons = body.getElementsByClassName("tab-button");
-    var tabs = body.getElementsByClassName("tab");
-    var setTabStatus = function (index) {
-        dom_1.default.forEach(tabs, function (tab, j) {
-            tab.style.display = (index === j) ? "block" : "none";
-            buttons.item(j).classList.toggle("active", (index === j));
-        });
-    };
-    dom_1.default.forEach(buttons, function (btn, i) {
-        btn.addEventListener("click", function () { setTabStatus(i); });
-    });
-    setTabStatus(0);
-    html.appendChild(body);
-    holder.appendChild(html);
-    holder.appendChild(closeBtn);
-    return holder;
-}
-exports.createRowInfoOverlay = createRowInfoOverlay;
-
-},{"../helpers/dom":1,"../helpers/svg":4,"./extract-details-keys":9}],12:[function(require,module,exports){
+},{"../helpers/dom":1,"../helpers/svg":4,"./details-overlay/svg-details-overlay":11,"./svg-general-components":13,"./svg-indicators":14,"./svg-row":16}],13:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -984,7 +988,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../helpers/svg":4}],13:[function(require,module,exports){
+},{"../helpers/svg":4}],14:[function(require,module,exports){
 var misc_1 = require("../helpers/misc");
 function getResponseHeader(entry, headerName) {
     return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
@@ -1092,7 +1096,7 @@ function getIndicators(block, docIsSsl) {
 }
 exports.getIndicators = getIndicators;
 
-},{"../helpers/misc":3}],14:[function(require,module,exports){
+},{"../helpers/misc":3}],15:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1273,7 +1277,7 @@ function createFlexRow(y, requestBarHeight, onClick) {
 }
 exports.createFlexRow = createFlexRow;
 
-},{"../helpers/svg":4}],15:[function(require,module,exports){
+},{"../helpers/svg":4}],16:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var icons_1 = require("../helpers/icons");
 var misc_1 = require("../helpers/misc");
@@ -1327,4 +1331,4 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
 }
 exports.createRow = createRow;
 
-},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":13,"./svg-row-subcomponents":14}]},{},[5]);
+},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":14,"./svg-row-subcomponents":15}]},{},[5]);

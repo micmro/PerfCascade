@@ -10,7 +10,7 @@ import {
   createAlignmentLines
 } from "./svg-general-components"
 import {createRow} from "./svg-row"
-import {createRowInfoOverlay} from "./svg-details-overlay"
+import {createRowInfoOverlay} from "./details-overlay/svg-details-overlay"
 import {getIndicators} from "./svg-indicators"
 import dom from "../helpers/dom"
 
