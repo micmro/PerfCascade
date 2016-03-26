@@ -261,7 +261,7 @@ if (location.host.indexOf("127.0.0.1") === 0) {
         .then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
 }
 
-},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":12}],6:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":13}],6:[function(require,module,exports){
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
@@ -415,6 +415,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
 },{}],9:[function(require,module,exports){
+function getOverlayOffset(rowIndex, accordeonHeight, openRows) {
+    return openRows.reduce(function (col, overlayIndex) {
+        if (overlayIndex < rowIndex) {
+            return col + accordeonHeight;
+        }
+        return col;
+    }, 0);
+}
+exports.getOverlayOffset = getOverlayOffset;
+function positionOverlayVertically(infoOverlay, y, rowIndex, accordeonHeight, openRows) {
+    var yOffset = this.getOverlayOffset(rowIndex, accordeonHeight, openRows);
+    var combinedAccordeonHeight = accordeonHeight * openRows.length;
+    var yPos = y + yOffset;
+    // dom.removeAllChildren(overlayHolder)
+    // infoOverlay.style.marginTop = `${yOffset}px`
+    infoOverlay.style.transform = "translate(0, " + yOffset + "px)";
+}
+exports.positionOverlayVertically = positionOverlayVertically;
+
+},{}],10:[function(require,module,exports){
 function getKeys(requestID, block) {
     //TODO: dodgy casting - will not work for other adapters
     var entry = block.rawResource;
@@ -554,7 +574,7 @@ function getKeys(requestID, block) {
 }
 exports.getKeys = getKeys;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues) {
     return Object.keys(dlKeyValues)
@@ -602,7 +622,7 @@ function createDetailsBody(requestID, block, accordeonHeight) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":9}],11:[function(require,module,exports){
+},{"./extract-details-keys":10}],12:[function(require,module,exports){
 var svg_1 = require("../../helpers/svg");
 var dom_1 = require("../../helpers/dom");
 var html_details_body_1 = require("./html-details-body");
@@ -633,9 +653,14 @@ function createCloseButtonSvg(y) {
     return closeBtn;
 }
 function createHolder(y, accordeonHeight) {
-    var holder = svg_1.default.newEl("g", {
-        "class": "info-overlay-holder"
+    var innerHolder = svg_1.default.newG("outer-info-overlay-holder", {
+        "width": "100%"
     });
+    //  let innerHolder = svg.newSvg("info-overlay-holder", {
+    //     "width": "100%",
+    //     "x": "0",
+    //     "y": y
+    //   })
     var bg = svg_1.default.newEl("rect", {
         "width": "100%",
         "height": accordeonHeight,
@@ -645,11 +670,14 @@ function createHolder(y, accordeonHeight) {
         "ry": 2,
         "class": "info-overlay"
     });
-    holder.appendChild(bg);
-    return holder;
+    innerHolder.appendChild(bg);
+    return innerHolder;
 }
 function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onClose, unit) {
     var requestID = parseInt(block.rawResource._index, 10) || indexBackup;
+    var wrapper = svg_1.default.newG("outer-info-overlay-holder", {
+        "width": "100%"
+    });
     var holder = createHolder(y, accordeonHeight);
     var html = svg_1.default.newEl("foreignObject", {
         "width": "100%",
@@ -660,7 +688,7 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
         "dx": "5"
     });
     var closeBtn = createCloseButtonSvg(y);
-    closeBtn.addEventListener("click", function (evt) { return onClose(holder); });
+    closeBtn.addEventListener("click", function (evt) { return onClose(wrapper); });
     var body = html_details_body_1.createDetailsBody(requestID, block, accordeonHeight);
     var buttons = body.getElementsByClassName("tab-button");
     var tabs = body.getElementsByClassName("tab");
@@ -677,17 +705,18 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
     html.appendChild(body);
     holder.appendChild(html);
     holder.appendChild(closeBtn);
-    return holder;
+    wrapper.appendChild(holder);
+    return wrapper;
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/dom":1,"../../helpers/svg":4,"./html-details-body":10}],12:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":4,"./html-details-body":11}],13:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var svg_general_components_1 = require("./svg-general-components");
 var svg_row_1 = require("./svg-row");
 var svg_details_overlay_1 = require("./details-overlay/svg-details-overlay");
 var svg_indicators_1 = require("./svg-indicators");
-var dom_1 = require("../helpers/dom");
+var details_overlay_helpers_1 = require("./details-overlay/details-overlay-helpers");
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
@@ -756,6 +785,19 @@ function createWaterfallSvg(data, requestBarHeight) {
         return Math.max(prev, x);
     }, 5);
     var barEls = [];
+    var openRows = [];
+    function getChartHeight(accordeonHeight) {
+        return (chartHolderHeight + (accordeonHeight * openRows.length)).toString() + "px";
+    }
+    //   function positionOverlayVertically(infoOverlay: SVGGElement, y: number, rowIndex: number, accordeonHeight: number) {
+    //     let yOffset = getOverlayOffset(rowIndex, accordeonHeight)
+    //     openRows.push(rowIndex)
+    //     let combinedAccordeonHeight = accordeonHeight * openRows.length
+    //     let yPos = y + yOffset
+    //     // dom.removeAllChildren(overlayHolder)
+    //     // infoOverlay.style.marginTop = `${yOffset}px`
+    //     infoOverlay.style.transform = `translate(0, ${yOffset}px)`
+    // }
     function renderRow(block, i) {
         var blockWidth = block.total || 1;
         var y = requestBarHeight * i;
@@ -773,25 +815,42 @@ function createWaterfallSvg(data, requestBarHeight) {
             "hideOverlay": mouseListeners.onMouseLeavePartial
         };
         var onOverlayClose = function (holder) {
+            console.log(overlayHolder);
             overlayHolder.removeChild(holder);
+            openRows.splice(openRows.indexOf(i));
+            //TODO: adjust for mutiple detail overlays
             barEls.forEach(function (bar, j) {
                 bar.style.transform = "translate(0, 0)";
             });
-            timeLineHolder.style.height = chartHolderHeight.toString() + "px";
+            timeLineHolder.style.height = getChartHeight(accordeonHeight);
         };
         var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, unit);
         var showDetailsOverlay = function (evt) {
-            dom_1.default.removeAllChildren(overlayHolder);
+            openRows.push(i);
+            details_overlay_helpers_1.positionOverlayVertically(infoOverlay, y, i, accordeonHeight, openRows);
+            // let yOffset = getOverlayOffset(i, accordeonHeight)
+            // openRows.push(i)
+            // let combinedAccordeonHeight = accordeonHeight * openRows.length
+            // let yPos = y + yOffset
+            // // dom.removeAllChildren(overlayHolder)
+            // // infoOverlay.style.marginTop = `${yOffset}px`
+            // infoOverlay.style.transform = `translate(0, ${yOffset}px)`
+            // // let fgnObj = infoOverlay.getElementsByTagName("foreignObject")[0] as SVGForeignObjectElement
+            // // fgnObj.
+            // // fgnObj. = `${yPos}px`
+            // // fgnObj.y = `${ddd}px`
+            var combinedAccordeonHeight = accordeonHeight * openRows.length;
             //if overlay has a preview image show it
             var previewImg = infoOverlay.querySelector("img.preview");
             if (previewImg && !previewImg.src) {
                 previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
             }
             overlayHolder.appendChild(infoOverlay);
-            timeLineHolder.style.height = (chartHolderHeight + accordeonHeight).toString() + "px";
+            timeLineHolder.style.height = getChartHeight(accordeonHeight);
+            //TODO: calculate based on where in between multiple detail boxes this is
             barEls.forEach(function (bar, j) {
                 if (i < j) {
-                    bar.style.transform = "translate(0, " + accordeonHeight + "px)";
+                    bar.style.transform = "translate(0, " + combinedAccordeonHeight + "px)";
                 }
                 else {
                     bar.style.transform = "translate(0, 0)";
@@ -812,7 +871,7 @@ function createWaterfallSvg(data, requestBarHeight) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/dom":1,"../helpers/svg":4,"./details-overlay/svg-details-overlay":11,"./svg-general-components":13,"./svg-indicators":14,"./svg-row":16}],13:[function(require,module,exports){
+},{"../helpers/svg":4,"./details-overlay/details-overlay-helpers":9,"./details-overlay/svg-details-overlay":12,"./svg-general-components":14,"./svg-indicators":15,"./svg-row":17}],14:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -988,7 +1047,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../helpers/svg":4}],14:[function(require,module,exports){
+},{"../helpers/svg":4}],15:[function(require,module,exports){
 var misc_1 = require("../helpers/misc");
 function getResponseHeader(entry, headerName) {
     return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
@@ -1096,7 +1155,7 @@ function getIndicators(block, docIsSsl) {
 }
 exports.getIndicators = getIndicators;
 
-},{"../helpers/misc":3}],15:[function(require,module,exports){
+},{"../helpers/misc":3}],16:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1277,7 +1336,7 @@ function createFlexRow(y, requestBarHeight, onClick) {
 }
 exports.createFlexRow = createFlexRow;
 
-},{"../helpers/svg":4}],16:[function(require,module,exports){
+},{"../helpers/svg":4}],17:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var icons_1 = require("../helpers/icons");
 var misc_1 = require("../helpers/misc");
@@ -1331,4 +1390,4 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
 }
 exports.createRow = createRow;
 
-},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":14,"./svg-row-subcomponents":15}]},{},[5]);
+},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":15,"./svg-row-subcomponents":16}]},{},[5]);

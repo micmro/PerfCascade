@@ -12,7 +12,7 @@ import {
 import {createRow} from "./svg-row"
 import {createRowInfoOverlay} from "./details-overlay/svg-details-overlay"
 import {getIndicators} from "./svg-indicators"
-import dom from "../helpers/dom"
+import {positionOverlayVertically} from "./details-overlay/details-overlay-helpers"
 
 
 
@@ -98,7 +98,24 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
   let barEls: SVGGElement[] = []
 
-  function renderRow(block, i) {
+  let openRows: number[] = []
+  function getChartHeight(accordeonHeight: number): string {
+    return (chartHolderHeight + (accordeonHeight * openRows.length)).toString() + "px"
+  }
+
+
+
+//   function positionOverlayVertically(infoOverlay: SVGGElement, y: number, rowIndex: number, accordeonHeight: number) {
+//     let yOffset = getOverlayOffset(rowIndex, accordeonHeight)
+//     openRows.push(rowIndex)
+//     let combinedAccordeonHeight = accordeonHeight * openRows.length
+//     let yPos = y + yOffset
+//     // dom.removeAllChildren(overlayHolder)
+//     // infoOverlay.style.marginTop = `${yOffset}px`
+//     infoOverlay.style.transform = `translate(0, ${yOffset}px)`
+// }
+
+  function renderRow(block: TimeBlock, i: number) {
     const blockWidth = block.total || 1
     const y = requestBarHeight * i
     const x = (block.start || 0.001)
@@ -117,17 +134,37 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
     } as RectData
 
     let onOverlayClose = (holder) => {
+      console.log(overlayHolder)
       overlayHolder.removeChild(holder)
+      openRows.splice(openRows.indexOf(i))
+      //TODO: adjust for mutiple detail overlays
       barEls.forEach((bar, j) => {
         bar.style.transform = "translate(0, 0)"
       })
-      timeLineHolder.style.height = chartHolderHeight.toString() + "px"
+      timeLineHolder.style.height = getChartHeight(accordeonHeight)
     }
 
     let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, unit)
 
+
+
     let showDetailsOverlay = (evt) => {
-      dom.removeAllChildren(overlayHolder)
+      openRows.push(i)
+      positionOverlayVertically(infoOverlay, y, i, accordeonHeight, openRows)
+      // let yOffset = getOverlayOffset(i, accordeonHeight)
+      // openRows.push(i)
+      // let combinedAccordeonHeight = accordeonHeight * openRows.length
+      // let yPos = y + yOffset
+      // // dom.removeAllChildren(overlayHolder)
+      // // infoOverlay.style.marginTop = `${yOffset}px`
+      // infoOverlay.style.transform = `translate(0, ${yOffset}px)`
+      // // let fgnObj = infoOverlay.getElementsByTagName("foreignObject")[0] as SVGForeignObjectElement
+      // // fgnObj.
+      // // fgnObj. = `${yPos}px`
+      // // fgnObj.y = `${ddd}px`
+
+      let combinedAccordeonHeight = accordeonHeight * openRows.length
+
       //if overlay has a preview image show it
       let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
       if (previewImg && !previewImg.src) {
@@ -135,11 +172,12 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
       }
       overlayHolder.appendChild(infoOverlay)
 
-      timeLineHolder.style.height = (chartHolderHeight + accordeonHeight).toString() + "px"
-      barEls.forEach((bar, j) => {
+      timeLineHolder.style.height = getChartHeight(accordeonHeight)
 
+      //TODO: calculate based on where in between multiple detail boxes this is
+      barEls.forEach((bar, j) => {
         if (i < j) {
-          bar.style.transform = `translate(0, ${accordeonHeight}px)`
+          bar.style.transform = `translate(0, ${combinedAccordeonHeight}px)`
         } else {
           bar.style.transform = "translate(0, 0)"
         }

@@ -37,10 +37,17 @@ function createCloseButtonSvg(y: number): SVGGElement {
 }
 
 
-function createHolder(y: number, accordeonHeight: number): SVGGElement {
-  let holder = svg.newEl("g", {
-    "class": "info-overlay-holder"
-  }) as SVGGElement
+function createHolder(y: number, accordeonHeight: number) {
+
+ let innerHolder = svg.newG("outer-info-overlay-holder", {
+    "width": "100%"
+  })
+
+//  let innerHolder = svg.newSvg("info-overlay-holder", {
+//     "width": "100%",
+//     "x": "0",
+//     "y": y
+//   })
 
   let bg = svg.newEl("rect", {
     "width": "100%",
@@ -52,14 +59,16 @@ function createHolder(y: number, accordeonHeight: number): SVGGElement {
     "class": "info-overlay"
   })
 
-  holder.appendChild(bg)
-  return holder
+  innerHolder.appendChild(bg)
+  return innerHolder
 }
-
 
 export function createRowInfoOverlay(indexBackup: number, barX: number,  y: number, accordeonHeight: number, block: TimeBlock,
   onClose: Function, unit: number): SVGGElement {
   const requestID =  parseInt(block.rawResource._index, 10) || indexBackup
+  let wrapper = svg.newG("outer-info-overlay-holder", {
+    "width": "100%"
+  })
   let holder = createHolder(y, accordeonHeight)
 
   let html = svg.newEl("foreignObject", {
@@ -73,7 +82,7 @@ export function createRowInfoOverlay(indexBackup: number, barX: number,  y: numb
 
 
   let closeBtn = createCloseButtonSvg(y)
-  closeBtn.addEventListener("click", evt => onClose(holder))
+  closeBtn.addEventListener("click", evt => onClose(wrapper))
 
   let body = createDetailsBody(requestID, block, accordeonHeight)
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>
@@ -96,6 +105,7 @@ export function createRowInfoOverlay(indexBackup: number, barX: number,  y: numb
   holder.appendChild(html)
   holder.appendChild(closeBtn)
 
+  wrapper.appendChild(holder)
 
-  return holder
+  return wrapper
 }
