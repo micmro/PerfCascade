@@ -39,7 +39,7 @@ function createCloseButtonSvg(y: number): SVGGElement {
 
 function createHolder(y: number, accordeonHeight: number) {
 
- let innerHolder = svg.newG("outer-info-overlay-holder", {
+ let innerHolder = svg.newG("info-overlay-holder", {
     "width": "100%"
   })
 
@@ -71,9 +71,9 @@ export function createRowInfoOverlay(indexBackup: number, barX: number,  y: numb
   })
   let holder = createHolder(y, accordeonHeight)
 
-  let html = svg.newEl("foreignObject", {
+  let foreignObject = svg.newEl("foreignObject", {
     "width": "100%",
-    "height": accordeonHeight - 100,
+    "height": accordeonHeight,
     "x": "0",
     "y": y,
     "dy": "5",
@@ -101,8 +101,8 @@ export function createRowInfoOverlay(indexBackup: number, barX: number,  y: numb
 
   setTabStatus(0)
 
-  html.appendChild(body)
-  holder.appendChild(html)
+  foreignObject.appendChild(body)
+  holder.appendChild(foreignObject)
   holder.appendChild(closeBtn)
 
   wrapper.appendChild(holder)

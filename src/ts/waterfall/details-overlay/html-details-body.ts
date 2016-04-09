@@ -36,9 +36,15 @@ function makeTabBtn(name: string, tab: string) {
 }
 
 export function createDetailsBody(requestID: number, block: TimeBlock, accordeonHeight: number) {
+
+  let html = document.createElement("html") as HTMLHtmlElement
   let body = document.createElement("body");
   body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-  body.style.height = `${accordeonHeight}px`
+  html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/")
+  // html.style.overflow = "crop"
+  // body.style.height = `${accordeonHeight}px`
+  // body.style.overflow = "crop"
+  // body.style.overflow = "scroll"
 
   const tabsData = getKeys(requestID, block)
   const generalTab = makeTab(makeDefinitionList(tabsData.general))
@@ -96,5 +102,7 @@ export function createDetailsBody(requestID: number, block: TimeBlock, accordeon
       </div>
     </div>
     `
-  return body
+
+  html.appendChild(body)
+  return html
 }

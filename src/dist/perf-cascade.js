@@ -1,4 +1,4 @@
-/*PerfCascade build:26/03/2016 */
+/*PerfCascade build:09/04/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -415,26 +415,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
 },{}],9:[function(require,module,exports){
-function getOverlayOffset(rowIndex, accordeonHeight, openRows) {
-    return openRows.reduce(function (col, overlayIndex) {
-        if (overlayIndex < rowIndex) {
-            return col + accordeonHeight;
-        }
-        return col;
-    }, 0);
-}
-exports.getOverlayOffset = getOverlayOffset;
-function positionOverlayVertically(infoOverlay, y, rowIndex, accordeonHeight, openRows) {
-    var yOffset = this.getOverlayOffset(rowIndex, accordeonHeight, openRows);
-    var combinedAccordeonHeight = accordeonHeight * openRows.length;
-    var yPos = y + yOffset;
-    // dom.removeAllChildren(overlayHolder)
-    // infoOverlay.style.marginTop = `${yOffset}px`
-    infoOverlay.style.transform = "translate(0, " + yOffset + "px)";
-}
-exports.positionOverlayVertically = positionOverlayVertically;
-
-},{}],10:[function(require,module,exports){
 function getKeys(requestID, block) {
     //TODO: dodgy casting - will not work for other adapters
     var entry = block.rawResource;
@@ -574,7 +554,7 @@ function getKeys(requestID, block) {
 }
 exports.getKeys = getKeys;
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues) {
     return Object.keys(dlKeyValues)
@@ -600,9 +580,14 @@ function makeTabBtn(name, tab) {
     return !!tab ? "<li><button class=\"tab-button\">" + name + "</button></li>" : "";
 }
 function createDetailsBody(requestID, block, accordeonHeight) {
+    var html = document.createElement("html");
     var body = document.createElement("body");
     body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-    body.style.height = accordeonHeight + "px";
+    html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
+    // html.style.overflow = "crop"
+    // body.style.height = `${accordeonHeight}px`
+    // body.style.overflow = "crop"
+    // body.style.overflow = "scroll"
     var tabsData = extract_details_keys_1.getKeys(requestID, block);
     var generalTab = makeTab(makeDefinitionList(tabsData.general));
     var timingsTab = makeTab(makeDefinitionList(tabsData.timings));
@@ -618,11 +603,92 @@ function createDetailsBody(requestID, block, accordeonHeight) {
     }, {}));
     var imgTab = makeImgTab(accordeonHeight, block);
     body.innerHTML = "\n    <div class=\"wrapper\">\n      <h3>#" + requestID + " " + block.name + "</h3>\n      <nav class=\"tab-nav\">\n      <ul>\n        " + makeTabBtn("Preview", imgTab) + "\n        " + makeTabBtn("General", generalTab) + "\n        <li><button class=\"tab-button\">Request</button></li>\n        <li><button class=\"tab-button\">Response</button></li>\n        " + makeTabBtn("Timings", timingsTab) + "\n        <li><button class=\"tab-button\">Raw Data</button></li>\n      </ul>\n      </nav>\n      " + imgTab + "\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
-    return body;
+    html.appendChild(body);
+    return html;
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":10}],12:[function(require,module,exports){
+},{"./extract-details-keys":9}],11:[function(require,module,exports){
+var svg_details_overlay_1 = require("./svg-details-overlay");
+var openRows = [];
+function getCombinedAccordeonHeight() {
+    return openRows.reduce(function (pre, curr) { return pre + curr.height; }, 0);
+}
+exports.getCombinedAccordeonHeight = getCombinedAccordeonHeight;
+function closeOvelay(holder, overlayHolder) {
+    console.log(overlayHolder);
+    overlayHolder.removeChild(holder);
+    openRows.splice(openRows.reduce(function (prev, curr, index) {
+        return (curr.index === index) ? index : prev;
+    }, -1));
+}
+exports.closeOvelay = closeOvelay;
+function openOverlay(index, barX, y, accordeonHeight, block, onClose, overlayHolder, unit) {
+    var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(index, barX, y, accordeonHeight, block, onClose, unit);
+    //if overlay has a preview image show it
+    var previewImg = infoOverlay.querySelector("img.preview");
+    if (previewImg && !previewImg.src) {
+        previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
+    }
+    overlayHolder.appendChild(infoOverlay);
+    openRows = openRows.map(function (v) {
+        v.height = v.el.getBoundingClientRect().height;
+        return v;
+    }).concat({
+        "index": index,
+        "y": y,
+        "height": infoOverlay.getBoundingClientRect().height,
+        "el": infoOverlay
+    }).sort(function (a, b) { return a.index > b.index ? 1 : -1; });
+    // let yOffset = getOverlayOffset(i, accordeonHeight)
+    // openRows.push(i)
+    // let combinedAccordeonHeight = accordeonHeight * openRows.length
+    // let yPos = y + yOffset
+    // // dom.removeAllChildren(overlayHolder)
+    // // infoOverlay.style.marginTop = `${yOffset}px`
+    // infoOverlay.style.transform = `translate(0, ${yOffset}px)`
+    // // let fgnObj = infoOverlay.getElementsByTagName("foreignObject")[0] as SVGForeignObjectElement
+    // // fgnObj.
+    // // fgnObj. = `${yPos}px`
+    // // fgnObj.y = `${ddd}px`
+    // renderOverlays()
+    positionOverlayVertically(infoOverlay, y, index, openRows);
+    // console.log(infoOverlay.getBoundingClientRect().height)
+}
+exports.openOverlay = openOverlay;
+function getOverlayOffset(rowIndex, openRows) {
+    return openRows.reduce(function (col, overlay) {
+        if (overlay.index < rowIndex) {
+            return col + overlay.height;
+        }
+        return col;
+    }, 0);
+}
+exports.getOverlayOffset = getOverlayOffset;
+function positionOverlayVertically(infoOverlay, y, rowIndex, openRows) {
+    var yOffset = getOverlayOffset(rowIndex, openRows);
+    var combinedAccordeonHeight = getCombinedAccordeonHeight();
+    var yPos = y + yOffset;
+    // dom.removeAllChildren(overlayHolder)
+    // infoOverlay.style.marginTop = `${yOffset}px`
+    // infoOverlay./
+    infoOverlay.style.transform = "translate(0, " + yOffset + "px)";
+    var fgnObj = infoOverlay.getElementsByTagName("foreignObject")[0];
+    var body = (fgnObj.firstChild.firstChild);
+    var wrapper = body.children[0];
+    // console.log(body, wrapper)
+    console.log(infoOverlay.getBoundingClientRect().height);
+    // wrapper.style.height = "450px"
+    // wrapper.style.overflow = "scroll"
+    // body.
+    // fgnObj.style.transform = `translate(0, ${yOffset}px)`
+}
+function renderOverlays(indexBackup, barX, y, accordeonHeight, block, onClose, unit) {
+    // TODO: re-reate all overlays
+    // createRowInfoOverlay
+}
+
+},{"./svg-details-overlay":12}],12:[function(require,module,exports){
 var svg_1 = require("../../helpers/svg");
 var dom_1 = require("../../helpers/dom");
 var html_details_body_1 = require("./html-details-body");
@@ -653,7 +719,7 @@ function createCloseButtonSvg(y) {
     return closeBtn;
 }
 function createHolder(y, accordeonHeight) {
-    var innerHolder = svg_1.default.newG("outer-info-overlay-holder", {
+    var innerHolder = svg_1.default.newG("info-overlay-holder", {
         "width": "100%"
     });
     //  let innerHolder = svg.newSvg("info-overlay-holder", {
@@ -679,9 +745,9 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
         "width": "100%"
     });
     var holder = createHolder(y, accordeonHeight);
-    var html = svg_1.default.newEl("foreignObject", {
+    var foreignObject = svg_1.default.newEl("foreignObject", {
         "width": "100%",
-        "height": accordeonHeight - 100,
+        "height": accordeonHeight,
         "x": "0",
         "y": y,
         "dy": "5",
@@ -702,21 +768,20 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
         btn.addEventListener("click", function () { setTabStatus(i); });
     });
     setTabStatus(0);
-    html.appendChild(body);
-    holder.appendChild(html);
+    foreignObject.appendChild(body);
+    holder.appendChild(foreignObject);
     holder.appendChild(closeBtn);
     wrapper.appendChild(holder);
     return wrapper;
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/dom":1,"../../helpers/svg":4,"./html-details-body":11}],13:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":4,"./html-details-body":10}],13:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var svg_general_components_1 = require("./svg-general-components");
 var svg_row_1 = require("./svg-row");
-var svg_details_overlay_1 = require("./details-overlay/svg-details-overlay");
 var svg_indicators_1 = require("./svg-indicators");
-var details_overlay_helpers_1 = require("./details-overlay/details-overlay-helpers");
+var overlayManager = require("./details-overlay/svg-details-overlay-manager");
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
@@ -786,18 +851,10 @@ function createWaterfallSvg(data, requestBarHeight) {
     }, 5);
     var barEls = [];
     var openRows = [];
-    function getChartHeight(accordeonHeight) {
-        return (chartHolderHeight + (accordeonHeight * openRows.length)).toString() + "px";
+    function getChartHeight() {
+        return (chartHolderHeight + overlayManager.getCombinedAccordeonHeight()).toString() + "px";
     }
-    //   function positionOverlayVertically(infoOverlay: SVGGElement, y: number, rowIndex: number, accordeonHeight: number) {
-    //     let yOffset = getOverlayOffset(rowIndex, accordeonHeight)
-    //     openRows.push(rowIndex)
-    //     let combinedAccordeonHeight = accordeonHeight * openRows.length
-    //     let yPos = y + yOffset
-    //     // dom.removeAllChildren(overlayHolder)
-    //     // infoOverlay.style.marginTop = `${yOffset}px`
-    //     infoOverlay.style.transform = `translate(0, ${yOffset}px)`
-    // }
+    /** Renders single row and hooks up behaviour */
     function renderRow(block, i) {
         var blockWidth = block.total || 1;
         var y = requestBarHeight * i;
@@ -814,39 +871,19 @@ function createWaterfallSvg(data, requestBarHeight) {
             "showOverlay": mouseListeners.onMouseEnterPartial,
             "hideOverlay": mouseListeners.onMouseLeavePartial
         };
+        //TODO: move to factory
         var onOverlayClose = function (holder) {
-            console.log(overlayHolder);
-            overlayHolder.removeChild(holder);
-            openRows.splice(openRows.indexOf(i));
+            overlayManager.closeOvelay(holder, overlayHolder);
             //TODO: adjust for mutiple detail overlays
             barEls.forEach(function (bar, j) {
                 bar.style.transform = "translate(0, 0)";
             });
-            timeLineHolder.style.height = getChartHeight(accordeonHeight);
+            timeLineHolder.style.height = getChartHeight();
         };
-        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, unit);
         var showDetailsOverlay = function (evt) {
-            openRows.push(i);
-            details_overlay_helpers_1.positionOverlayVertically(infoOverlay, y, i, accordeonHeight, openRows);
-            // let yOffset = getOverlayOffset(i, accordeonHeight)
-            // openRows.push(i)
-            // let combinedAccordeonHeight = accordeonHeight * openRows.length
-            // let yPos = y + yOffset
-            // // dom.removeAllChildren(overlayHolder)
-            // // infoOverlay.style.marginTop = `${yOffset}px`
-            // infoOverlay.style.transform = `translate(0, ${yOffset}px)`
-            // // let fgnObj = infoOverlay.getElementsByTagName("foreignObject")[0] as SVGForeignObjectElement
-            // // fgnObj.
-            // // fgnObj. = `${yPos}px`
-            // // fgnObj.y = `${ddd}px`
-            var combinedAccordeonHeight = accordeonHeight * openRows.length;
-            //if overlay has a preview image show it
-            var previewImg = infoOverlay.querySelector("img.preview");
-            if (previewImg && !previewImg.src) {
-                previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
-            }
-            overlayHolder.appendChild(infoOverlay);
-            timeLineHolder.style.height = getChartHeight(accordeonHeight);
+            overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, overlayHolder, unit);
+            var combinedAccordeonHeight = overlayManager.getCombinedAccordeonHeight();
+            timeLineHolder.style.height = getChartHeight();
             //TODO: calculate based on where in between multiple detail boxes this is
             barEls.forEach(function (bar, j) {
                 if (i < j) {
@@ -871,7 +908,7 @@ function createWaterfallSvg(data, requestBarHeight) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":4,"./details-overlay/details-overlay-helpers":9,"./details-overlay/svg-details-overlay":12,"./svg-general-components":14,"./svg-indicators":15,"./svg-row":17}],14:[function(require,module,exports){
+},{"../helpers/svg":4,"./details-overlay/svg-details-overlay-manager":11,"./svg-general-components":14,"./svg-indicators":15,"./svg-row":17}],14:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */

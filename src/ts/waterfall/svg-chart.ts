@@ -10,10 +10,9 @@ import {
   createAlignmentLines
 } from "./svg-general-components"
 import {createRow} from "./svg-row"
-import {createRowInfoOverlay} from "./details-overlay/svg-details-overlay"
 import {getIndicators} from "./svg-indicators"
-import {positionOverlayVertically} from "./details-overlay/details-overlay-helpers"
-
+import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
+import {OpenRowMeta} from "../typing/open-row-meta"
 
 
 
@@ -98,23 +97,13 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
   let barEls: SVGGElement[] = []
 
-  let openRows: number[] = []
-  function getChartHeight(accordeonHeight: number): string {
-    return (chartHolderHeight + (accordeonHeight * openRows.length)).toString() + "px"
+
+  let openRows: OpenRowMeta[] = []
+  function getChartHeight(): string {
+    return (chartHolderHeight + overlayManager.getCombinedAccordeonHeight()).toString() + "px"
   }
 
-
-
-//   function positionOverlayVertically(infoOverlay: SVGGElement, y: number, rowIndex: number, accordeonHeight: number) {
-//     let yOffset = getOverlayOffset(rowIndex, accordeonHeight)
-//     openRows.push(rowIndex)
-//     let combinedAccordeonHeight = accordeonHeight * openRows.length
-//     let yPos = y + yOffset
-//     // dom.removeAllChildren(overlayHolder)
-//     // infoOverlay.style.marginTop = `${yOffset}px`
-//     infoOverlay.style.transform = `translate(0, ${yOffset}px)`
-// }
-
+  /** Renders single row and hooks up behaviour */
   function renderRow(block: TimeBlock, i: number) {
     const blockWidth = block.total || 1
     const y = requestBarHeight * i
@@ -133,46 +122,21 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
       "hideOverlay": mouseListeners.onMouseLeavePartial
     } as RectData
 
+    //TODO: move to factory
     let onOverlayClose = (holder) => {
-      console.log(overlayHolder)
-      overlayHolder.removeChild(holder)
-      openRows.splice(openRows.indexOf(i))
+      overlayManager.closeOvelay(holder, overlayHolder)
       //TODO: adjust for mutiple detail overlays
       barEls.forEach((bar, j) => {
         bar.style.transform = "translate(0, 0)"
       })
-      timeLineHolder.style.height = getChartHeight(accordeonHeight)
+      timeLineHolder.style.height = getChartHeight()
     }
-
-    let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, unit)
-
 
 
     let showDetailsOverlay = (evt) => {
-      openRows.push(i)
-      positionOverlayVertically(infoOverlay, y, i, accordeonHeight, openRows)
-      // let yOffset = getOverlayOffset(i, accordeonHeight)
-      // openRows.push(i)
-      // let combinedAccordeonHeight = accordeonHeight * openRows.length
-      // let yPos = y + yOffset
-      // // dom.removeAllChildren(overlayHolder)
-      // // infoOverlay.style.marginTop = `${yOffset}px`
-      // infoOverlay.style.transform = `translate(0, ${yOffset}px)`
-      // // let fgnObj = infoOverlay.getElementsByTagName("foreignObject")[0] as SVGForeignObjectElement
-      // // fgnObj.
-      // // fgnObj. = `${yPos}px`
-      // // fgnObj.y = `${ddd}px`
-
-      let combinedAccordeonHeight = accordeonHeight * openRows.length
-
-      //if overlay has a preview image show it
-      let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
-      if (previewImg && !previewImg.src) {
-        previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)
-      }
-      overlayHolder.appendChild(infoOverlay)
-
-      timeLineHolder.style.height = getChartHeight(accordeonHeight)
+      overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, overlayHolder, unit)
+      let combinedAccordeonHeight = overlayManager.getCombinedAccordeonHeight()
+      timeLineHolder.style.height = getChartHeight()
 
       //TODO: calculate based on where in between multiple detail boxes this is
       barEls.forEach((bar, j) => {
@@ -182,7 +146,6 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
           bar.style.transform = "translate(0, 0)"
         }
       })
-
     }
 
     let rowItem = createRow(i, rectData, block, labelXPos,
