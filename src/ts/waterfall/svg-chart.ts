@@ -134,18 +134,9 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
 
     let showDetailsOverlay = (evt) => {
-      overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, overlayHolder, unit)
+      overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, overlayHolder, barEls, unit)
       let combinedAccordeonHeight = overlayManager.getCombinedAccordeonHeight()
       timeLineHolder.style.height = getChartHeight()
-
-      //TODO: calculate based on where in between multiple detail boxes this is
-      barEls.forEach((bar, j) => {
-        if (i < j) {
-          bar.style.transform = `translate(0, ${combinedAccordeonHeight}px)`
-        } else {
-          bar.style.transform = "translate(0, 0)"
-        }
-      })
     }
 
     let rowItem = createRow(i, rectData, block, labelXPos,
