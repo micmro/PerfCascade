@@ -612,10 +612,10 @@ exports.createDetailsBody = createDetailsBody;
 var svg_details_overlay_1 = require("./svg-details-overlay");
 /** Collection of currely open overlays */
 var openOverlays = [];
-function getCombinedAccordeonHeight() {
+function getCombinedOverlayHeight() {
     return openOverlays.reduce(function (pre, curr) { return pre + curr.height; }, 0);
 }
-exports.getCombinedAccordeonHeight = getCombinedAccordeonHeight;
+exports.getCombinedOverlayHeight = getCombinedOverlayHeight;
 function getOverlayOffset(rowIndex) {
     return openOverlays.reduce(function (col, overlay) {
         if (overlay.index < rowIndex) {
@@ -624,15 +624,20 @@ function getOverlayOffset(rowIndex) {
         return col;
     }, 0);
 }
-function closeOvelay(holder, overlayHolder, barX, accordeonHeigh, barEls, unit) {
-    openOverlays.splice(openOverlays.reduce(function (prev, curr, index) {
-        return (curr.index === index) ? index : prev;
-    }, -1));
+exports.getOverlayOffset = getOverlayOffset;
+function closeOvelay(index, holder, overlayHolder, barX, accordeonHeigh, barEls, unit) {
+    openOverlays.splice(openOverlays.reduce(function (prev, curr, i) {
+        console.log(curr.index, index);
+        return (curr.index === index) ? i : prev;
+    }, -1), 1);
     renderOverlays(barX, accordeonHeigh, overlayHolder, unit);
-    renderBars(barEls);
+    reAlignBars(barEls);
 }
 exports.closeOvelay = closeOvelay;
 function openOverlay(index, barX, y, accordeonHeight, block, onClose, overlayHolder, barEls, unit) {
+    if (openOverlays.filter(function (o) { return o.index === index; }).length > 0) {
+        return;
+    }
     openOverlays.push({
         "index": index,
         "defaultY": y,
@@ -640,14 +645,13 @@ function openOverlay(index, barX, y, accordeonHeight, block, onClose, overlayHol
         "onClose": onClose
     });
     renderOverlays(barX, accordeonHeight, overlayHolder, unit);
-    renderBars(barEls);
+    reAlignBars(barEls);
 }
 exports.openOverlay = openOverlay;
-function renderBars(barEls) {
+function reAlignBars(barEls) {
     barEls.forEach(function (bar, j) {
         var offset = getOverlayOffset(j);
         bar.style.transform = "translate(0, " + offset + "px)";
-        console.log(offset, bar.style.transform);
     });
 }
 function renderOverlays(barX, accordeonHeight, overlayHolder, unit) {
@@ -741,7 +745,7 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
         "dx": "5"
     });
     var closeBtn = createCloseButtonSvg(y);
-    closeBtn.addEventListener("click", function (evt) { return onClose(wrapper); });
+    closeBtn.addEventListener("click", function (evt) { return onClose(indexBackup, holder); });
     var body = html_details_body_1.createDetailsBody(requestID, block, accordeonHeight);
     var buttons = body.getElementsByClassName("tab-button");
     var tabs = body.getElementsByClassName("tab");
@@ -837,9 +841,8 @@ function createWaterfallSvg(data, requestBarHeight) {
         return Math.max(prev, x);
     }, 5);
     var barEls = [];
-    var openRows = [];
     function getChartHeight() {
-        return (chartHolderHeight + overlayManager.getCombinedAccordeonHeight()).toString() + "px";
+        return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px";
     }
     /** Renders single row and hooks up behaviour */
     function renderRow(block, i) {
@@ -859,8 +862,8 @@ function createWaterfallSvg(data, requestBarHeight) {
             "hideOverlay": mouseListeners.onMouseLeavePartial
         };
         //TODO: move to factory
-        var onOverlayClose = function (holder) {
-            overlayManager.closeOvelay(holder, overlayHolder, x, accordeonHeight, barEls, unit);
+        var onOverlayClose = function (indexBackup) {
+            overlayManager.closeOvelay(indexBackup, null, overlayHolder, x, accordeonHeight, barEls, unit);
             timeLineHolder.style.height = getChartHeight();
         };
         var showDetailsOverlay = function (evt) {

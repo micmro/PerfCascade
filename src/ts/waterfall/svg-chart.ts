@@ -12,7 +12,6 @@ import {
 import {createRow} from "./svg-row"
 import {getIndicators} from "./svg-indicators"
 import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
-import {OpenRowMeta} from "../typing/open-row-meta"
 
 
 
@@ -97,10 +96,8 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
   let barEls: SVGGElement[] = []
 
-
-  let openRows: OpenRowMeta[] = []
   function getChartHeight(): string {
-    return (chartHolderHeight + overlayManager.getCombinedAccordeonHeight()).toString() + "px"
+    return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px"
   }
 
   /** Renders single row and hooks up behaviour */
@@ -123,8 +120,8 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
     } as RectData
 
     //TODO: move to factory
-    let onOverlayClose = (holder) => {
-      overlayManager.closeOvelay(holder, overlayHolder, x, accordeonHeight, barEls, unit)
+    let onOverlayClose = (indexBackup) => {
+      overlayManager.closeOvelay(indexBackup, null, overlayHolder, x, accordeonHeight, barEls, unit)
       timeLineHolder.style.height = getChartHeight()
     }
 

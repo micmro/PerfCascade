@@ -82,7 +82,7 @@ export function createRowInfoOverlay(indexBackup: number, barX: number,  y: numb
 
 
   let closeBtn = createCloseButtonSvg(y)
-  closeBtn.addEventListener("click", evt => onClose(wrapper))
+  closeBtn.addEventListener("click", evt => onClose(indexBackup, holder))
 
   let body = createDetailsBody(requestID, block, accordeonHeight)
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>

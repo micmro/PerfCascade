@@ -1,26 +1,15 @@
-import {OpenRowMeta} from "../../typing/open-row-meta"
+import {OpenOverlay} from "../../typing/open-overlay"
 import TimeBlock from "../../typing/time-block"
 import {createRowInfoOverlay} from "./svg-details-overlay"
-
-interface OpenOverlay {
-  index: number
-  defaultY: number
-  block: TimeBlock
-  onClose: Function
-   /* instance  info **/
-  actualY?: number
-  height?: number
-}
-
 
 /** Collection of currely open overlays */
 let openOverlays: OpenOverlay[] = []
 
-export function getCombinedAccordeonHeight() {
+export function getCombinedOverlayHeight() {
   return openOverlays.reduce((pre, curr) => pre + curr.height, 0)
 }
 
-function getOverlayOffset(rowIndex: number): number {
+export function getOverlayOffset(rowIndex: number): number {
   return openOverlays.reduce((col, overlay) => {
     if (overlay.index < rowIndex) {
       return col + overlay.height
@@ -30,14 +19,16 @@ function getOverlayOffset(rowIndex: number): number {
 }
 
 
-
-export function closeOvelay(holder: SVGElement, overlayHolder: SVGGElement,
+export function closeOvelay(index: number, holder: SVGElement, overlayHolder: SVGGElement,
   barX: number, accordeonHeigh: number, barEls: SVGGElement[], unit: number) {
-  openOverlays.splice(openOverlays.reduce((prev: number, curr, index) => {
-    return (curr.index === index) ? index : prev
-  }, -1))
+
+  openOverlays.splice(openOverlays.reduce((prev: number, curr, i) => {
+    console.log(curr.index, index)
+    return (curr.index === index) ? i : prev
+  }, -1), 1)
+
   renderOverlays(barX, accordeonHeigh, overlayHolder, unit)
-  renderBars(barEls)
+  reAlignBars(barEls)
 }
 
 
@@ -45,6 +36,9 @@ export function openOverlay(index: number,
   barX: number,  y: number, accordeonHeight: number, block: TimeBlock,
   onClose: Function, overlayHolder: SVGGElement, barEls: SVGGElement[], unit: number) {
 
+      if(openOverlays.filter((o) => o.index === index).length > 0){
+        return
+      }
       openOverlays.push({
         "index": index,
         "defaultY": y,
@@ -53,15 +47,14 @@ export function openOverlay(index: number,
       })
 
       renderOverlays(barX, accordeonHeight, overlayHolder, unit)
-      renderBars(barEls)
+      reAlignBars(barEls)
 }
 
 
-function renderBars(barEls: SVGGElement[]) {
+function reAlignBars(barEls: SVGGElement[]) {
     barEls.forEach((bar, j) => {
       let offset = getOverlayOffset(j)
       bar.style.transform = `translate(0, ${offset}px)`
-      console.log(offset, bar.style.transform)
     })
 }
 
