@@ -124,11 +124,7 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
     //TODO: move to factory
     let onOverlayClose = (holder) => {
-      overlayManager.closeOvelay(holder, overlayHolder, x, accordeonHeight, unit)
-      //TODO: adjust for mutiple detail overlays
-      barEls.forEach((bar, j) => {
-        bar.style.transform = "translate(0, 0)"
-      })
+      overlayManager.closeOvelay(holder, overlayHolder, x, accordeonHeight, barEls, unit)
       timeLineHolder.style.height = getChartHeight()
     }
 
