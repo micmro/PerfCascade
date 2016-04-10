@@ -14,25 +14,21 @@ interface OpenOverlay {
 
 
 /** Collection of currely open overlays */
-let openRows: OpenRowMeta[] = []
+// let openRows: OpenRowMeta[] = []
 
 /* TODO: use this instead of openrows? */
 let openOverlays: OpenOverlay[] = []
 
 export function getCombinedAccordeonHeight() {
-  return openRows.reduce((pre, curr) => pre + curr.height, 0)
+  return openOverlays.reduce((pre, curr) => pre + curr.height, 0)
 }
 
 
-export function closeOvelay(holder, overlayHolder: SVGGElement) {
-  console.log(overlayHolder)
-  overlayHolder.removeChild(holder)
-  openRows.splice(openRows.reduce((prev: number, curr, index) => {
-    return (curr.index === index) ? index : prev
-  }, -1))
+export function closeOvelay(holder: SVGElement, overlayHolder: SVGGElement, barX: number, accordeonHeigh: number, unit: number) {
   openOverlays.splice(openOverlays.reduce((prev: number, curr, index) => {
     return (curr.index === index) ? index : prev
   }, -1))
+  renderOverlays(barX, accordeonHeigh, overlayHolder, unit)
 }
 
 export function openOverlay(index: number,
@@ -46,18 +42,20 @@ export function openOverlay(index: number,
          - calculate new y
          - update height got next ones y
 
+
+         TODO: adjust event lables
        */
 
       openOverlays.push({
         "index": index,
         "defaultY": y,
         "block": block,
-        "onClose": close
+        "onClose": onClose
       })
 
 
 
-      renderOverlays(index, barX, y, accordeonHeight, block, onClose, overlayHolder, unit)
+      renderOverlays(barX, accordeonHeight, overlayHolder, unit)
       renderBar(index, barEls)
 
       // positionOverlayVertically(infoOverlay, y, index)
@@ -117,30 +115,45 @@ function renderBar(i: number, barEls: SVGGElement[]) {
 // }
 
 
-function renderOverlays(index: number,
-  barX: number,  y: number, accordeonHeight: number, block: TimeBlock,
-  onClose: Function, overlayHolder: SVGGElement, unit: number) {
-
-
-
-      let infoOverlay = createRowInfoOverlay(index, barX, y, accordeonHeight, block, onClose, unit)
-
-        //if overlay has a preview image show it
-      let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
-      if (previewImg && !previewImg.src) {
-        previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)
+function renderOverlays(barX: number, accordeonHeight: number, overlayHolder: SVGGElement, unit: number) {
+      while (overlayHolder.firstChild ) {
+        overlayHolder.removeChild(overlayHolder.firstChild)
       }
-      overlayHolder.appendChild(infoOverlay)
-      openRows = openRows.map(v => {
-        v.height = v.el.getBoundingClientRect().height
-        return v
-      }).concat({
-          "index": index,
-          "y": y,
-          "height": infoOverlay.getBoundingClientRect().height,
-          "el": infoOverlay
-        } as OpenRowMeta
-      ).sort((a, b) => a.index > b.index ? 1 : -1)
+
+      // TODO :change to reduce
+      let currY = 0;
+      openOverlays
+        .sort((a, b) => a.index > b.index ? 1 : -1)
+        .map((overlay) => {
+          let y = overlay.defaultY + currY
+          let infoOverlay = createRowInfoOverlay(overlay.index, barX, y, accordeonHeight, overlay.block, overlay.onClose, unit)
+          //if overlay has a preview image show it
+          let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
+          if (previewImg && !previewImg.src) {
+            previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)
+          }
+          overlayHolder.appendChild(infoOverlay)
+
+          let currHeight = infoOverlay.getBoundingClientRect().height
+          currY += currHeight
+          overlay.actualY = y
+          overlay.height = currHeight
+          return overlay
+        })
+
+      // let infoOverlay = createRowInfoOverlay(index, barX, y, accordeonHeight, block, onClose, unit)
+
+
+      // openRows = openRows.map(v => {
+      //   v.height = v.el.getBoundingClientRect().height
+      //   return v
+      // }).concat({
+      //     "index": index,
+      //     "y": y,
+      //     "height": infoOverlay.getBoundingClientRect().height,
+      //     "el": infoOverlay
+      //   } as OpenRowMeta
+      // ).sort((a, b) => a.index > b.index ? 1 : -1)
 
 
     // TODO: re-reate all overlays

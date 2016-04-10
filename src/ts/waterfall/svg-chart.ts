@@ -124,7 +124,7 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
     //TODO: move to factory
     let onOverlayClose = (holder) => {
-      overlayManager.closeOvelay(holder, overlayHolder)
+      overlayManager.closeOvelay(holder, overlayHolder, x, accordeonHeight, unit)
       //TODO: adjust for mutiple detail overlays
       barEls.forEach((bar, j) => {
         bar.style.transform = "translate(0, 0)"
@@ -135,7 +135,6 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
     let showDetailsOverlay = (evt) => {
       overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, overlayHolder, barEls, unit)
-      let combinedAccordeonHeight = overlayManager.getCombinedAccordeonHeight()
       timeLineHolder.style.height = getChartHeight()
     }
 

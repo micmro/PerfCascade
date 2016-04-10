@@ -1,4 +1,4 @@
-/*PerfCascade build:09/04/2016 */
+/*PerfCascade build:10/04/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -611,22 +611,18 @@ exports.createDetailsBody = createDetailsBody;
 },{"./extract-details-keys":9}],11:[function(require,module,exports){
 var svg_details_overlay_1 = require("./svg-details-overlay");
 /** Collection of currely open overlays */
-var openRows = [];
+// let openRows: OpenRowMeta[] = []
 /* TODO: use this instead of openrows? */
 var openOverlays = [];
 function getCombinedAccordeonHeight() {
-    return openRows.reduce(function (pre, curr) { return pre + curr.height; }, 0);
+    return openOverlays.reduce(function (pre, curr) { return pre + curr.height; }, 0);
 }
 exports.getCombinedAccordeonHeight = getCombinedAccordeonHeight;
-function closeOvelay(holder, overlayHolder) {
-    console.log(overlayHolder);
-    overlayHolder.removeChild(holder);
-    openRows.splice(openRows.reduce(function (prev, curr, index) {
-        return (curr.index === index) ? index : prev;
-    }, -1));
+function closeOvelay(holder, overlayHolder, barX, accordeonHeigh, unit) {
     openOverlays.splice(openOverlays.reduce(function (prev, curr, index) {
         return (curr.index === index) ? index : prev;
     }, -1));
+    renderOverlays(barX, accordeonHeigh, overlayHolder, unit);
 }
 exports.closeOvelay = closeOvelay;
 function openOverlay(index, barX, y, accordeonHeight, block, onClose, overlayHolder, barEls, unit) {
@@ -637,14 +633,16 @@ function openOverlay(index, barX, y, accordeonHeight, block, onClose, overlayHol
        - calculate new y
        - update height got next ones y
 
+
+       TODO: adjust event lables
      */
     openOverlays.push({
         "index": index,
         "defaultY": y,
         "block": block,
-        "onClose": close
+        "onClose": onClose
     });
-    renderOverlays(index, barX, y, accordeonHeight, block, onClose, overlayHolder, unit);
+    renderOverlays(barX, accordeonHeight, overlayHolder, unit);
     renderBar(index, barEls);
     // positionOverlayVertically(infoOverlay, y, index)
     // console.log(infoOverlay.getBoundingClientRect().height)
@@ -688,23 +686,40 @@ function renderBar(i, barEls) {
 //     // body.
 //     // fgnObj.style.transform = `translate(0, ${yOffset}px)`
 // }
-function renderOverlays(index, barX, y, accordeonHeight, block, onClose, overlayHolder, unit) {
-    var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(index, barX, y, accordeonHeight, block, onClose, unit);
-    //if overlay has a preview image show it
-    var previewImg = infoOverlay.querySelector("img.preview");
-    if (previewImg && !previewImg.src) {
-        previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
+function renderOverlays(barX, accordeonHeight, overlayHolder, unit) {
+    while (overlayHolder.firstChild) {
+        overlayHolder.removeChild(overlayHolder.firstChild);
     }
-    overlayHolder.appendChild(infoOverlay);
-    openRows = openRows.map(function (v) {
-        v.height = v.el.getBoundingClientRect().height;
-        return v;
-    }).concat({
-        "index": index,
-        "y": y,
-        "height": infoOverlay.getBoundingClientRect().height,
-        "el": infoOverlay
-    }).sort(function (a, b) { return a.index > b.index ? 1 : -1; });
+    // TODO :change to reduce
+    var currY = 0;
+    openOverlays
+        .sort(function (a, b) { return a.index > b.index ? 1 : -1; })
+        .map(function (overlay) {
+        var y = overlay.defaultY + currY;
+        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(overlay.index, barX, y, accordeonHeight, overlay.block, overlay.onClose, unit);
+        //if overlay has a preview image show it
+        var previewImg = infoOverlay.querySelector("img.preview");
+        if (previewImg && !previewImg.src) {
+            previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
+        }
+        overlayHolder.appendChild(infoOverlay);
+        var currHeight = infoOverlay.getBoundingClientRect().height;
+        currY += currHeight;
+        overlay.actualY = y;
+        overlay.height = currHeight;
+        return overlay;
+    });
+    // let infoOverlay = createRowInfoOverlay(index, barX, y, accordeonHeight, block, onClose, unit)
+    // openRows = openRows.map(v => {
+    //   v.height = v.el.getBoundingClientRect().height
+    //   return v
+    // }).concat({
+    //     "index": index,
+    //     "y": y,
+    //     "height": infoOverlay.getBoundingClientRect().height,
+    //     "el": infoOverlay
+    //   } as OpenRowMeta
+    // ).sort((a, b) => a.index > b.index ? 1 : -1)
     // TODO: re-reate all overlays
     // createRowInfoOverlay
 }
@@ -894,7 +909,7 @@ function createWaterfallSvg(data, requestBarHeight) {
         };
         //TODO: move to factory
         var onOverlayClose = function (holder) {
-            overlayManager.closeOvelay(holder, overlayHolder);
+            overlayManager.closeOvelay(holder, overlayHolder, x, accordeonHeight, unit);
             //TODO: adjust for mutiple detail overlays
             barEls.forEach(function (bar, j) {
                 bar.style.transform = "translate(0, 0)";
@@ -903,7 +918,6 @@ function createWaterfallSvg(data, requestBarHeight) {
         };
         var showDetailsOverlay = function (evt) {
             overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, overlayHolder, barEls, unit);
-            var combinedAccordeonHeight = overlayManager.getCombinedAccordeonHeight();
             timeLineHolder.style.height = getChartHeight();
         };
         var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay, onOverlayClose);
