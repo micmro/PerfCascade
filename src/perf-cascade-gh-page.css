@@ -709,8 +709,10 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}
 .info-overlay-close-btn:focus {border: solid 1px #36c;}
 
-.info-overlay-holder body { position: relative; width:100%; background: #e0e0e0; color: #333;}
-.info-overlay-holder body .wrapper { position: absolute; top: 0; bottom: 0; left: 0; right: 0px; overflow: scroll;}
+.info-overlay-holder * { padding: 0; margin:0; font-size: 12px;}
+.info-overlay-holder body { padding: 0; margin:0; width:100%; background: #e0e0e0; color: #333;}
+.info-overlay-holder body { position: relative;  height: 450px; clear: both;}
+.info-overlay-holder body .wrapper { height: 450px; width: 100%; overflow: scroll;}
 .info-overlay-holder h3 {font-size: 12px; padding: 1em; margin:0; background: #f9f9f9;}
 .info-overlay-holder dt {float: left; clear: both; margin-top: 5px; width: 25%; text-align: right; font-weight: bold; }
 .info-overlay-holder dd {float: left; margin: 5px 0 0 2%; padding: 0 0 0.5em 0;}
@@ -726,6 +728,7 @@ svg.water-fall-chart {width:100%; background:#f0f5f0; overflow: visible;}
 .info-overlay-holder button:focus,.info-overlay-holder button:hover {border-color: #36c;}
 .info-overlay-holder button.active {background: #e0e0e0; cursor: default;}
 
+.info-overlay-holder .tab {height: 350px;}
 .info-overlay-holder .tab { padding:12px 12px 24px; float: left; width:100%; }
 .info-overlay-holder .tab pre {overflow-y: hidden;}
 .info-overlay-holder .tab dl:after {content: ""; display: table; clear: both;}
