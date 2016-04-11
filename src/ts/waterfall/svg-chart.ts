@@ -10,10 +10,8 @@ import {
   createAlignmentLines
 } from "./svg-general-components"
 import {createRow} from "./svg-row"
-import {createRowInfoOverlay} from "./svg-details-overlay"
 import {getIndicators} from "./svg-indicators"
-import dom from "../helpers/dom"
-
+import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
 
 
 
@@ -98,7 +96,12 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
 
   let barEls: SVGGElement[] = []
 
-  function renderRow(block, i) {
+  function getChartHeight(): string {
+    return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px"
+  }
+
+  /** Renders single row and hooks up behaviour */
+  function renderRow(block: TimeBlock, i: number) {
     const blockWidth = block.total || 1
     const y = requestBarHeight * i
     const x = (block.start || 0.001)
@@ -116,35 +119,16 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
       "hideOverlay": mouseListeners.onMouseLeavePartial
     } as RectData
 
-    let onOverlayClose = (holder) => {
-      overlayHolder.removeChild(holder)
-      barEls.forEach((bar, j) => {
-        bar.style.transform = "translate(0, 0)"
-      })
-      timeLineHolder.style.height = chartHolderHeight.toString() + "px"
+    //TODO: move to factory
+    let onOverlayClose = (indexBackup) => {
+      overlayManager.closeOvelay(indexBackup, null, overlayHolder, x, accordeonHeight, barEls, unit)
+      timeLineHolder.style.height = getChartHeight()
     }
 
-    let infoOverlay = createRowInfoOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, unit)
 
     let showDetailsOverlay = (evt) => {
-      dom.removeAllChildren(overlayHolder)
-      //if overlay has a preview image show it
-      let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
-      if (previewImg && !previewImg.src) {
-        previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)
-      }
-      overlayHolder.appendChild(infoOverlay)
-
-      timeLineHolder.style.height = (chartHolderHeight + accordeonHeight).toString() + "px"
-      barEls.forEach((bar, j) => {
-
-        if (i < j) {
-          bar.style.transform = `translate(0, ${accordeonHeight}px)`
-        } else {
-          bar.style.transform = "translate(0, 0)"
-        }
-      })
-
+      overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, overlayHolder, barEls, unit)
+      timeLineHolder.style.height = getChartHeight()
     }
 
     let rowItem = createRow(i, rectData, block, labelXPos,
