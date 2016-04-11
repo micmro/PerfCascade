@@ -1,6 +1,3 @@
-
-import svg from "../../helpers/svg"
-import dom from "../../helpers/dom"
 import TimeBlock from "../../typing/time-block"
 import {getKeys} from "./extract-details-keys"
 
