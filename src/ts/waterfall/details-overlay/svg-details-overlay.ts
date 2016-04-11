@@ -43,12 +43,6 @@ function createHolder(y: number, accordeonHeight: number) {
     "width": "100%"
   })
 
-//  let innerHolder = svg.newSvg("info-overlay-holder", {
-//     "width": "100%",
-//     "x": "0",
-//     "y": y
-//   })
-
   let bg = svg.newEl("rect", {
     "width": "100%",
     "height": accordeonHeight,

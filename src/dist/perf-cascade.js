@@ -1,4 +1,4 @@
-/*PerfCascade build:10/04/2016 */
+/*PerfCascade build:11/04/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -612,10 +612,12 @@ exports.createDetailsBody = createDetailsBody;
 var svg_details_overlay_1 = require("./svg-details-overlay");
 /** Collection of currely open overlays */
 var openOverlays = [];
+/** all open overlays height combined */
 function getCombinedOverlayHeight() {
     return openOverlays.reduce(function (pre, curr) { return pre + curr.height; }, 0);
 }
 exports.getCombinedOverlayHeight = getCombinedOverlayHeight;
+/** y offset to it's default y position */
 function getOverlayOffset(rowIndex) {
     return openOverlays.reduce(function (col, overlay) {
         if (overlay.index < rowIndex) {
@@ -625,15 +627,20 @@ function getOverlayOffset(rowIndex) {
     }, 0);
 }
 exports.getOverlayOffset = getOverlayOffset;
+/**
+ * closes on overlay - rerenders others internaly
+ */
 function closeOvelay(index, holder, overlayHolder, barX, accordeonHeigh, barEls, unit) {
     openOverlays.splice(openOverlays.reduce(function (prev, curr, i) {
-        console.log(curr.index, index);
         return (curr.index === index) ? i : prev;
     }, -1), 1);
     renderOverlays(barX, accordeonHeigh, overlayHolder, unit);
     reAlignBars(barEls);
 }
 exports.closeOvelay = closeOvelay;
+/**
+ * Opens an overlay - rerenders others internaly
+ */
 function openOverlay(index, barX, y, accordeonHeight, block, onClose, overlayHolder, barEls, unit) {
     if (openOverlays.filter(function (o) { return o.index === index; }).length > 0) {
         return;
@@ -648,21 +655,34 @@ function openOverlay(index, barX, y, accordeonHeight, block, onClose, overlayHol
     reAlignBars(barEls);
 }
 exports.openOverlay = openOverlay;
+/**
+ * sets the offset for request-bars
+ * @param  {SVGGElement[]} barEls
+ */
 function reAlignBars(barEls) {
     barEls.forEach(function (bar, j) {
         var offset = getOverlayOffset(j);
         bar.style.transform = "translate(0, " + offset + "px)";
     });
 }
+/**
+ * removes all overlays and renders them again
+ *
+ * @summary this is to re-set the "y" position since there is a bug in chrome with
+ * tranform of an SVG and positioning/scoll of a foreignObjects
+ * @param  {number} barX
+ * @param  {number} accordeonHeight
+ * @param  {SVGGElement} overlayHolder
+ * @param  {number} unit
+ */
 function renderOverlays(barX, accordeonHeight, overlayHolder, unit) {
     while (overlayHolder.firstChild) {
         overlayHolder.removeChild(overlayHolder.firstChild);
     }
-    // TODO :change to reduce
     var currY = 0;
     openOverlays
         .sort(function (a, b) { return a.index > b.index ? 1 : -1; })
-        .map(function (overlay) {
+        .forEach(function (overlay) {
         var y = overlay.defaultY + currY;
         var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(overlay.index, barX, y, accordeonHeight, overlay.block, overlay.onClose, unit);
         //if overlay has a preview image show it
@@ -713,11 +733,6 @@ function createHolder(y, accordeonHeight) {
     var innerHolder = svg_1.default.newG("info-overlay-holder", {
         "width": "100%"
     });
-    //  let innerHolder = svg.newSvg("info-overlay-holder", {
-    //     "width": "100%",
-    //     "x": "0",
-    //     "y": y
-    //   })
     var bg = svg_1.default.newEl("rect", {
         "width": "100%",
         "height": accordeonHeight,
