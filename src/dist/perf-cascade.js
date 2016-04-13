@@ -1,4 +1,4 @@
-/*PerfCascade build:11/04/2016 */
+/*PerfCascade build:13/04/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -254,12 +254,18 @@ function onFileSubmit(evt) {
     reader.readAsText(files[0]);
 }
 document.getElementById("fileinput").addEventListener("change", onFileSubmit, false);
-//TODO: remove Dev/Test only - load test file
-if (location.host.indexOf("127.0.0.1") === 0) {
-    //http://www.webpagetest.org/result/151226_X7_b43d35e592fab70e0ba012fe11a41020/
-    window["fetch"]("test-data/github.com.MODIFIED.151226_X7_b43d35e592fab70e0ba012fe11a41020.har")
-        .then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
+// TEMP: create public and renderHar
+if (window["define"] === undefined) {
+    window["perfCascade"] = {
+        renderHar: renderHar,
+        createWaterfallSvg: svg_chart_1.createWaterfallSvg
+    };
 }
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = {
+    renderHar: renderHar,
+    createWaterfallSvg: svg_chart_1.createWaterfallSvg
+};
 
 },{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":13}],6:[function(require,module,exports){
 var time_block_1 = require("../typing/time-block");

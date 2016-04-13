@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES5",
-    "module": "commonJS",
+    "module": "umd",
     "moduleResolution": "node",
     "sourceMap": true,
     "removeComments": false,

@@ -42,9 +42,16 @@ document.getElementById("fileinput").addEventListener("change", onFileSubmit, fa
 
 
 
-//TODO: remove Dev/Test only - load test file
-if (location.host.indexOf("127.0.0.1") === 0) {
-  //http://www.webpagetest.org/result/151226_X7_b43d35e592fab70e0ba012fe11a41020/
-  window["fetch"]("test-data/github.com.MODIFIED.151226_X7_b43d35e592fab70e0ba012fe11a41020.har")
-    .then(f => f.json().then(j => renderHar(j.log)))
+
+
+// TEMP: create public and renderHar
+if (window["define"] === undefined) {
+  window["perfCascade"] = {
+    renderHar : renderHar,
+    createWaterfallSvg: createWaterfallSvg
+  }
+}
+export default {
+  renderHar : renderHar,
+  createWaterfallSvg: createWaterfallSvg
 }
