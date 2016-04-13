@@ -1,4 +1,4 @@
-*Under active development*
+*Under active development - API, UI and features are not fully completed yet*
 
 # PerfCascase
 Extensible waterfall-viewer that works with HAR and other formats (in the future).
