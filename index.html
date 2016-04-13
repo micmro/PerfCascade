@@ -2,43 +2,58 @@
 <html lang="en-us">
 
 <head>
-    <meta charset="UTF-8">
-    <title>PerfCascade - SVG based HAR Waterfall Viewer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
-    <link rel="stylesheet" href="stylesheets/github-light.css" media="screen">
-    <link rel="stylesheet" href="src/perf-cascade-gh-page.css">
+  <meta charset="UTF-8">
+  <title>PerfCascade - SVG based HAR Waterfall Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+  <link rel="stylesheet" href="stylesheets/github-light.css" media="screen">
+  <link rel="stylesheet" href="src/perf-cascade-gh-page.css">
 </head>
 
 <body>
-    <section class="page-header">
-        <h1 class="project-name">PerfCascade</h1>
-        <h2 class="project-tagline">SVG based HAR Waterfall Viewer</h2>
-        <a href="https://github.com/micmro/PerfCascade" class="btn">View on GitHub</a>
-        <a href="https://github.com/micmro/PerfCascade/zipball/master" class="btn">Download .zip</a>
-        <a href="https://github.com/micmro/PerfCascade/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
-    <section class="main-content">
-        <fieldset>
-            <legend>Try it!</legend>
-            <label for="fileinput">Upload a *.har file to visualize it</label>
-            <input type="file" id="fileinput" />
-        </fieldset>
-        <div id="output"></div>
-        
-    </section>
+  <section class="page-header">
+    <h1 class="project-name">PerfCascade</h1>
+    <h2 class="project-tagline">SVG based HAR Waterfall Viewer</h2>
+    <a href="https://github.com/micmro/PerfCascade" class="btn">View on GitHub</a>
+    <a href="https://github.com/micmro/PerfCascade/zipball/master" class="btn">Download .zip</a>
+    <a href="https://github.com/micmro/PerfCascade/tarball/master" class="btn">Download .tar.gz</a>
+  </section>
+  <section class="main-content">
+    <fieldset>
+      <legend>Try it!</legend>
+      <label for="fileinput">Upload a <code>*.har</code> file to visualize it</label>
+      <input type="file" id="fileinput" />
+      <span>or</span>
+      <button type="button" id="useExample">use example HAR</button>
+    </fieldset>
+    <div id="output"></div>
 
-    <script src="src/perf-cascade.min.js"></script>
-    <script type="text/javascript">
-        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  </section>
+
+  <script src="src/perf-cascade.min.js"></script>
+  <script>
+    document.getElementById("useExample").addEventListener("click", function(){
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', "/src/github.com.prep.har", true);
+      xhr.addEventListener("readystatechange", function(){
+        if (xhr.readyState == 4 && xhr.status == 200) {
+          var response = JSON.parse(xhr.responseText);
+          PerfCascade.renderHar(response.log)
+        }
+      })
+      xhr.send();
+    }, false);
+  </script>
+  <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
         document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-    </script>
-    <script type="text/javascript">
-        try {
+  </script>
+  <script type="text/javascript">
+    try {
             var pageTracker = _gat._getTracker("UA-72364598-1");
             pageTracker._trackPageview();
         } catch (err) {}
-    </script>
+  </script>
 </body>
 
 </html>
