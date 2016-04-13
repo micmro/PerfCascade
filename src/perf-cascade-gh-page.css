@@ -427,9 +427,12 @@ th {
 }
 
 fieldset {border-radius: 0.3rem; font-size: 2em;}
-fieldset label {display: block; font-size: 0.5em;;}
+fieldset label {display: block; font-size: 0.5em;}
+fieldset span {font-size: 0.5em;}
 #fileinput {display: block; padding: 2em 1em; font-size: 0.3em; width: 100%;}
 #fileinput::-webkit-file-upload-button { padding: 1em; font-size: 16px; }
+#useExample {font-size: 0.5em; padding: 0.5em 1em; margin: 0 1em;}
+
 
 #output .wrapper {font-size: 12px;}
 
