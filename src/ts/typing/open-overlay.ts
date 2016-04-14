@@ -10,3 +10,12 @@ export interface OpenOverlay {
   height?: number
 }
 
+export interface OverlayChangeEvent {
+  type: string
+  openOverlays: OpenOverlay[]
+  combinedOverlayHeight: number
+}
+
+export interface OverlayChangeSubscriber {
+  (change: OverlayChangeEvent): void
+}

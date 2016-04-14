@@ -1,4 +1,4 @@
-/*PerfCascade build:13/04/2016 */
+/*PerfCascade build:14/04/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -267,7 +267,7 @@ exports.default = {
     createWaterfallSvg: svg_chart_1.createWaterfallSvg
 };
 
-},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":13}],6:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":14}],6:[function(require,module,exports){
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
@@ -615,7 +615,25 @@ function createDetailsBody(requestID, block, accordeonHeight) {
 exports.createDetailsBody = createDetailsBody;
 
 },{"./extract-details-keys":9}],11:[function(require,module,exports){
+//simple pub/sub for change to the overlay
+exports.eventTypes = {
+    "OPEN": "open",
+    "CLOSE": "closed"
+};
+var subscribers = [];
+function subscribeToOvelayChanges(fn) {
+    subscribers.push(fn);
+}
+exports.subscribeToOvelayChanges = subscribeToOvelayChanges;
+//no need for unsubscribe in the moment
+function publishToOvelayChanges(change) {
+    subscribers.forEach(function (fn) { return fn(change); });
+}
+exports.publishToOvelayChanges = publishToOvelayChanges;
+
+},{}],12:[function(require,module,exports){
 var svg_details_overlay_1 = require("./svg-details-overlay");
+var overlayChangesPubSub = require("./overlay-changes-pub-sub");
 /** Collection of currely open overlays */
 var openOverlays = [];
 /** all open overlays height combined */
@@ -641,13 +659,19 @@ function closeOvelay(index, holder, overlayHolder, barX, accordeonHeigh, barEls,
         return (curr.index === index) ? i : prev;
     }, -1), 1);
     renderOverlays(barX, accordeonHeigh, overlayHolder, unit);
+    overlayChangesPubSub.publishToOvelayChanges({
+        "type": overlayChangesPubSub.eventTypes.CLOSE,
+        "openOverlays": openOverlays,
+        "combinedOverlayHeight": getCombinedOverlayHeight()
+    });
     reAlignBars(barEls);
 }
 exports.closeOvelay = closeOvelay;
 /**
  * Opens an overlay - rerenders others internaly
  */
-function openOverlay(index, barX, y, accordeonHeight, block, onClose, overlayHolder, barEls, unit) {
+function openOverlay(index, barX, y, accordeonHeight, block, overlayHolder, barEls, unit) {
+    var _this = this;
     if (openOverlays.filter(function (o) { return o.index === index; }).length > 0) {
         return;
     }
@@ -655,9 +679,16 @@ function openOverlay(index, barX, y, accordeonHeight, block, onClose, overlayHol
         "index": index,
         "defaultY": y,
         "block": block,
-        "onClose": onClose
+        "onClose": function () {
+            _this.closeOvelay(index, null, overlayHolder, barX, accordeonHeight, barEls, unit);
+        }
     });
     renderOverlays(barX, accordeonHeight, overlayHolder, unit);
+    overlayChangesPubSub.publishToOvelayChanges({
+        "type": overlayChangesPubSub.eventTypes.OPEN,
+        "openOverlays": openOverlays,
+        "combinedOverlayHeight": getCombinedOverlayHeight()
+    });
     reAlignBars(barEls);
 }
 exports.openOverlay = openOverlay;
@@ -705,7 +736,7 @@ function renderOverlays(barX, accordeonHeight, overlayHolder, unit) {
     });
 }
 
-},{"./svg-details-overlay":12}],12:[function(require,module,exports){
+},{"./overlay-changes-pub-sub":11,"./svg-details-overlay":13}],13:[function(require,module,exports){
 var svg_1 = require("../../helpers/svg");
 var dom_1 = require("../../helpers/dom");
 var html_details_body_1 = require("./html-details-body");
@@ -788,12 +819,13 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/dom":1,"../../helpers/svg":4,"./html-details-body":10}],13:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":4,"./html-details-body":10}],14:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var svg_general_components_1 = require("./svg-general-components");
 var svg_row_1 = require("./svg-row");
 var svg_indicators_1 = require("./svg-indicators");
 var overlayManager = require("./details-overlay/svg-details-overlay-manager");
+var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
@@ -865,6 +897,9 @@ function createWaterfallSvg(data, requestBarHeight) {
     function getChartHeight() {
         return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px";
     }
+    overlayChangesPubSub.subscribeToOvelayChanges(function (evt) {
+        timeLineHolder.style.height = getChartHeight();
+    });
     /** Renders single row and hooks up behaviour */
     function renderRow(block, i) {
         var blockWidth = block.total || 1;
@@ -882,16 +917,10 @@ function createWaterfallSvg(data, requestBarHeight) {
             "showOverlay": mouseListeners.onMouseEnterPartial,
             "hideOverlay": mouseListeners.onMouseLeavePartial
         };
-        //TODO: move to factory
-        var onOverlayClose = function (indexBackup) {
-            overlayManager.closeOvelay(indexBackup, null, overlayHolder, x, accordeonHeight, barEls, unit);
-            timeLineHolder.style.height = getChartHeight();
-        };
         var showDetailsOverlay = function (evt) {
-            overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, overlayHolder, barEls, unit);
-            timeLineHolder.style.height = getChartHeight();
+            overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, overlayHolder, barEls, unit);
         };
-        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay, onOverlayClose);
+        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay);
         barEls.push(rowItem);
         rowHolder.appendChild(rowItem);
     }
@@ -905,7 +934,7 @@ function createWaterfallSvg(data, requestBarHeight) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":4,"./details-overlay/svg-details-overlay-manager":11,"./svg-general-components":14,"./svg-indicators":15,"./svg-row":17}],14:[function(require,module,exports){
+},{"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11,"./details-overlay/svg-details-overlay-manager":12,"./svg-general-components":15,"./svg-indicators":16,"./svg-row":18}],15:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1081,7 +1110,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../helpers/svg":4}],15:[function(require,module,exports){
+},{"../helpers/svg":4}],16:[function(require,module,exports){
 var misc_1 = require("../helpers/misc");
 function getResponseHeader(entry, headerName) {
     return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
@@ -1189,7 +1218,7 @@ function getIndicators(block, docIsSsl) {
 }
 exports.getIndicators = getIndicators;
 
-},{"../helpers/misc":3}],16:[function(require,module,exports){
+},{"../helpers/misc":3}],17:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1370,7 +1399,7 @@ function createFlexRow(y, requestBarHeight, onClick) {
 }
 exports.createFlexRow = createFlexRow;
 
-},{"../helpers/svg":4}],17:[function(require,module,exports){
+},{"../helpers/svg":4}],18:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var icons_1 = require("../helpers/icons");
 var misc_1 = require("../helpers/misc");
@@ -1385,7 +1414,7 @@ clipPathElProto.appendChild(svg_1.default.newEl("rect", {
     "height": "100%"
 }));
 //Creates single reques's row
-function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, onDetailsOverlayShow, onOverlayClose) {
+function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, onDetailsOverlayShow) {
     var y = rectData.y;
     var requestBarHeight = rectData.height;
     var rowItem = svg_1.default.newG("row-item");
@@ -1424,4 +1453,4 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
 }
 exports.createRow = createRow;
 
-},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":15,"./svg-row-subcomponents":16}]},{},[5]);
+},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":16,"./svg-row-subcomponents":17}]},{},[5]);

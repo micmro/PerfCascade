@@ -1,6 +1,7 @@
-import {OpenOverlay} from "../../typing/open-overlay"
+import {OpenOverlay, OverlayChangeEvent} from "../../typing/open-overlay"
 import TimeBlock from "../../typing/time-block"
 import {createRowInfoOverlay} from "./svg-details-overlay"
+import * as overlayChangesPubSub from "./overlay-changes-pub-sub"
 
 /** Collection of currely open overlays */
 let openOverlays: OpenOverlay[] = []
@@ -32,6 +33,11 @@ export function closeOvelay(index: number, holder: SVGElement, overlayHolder: SV
   }, -1), 1)
 
   renderOverlays(barX, accordeonHeigh, overlayHolder, unit)
+  overlayChangesPubSub.publishToOvelayChanges({
+    "type" : overlayChangesPubSub.eventTypes.CLOSE,
+    "openOverlays": openOverlays,
+    "combinedOverlayHeight": getCombinedOverlayHeight()
+  } as OverlayChangeEvent)
   reAlignBars(barEls)
 }
 
@@ -39,7 +45,7 @@ export function closeOvelay(index: number, holder: SVGElement, overlayHolder: SV
  * Opens an overlay - rerenders others internaly
  */
 export function openOverlay(index: number, barX: number,  y: number, accordeonHeight: number, block: TimeBlock,
-  onClose: Function, overlayHolder: SVGGElement, barEls: SVGGElement[], unit: number) {
+  overlayHolder: SVGGElement, barEls: SVGGElement[], unit: number) {
 
   if (openOverlays.filter((o) => o.index === index).length > 0) {
     return
@@ -49,10 +55,17 @@ export function openOverlay(index: number, barX: number,  y: number, accordeonHe
     "index": index,
     "defaultY": y,
     "block": block,
-    "onClose": onClose
+    "onClose": () => {
+      this.closeOvelay(index, null, overlayHolder, barX, accordeonHeight, barEls, unit)
+    }
   })
 
   renderOverlays(barX, accordeonHeight, overlayHolder, unit)
+  overlayChangesPubSub.publishToOvelayChanges({
+    "type" : overlayChangesPubSub.eventTypes.OPEN,
+    "openOverlays": openOverlays,
+    "combinedOverlayHeight": getCombinedOverlayHeight()
+  } as OverlayChangeEvent)
   reAlignBars(barEls)
 }
 

@@ -12,7 +12,7 @@ import {
 import {createRow} from "./svg-row"
 import {getIndicators} from "./svg-indicators"
 import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
-
+import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
 
 
 /**
@@ -99,6 +99,9 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
   function getChartHeight(): string {
     return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px"
   }
+  overlayChangesPubSub.subscribeToOvelayChanges((evt) => {
+    timeLineHolder.style.height = getChartHeight()
+  })
 
   /** Renders single row and hooks up behaviour */
   function renderRow(block: TimeBlock, i: number) {
@@ -119,21 +122,13 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
       "hideOverlay": mouseListeners.onMouseLeavePartial
     } as RectData
 
-    //TODO: move to factory
-    let onOverlayClose = (indexBackup) => {
-      overlayManager.closeOvelay(indexBackup, null, overlayHolder, x, accordeonHeight, barEls, unit)
-      timeLineHolder.style.height = getChartHeight()
-    }
-
-
     let showDetailsOverlay = (evt) => {
-      overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, onOverlayClose, overlayHolder, barEls, unit)
-      timeLineHolder.style.height = getChartHeight()
+      overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, overlayHolder, barEls, unit)
     }
 
     let rowItem = createRow(i, rectData, block, labelXPos,
       leftFixedWidthPerc, docIsSsl,
-      showDetailsOverlay, onOverlayClose)
+      showDetailsOverlay)
 
     barEls.push(rowItem)
     rowHolder.appendChild(rowItem)
