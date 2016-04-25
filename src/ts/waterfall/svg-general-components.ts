@@ -5,7 +5,8 @@
 import svg from "../helpers/svg"
 import TimeBlock from "../typing/time-block"
 import {Mark} from "../typing/waterfall-data"
-
+import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
+import {OverlayChangeEvent} from "../typing/open-overlay"
 
 
 export interface HoverElements {
@@ -40,7 +41,7 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
 
 
 /**
- * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover 
+ * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover
  * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
  */
 export function makeHoverEvtListeners(hoverEl: HoverElements) {
@@ -118,6 +119,7 @@ export function createBgRect(block: TimeBlock, unit: number, diagramHeight: numb
   rect.appendChild(svg.newEl("title", {
     "text": block.name
   })) // Add tile to wedge path
+
   return rect
 }
 
@@ -153,13 +155,13 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
     lineLabel.setAttribute("x", x + "%")
     lineLabel.setAttribute("stroke", "")
 
-
-    lineHolder.appendChild(svg.newEl("line", {
+    let line = svg.newEl("line", {
       "x1": x + "%",
       "y1": 0,
       "x2": x + "%",
       "y2": diagramHeight
-    }))
+    }) as SVGLineElement
+    lineHolder.appendChild(line)
 
     const lastMark = marks[i - 1]
     if (lastMark && mark.x - lastMark.x < 1) {
@@ -167,7 +169,19 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       mark.x = lastMark.x + 1
     }
 
-    //would use polyline but can't use percentage for points 
+    overlayChangesPubSub.subscribeToOvelayChanges((change: OverlayChangeEvent) => {
+      let offset = change.combinedOverlayHeight
+      //figure out why there is an offset
+      let scale = (diagramHeight + offset - (change.openOverlays.length * 28)) / (diagramHeight)
+
+      console.log(diagramHeight, offset, scale, change.openOverlays.length, unit);
+
+      lineHolder.setAttribute("transform", `scale(1, ${scale})`)
+
+      lineLabelHolder.setAttribute("transform", `translate(0, ${offset})`)
+    })
+
+    //would use polyline but can't use percentage for points
     lineHolder.appendChild(svg.newEl("line", {
       "x1": x + "%",
       "y1": diagramHeight,
@@ -189,6 +203,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       isActive = false
       svg.removeClass(lineHolder, "active")
     }
+
 
     lineLabel.addEventListener("mouseenter", onLableMouseEnter)
     lineLabel.addEventListener("mouseleave", onLableMouseLeave)

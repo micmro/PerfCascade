@@ -1,4 +1,4 @@
-/*PerfCascade build:14/04/2016 */
+/*PerfCascade build:25/04/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -939,6 +939,7 @@ exports.createWaterfallSvg = createWaterfallSvg;
  * Creation of sub-components of the waterfall chart
  */
 var svg_1 = require("../helpers/svg");
+var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
 /**
  * Creates verticale alignment bars
  * @param {number} diagramHeight  height of the requests part of the diagram in px
@@ -1065,18 +1066,27 @@ function createMarks(marks, unit, diagramHeight) {
         //lineLabel.setAttribute("writing-mode", "tb")
         lineLabel.setAttribute("x", x + "%");
         lineLabel.setAttribute("stroke", "");
-        lineHolder.appendChild(svg_1.default.newEl("line", {
+        var line = svg_1.default.newEl("line", {
             "x1": x + "%",
             "y1": 0,
             "x2": x + "%",
             "y2": diagramHeight
-        }));
+        });
+        lineHolder.appendChild(line);
         var lastMark = marks[i - 1];
         if (lastMark && mark.x - lastMark.x < 1) {
             lineLabel.setAttribute("x", lastMark.x + 1 + "%");
             mark.x = lastMark.x + 1;
         }
-        //would use polyline but can't use percentage for points 
+        overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
+            var offset = change.combinedOverlayHeight;
+            //figure out why there is an offset
+            var scale = (diagramHeight + offset - (change.openOverlays.length * 28)) / (diagramHeight);
+            console.log(diagramHeight, offset, scale, change.openOverlays.length, unit);
+            lineHolder.setAttribute("transform", "scale(1, " + scale + ")");
+            lineLabelHolder.setAttribute("transform", "translate(0, " + offset + ")");
+        });
+        //would use polyline but can't use percentage for points
         lineHolder.appendChild(svg_1.default.newEl("line", {
             "x1": x + "%",
             "y1": diagramHeight,
@@ -1110,7 +1120,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../helpers/svg":4}],16:[function(require,module,exports){
+},{"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11}],16:[function(require,module,exports){
 var misc_1 = require("../helpers/misc");
 function getResponseHeader(entry, headerName) {
     return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
