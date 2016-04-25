@@ -84,22 +84,34 @@ export function makeHoverEvtListeners(hoverEl: HoverElements) {
 export function createTimeScale(durationMs: number, diagramHeight: number): SVGGElement {
   let timeHolder = svg.newEl("g", { class: "time-scale full-width" }) as SVGGElement
   for (let i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
-    let lineLabel = svg.newTextEl(i + "sec", diagramHeight)
-    if (i > secs - 0.2) {
-      lineLabel.setAttribute("x", secPerc * i - 0.5 + "%")
-      lineLabel.setAttribute("text-anchor", "end")
-    } else {
-      lineLabel.setAttribute("x", secPerc * i + 0.5 + "%")
-    }
+    ((i, secs, secPerc) => {
+      const lineLabel = svg.newTextEl(i + "sec", diagramHeight)
+      if (i > secs - 0.2) {
+        lineLabel.setAttribute("x", secPerc * i - 0.5 + "%")
+        lineLabel.setAttribute("text-anchor", "end")
+      } else {
+        lineLabel.setAttribute("x", secPerc * i + 0.5 + "%")
+      }
 
-    let lineEl = svg.newEl("line", {
-      "x1": secPerc * i + "%",
-      "y1": "0",
-      "x2": secPerc * i + "%",
-      "y2": diagramHeight
-    })
-    timeHolder.appendChild(lineEl)
-    timeHolder.appendChild(lineLabel)
+      const lineEl = svg.newEl("line", {
+        "x1": secPerc * i + "%",
+        "y1": "0",
+        "x2": secPerc * i + "%",
+        "y2": diagramHeight
+      })
+
+      overlayChangesPubSub.subscribeToOvelayChanges((change: OverlayChangeEvent) => {
+        let offset = change.combinedOverlayHeight
+        //figure out why there is an offset
+        let scale = (diagramHeight + offset) / (diagramHeight)
+
+        lineEl.setAttribute("transform", `scale(1, ${scale})`)
+        lineLabel.setAttribute("transform", `translate(0, ${offset})`)
+      })
+
+      timeHolder.appendChild(lineEl)
+      timeHolder.appendChild(lineLabel)
+    })(i, secs, secPerc)
   }
   return timeHolder
 }
@@ -161,33 +173,31 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       "x2": x + "%",
       "y2": diagramHeight
     }) as SVGLineElement
-    lineHolder.appendChild(line)
 
     const lastMark = marks[i - 1]
     if (lastMark && mark.x - lastMark.x < 1) {
       lineLabel.setAttribute("x", lastMark.x + 1 + "%")
       mark.x = lastMark.x + 1
     }
-
-    overlayChangesPubSub.subscribeToOvelayChanges((change: OverlayChangeEvent) => {
-      let offset = change.combinedOverlayHeight
-      //figure out why there is an offset
-      let scale = (diagramHeight + offset - (change.openOverlays.length * 28)) / (diagramHeight)
-
-      console.log(diagramHeight, offset, scale, change.openOverlays.length, unit);
-
-      lineHolder.setAttribute("transform", `scale(1, ${scale})`)
-
-      lineLabelHolder.setAttribute("transform", `translate(0, ${offset})`)
-    })
-
     //would use polyline but can't use percentage for points
-    lineHolder.appendChild(svg.newEl("line", {
+    let lineConnection = svg.newEl("line", {
       "x1": x + "%",
       "y1": diagramHeight,
       "x2": mark.x + "%",
       "y2": diagramHeight + 23
-    }))
+    })
+    lineHolder.appendChild(line)
+    lineHolder.appendChild(lineConnection)
+
+    overlayChangesPubSub.subscribeToOvelayChanges((change: OverlayChangeEvent) => {
+      let offset = change.combinedOverlayHeight
+      let scale = (diagramHeight + offset) / (diagramHeight)
+
+      line.setAttribute("transform", `scale(1, ${scale})`)
+      lineLabelHolder.setAttribute("transform", `translate(0, ${offset})`)
+      lineConnection.setAttribute("transform", `translate(0, ${offset})`)
+    })
+
 
     let isActive = false
     let onLableMouseEnter = function(evt) {

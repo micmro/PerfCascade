@@ -1003,22 +1003,31 @@ exports.makeHoverEvtListeners = makeHoverEvtListeners;
 function createTimeScale(durationMs, diagramHeight) {
     var timeHolder = svg_1.default.newEl("g", { class: "time-scale full-width" });
     for (var i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
-        var lineLabel = svg_1.default.newTextEl(i + "sec", diagramHeight);
-        if (i > secs - 0.2) {
-            lineLabel.setAttribute("x", secPerc * i - 0.5 + "%");
-            lineLabel.setAttribute("text-anchor", "end");
-        }
-        else {
-            lineLabel.setAttribute("x", secPerc * i + 0.5 + "%");
-        }
-        var lineEl = svg_1.default.newEl("line", {
-            "x1": secPerc * i + "%",
-            "y1": "0",
-            "x2": secPerc * i + "%",
-            "y2": diagramHeight
-        });
-        timeHolder.appendChild(lineEl);
-        timeHolder.appendChild(lineLabel);
+        (function (i, secs, secPerc) {
+            var lineLabel = svg_1.default.newTextEl(i + "sec", diagramHeight);
+            if (i > secs - 0.2) {
+                lineLabel.setAttribute("x", secPerc * i - 0.5 + "%");
+                lineLabel.setAttribute("text-anchor", "end");
+            }
+            else {
+                lineLabel.setAttribute("x", secPerc * i + 0.5 + "%");
+            }
+            var lineEl = svg_1.default.newEl("line", {
+                "x1": secPerc * i + "%",
+                "y1": "0",
+                "x2": secPerc * i + "%",
+                "y2": diagramHeight
+            });
+            overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
+                var offset = change.combinedOverlayHeight;
+                //figure out why there is an offset
+                var scale = (diagramHeight + offset) / (diagramHeight);
+                lineEl.setAttribute("transform", "scale(1, " + scale + ")");
+                lineLabel.setAttribute("transform", "translate(0, " + offset + ")");
+            });
+            timeHolder.appendChild(lineEl);
+            timeHolder.appendChild(lineLabel);
+        })(i, secs, secPerc);
     }
     return timeHolder;
 }
@@ -1072,27 +1081,27 @@ function createMarks(marks, unit, diagramHeight) {
             "x2": x + "%",
             "y2": diagramHeight
         });
-        lineHolder.appendChild(line);
         var lastMark = marks[i - 1];
         if (lastMark && mark.x - lastMark.x < 1) {
             lineLabel.setAttribute("x", lastMark.x + 1 + "%");
             mark.x = lastMark.x + 1;
         }
-        overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
-            var offset = change.combinedOverlayHeight;
-            //figure out why there is an offset
-            var scale = (diagramHeight + offset - (change.openOverlays.length * 28)) / (diagramHeight);
-            console.log(diagramHeight, offset, scale, change.openOverlays.length, unit);
-            lineHolder.setAttribute("transform", "scale(1, " + scale + ")");
-            lineLabelHolder.setAttribute("transform", "translate(0, " + offset + ")");
-        });
         //would use polyline but can't use percentage for points
-        lineHolder.appendChild(svg_1.default.newEl("line", {
+        var lineConnection = svg_1.default.newEl("line", {
             "x1": x + "%",
             "y1": diagramHeight,
             "x2": mark.x + "%",
             "y2": diagramHeight + 23
-        }));
+        });
+        lineHolder.appendChild(line);
+        lineHolder.appendChild(lineConnection);
+        overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
+            var offset = change.combinedOverlayHeight;
+            var scale = (diagramHeight + offset) / (diagramHeight);
+            line.setAttribute("transform", "scale(1, " + scale + ")");
+            lineLabelHolder.setAttribute("transform", "translate(0, " + offset + ")");
+            lineConnection.setAttribute("transform", "translate(0, " + offset + ")");
+        });
         var isActive = false;
         var onLableMouseEnter = function (evt) {
             if (!isActive) {
