@@ -60,17 +60,19 @@ export function createDetailsBody(requestID: number, block: TimeBlock, accordeon
 
   body.innerHTML = `
     <div class="wrapper">
-      <h3>#${requestID} ${block.name}</h3>
-      <nav class="tab-nav">
-      <ul>
-        ${makeTabBtn("Preview", imgTab)}
-        ${makeTabBtn("General", generalTab)}
-        <li><button class="tab-button">Request</button></li>
-        <li><button class="tab-button">Response</button></li>
-        ${makeTabBtn("Timings", timingsTab)}
-        <li><button class="tab-button">Raw Data</button></li>
-      </ul>
-      </nav>
+      <header class="type-${block.requestType}">
+        <h3><strong>#${requestID}</strong> ${block.name}</h3>
+        <nav class="tab-nav">
+        <ul>
+          ${makeTabBtn("Preview", imgTab)}
+          ${makeTabBtn("General", generalTab)}
+          <li><button class="tab-button">Request</button></li>
+          <li><button class="tab-button">Response</button></li>
+          ${makeTabBtn("Timings", timingsTab)}
+          <li><button class="tab-button">Raw Data</button></li>
+        </ul>
+        </nav>
+      </header>
       ${imgTab}
       ${generalTab}
       <div class="tab">
