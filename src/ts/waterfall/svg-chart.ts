@@ -90,7 +90,7 @@ export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number
   const labelXPos = barsToShow.reduce((prev: number, curr: TimeBlock) => {
     const i = getIndicators(curr, docIsSsl)
     const lastIndicator = i[i.length - 1]
-    const x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1))  : 0)
+    const x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0)
     return Math.max(prev, x)
   }, 5)
 

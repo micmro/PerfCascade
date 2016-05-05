@@ -72,7 +72,7 @@ function createTimingLable(rectData: RectData, timeTotal: number, firstX: number
 
   if (percStart + (txtWidth / minWidth * 100) > 100) {
     percStart = firstX / rectData.unit - spacingPerc
-    txtEl = svg.newTextEl(`${timeTotal}ms`, y, `${misc.roundNumber(percStart, 2)}%`, {"textAnchor": "end"})
+    txtEl = svg.newTextEl(`${timeTotal}ms`, y, `${misc.roundNumber(percStart, 2)}%`, { "textAnchor": "end" })
   }
 
   return txtEl

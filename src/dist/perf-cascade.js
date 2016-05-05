@@ -343,7 +343,7 @@ var HarTransformer = (function () {
             .map(function (k) {
             var startRelative = pageTimings[k];
             return {
-                "name": k.replace(/^[_]/, ""),
+                "name": k.replace(/^[_]/, "") + " (" + startRelative + "ms)",
                 "startTime": startRelative
             };
         });

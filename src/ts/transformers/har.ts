@@ -50,7 +50,7 @@ export default class HarTransformer {
         const startRelative = pageTimings[k]
 
         return {
-          "name": k.replace(/^[_]/, ""),
+          "name": `${k.replace(/^[_]/, "")} (${startRelative}ms)`,
           "startTime": startRelative
         } as Mark
       })
