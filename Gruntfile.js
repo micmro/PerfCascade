@@ -20,7 +20,7 @@ module.exports = function( grunt ) {
         src: ["src/css-raw/normalize.css", "src/css-raw/gh-page.css", "src/css-raw/main.css"],
         dest: "src/dist/perf-cascade-gh-page.css",
       }
-      
+
     },
     browserify: {
       options: {
@@ -35,7 +35,7 @@ module.exports = function( grunt ) {
     },
     tslint: {
         options: {
-            // can be a configuration object or a filepath to tslint.json 
+            // can be a configuration object or a filepath to tslint.json
             configuration: "tslint.json"
         },
         files: {
@@ -64,6 +64,14 @@ module.exports = function( grunt ) {
       babel: {
         files: ["src/ts/**/*.ts", "Gruntfile.js"],
         tasks: ["distBase"],
+        options: {
+          spawn: false,
+          interrupt: true
+        },
+      },
+      css: {
+        files: ["src/css-raw/**/*.css"],
+        tasks: ["concat:dist"],
         options: {
           spawn: false,
           interrupt: true
