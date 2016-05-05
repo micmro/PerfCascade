@@ -92,7 +92,7 @@ export function getIndicators(block: TimeBlock, docIsSsl: boolean): Indicator[] 
   let xPos = 3
 
   // helper to avoid typing out all key of the helper object
-  const makeIcon = function(type: string, title: string) {
+  const makeIcon = function (type: string, title: string) {
     output.push({ "type": type, "x": xPos, "title": title })
     xPos += iconWidth
   }
@@ -101,8 +101,8 @@ export function getIndicators(block: TimeBlock, docIsSsl: boolean): Indicator[] 
 
   //highlight redirects
   if (!!entry.response.redirectURL) {
-     const url = encodeURI(entry.response.redirectURL.split("?")[0] || "")
-     makeIcon("err3xx", `${entry.response.status} response status: Redirect to ${url}...`)
+    const url = encodeURI(entry.response.redirectURL.split("?")[0] || "")
+    makeIcon("err3xx", `${entry.response.status} response status: Redirect to ${url}...`)
   }
 
   if (!docIsSsl && isSecure) {
@@ -128,7 +128,7 @@ export function getIndicators(block: TimeBlock, docIsSsl: boolean): Indicator[] 
   }
 
   if (!entry.response.content.mimeType && isInStatusCodeRange(entry, 200, 299)) {
-     makeIcon("warning", "No MIME Type defined")
+    makeIcon("warning", "No MIME Type defined")
   }
 
   return output

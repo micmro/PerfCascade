@@ -46,8 +46,8 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
  */
 export function makeHoverEvtListeners(hoverEl: HoverElements) {
   return {
-    onMouseEnterPartial: function() {
-      return function(evt: MouseEvent) {
+    onMouseEnterPartial: function () {
+      return function (evt: MouseEvent) {
         const targetRect = evt.target as SVGRectElement
         svg.addClass(targetRect, "active")
 
@@ -63,8 +63,8 @@ export function makeHoverEvtListeners(hoverEl: HoverElements) {
         svg.addClass(hoverEl.startline, "active")
       }
     },
-    onMouseLeavePartial: function() {
-      return function(evt: MouseEvent) {
+    onMouseLeavePartial: function () {
+      return function (evt: MouseEvent) {
         const targetRect = evt.target as SVGRectElement
         svg.removeClass(targetRect, "active")
         svg.removeClass(hoverEl.endline, "active")
@@ -200,7 +200,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
 
 
     let isActive = false
-    let onLableMouseEnter = function(evt) {
+    let onLableMouseEnter = function (evt) {
       if (!isActive) {
         isActive = true
         svg.addClass(lineHolder, "active")
@@ -209,7 +209,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       }
     }
 
-    let onLableMouseLeave = function(evt) {
+    let onLableMouseLeave = function (evt) {
       isActive = false
       svg.removeClass(lineHolder, "active")
     }
