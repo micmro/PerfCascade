@@ -32,7 +32,7 @@ let svg = {
     return svg.newEl("g", settings, css) as SVGGElement
   },
 
-  newTextEl: function(text: string, y: number, x?: number, css?: Object): SVGTextElement {
+  newTextEl: function(text: string, y: number, x?: number | string, css?: Object): SVGTextElement {
     css = css || {}
     let opt = {
       fill: "#111",

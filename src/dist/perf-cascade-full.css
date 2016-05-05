@@ -500,7 +500,7 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .row-item .odd {fill: #000; opacity: 0.05;}
 .row-item:hover .odd,
 .row-item:hover .even {fill: #000; opacity: 0.1}
-
+.row-item .rect-holder text {fill: #aaa}
 
 .lables { overflow: hidden;}
 

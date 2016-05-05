@@ -36,6 +36,9 @@ let misc = {
       return matches.authority.substr(0, 17) + "..." + p[p.length - 1].substr(-15)
     }
     return matches.authority + "..." + p[p.length - 1].substr(-15)
+  },
+  roundNumber: function roundNumber(num, dec) {
+    return Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
   }
 }
 
