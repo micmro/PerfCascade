@@ -270,7 +270,7 @@ exports.default = {
     createWaterfallSvg: svg_chart_1.createWaterfallSvg
 };
 
-},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":14}],6:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":17}],6:[function(require,module,exports){
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
@@ -823,317 +823,7 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
 },{"../../helpers/dom":1,"../../helpers/svg":4,"./html-details-body":10}],14:[function(require,module,exports){
-var svg_1 = require("../helpers/svg");
-var svg_general_components_1 = require("./svg-general-components");
-var svg_row_1 = require("./svg-row");
-var svg_indicators_1 = require("./svg-indicators");
-var overlayManager = require("./details-overlay/svg-details-overlay-manager");
-var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
-/**
- * Calculate the height of the SVG chart in px
- * @param {any[]}       marks      [description]
- * @param {TimeBlock[]} barsToShow [description]
- * @param  {number} diagramHeight
- * @returns Number
- */
-function getSvgHeight(marks, barsToShow, diagramHeight) {
-    var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
-        return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
-    }, 0);
-    return Math.floor(diagramHeight + maxMarkTextLength + 35);
-}
-/**
- * Entry point to start rendering the full waterfall SVG
- * @param {WaterfallData} data  Object containing the setup parameter
-
- * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
- * @return {SVGSVGElement}            SVG Element ready to render
- */
-function createWaterfallSvg(data, requestBarHeight) {
-    //constants
-    if (requestBarHeight === void 0) { requestBarHeight = 23; }
-    /** Width of bar on left in percentage */
-    var leftFixedWidthPerc = 25;
-    /** horizontal unit (duration in ms of 1%) */
-    var unit = data.durationMs / 100;
-    var barsToShow = data.blocks
-        .filter(function (block) { return (typeof block.start === "number" && typeof block.total === "number"); })
-        .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
-    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
-    /** height of the requests part of the diagram in px */
-    var diagramHeight = (barsToShow.length + 1) * requestBarHeight;
-    /** full height of the SVG chart in px */
-    var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
-    /** Main SVG Element that holds all data */
-    var timeLineHolder = svg_1.default.newSvg("water-fall-chart", {
-        "height": chartHolderHeight
-    });
-    /** Holder for on-hover vertical comparison bars */
-    var hoverOverlayHolder = svg_1.default.newG("hover-overlays");
-    /** Holder of request-details overlay */
-    var overlayHolder = svg_1.default.newG("overlays");
-    /** Holder for scale, event and marks */
-    var scaleAndMarksHolder = svg_1.default.newSvg("scale-and-marks-holder", {
-        "x": leftFixedWidthPerc + "%",
-        "width": (100 - leftFixedWidthPerc) + "%"
-    });
-    /** Holds all rows */
-    var rowHolder = svg_1.default.newG("rows-holder");
-    var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
-    hoverOverlayHolder.appendChild(hoverEl.startline);
-    hoverOverlayHolder.appendChild(hoverEl.endline);
-    var mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
-    //Start appending SVG elements to the holder element (timeLineHolder)
-    scaleAndMarksHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
-    scaleAndMarksHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
-    data.lines.forEach(function (block, i) {
-        timeLineHolder.appendChild(svg_general_components_1.createBgRect(block, unit, diagramHeight));
-    });
-    //calculate x position for label based on number of icons
-    var labelXPos = barsToShow.reduce(function (prev, curr) {
-        var i = svg_indicators_1.getIndicators(curr, docIsSsl);
-        var lastIndicator = i[i.length - 1];
-        var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
-        return Math.max(prev, x);
-    }, 5);
-    var barEls = [];
-    function getChartHeight() {
-        return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px";
-    }
-    overlayChangesPubSub.subscribeToOvelayChanges(function (evt) {
-        timeLineHolder.style.height = getChartHeight();
-    });
-    /** Renders single row and hooks up behaviour */
-    function renderRow(block, i) {
-        var blockWidth = block.total || 1;
-        var y = requestBarHeight * i;
-        var x = (block.start || 0.001);
-        var accordeonHeight = 450;
-        var rectData = {
-            "width": blockWidth,
-            "height": requestBarHeight,
-            "x": x,
-            "y": y,
-            "cssClass": block.cssClass,
-            "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
-            "unit": unit,
-            "showOverlay": mouseListeners.onMouseEnterPartial,
-            "hideOverlay": mouseListeners.onMouseLeavePartial
-        };
-        var showDetailsOverlay = function (evt) {
-            overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, overlayHolder, barEls, unit);
-        };
-        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay);
-        barEls.push(rowItem);
-        rowHolder.appendChild(rowItem);
-    }
-    //Main loop to render rows with blocks
-    barsToShow.forEach(renderRow);
-    scaleAndMarksHolder.appendChild(hoverOverlayHolder);
-    timeLineHolder.appendChild(scaleAndMarksHolder);
-    timeLineHolder.appendChild(rowHolder);
-    timeLineHolder.appendChild(overlayHolder);
-    return timeLineHolder;
-}
-exports.createWaterfallSvg = createWaterfallSvg;
-
-},{"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11,"./details-overlay/svg-details-overlay-manager":12,"./svg-general-components":15,"./svg-indicators":16,"./svg-row":18}],15:[function(require,module,exports){
-/**
- * Creation of sub-components of the waterfall chart
- */
-var svg_1 = require("../helpers/svg");
-var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
-/**
- * Creates verticale alignment bars
- * @param {number} diagramHeight  height of the requests part of the diagram in px
- */
-function createAlignmentLines(diagramHeight) {
-    return {
-        endline: svg_1.default.newEl("line", {
-            "x1": "0",
-            "y1": "0",
-            "x2": "0",
-            "y2": diagramHeight,
-            "class": "line-end"
-        }),
-        startline: svg_1.default.newEl("line", {
-            "x1": "0",
-            "y1": "0",
-            "x2": "0",
-            "y2": diagramHeight,
-            "class": "line-start"
-        })
-    };
-}
-exports.createAlignmentLines = createAlignmentLines;
-/**
- * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover
- * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
- */
-function makeHoverEvtListeners(hoverEl) {
-    return {
-        onMouseEnterPartial: function () {
-            return function (evt) {
-                var targetRect = evt.target;
-                svg_1.default.addClass(targetRect, "active");
-                var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
-                    targetRect.width.baseVal.valueInSpecifiedUnits + "%";
-                var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
-                hoverEl.endline.x1.baseVal.valueAsString = xPosEnd;
-                hoverEl.endline.x2.baseVal.valueAsString = xPosEnd;
-                hoverEl.startline.x1.baseVal.valueAsString = xPosStart;
-                hoverEl.startline.x2.baseVal.valueAsString = xPosStart;
-                svg_1.default.addClass(hoverEl.endline, "active");
-                svg_1.default.addClass(hoverEl.startline, "active");
-            };
-        },
-        onMouseLeavePartial: function () {
-            return function (evt) {
-                var targetRect = evt.target;
-                svg_1.default.removeClass(targetRect, "active");
-                svg_1.default.removeClass(hoverEl.endline, "active");
-                svg_1.default.removeClass(hoverEl.startline, "active");
-            };
-        }
-    };
-}
-exports.makeHoverEvtListeners = makeHoverEvtListeners;
-/**
- * Renders the time-scale SVG elements (1sec, 2sec...)
- * @param {number} durationMs    Full duration of the waterfall
- * @param {number} diagramHeight Full height of SVG in px
- */
-function createTimeScale(durationMs, diagramHeight) {
-    var timeHolder = svg_1.default.newEl("g", { class: "time-scale full-width" });
-    for (var i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
-        (function (i, secs, secPerc) {
-            var lineLabel = svg_1.default.newTextEl(i + "sec", diagramHeight);
-            if (i > secs - 0.2) {
-                lineLabel.setAttribute("x", secPerc * i - 0.5 + "%");
-                lineLabel.setAttribute("text-anchor", "end");
-            }
-            else {
-                lineLabel.setAttribute("x", secPerc * i + 0.5 + "%");
-            }
-            var lineEl = svg_1.default.newEl("line", {
-                "x1": secPerc * i + "%",
-                "y1": "0",
-                "x2": secPerc * i + "%",
-                "y2": diagramHeight
-            });
-            overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
-                var offset = change.combinedOverlayHeight;
-                //figure out why there is an offset
-                var scale = (diagramHeight + offset) / (diagramHeight);
-                lineEl.setAttribute("transform", "scale(1, " + scale + ")");
-                lineLabel.setAttribute("transform", "translate(0, " + offset + ")");
-            });
-            timeHolder.appendChild(lineEl);
-            timeHolder.appendChild(lineLabel);
-        })(i, secs, secPerc);
-    }
-    return timeHolder;
-}
-exports.createTimeScale = createTimeScale;
-//TODO: Implement - data for this not parsed yet
-function createBgRect(block, unit, diagramHeight) {
-    var rect = svg_1.default.newEl("rect", {
-        "width": ((block.total || 1) / unit) + "%",
-        "height": diagramHeight,
-        "x": ((block.start || 0.001) / unit) + "%",
-        "y": 0,
-        "class": block.cssClass || "block-other"
-    });
-    rect.appendChild(svg_1.default.newEl("title", {
-        "text": block.name
-    })); // Add tile to wedge path
-    return rect;
-}
-exports.createBgRect = createBgRect;
-/**
- * Renders global markes for events like the onLoad event etc
- * @param {Array<Mark>} marks         [description]
- * @param {number}      unit          horizontal unit (duration in ms of 1%)
- * @param {number}      diagramHeight Full height of SVG in px
- */
-function createMarks(marks, unit, diagramHeight) {
-    var marksHolder = svg_1.default.newEl("g", {
-        "transform": "scale(1, 1)",
-        "class": "marker-holder"
-    });
-    marks.forEach(function (mark, i) {
-        var x = mark.startTime / unit;
-        var markHolder = svg_1.default.newEl("g", {
-            "class": "mark-holder type-" + mark.name.toLowerCase()
-        });
-        var lineHolder = svg_1.default.newEl("g", {
-            "class": "line-holder"
-        });
-        var lineLabelHolder = svg_1.default.newEl("g", {
-            "class": "line-label-holder",
-            "x": x + "%"
-        });
-        mark.x = x;
-        var lineLabel = svg_1.default.newTextEl(mark.name, diagramHeight + 25);
-        //lineLabel.setAttribute("writing-mode", "tb")
-        lineLabel.setAttribute("x", x + "%");
-        lineLabel.setAttribute("stroke", "");
-        var line = svg_1.default.newEl("line", {
-            "x1": x + "%",
-            "y1": 0,
-            "x2": x + "%",
-            "y2": diagramHeight
-        });
-        var lastMark = marks[i - 1];
-        if (lastMark && mark.x - lastMark.x < 1) {
-            lineLabel.setAttribute("x", lastMark.x + 1 + "%");
-            mark.x = lastMark.x + 1;
-        }
-        //would use polyline but can't use percentage for points
-        var lineConnection = svg_1.default.newEl("line", {
-            "x1": x + "%",
-            "y1": diagramHeight,
-            "x2": mark.x + "%",
-            "y2": diagramHeight + 23
-        });
-        lineHolder.appendChild(line);
-        lineHolder.appendChild(lineConnection);
-        overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
-            var offset = change.combinedOverlayHeight;
-            var scale = (diagramHeight + offset) / (diagramHeight);
-            line.setAttribute("transform", "scale(1, " + scale + ")");
-            lineLabelHolder.setAttribute("transform", "translate(0, " + offset + ")");
-            lineConnection.setAttribute("transform", "translate(0, " + offset + ")");
-        });
-        var isActive = false;
-        var onLableMouseEnter = function (evt) {
-            if (!isActive) {
-                isActive = true;
-                svg_1.default.addClass(lineHolder, "active");
-                //firefox has issues with this
-                markHolder.parentNode.appendChild(markHolder);
-            }
-        };
-        var onLableMouseLeave = function (evt) {
-            isActive = false;
-            svg_1.default.removeClass(lineHolder, "active");
-        };
-        lineLabel.addEventListener("mouseenter", onLableMouseEnter);
-        lineLabel.addEventListener("mouseleave", onLableMouseLeave);
-        lineLabelHolder.appendChild(lineLabel);
-        markHolder.appendChild(svg_1.default.newEl("title", {
-            "text": mark.name + " (" + Math.round(mark.startTime) + "ms)"
-        }));
-        markHolder.appendChild(lineHolder);
-        markHolder.appendChild(lineLabelHolder);
-        marksHolder.appendChild(markHolder);
-    });
-    return marksHolder;
-}
-exports.createMarks = createMarks;
-
-},{"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11}],16:[function(require,module,exports){
-var misc_1 = require("../helpers/misc");
+var misc_1 = require("../../helpers/misc");
 function getResponseHeader(entry, headerName) {
     return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
 }
@@ -1240,12 +930,12 @@ function getIndicators(block, docIsSsl) {
 }
 exports.getIndicators = getIndicators;
 
-},{"../helpers/misc":3}],17:[function(require,module,exports){
+},{"../../helpers/misc":3}],15:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
-var svg_1 = require("../helpers/svg");
-var misc_1 = require("../helpers/misc");
+var svg_1 = require("../../helpers/svg");
+var misc_1 = require("../../helpers/misc");
 /**
  * Creates the `rect` that represent the timings in `rectData`
  * @param  {RectData} rectData - Data for block
@@ -1459,10 +1149,10 @@ function createRequestBarRowBg(y, requestBarHeight, onClick) {
 }
 exports.createRequestBarRowBg = createRequestBarRowBg;
 
-},{"../helpers/misc":3,"../helpers/svg":4}],18:[function(require,module,exports){
-var svg_1 = require("../helpers/svg");
-var icons_1 = require("../helpers/icons");
-var misc_1 = require("../helpers/misc");
+},{"../../helpers/misc":3,"../../helpers/svg":4}],16:[function(require,module,exports){
+var svg_1 = require("../../helpers/svg");
+var icons_1 = require("../../helpers/icons");
+var misc_1 = require("../../helpers/misc");
 var rowSubComponents = require("./svg-row-subcomponents");
 var svg_indicators_1 = require("./svg-indicators");
 //initial clip path
@@ -1513,4 +1203,314 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
 }
 exports.createRow = createRow;
 
-},{"../helpers/icons":2,"../helpers/misc":3,"../helpers/svg":4,"./svg-indicators":16,"./svg-row-subcomponents":17}]},{},[5]);
+},{"../../helpers/icons":2,"../../helpers/misc":3,"../../helpers/svg":4,"./svg-indicators":14,"./svg-row-subcomponents":15}],17:[function(require,module,exports){
+var svg_1 = require("../helpers/svg");
+var svg_general_components_1 = require("./svg-general-components");
+var svg_row_1 = require("./row/svg-row");
+var svg_indicators_1 = require("./row/svg-indicators");
+var overlayManager = require("./details-overlay/svg-details-overlay-manager");
+var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
+/**
+ * Calculate the height of the SVG chart in px
+ * @param {any[]}       marks      [description]
+ * @param {TimeBlock[]} barsToShow [description]
+ * @param  {number} diagramHeight
+ * @returns Number
+ */
+function getSvgHeight(marks, barsToShow, diagramHeight) {
+    var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
+        return Math.max(currMax, svg_1.default.getNodeTextWidth(svg_1.default.newTextEl(currValue.name, 0)));
+    }, 0);
+    return Math.floor(diagramHeight + maxMarkTextLength + 35);
+}
+/**
+ * Entry point to start rendering the full waterfall SVG
+ * @param {WaterfallData} data  Object containing the setup parameter
+
+ * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
+ * @return {SVGSVGElement}            SVG Element ready to render
+ */
+function createWaterfallSvg(data, requestBarHeight) {
+    //constants
+    if (requestBarHeight === void 0) { requestBarHeight = 23; }
+    /** Width of bar on left in percentage */
+    var leftFixedWidthPerc = 25;
+    /** horizontal unit (duration in ms of 1%) */
+    var unit = data.durationMs / 100;
+    var barsToShow = data.blocks
+        .filter(function (block) { return (typeof block.start === "number" && typeof block.total === "number"); })
+        .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
+    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
+    /** height of the requests part of the diagram in px */
+    var diagramHeight = (barsToShow.length + 1) * requestBarHeight;
+    /** full height of the SVG chart in px */
+    var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
+    /** Main SVG Element that holds all data */
+    var timeLineHolder = svg_1.default.newSvg("water-fall-chart", {
+        "height": chartHolderHeight
+    });
+    /** Holder for on-hover vertical comparison bars */
+    var hoverOverlayHolder = svg_1.default.newG("hover-overlays");
+    /** Holder of request-details overlay */
+    var overlayHolder = svg_1.default.newG("overlays");
+    /** Holder for scale, event and marks */
+    var scaleAndMarksHolder = svg_1.default.newSvg("scale-and-marks-holder", {
+        "x": leftFixedWidthPerc + "%",
+        "width": (100 - leftFixedWidthPerc) + "%"
+    });
+    /** Holds all rows */
+    var rowHolder = svg_1.default.newG("rows-holder");
+    var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
+    hoverOverlayHolder.appendChild(hoverEl.startline);
+    hoverOverlayHolder.appendChild(hoverEl.endline);
+    var mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
+    //Start appending SVG elements to the holder element (timeLineHolder)
+    scaleAndMarksHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
+    scaleAndMarksHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
+    data.lines.forEach(function (block, i) {
+        timeLineHolder.appendChild(svg_general_components_1.createBgRect(block, unit, diagramHeight));
+    });
+    //calculate x position for label based on number of icons
+    var labelXPos = barsToShow.reduce(function (prev, curr) {
+        var i = svg_indicators_1.getIndicators(curr, docIsSsl);
+        var lastIndicator = i[i.length - 1];
+        var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
+        return Math.max(prev, x);
+    }, 5);
+    var barEls = [];
+    function getChartHeight() {
+        return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px";
+    }
+    overlayChangesPubSub.subscribeToOvelayChanges(function (evt) {
+        timeLineHolder.style.height = getChartHeight();
+    });
+    /** Renders single row and hooks up behaviour */
+    function renderRow(block, i) {
+        var blockWidth = block.total || 1;
+        var y = requestBarHeight * i;
+        var x = (block.start || 0.001);
+        var accordeonHeight = 450;
+        var rectData = {
+            "width": blockWidth,
+            "height": requestBarHeight,
+            "x": x,
+            "y": y,
+            "cssClass": block.cssClass,
+            "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+            "unit": unit,
+            "showOverlay": mouseListeners.onMouseEnterPartial,
+            "hideOverlay": mouseListeners.onMouseLeavePartial
+        };
+        var showDetailsOverlay = function (evt) {
+            overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, overlayHolder, barEls, unit);
+        };
+        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay);
+        barEls.push(rowItem);
+        rowHolder.appendChild(rowItem);
+    }
+    //Main loop to render rows with blocks
+    barsToShow.forEach(renderRow);
+    scaleAndMarksHolder.appendChild(hoverOverlayHolder);
+    timeLineHolder.appendChild(scaleAndMarksHolder);
+    timeLineHolder.appendChild(rowHolder);
+    timeLineHolder.appendChild(overlayHolder);
+    return timeLineHolder;
+}
+exports.createWaterfallSvg = createWaterfallSvg;
+
+},{"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11,"./details-overlay/svg-details-overlay-manager":12,"./row/svg-indicators":14,"./row/svg-row":16,"./svg-general-components":18}],18:[function(require,module,exports){
+/**
+ * Creation of sub-components of the waterfall chart
+ */
+var svg_1 = require("../helpers/svg");
+var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
+/**
+ * Creates verticale alignment bars
+ * @param {number} diagramHeight  height of the requests part of the diagram in px
+ */
+function createAlignmentLines(diagramHeight) {
+    return {
+        endline: svg_1.default.newEl("line", {
+            "x1": "0",
+            "y1": "0",
+            "x2": "0",
+            "y2": diagramHeight,
+            "class": "line-end"
+        }),
+        startline: svg_1.default.newEl("line", {
+            "x1": "0",
+            "y1": "0",
+            "x2": "0",
+            "y2": diagramHeight,
+            "class": "line-start"
+        })
+    };
+}
+exports.createAlignmentLines = createAlignmentLines;
+/**
+ * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover
+ * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
+ */
+function makeHoverEvtListeners(hoverEl) {
+    return {
+        onMouseEnterPartial: function () {
+            return function (evt) {
+                var targetRect = evt.target;
+                svg_1.default.addClass(targetRect, "active");
+                var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
+                    targetRect.width.baseVal.valueInSpecifiedUnits + "%";
+                var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
+                hoverEl.endline.x1.baseVal.valueAsString = xPosEnd;
+                hoverEl.endline.x2.baseVal.valueAsString = xPosEnd;
+                hoverEl.startline.x1.baseVal.valueAsString = xPosStart;
+                hoverEl.startline.x2.baseVal.valueAsString = xPosStart;
+                svg_1.default.addClass(hoverEl.endline, "active");
+                svg_1.default.addClass(hoverEl.startline, "active");
+            };
+        },
+        onMouseLeavePartial: function () {
+            return function (evt) {
+                var targetRect = evt.target;
+                svg_1.default.removeClass(targetRect, "active");
+                svg_1.default.removeClass(hoverEl.endline, "active");
+                svg_1.default.removeClass(hoverEl.startline, "active");
+            };
+        }
+    };
+}
+exports.makeHoverEvtListeners = makeHoverEvtListeners;
+/**
+ * Renders the time-scale SVG elements (1sec, 2sec...)
+ * @param {number} durationMs    Full duration of the waterfall
+ * @param {number} diagramHeight Full height of SVG in px
+ */
+function createTimeScale(durationMs, diagramHeight) {
+    var timeHolder = svg_1.default.newEl("g", { class: "time-scale full-width" });
+    for (var i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
+        (function (i, secs, secPerc) {
+            var lineLabel = svg_1.default.newTextEl(i + "sec", diagramHeight);
+            if (i > secs - 0.2) {
+                lineLabel.setAttribute("x", secPerc * i - 0.5 + "%");
+                lineLabel.setAttribute("text-anchor", "end");
+            }
+            else {
+                lineLabel.setAttribute("x", secPerc * i + 0.5 + "%");
+            }
+            var lineEl = svg_1.default.newEl("line", {
+                "x1": secPerc * i + "%",
+                "y1": "0",
+                "x2": secPerc * i + "%",
+                "y2": diagramHeight
+            });
+            overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
+                var offset = change.combinedOverlayHeight;
+                //figure out why there is an offset
+                var scale = (diagramHeight + offset) / (diagramHeight);
+                lineEl.setAttribute("transform", "scale(1, " + scale + ")");
+                lineLabel.setAttribute("transform", "translate(0, " + offset + ")");
+            });
+            timeHolder.appendChild(lineEl);
+            timeHolder.appendChild(lineLabel);
+        })(i, secs, secPerc);
+    }
+    return timeHolder;
+}
+exports.createTimeScale = createTimeScale;
+//TODO: Implement - data for this not parsed yet
+function createBgRect(block, unit, diagramHeight) {
+    var rect = svg_1.default.newEl("rect", {
+        "width": ((block.total || 1) / unit) + "%",
+        "height": diagramHeight,
+        "x": ((block.start || 0.001) / unit) + "%",
+        "y": 0,
+        "class": block.cssClass || "block-other"
+    });
+    rect.appendChild(svg_1.default.newEl("title", {
+        "text": block.name
+    })); // Add tile to wedge path
+    return rect;
+}
+exports.createBgRect = createBgRect;
+/**
+ * Renders global markes for events like the onLoad event etc
+ * @param {Array<Mark>} marks         [description]
+ * @param {number}      unit          horizontal unit (duration in ms of 1%)
+ * @param {number}      diagramHeight Full height of SVG in px
+ */
+function createMarks(marks, unit, diagramHeight) {
+    var marksHolder = svg_1.default.newEl("g", {
+        "transform": "scale(1, 1)",
+        "class": "marker-holder"
+    });
+    marks.forEach(function (mark, i) {
+        var x = mark.startTime / unit;
+        var markHolder = svg_1.default.newEl("g", {
+            "class": "mark-holder type-" + mark.name.toLowerCase()
+        });
+        var lineHolder = svg_1.default.newEl("g", {
+            "class": "line-holder"
+        });
+        var lineLabelHolder = svg_1.default.newEl("g", {
+            "class": "line-label-holder",
+            "x": x + "%"
+        });
+        mark.x = x;
+        var lineLabel = svg_1.default.newTextEl(mark.name, diagramHeight + 25);
+        //lineLabel.setAttribute("writing-mode", "tb")
+        lineLabel.setAttribute("x", x + "%");
+        lineLabel.setAttribute("stroke", "");
+        var line = svg_1.default.newEl("line", {
+            "x1": x + "%",
+            "y1": 0,
+            "x2": x + "%",
+            "y2": diagramHeight
+        });
+        var lastMark = marks[i - 1];
+        if (lastMark && mark.x - lastMark.x < 1) {
+            lineLabel.setAttribute("x", lastMark.x + 1 + "%");
+            mark.x = lastMark.x + 1;
+        }
+        //would use polyline but can't use percentage for points
+        var lineConnection = svg_1.default.newEl("line", {
+            "x1": x + "%",
+            "y1": diagramHeight,
+            "x2": mark.x + "%",
+            "y2": diagramHeight + 23
+        });
+        lineHolder.appendChild(line);
+        lineHolder.appendChild(lineConnection);
+        overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
+            var offset = change.combinedOverlayHeight;
+            var scale = (diagramHeight + offset) / (diagramHeight);
+            line.setAttribute("transform", "scale(1, " + scale + ")");
+            lineLabelHolder.setAttribute("transform", "translate(0, " + offset + ")");
+            lineConnection.setAttribute("transform", "translate(0, " + offset + ")");
+        });
+        var isActive = false;
+        var onLableMouseEnter = function (evt) {
+            if (!isActive) {
+                isActive = true;
+                svg_1.default.addClass(lineHolder, "active");
+                //firefox has issues with this
+                markHolder.parentNode.appendChild(markHolder);
+            }
+        };
+        var onLableMouseLeave = function (evt) {
+            isActive = false;
+            svg_1.default.removeClass(lineHolder, "active");
+        };
+        lineLabel.addEventListener("mouseenter", onLableMouseEnter);
+        lineLabel.addEventListener("mouseleave", onLableMouseLeave);
+        lineLabelHolder.appendChild(lineLabel);
+        markHolder.appendChild(svg_1.default.newEl("title", {
+            "text": mark.name + " (" + Math.round(mark.startTime) + "ms)"
+        }));
+        markHolder.appendChild(lineHolder);
+        markHolder.appendChild(lineLabelHolder);
+        marksHolder.appendChild(markHolder);
+    });
+    return marksHolder;
+}
+exports.createMarks = createMarks;
+
+},{"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11}]},{},[5]);
