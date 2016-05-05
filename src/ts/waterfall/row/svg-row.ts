@@ -1,12 +1,12 @@
-import TimeBlock from "../typing/time-block"
-import {RectData} from "../typing/rect-data"
-import svg from "../helpers/svg"
-import icons from "../helpers/icons"
-import misc from "../helpers/misc"
+import TimeBlock from "../../typing/time-block"
+import {RectData} from "../../typing/rect-data"
+import * as svg from "../../helpers/svg"
+import * as icons from "../../helpers/icons"
+import * as misc from "../../helpers/misc"
 import * as rowSubComponents from "./svg-row-subcomponents"
 import {
-Indicator,
-getIndicators
+  Indicator,
+  getIndicators
 } from "./svg-indicators"
 
 

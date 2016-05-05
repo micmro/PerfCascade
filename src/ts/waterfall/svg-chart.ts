@@ -1,7 +1,7 @@
 import TimeBlock from "../typing/time-block"
 import {WaterfallData} from "../typing/waterfall-data"
 import {RectData} from "../typing/rect-data"
-import svg from "../helpers/svg"
+import * as svg from "../helpers/svg"
 import {
   createBgRect,
   createTimeScale,
@@ -9,8 +9,8 @@ import {
   makeHoverEvtListeners,
   createAlignmentLines
 } from "./svg-general-components"
-import {createRow} from "./svg-row"
-import {getIndicators} from "./svg-indicators"
+import {createRow} from "./row/svg-row"
+import {getIndicators} from "./row/svg-indicators"
 import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
 import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
 

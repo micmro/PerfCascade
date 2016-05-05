@@ -13,19 +13,20 @@ const toSvg = (x: number, y: number, title: string, className: string, scale: nu
   return doc.firstChild as SVGElement
 }
 
-let icons = {
-  lock: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-lock", scale, `<g>
-    <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0 
+export function lock(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-lock", scale, `<g>
+    <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
       C16.3,1,17,1.7,17,2.5L17,15.5z"/>
     <path fill="none" stroke="#E6E7E8" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
       C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
   </g>
   <path fill="#A452A0" d="M13,8V6.5C13,5,12,3,9,3S5,5,5,6.5V8H4v7h10V8H13z M10,12.5c0,0.3-0.7,0.5-1,0.5s-1-0.2-1-0.5v-2
     C8,10.2,8.7,10,9,10s1,0.2,1,0.5V12.5z M11,8H7V6.5C7,5.7,7.5,5,9,5s2,0.7,2,1.5V8z"/>`)
-  },
-  noTls: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-no-tls", scale, `<g>
+}
+
+
+export function noTls(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-no-tls", scale, `<g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
             C16.3,1,17,1.7,17,2.5L17,15.5z"/>
         <path fill="none" stroke="#CC6666" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
@@ -34,9 +35,11 @@ let icons = {
     <path fill="#414042" d="M13,8V6.5C13,5,12,3,9,3S5,5,5,6.5V8H4v7h10V8H13z M10,12.5c0,0.3-0.7,0.5-1,0.5s-1-0.2-1-0.5v-2
         C8,10.2,8.7,10,9,10s1,0.2,1,0.5V12.5z M11,8H7V6.5C7,5.7,7.5,5,9,5s2,0.7,2,1.5V8z"/>
     <line fill="#CC6666" stroke="#CC6666" stroke-miterlimit="10" x1="3" y1="15" x2="15" y2="3"/>`)
-  },
-  err3xx: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-redirect", scale, `<g>
+}
+
+
+export function err3xx(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-redirect", scale, `<g>
         <path fill="#F9EF66" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5
             L17,15.5z"/>
         <path fill="none" stroke="#E6E7E8" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
@@ -45,9 +48,11 @@ let icons = {
     <polygon fill="#414042" points="9,5 9,10 12,7.5 "/>
     <polyline fill="none" stroke="#414042" stroke-miterlimit="10" points="9,7.5 4.5,7.5 4.5,11.5 13,11.5 "/>
     <path fill="#414042" d="M11,10"/>`)
-  },
-  err4xx : function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-4xx", scale, `<g>
+}
+
+
+export function err4xx(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-4xx", scale, `<g>
         <path fill="#F16062" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
             C16.3,1,17,1.7,17,2.5L17,15.5z"/>
         <path fill="none" stroke="#E6E7E8" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
@@ -60,9 +65,11 @@ let icons = {
         <path fill="#FFFFFF" d="M11.5,14l1.5-2.7l-1.4-2.5h0.9l0.6,1.2c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8
             l-1.4,2.4l1.5,2.7h-0.9l-0.9-1.6L13.4,12l-1.1,2H11.5z"/>
     </g>`)
-  },
-  err5xx : function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-5xx", scale, ` <g>
+}
+
+
+export function err5xx(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-5xx", scale, ` <g>
         <path fill="#F16061" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
             C16.3,1,17,1.7,17,2.5L17,15.5z"/>
         <path fill="none" stroke="#E6E7E8" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
@@ -78,9 +85,11 @@ let icons = {
         <path fill="#FFFFFF" d="M11.5,14l1.5-2.7l-1.4-2.5h0.9l0.6,1.2c0.1,0.2,0.2,0.4,0.3,0.6c0.1-0.2,0.2-0.4,0.3-0.6l0.7-1.2h0.8
             l-1.4,2.4l1.5,2.7h-0.9l-0.9-1.6L13.4,12l-1.1,2H11.5z"/>
     </g>`)
-  },
-  noCache : function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-no-cache", scale, `<g>
+}
+
+
+export function noCache(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-no-cache", scale, `<g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
             C16.3,1,17,1.7,17,2.5L17,15.5z"/>
         <path fill="none" stroke="#CC6666" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
@@ -92,9 +101,11 @@ let icons = {
             C13,5.7,11.2,5,9,5S5,5.7,5,6.5C5,6.7,5.1,6.8,5.2,7C5.8,7.6,7.3,8,9,8z"/>
     </g>
     <line fill="#CC6666" stroke="#CC6666" stroke-miterlimit="10" x1="3" y1="15" x2="15" y2="3"/>`)
-  },
-  noGzip : function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-no-gzip", scale, `<g>
+}
+
+
+export function noGzip(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-no-gzip", scale, `<g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
             C16.3,1,17,1.7,17,2.5L17,15.5z"/>
         <path fill="none" stroke="#CC6666" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
@@ -109,9 +120,11 @@ let icons = {
     <polygon fill="#FFFFFF" points="9,13.5 9,13.5 8,13 8,11.5 10,11.5 10,13     "/>
     <rect x="9" y="7" fill="#414042" width="1.5" height="1"/>
     <line fill="#CC6666" stroke="#CC6666" stroke-miterlimit="10" x1="3" y1="15" x2="15" y2="3"/>`)
-  },
-  plain: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-plain", scale, `<g>
+}
+
+
+export function plain(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-plain", scale, `<g>
       <g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
           C16.3,1,17,1.7,17,2.5L17,15.5z"/>
@@ -124,9 +137,11 @@ let icons = {
       <line fill="none" stroke="#414042" stroke-miterlimit="10" x1="3" y1="10.5" x2="10" y2="10.5"/>
       <line fill="none" stroke="#414042" stroke-miterlimit="10" x1="3" y1="12.5" x2="15" y2="12.5"/>
     </g>`)
-  },
-  other: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-other", scale, `<g>
+}
+
+
+export function other(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-other", scale, `<g>
       <g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
           C16.3,1,17,1.7,17,2.5L17,15.5z"/>
@@ -140,9 +155,11 @@ let icons = {
           c0.5,0,0.8,0.1,1.2,0.2c0.3,0.1,0.6,0.3,0.9,0.4c0.2,0.2,0.4,0.4,0.5,0.7C11.8,6.4,11.8,6.6,11.8,7z M9.8,13H7.7v-1.4h2.1V13z"/>
       </g>
     </g>`)
-  },
-  javascript: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-js", scale, `<g>
+}
+
+
+export function javascript(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-js", scale, `<g>
       <g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5
           L17,15.5z"/>
@@ -162,9 +179,11 @@ let icons = {
           c0.5,0.2,0.8,0.4,1.1,0.7c0.2,0.3,0.4,0.7,0.4,1.2c0,0.7-0.3,1.3-0.8,1.7S12,13.9,11.1,13.9z"/>
       </g>
     </g>`)
-  },
-  image: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-image", scale, `<g>
+}
+
+
+export function image(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-image", scale, `<g>
       <g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
           C16.3,1,17,1.7,17,2.5L17,15.5z"/>
@@ -174,9 +193,11 @@ let icons = {
       <polygon points="2.6,14 8.2,9.9 12,11.4 15,8.2 15,14 	"/>
       <circle cx="6.6" cy="5.8" r="1.8"/>
     </g>`)
-  },
-  html: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-html", scale, `<g>
+}
+
+
+export function html(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-html", scale, `<g>
       <g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5
           L17,15.5z"/>
@@ -188,9 +209,11 @@ let icons = {
         <path d="M14,10.2l-4.7,2v-1l3.3-1.3L9.3,8.4v-1l4.7,2V10.2z"/>
       </g>
     </g>`)
-  },
-  css: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-css", scale, `<g>
+}
+
+
+export function css(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-css", scale, `<g>
       <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
         C16.3,1,17,1.7,17,2.5L17,15.5z"/>
       <path fill="none" stroke="#A6D08E" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
@@ -208,18 +231,22 @@ let icons = {
         C11.2,7.1,11.1,7,10.9,7c-0.1,0-0.3,0-0.4,0h-0.4V6.1h1c0.5,0,0.9,0.1,1.2,0.4c0.3,0.3,0.4,0.6,0.4,1.1v0.6c0,0.4,0.1,0.8,0.3,0.9
         c0.2,0.2,0.5,0.3,1,0.3h0.3V10.4z"/>
     </g>`)
-  },
-  warning: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-warning", scale, `<g>
+}
+
+
+export function warning(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-warning", scale, `<g>
           <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
               C16.3,1,17,1.7,17,2.5L17,15.5z"/>
           <path fill="none" stroke="#CC6666" stroke-width="2" stroke-miterlimit="10" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13
               C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0C16.3,1,17,1.7,17,2.5L17,15.5z"/>
       </g>
       <path fill="#414042" d="M9,3L3,14h12L9,3z M10,13H8v-1h2V13z M9.5,11h-1L8,10V7l0.5-1h1L10,7v3L9.5,11z"/>`)
-  },
-  font: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-font", scale, `<g>
+}
+
+
+export function font(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-font", scale, `<g>
       <g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1h13C16.3,1,17,1.7,17,2.5
           L17,15.5z"/>
@@ -245,9 +272,11 @@ let icons = {
           C15,9.3,15.2,9.3,15.4,9.4z"/>
       </g>
     </g>`)
-  },
-  flash: function(x: number, y: number, title: string, scale: number = 1): SVGElement {
-    return toSvg(x, y, title, "icon-flash", scale, `<g>
+}
+
+
+export function flash(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return toSvg(x, y, title, "icon-flash", scale, `<g>
       <g>
         <path fill="#FFFFFF" d="M17,15.5c0,0.8-0.7,1.5-1.5,1.5h-13C1.7,17,1,16.3,1,15.5v-13C1,1.7,1.7,1,2.5,1l13,0
           C16.3,1,17,1.7,17,2.5L17,15.5z"/>
@@ -257,8 +286,4 @@ let icons = {
     </g>
     <path fill="#414042" d="M13.1,6.2c-2.1-0.1-2.9,2.3-2.9,2.3h1.7l0,2.1l-2.5,0C8.8,11.9,7.6,15,4,15c0-0.1,0-1.8,0-2.1
       c2.1-0.1,3.2-2.4,3.7-4.1c1.4-4.1,3.5-4.6,5.3-4.8V6.2z"/>`)
-  }
-
 }
-
-export default icons

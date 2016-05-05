@@ -1,9 +1,9 @@
 /**
  * Creation of sub-components used in a ressource request row
  */
-import TimeBlock from "../typing/time-block"
-import {Entry, Header} from "../typing/har"
-import misc from "../helpers/misc"
+import TimeBlock from "../../typing/time-block"
+import {Entry, Header} from "../../typing/har"
+import * as misc from "../../helpers/misc"
 
 /**
  * Interface for `Icon` metadata

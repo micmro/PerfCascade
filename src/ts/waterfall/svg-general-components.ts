@@ -2,7 +2,7 @@
  * Creation of sub-components of the waterfall chart
  */
 
-import svg from "../helpers/svg"
+import * as svg from "../helpers/svg"
 import TimeBlock from "../typing/time-block"
 import {Mark} from "../typing/waterfall-data"
 import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
