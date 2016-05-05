@@ -132,6 +132,9 @@ var misc = {
             return matches.authority.substr(0, 17) + "..." + p[p.length - 1].substr(-15);
         }
         return matches.authority + "..." + p[p.length - 1].substr(-15);
+    },
+    roundNumber: function roundNumber(num, dec) {
+        return Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1242,22 +1245,20 @@ exports.getIndicators = getIndicators;
  * Creation of sub-components used in a ressource request row
  */
 var svg_1 = require("../helpers/svg");
+var misc_1 = require("../helpers/misc");
 /**
- * Render the block and timings for a request
- * @param  {RectData}         rectData Basic dependencys and globals
- * @param  {Array<TimeBlock>} segments Request and Timing Data
- * @return {SVGElement}                Renerated SVG (rect or g element)
+ * Creates the `rect` that represent the timings in `rectData`
+ * @param  {RectData} rectData - Data for block
+ * @param  {string} className - className for block `rect`
  */
-function createRect(rectData, segments) {
+function makeBlock(rectData, className) {
     var blockHeight = rectData.height - 1;
-    var rectHolder;
     var rect = svg_1.default.newEl("rect", {
-        "width": (rectData.width / rectData.unit) + "%",
+        "width": misc_1.default.roundNumber(rectData.width / rectData.unit, 2) + "%",
         "height": blockHeight,
-        "x": Math.round((rectData.x / rectData.unit) * 100) / 100 + "%",
+        "x": misc_1.default.roundNumber(rectData.x / rectData.unit, 2) + "%",
         "y": rectData.y,
-        "class": ((segments && segments.length > 0 ? "time-block" : "segment")) + " "
-            + (rectData.cssClass || "block-other")
+        "class": className
     });
     if (rectData.label) {
         rect.appendChild(svg_1.default.newEl("title", {
@@ -1266,33 +1267,73 @@ function createRect(rectData, segments) {
     }
     rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
     rect.addEventListener("mouseleave", rectData.hideOverlay(rectData));
+    return rect;
+}
+/**
+ * Converts a segment to RectData
+ * @param  {TimeBlock} segment
+ * @param  {RectData} rectData
+ * @returns RectData
+ */
+function segmentToRectData(segment, rectData) {
+    return {
+        "width": segment.total,
+        "height": (rectData.height - 6),
+        "x": segment.start || 0.001,
+        "y": rectData.y,
+        "cssClass": segment.cssClass,
+        "label": segment.name + " (" + Math.round(segment.start) + "ms - "
+            + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
+        "unit": rectData.unit,
+        "showOverlay": rectData.showOverlay,
+        "hideOverlay": rectData.hideOverlay
+    };
+}
+/**
+ * @param  {RectData} rectData
+ * @param  {number} timeTotal
+ * @param  {number} firstX
+ * @returns SVGTextElement
+ */
+function createTimingLable(rectData, timeTotal, firstX) {
+    var minWidth = 500; // minimum supported diagram width that should show the timing lable uncropped
+    var spacingPerc = (5 / minWidth * 100);
+    var y = rectData.y + rectData.height / 1.5;
+    var percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc;
+    var txtEl = svg_1.default.newTextEl(timeTotal + "ms", y, misc_1.default.roundNumber(percStart, 2) + "%");
+    var txtWidth = svg_1.default.getNodeTextWidth(txtEl);
+    if (percStart + (txtWidth / minWidth * 100) > 100) {
+        percStart = firstX / rectData.unit - spacingPerc;
+        txtEl = svg_1.default.newTextEl(timeTotal + "ms", y, misc_1.default.roundNumber(percStart, 2) + "%", { "textAnchor": "end" });
+    }
+    return txtEl;
+}
+/**
+ * Render the block and timings for a request
+ * @param  {RectData}         rectData Basic dependencys and globals
+ * @param  {Array<TimeBlock>} segments Request and Timing Data
+ * @param  {number} timeTotal  - total time of the request
+ * @return {SVGElement}                Renerated SVG (rect or g element)
+ */
+function createRect(rectData, segments, timeTotal) {
+    var rect = makeBlock(rectData, "time-block " + (rectData.cssClass || "block-other"));
+    var rectHolder = svg_1.default.newEl("g", {
+        "class": "rect-holder"
+    });
+    var firstX = rectData.x;
+    rectHolder.appendChild(rect);
     if (segments && segments.length > 0) {
-        rectHolder = svg_1.default.newEl("g", {
-            "class": "rect-holder"
-        });
-        rectHolder.appendChild(rect);
         segments.forEach(function (segment) {
             if (segment.total > 0 && typeof segment.start === "number") {
-                var childRectData = {
-                    "width": segment.total,
-                    "height": (blockHeight - 5),
-                    "x": segment.start || 0.001,
-                    "y": rectData.y,
-                    "cssClass": segment.cssClass,
-                    "label": segment.name + " (" + Math.round(segment.start) + "ms - "
-                        + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
-                    "unit": rectData.unit,
-                    "showOverlay": rectData.showOverlay,
-                    "hideOverlay": rectData.hideOverlay
-                };
-                rectHolder.appendChild(createRect(childRectData));
+                var childRectData = segmentToRectData(segment, rectData);
+                var childRect = makeBlock(childRectData, "segment " + childRectData.cssClass);
+                firstX = Math.min(firstX, childRectData.x);
+                rectHolder.appendChild(childRect);
             }
         });
-        return rectHolder;
+        rectHolder.appendChild(createTimingLable(rectData, timeTotal, firstX));
     }
-    else {
-        return rect;
-    }
+    return rectHolder;
 }
 exports.createRect = createRect;
 /**
@@ -1387,7 +1428,7 @@ function createBgStripe(y, height, isEven) {
     });
 }
 exports.createBgStripe = createBgStripe;
-function createNameRow(y, requestBarHeight, onClick, leftFixedWidthPerc) {
+function createNameRowBg(y, requestBarHeight, onClick, leftFixedWidthPerc) {
     var rowFixed = svg_1.default.newEl("g", {
         "class": "row row-fixed"
     });
@@ -1401,8 +1442,8 @@ function createNameRow(y, requestBarHeight, onClick, leftFixedWidthPerc) {
     rowFixed.addEventListener("click", onClick);
     return rowFixed;
 }
-exports.createNameRow = createNameRow;
-function createRequestBarRow(y, requestBarHeight, onClick) {
+exports.createNameRowBg = createNameRowBg;
+function createRequestBarRowBg(y, requestBarHeight, onClick) {
     var rowFixed = svg_1.default.newEl("g", {
         "class": "row row-flex"
     });
@@ -1416,9 +1457,9 @@ function createRequestBarRow(y, requestBarHeight, onClick) {
     rowFixed.addEventListener("click", onClick);
     return rowFixed;
 }
-exports.createRequestBarRow = createRequestBarRow;
+exports.createRequestBarRowBg = createRequestBarRowBg;
 
-},{"../helpers/svg":4}],18:[function(require,module,exports){
+},{"../helpers/misc":3,"../helpers/svg":4}],18:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var icons_1 = require("../helpers/icons");
 var misc_1 = require("../helpers/misc");
@@ -1445,14 +1486,14 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
         "x": leftFixedWidthPerc + "%",
         "width": (100 - leftFixedWidthPerc) + "%"
     });
-    var rect = rowSubComponents.createRect(rectData, block.segments);
+    var rect = rowSubComponents.createRect(rectData, block.segments, block.total);
     var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, misc_1.default.ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
     var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
-    var rowName = rowSubComponents.createNameRow(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc);
-    var rowFlex = rowSubComponents.createRequestBarRow(y, requestBarHeight, onDetailsOverlayShow);
+    var rowName = rowSubComponents.createNameRowBg(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc);
+    var rowBar = rowSubComponents.createRequestBarRowBg(y, requestBarHeight, onDetailsOverlayShow);
     var bgStripe = rowSubComponents.createBgStripe(y, requestBarHeight, (index % 2 === 0));
     //create and attach request block
-    rowFlex.appendChild(rect);
+    rowBar.appendChild(rect);
     //Add create and add warnings
     svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
         rowName.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
@@ -1462,7 +1503,7 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
         rowName.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
     });
     rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel);
-    flexScaleHolder.appendChild(rowFlex);
+    flexScaleHolder.appendChild(rowBar);
     leftFixedHolder.appendChild(clipPathElProto.cloneNode(true));
     leftFixedHolder.appendChild(rowName);
     rowItem.appendChild(bgStripe);

@@ -39,17 +39,17 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
     "width": `${100 - leftFixedWidthPerc}%`
   })
 
-  let rect = rowSubComponents.createRect(rectData, block.segments)
+  let rect = rowSubComponents.createRect(rectData, block.segments, block.total)
   let shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y,
     misc.ressourceUrlFormater(block.name), requestBarHeight, "clipPath")
   let fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight)
 
-  let rowName = rowSubComponents.createNameRow(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc)
-  let rowFlex = rowSubComponents.createRequestBarRow(y, requestBarHeight, onDetailsOverlayShow)
+  let rowName = rowSubComponents.createNameRowBg(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc)
+  let rowBar = rowSubComponents.createRequestBarRowBg(y, requestBarHeight, onDetailsOverlayShow)
   let bgStripe = rowSubComponents.createBgStripe(y, requestBarHeight, (index % 2 === 0))
 
   //create and attach request block
-  rowFlex.appendChild(rect)
+  rowBar.appendChild(rect)
 
   //Add create and add warnings
   getIndicators(block, docIsSsl).forEach((value: Indicator) => {
@@ -62,7 +62,7 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
   })
   rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel)
 
-  flexScaleHolder.appendChild(rowFlex)
+  flexScaleHolder.appendChild(rowBar)
   leftFixedHolder.appendChild(clipPathElProto.cloneNode(true))
   leftFixedHolder.appendChild(rowName)
 
