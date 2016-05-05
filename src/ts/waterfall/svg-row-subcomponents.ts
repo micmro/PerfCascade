@@ -170,7 +170,7 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
 
 
 
-export function createFixedRow(y: number, requestBarHeight: number, onClick: EventListener, leftFixedWidthPerc: number): SVGGElement {
+export function createNameRow(y: number, requestBarHeight: number, onClick: EventListener, leftFixedWidthPerc: number): SVGGElement {
   let rowFixed = svg.newEl("g", {
     "class": "row row-fixed"
   }) as SVGGElement
@@ -190,7 +190,7 @@ export function createFixedRow(y: number, requestBarHeight: number, onClick: Eve
 
 
 
-export function createFlexRow(y: number, requestBarHeight: number, onClick: EventListener): SVGGElement {
+export function createRequestBarRow(y: number, requestBarHeight: number, onClick: EventListener): SVGGElement {
   let rowFixed = svg.newEl("g", {
     "class": "row row-flex"
   }) as SVGGElement

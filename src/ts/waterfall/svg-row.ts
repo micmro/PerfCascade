@@ -3,15 +3,7 @@ import {RectData} from "../typing/rect-data"
 import svg from "../helpers/svg"
 import icons from "../helpers/icons"
 import misc from "../helpers/misc"
-import {
-  createRect,
-  createRequestLabelFull,
-  createRequestLabelClipped,
-  appendRequestLabels,
-  createBgStripe,
-  createFixedRow,
-  createFlexRow
-} from "./svg-row-subcomponents"
+import * as rowSubComponents from "./svg-row-subcomponents"
 import {
 Indicator,
 getIndicators
@@ -47,31 +39,32 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
     "width": `${100 - leftFixedWidthPerc}%`
   })
 
-  let rect = createRect(rectData, block.segments)
-  let shortLabel = createRequestLabelClipped(labelXPos, y, misc.ressourceUrlFormater(block.name), requestBarHeight, "clipPath")
-  let fullLabel = createRequestLabelFull(labelXPos, y, block.name, requestBarHeight)
+  let rect = rowSubComponents.createRect(rectData, block.segments)
+  let shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y,
+    misc.ressourceUrlFormater(block.name), requestBarHeight, "clipPath")
+  let fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight)
 
-  let rowFixed = createFixedRow(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc)
-  let rowFlex = createFlexRow(y, requestBarHeight, onDetailsOverlayShow)
-  let bgStripe = createBgStripe(y, requestBarHeight, (index % 2 === 0))
+  let rowName = rowSubComponents.createNameRow(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc)
+  let rowFlex = rowSubComponents.createRequestBarRow(y, requestBarHeight, onDetailsOverlayShow)
+  let bgStripe = rowSubComponents.createBgStripe(y, requestBarHeight, (index % 2 === 0))
 
   //create and attach request block
   rowFlex.appendChild(rect)
 
   //Add create and add warnings
   getIndicators(block, docIsSsl).forEach((value: Indicator) => {
-    rowFixed.appendChild(icons[value.type](value.x, y + 3, value.title))
+    rowName.appendChild(icons[value.type](value.x, y + 3, value.title))
   })
 
   //Add create and add warnings
   getIndicators(block, docIsSsl).forEach((value: Indicator) => {
-    rowFixed.appendChild(icons[value.type](value.x, y + 3, value.title))
+    rowName.appendChild(icons[value.type](value.x, y + 3, value.title))
   })
-  appendRequestLabels(rowFixed, shortLabel, fullLabel)
+  rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel)
 
   flexScaleHolder.appendChild(rowFlex)
   leftFixedHolder.appendChild(clipPathElProto.cloneNode(true))
-  leftFixedHolder.appendChild(rowFixed)
+  leftFixedHolder.appendChild(rowName)
 
   rowItem.appendChild(bgStripe)
   rowItem.appendChild(flexScaleHolder)

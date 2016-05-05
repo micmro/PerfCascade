@@ -1387,7 +1387,7 @@ function createBgStripe(y, height, isEven) {
     });
 }
 exports.createBgStripe = createBgStripe;
-function createFixedRow(y, requestBarHeight, onClick, leftFixedWidthPerc) {
+function createNameRow(y, requestBarHeight, onClick, leftFixedWidthPerc) {
     var rowFixed = svg_1.default.newEl("g", {
         "class": "row row-fixed"
     });
@@ -1401,8 +1401,8 @@ function createFixedRow(y, requestBarHeight, onClick, leftFixedWidthPerc) {
     rowFixed.addEventListener("click", onClick);
     return rowFixed;
 }
-exports.createFixedRow = createFixedRow;
-function createFlexRow(y, requestBarHeight, onClick) {
+exports.createNameRow = createNameRow;
+function createRequestBarRow(y, requestBarHeight, onClick) {
     var rowFixed = svg_1.default.newEl("g", {
         "class": "row row-flex"
     });
@@ -1416,13 +1416,13 @@ function createFlexRow(y, requestBarHeight, onClick) {
     rowFixed.addEventListener("click", onClick);
     return rowFixed;
 }
-exports.createFlexRow = createFlexRow;
+exports.createRequestBarRow = createRequestBarRow;
 
 },{"../helpers/svg":4}],18:[function(require,module,exports){
 var svg_1 = require("../helpers/svg");
 var icons_1 = require("../helpers/icons");
 var misc_1 = require("../helpers/misc");
-var svg_row_subcomponents_1 = require("./svg-row-subcomponents");
+var rowSubComponents = require("./svg-row-subcomponents");
 var svg_indicators_1 = require("./svg-indicators");
 //initial clip path
 var clipPathElProto = svg_1.default.newEl("clipPath", {
@@ -1445,26 +1445,26 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
         "x": leftFixedWidthPerc + "%",
         "width": (100 - leftFixedWidthPerc) + "%"
     });
-    var rect = svg_row_subcomponents_1.createRect(rectData, block.segments);
-    var shortLabel = svg_row_subcomponents_1.createRequestLabelClipped(labelXPos, y, misc_1.default.ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
-    var fullLabel = svg_row_subcomponents_1.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
-    var rowFixed = svg_row_subcomponents_1.createFixedRow(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc);
-    var rowFlex = svg_row_subcomponents_1.createFlexRow(y, requestBarHeight, onDetailsOverlayShow);
-    var bgStripe = svg_row_subcomponents_1.createBgStripe(y, requestBarHeight, (index % 2 === 0));
+    var rect = rowSubComponents.createRect(rectData, block.segments);
+    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, misc_1.default.ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
+    var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
+    var rowName = rowSubComponents.createNameRow(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc);
+    var rowFlex = rowSubComponents.createRequestBarRow(y, requestBarHeight, onDetailsOverlayShow);
+    var bgStripe = rowSubComponents.createBgStripe(y, requestBarHeight, (index % 2 === 0));
     //create and attach request block
     rowFlex.appendChild(rect);
     //Add create and add warnings
     svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
-        rowFixed.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
+        rowName.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
     });
     //Add create and add warnings
     svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
-        rowFixed.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
+        rowName.appendChild(icons_1.default[value.type](value.x, y + 3, value.title));
     });
-    svg_row_subcomponents_1.appendRequestLabels(rowFixed, shortLabel, fullLabel);
+    rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel);
     flexScaleHolder.appendChild(rowFlex);
     leftFixedHolder.appendChild(clipPathElProto.cloneNode(true));
-    leftFixedHolder.appendChild(rowFixed);
+    leftFixedHolder.appendChild(rowName);
     rowItem.appendChild(bgStripe);
     rowItem.appendChild(flexScaleHolder);
     rowItem.appendChild(leftFixedHolder);
