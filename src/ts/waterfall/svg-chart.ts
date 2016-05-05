@@ -1,7 +1,7 @@
 import TimeBlock from "../typing/time-block"
 import {WaterfallData} from "../typing/waterfall-data"
 import {RectData} from "../typing/rect-data"
-import svg from "../helpers/svg"
+import * as svg from "../helpers/svg"
 import {
   createBgRect,
   createTimeScale,

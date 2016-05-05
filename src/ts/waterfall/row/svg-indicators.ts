@@ -3,7 +3,7 @@
  */
 import TimeBlock from "../../typing/time-block"
 import {Entry, Header} from "../../typing/har"
-import misc from "../../helpers/misc"
+import * as misc from "../../helpers/misc"
 
 /**
  * Interface for `Icon` metadata

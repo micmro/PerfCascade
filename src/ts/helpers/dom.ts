@@ -2,18 +2,17 @@
  *  DOM Helpers
  */
 
-let dom = {
-  removeAllChildren: function(el: HTMLElement | SVGElement){
-    while (el.childNodes.length > 0) {
-      el.removeChild(el.childNodes[0])
-    }
-  },
-  forEach: function(els: NodeListOf<Element>, fn: (el: Element, index: number) => any){
-    Array.prototype.forEach.call(els, fn)
-  },
-  filter: function(els: NodeListOf<Element>, predicat: (el: Element, index: number) => boolean): NodeListOf<Element>{
-    return Array.prototype.filter.call(els, predicat)
+
+export function removeAllChildren(el: HTMLElement | SVGElement) {
+  while (el.childNodes.length > 0) {
+    el.removeChild(el.childNodes[0])
   }
 }
 
-export default dom
+export function forEach(els: NodeListOf<Element>, fn: (el: Element, index: number) => any) {
+  Array.prototype.forEach.call(els, fn)
+}
+
+export function filter(els: NodeListOf<Element>, predicat: (el: Element, index: number) => boolean): NodeListOf<Element> {
+  return Array.prototype.filter.call(els, predicat)
+}
