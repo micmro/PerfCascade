@@ -1,8 +1,11 @@
 import TimeBlock from "../../typing/time-block"
+import {Entry} from "../../typing/har.d" //TODO: Delete - temp only - need to greate source agnostic data structure
 
-//TODO: Delete - temp only - needt to greate source agnostic data structure
-import {Entry} from "../../typing/har.d"
-
+/**
+ * Data to show in overlay tabs
+ * @param  {number} requestID - request number
+ * @param  {TimeBlock} block
+ */
 export function getKeys(requestID: number, block: TimeBlock) {
   //TODO: dodgy casting - will not work for other adapters
   let entry = block.rawResource as Entry
