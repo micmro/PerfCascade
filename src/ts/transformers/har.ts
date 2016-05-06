@@ -13,6 +13,11 @@ mimeToRequestType
 
 
 export default class HarTransformer {
+  /**
+   * Transforms a HAR object into the format needed to render the PerfCascade
+   * @param  {Har} data
+   * @returns WaterfallData
+   */
   public static transfrom(data: Har): WaterfallData {
     console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length)
 
@@ -62,10 +67,14 @@ export default class HarTransformer {
       lines: [],
     }
   }
-
+  /**
+   * Create `TimeBlock`s to represent the subtimings of a request ("blocked", "dns", "connect", "send", "wait", "receive")
+   * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
+   * @param  {Entry} entry
+   * @returns Array
+   */
   public static buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<TimeBlock> {
     let t = entry.timings
-    // var timings = []
     return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<TimeBlock>, key) => {
 
       const time = this.getTimePair(key, entry, collect, startRelative)
@@ -90,6 +99,15 @@ export default class HarTransformer {
     }, [])
   }
 
+  /**
+   * Returns Object containing start and end time of `collect`
+   *
+   * @param  {string} key
+   * @param  {Entry} entry
+   * @param  {Array<TimeBlock>} collect
+   * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
+   * @returns {Object}
+   */
   private static getTimePair(key: string, entry: Entry, collect: Array<TimeBlock>, startRelative: number) {
     let wptKey;
     switch (key) {

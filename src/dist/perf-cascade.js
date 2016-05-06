@@ -1,8 +1,12 @@
-/*PerfCascade build:05/05/2016 */
+/*PerfCascade build:06/05/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  *  DOM Helpers
+ */
+/**
+ * Remove all child nodes from `el`
+ * @param  {HTMLElement|SVGElement} el
  */
 function removeAllChildren(el) {
     while (el.childNodes.length > 0) {
@@ -10,10 +14,22 @@ function removeAllChildren(el) {
     }
 }
 exports.removeAllChildren = removeAllChildren;
+/**
+ * Iterate over list of DOM elements
+ * @param  {NodeListOf<Element>} els
+ * @param  {(el:Element,index:number)=>any} fn
+ */
 function forEach(els, fn) {
     Array.prototype.forEach.call(els, fn);
 }
 exports.forEach = forEach;
+/**
+ * Filter list of DOM elements
+ *
+ * @param  {NodeListOf<Element>} els
+ * @param  {(el:Element,index:number)=>boolean} predicat
+ * @returns NodeListOf
+ */
 function filter(els, predicat) {
     return Array.prototype.filter.call(els, predicat);
 }
@@ -319,6 +335,11 @@ var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
     function HarTransformer() {
     }
+    /**
+     * Transforms a HAR object into the format needed to render the PerfCascade
+     * @param  {Har} data
+     * @returns WaterfallData
+     */
     HarTransformer.transfrom = function (data) {
         var _this = this;
         console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
@@ -354,10 +375,15 @@ var HarTransformer = (function () {
             lines: [],
         };
     };
+    /**
+     * Create `TimeBlock`s to represent the subtimings of a request ("blocked", "dns", "connect", "send", "wait", "receive")
+     * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
+     * @param  {Entry} entry
+     * @returns Array
+     */
     HarTransformer.buildDetailTimingBlocks = function (startRelative, entry) {
         var _this = this;
         var t = entry.timings;
-        // var timings = []
         return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce(function (collect, key) {
             var time = _this.getTimePair(key, entry, collect, startRelative);
             if (time.end && time.start >= time.end) {
@@ -376,6 +402,15 @@ var HarTransformer = (function () {
             return collect.concat([new time_block_1.default(key, time.start, time.end, "block-" + key)]);
         }, []);
     };
+    /**
+     * Returns Object containing start and end time of `collect`
+     *
+     * @param  {string} key
+     * @param  {Entry} entry
+     * @param  {Array<TimeBlock>} collect
+     * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
+     * @returns {Object}
+     */
     HarTransformer.getTimePair = function (key, entry, collect, startRelative) {
         var wptKey;
         switch (key) {
