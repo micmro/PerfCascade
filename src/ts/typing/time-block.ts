@@ -1,4 +1,4 @@
-import {Entry} from "./har.ts"
+import {Entry} from "./har.d"
 
 export default class TimeBlock {
   public total: number

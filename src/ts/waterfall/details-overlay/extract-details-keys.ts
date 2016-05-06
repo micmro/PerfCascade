@@ -1,7 +1,7 @@
 import TimeBlock from "../../typing/time-block"
 
 //TODO: Delete - temp only - needt to greate source agnostic data structure
-import {Entry} from "../../typing/har"
+import {Entry} from "../../typing/har.d"
 
 export function getKeys(requestID: number, block: TimeBlock) {
   //TODO: dodgy casting - will not work for other adapters

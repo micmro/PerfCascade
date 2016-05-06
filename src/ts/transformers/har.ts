@@ -1,6 +1,6 @@
 import {Har,
 Entry
-} from "../typing/har"
+} from "../typing/har.d"
 import TimeBlock from "../typing/time-block"
 import {
 WaterfallData,
