@@ -1,4 +1,4 @@
-import {OpenOverlay, OverlayChangeEvent} from "../../typing/open-overlay"
+import {OpenOverlay, OverlayChangeEvent} from "../../typing/open-overlay.d"
 import TimeBlock from "../../typing/time-block"
 import {createRowInfoOverlay} from "./svg-details-overlay"
 import * as overlayChangesPubSub from "./overlay-changes-pub-sub"

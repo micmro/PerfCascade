@@ -1,6 +1,6 @@
+import TimeBlock from "../../typing/time-block"
 import * as svg from "../../helpers/svg"
 import * as dom from "../../helpers/dom"
-import TimeBlock from "../../typing/time-block"
 import {createDetailsBody} from "./html-details-body"
 
 

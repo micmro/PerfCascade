@@ -1,14 +1,15 @@
-import {Har,
-Entry
+import {
+  Har,
+  Entry
 } from "../typing/har.d"
+import {
+  WaterfallData,
+  Mark
+} from "../typing/waterfall-data.d"
 import TimeBlock from "../typing/time-block"
 import {
-WaterfallData,
-Mark
-} from "../typing/waterfall-data"
-import {
-mimeToCssClass,
-mimeToRequestType
+  mimeToCssClass,
+  mimeToRequestType
 } from "./styling-converters"
 
 

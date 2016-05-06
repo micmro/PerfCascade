@@ -2,11 +2,11 @@
  * Creation of sub-components of the waterfall chart
  */
 
-import * as svg from "../helpers/svg"
+import {Mark} from "../typing/waterfall-data.d"
+import {OverlayChangeEvent} from "../typing/open-overlay.d"
 import TimeBlock from "../typing/time-block"
-import {Mark} from "../typing/waterfall-data"
+import * as svg from "../helpers/svg"
 import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
-import {OverlayChangeEvent} from "../typing/open-overlay"
 
 
 export interface HoverElements {

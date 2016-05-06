@@ -2,10 +2,10 @@
  * Creation of sub-components used in a ressource request row
  */
 
+import {RectData} from "../../typing/rect-data.d"
+import TimeBlock from "../../typing/time-block"
 import * as svg from "../../helpers/svg"
 import * as misc from "../../helpers/misc"
-import TimeBlock from "../../typing/time-block"
-import {RectData} from "../../typing/rect-data"
 
 
 

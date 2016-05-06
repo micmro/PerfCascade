@@ -1,6 +1,6 @@
+import {WaterfallData} from "../typing/waterfall-data.d"
+import {RectData} from "../typing/rect-data.d"
 import TimeBlock from "../typing/time-block"
-import {WaterfallData} from "../typing/waterfall-data"
-import {RectData} from "../typing/rect-data"
 import * as svg from "../helpers/svg"
 import {
   createBgRect,

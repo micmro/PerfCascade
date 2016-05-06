@@ -1,6 +1,6 @@
 //simple pub/sub for change to the overlay
 
-import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay"
+import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay.d"
 
 
 export const eventTypes = {
