@@ -50,17 +50,51 @@ export function newTextEl(text: string, y: number, x?: number | string, css?: Ob
   return newEl("text", opt, css) as SVGTextElement
 }
 
-//needs access to body to measure size
-//TODO: refactor for server side use
+
+
+/** temp SVG element for size measurements  */
+let getTestSVGEl = (() => {
+  /** Reference to Temp SVG element for size measurements */
+  let svgTestEl: SVGSVGElement
+  let removeSvgTestElTimeout
+
+  return function getTestSVGElInner(): SVGSVGElement {
+    // lazy init svgTestEl
+    if (svgTestEl === undefined) {
+      svgTestEl = newEl("svg:svg", {
+        "className": "water-fall-chart temp",
+        "width": "9999px"
+      }, {
+        "visibility": "hidden",
+        "position": "absoulte",
+        "top": "0px",
+        "left": "0px",
+        "z-index": "99999"
+      }) as SVGSVGElement
+    }
+
+    //needs access to body to measure size
+    //TODO: refactor for server side use
+    if (svgTestEl.parentElement === undefined ) {
+      window.document.body.appendChild(svgTestEl)
+    }
+
+    //debounced time-deleayed cleanup, so the element can be re-used in tight loops
+    clearTimeout(removeSvgTestElTimeout)
+    removeSvgTestElTimeout = setTimeout(() => {
+      svgTestEl.parentNode.removeChild(svgTestEl)
+    }, 1000)
+
+    return svgTestEl
+  }
+})()
+
+
 export function getNodeTextWidth(textNode: SVGTextElement): number {
-  let tmp = newEl("svg:svg", {}, {
-    "visibility": "hidden"
-  }) as SVGSVGElement
+  let tmp = getTestSVGEl()
   tmp.appendChild(textNode)
   window.document.body.appendChild(tmp)
-
   const nodeWidth = textNode.getBBox().width
-  tmp.parentNode.removeChild(tmp)
   return nodeWidth
 }
 

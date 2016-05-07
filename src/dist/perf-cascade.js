@@ -1,4 +1,4 @@
-/*PerfCascade build:06/05/2016 */
+/*PerfCascade build:07/05/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -235,16 +235,43 @@ function newTextEl(text, y, x, css) {
     return newEl("text", opt, css);
 }
 exports.newTextEl = newTextEl;
-//needs access to body to measure size
-//TODO: refactor for server side use
+/** temp SVG element for size measurements  */
+var getTestSVGEl = (function () {
+    /** Reference to Temp SVG element for size measurements */
+    var svgTestEl;
+    var removeSvgTestElTimeout;
+    return function getTestSVGElInner() {
+        // lazy init svgTestEl
+        if (svgTestEl === undefined) {
+            svgTestEl = newEl("svg:svg", {
+                "className": "water-fall-chart temp",
+                "width": "9999px"
+            }, {
+                "visibility": "hidden",
+                "position": "absoulte",
+                "top": "0px",
+                "left": "0px",
+                "z-index": "99999"
+            });
+        }
+        //needs access to body to measure size
+        //TODO: refactor for server side use
+        if (svgTestEl.parentElement === undefined) {
+            window.document.body.appendChild(svgTestEl);
+        }
+        //debounced time-deleayed cleanup, so the element can be re-used in tight loops
+        clearTimeout(removeSvgTestElTimeout);
+        removeSvgTestElTimeout = setTimeout(function () {
+            svgTestEl.parentNode.removeChild(svgTestEl);
+        }, 1000);
+        return svgTestEl;
+    };
+})();
 function getNodeTextWidth(textNode) {
-    var tmp = newEl("svg:svg", {}, {
-        "visibility": "hidden"
-    });
+    var tmp = getTestSVGEl();
     tmp.appendChild(textNode);
     window.document.body.appendChild(tmp);
     var nodeWidth = textNode.getBBox().width;
-    tmp.parentNode.removeChild(tmp);
     return nodeWidth;
 }
 exports.getNodeTextWidth = getNodeTextWidth;
@@ -292,7 +319,12 @@ var outputHolder = document.getElementById("output");
 function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
     dom.removeAllChildren(outputHolder);
-    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, 23));
+    console.time("setup");
+    var svg = svg_chart_1.createWaterfallSvg(data, 23);
+    console.timeEnd("setup");
+    console.time("append");
+    outputHolder.appendChild(svg);
+    console.timeEnd("append");
 }
 function onFileSubmit(evt) {
     var files = evt.target.files;
@@ -502,6 +534,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
 },{}],9:[function(require,module,exports){
+/**
+ * Data to show in overlay tabs
+ * @param  {number} requestID - request number
+ * @param  {TimeBlock} block
+ */
 function getKeys(requestID, block) {
     //TODO: dodgy casting - will not work for other adapters
     var entry = block.rawResource;
@@ -1069,8 +1106,9 @@ function createTimingLable(rectData, timeTotal, firstX) {
     var y = rectData.y + rectData.height / 1.5;
     var percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc;
     var txtEl = svg.newTextEl(timeTotal + "ms", y, misc.roundNumber(percStart, 2) + "%");
-    var txtWidth = svg.getNodeTextWidth(txtEl);
-    if (percStart + (txtWidth / minWidth * 100) > 100) {
+    //(pessimistic) estimation of text with to avoid performance penalty of `getBBox`
+    var roughTxtWidth = (timeTotal + "ms").length * 8;
+    if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
         percStart = firstX / rectData.unit - spacingPerc;
         txtEl = svg.newTextEl(timeTotal + "ms", y, misc.roundNumber(percStart, 2) + "%", { "textAnchor": "end" });
     }

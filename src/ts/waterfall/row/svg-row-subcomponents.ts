@@ -68,9 +68,11 @@ function createTimingLable(rectData: RectData, timeTotal: number, firstX: number
 
   let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc
   let txtEl = svg.newTextEl(`${timeTotal}ms`, y, `${misc.roundNumber(percStart, 2)}%`)
-  let txtWidth = svg.getNodeTextWidth(txtEl)
 
-  if (percStart + (txtWidth / minWidth * 100) > 100) {
+  //(pessimistic) estimation of text with to avoid performance penalty of `getBBox`
+  let roughTxtWidth = `${timeTotal}ms`.length * 8
+
+  if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
     percStart = firstX / rectData.unit - spacingPerc
     txtEl = svg.newTextEl(`${timeTotal}ms`, y, `${misc.roundNumber(percStart, 2)}%`, { "textAnchor": "end" })
   }
