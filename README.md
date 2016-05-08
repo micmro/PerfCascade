@@ -5,6 +5,8 @@ Extensible waterfall-viewer that works with HAR and other formats (in the future
 
 Live exampe at: https://micmro.github.io/PerfCascade/
 
+![example screenshot](https://raw.githubusercontent.com/micmro/PerfCascade/gh-pages/img/PerfCascade-sample1.png)
+
 ## Dev
 - Start live-reload server and Typescript compiler with watch: `npm run watch`
 - Create uglified version: `npm run build` (not tracked ITM)
