@@ -1,6 +1,6 @@
 *Under active development - API, UI and features are not fully completed yet*
 
-# PerfCascase
+# PerfCascade
 Extensible waterfall-viewer that works with HAR and other formats (in the future).
 
 Live exampe at: https://micmro.github.io/PerfCascade/
