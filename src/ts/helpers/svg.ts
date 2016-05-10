@@ -44,9 +44,6 @@ export function newTextEl(text: string, y: number, x?: number | string, css?: Ob
   if (x !== undefined) {
     opt["x"] = x
   }
-  if (css["textShadow"] === undefined) {
-    css["textShadow"] = "0 0 4px #fff"
-  }
   return newEl("text", opt, css) as SVGTextElement
 }
 
@@ -92,9 +89,12 @@ let getTestSVGEl = (() => {
 
 export function getNodeTextWidth(textNode: SVGTextElement): number {
   let tmp = getTestSVGEl()
-  tmp.appendChild(textNode)
+  let tmpTextNode = textNode.cloneNode(false) as SVGTextElement
+  tmp.appendChild(tmpTextNode)
+  //make sure to turn of shadow for performance
+  tmpTextNode.style.textShadow = "0"
   window.document.body.appendChild(tmp)
-  const nodeWidth = textNode.getBBox().width
+  const nodeWidth = tmpTextNode.getBBox().width
   return nodeWidth
 }
 
