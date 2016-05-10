@@ -501,6 +501,26 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .row-item:hover .odd,
 .row-item:hover .even {fill: #000; opacity: 0.1}
 .row-item .rect-holder text {fill: #aaa}
+.row-item.status5xx .even {fill: #f66;}
+.row-item.status5xx .odd {fill: #f00;}
+.row-item.status4xx .even{fill: #c33;}
+.row-item.status4xx .odd {fill: #c00;}
+.row-item.status3xx .even {fill: #ff6;}
+.row-item.status3xx .odd {fill: #ff0;}
+
+.row-item.status5xx .even,
+.row-item.status5xx .odd,
+.row-item.status4xx .even,
+.row-item.status4xx .odd,
+.row-item.status3xx .even,
+.row-item.status3xx .odd {opacity: 0.3}
+.row-item.status5xx:hover .even,
+.row-item.status5xx:hover .odd,
+.row-item.status4xx:hover .even,
+.row-item.status4xx:hover .odd,
+.row-item.status3xx:hover .even,
+.row-item.status3xx:hover .odd {opacity: 0.5}
+
 
 .lables { overflow: hidden;}
 

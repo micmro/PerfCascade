@@ -1,4 +1,4 @@
-/*PerfCascade build:07/05/2016 */
+/*PerfCascade build:10/05/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -229,9 +229,6 @@ function newTextEl(text, y, x, css) {
     if (x !== undefined) {
         opt["x"] = x;
     }
-    if (css["textShadow"] === undefined) {
-        css["textShadow"] = "0 0 4px #fff";
-    }
     return newEl("text", opt, css);
 }
 exports.newTextEl = newTextEl;
@@ -269,9 +266,12 @@ var getTestSVGEl = (function () {
 })();
 function getNodeTextWidth(textNode) {
     var tmp = getTestSVGEl();
-    tmp.appendChild(textNode);
+    var tmpTextNode = textNode.cloneNode(false);
+    tmp.appendChild(tmpTextNode);
+    //make sure to turn of shadow for performance
+    tmpTextNode.style.textShadow = "0";
     window.document.body.appendChild(tmp);
-    var nodeWidth = textNode.getBBox().width;
+    var nodeWidth = tmpTextNode.getBBox().width;
     return nodeWidth;
 }
 exports.getNodeTextWidth = getNodeTextWidth;
@@ -319,12 +319,7 @@ var outputHolder = document.getElementById("output");
 function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
     dom.removeAllChildren(outputHolder);
-    console.time("setup");
-    var svg = svg_chart_1.createWaterfallSvg(data, 23);
-    console.timeEnd("setup");
-    console.time("append");
-    outputHolder.appendChild(svg);
-    console.timeEnd("append");
+    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, 23));
 }
 function onFileSubmit(evt) {
     var files = evt.target.files;
@@ -951,9 +946,17 @@ function getResponseHeaderValue(entry, headerName) {
         return "";
     }
 }
+/**
+ *
+ * Checks if `entry.response.status` code is `>= lowerBound` and `<= upperBound`
+ * @param  {Entry} entry
+ * @param  {number} lowerBound - inclusive lower bound
+ * @param  {number} upperBound - inclusive upper bound
+ */
 function isInStatusCodeRange(entry, lowerBound, upperBound) {
     return entry.response.status >= lowerBound && entry.response.status <= upperBound;
 }
+exports.isInStatusCodeRange = isInStatusCodeRange;
 function isCompressable(block) {
     var entry = block.rawResource;
     var minCompressionSize = 1000;
@@ -1270,7 +1273,7 @@ var svg = require("../../helpers/svg");
 var icons = require("../../helpers/icons");
 var misc = require("../../helpers/misc");
 var rowSubComponents = require("./svg-row-subcomponents");
-var svg_indicators_1 = require("./svg-indicators");
+var indicators = require("./svg-indicators");
 //initial clip path
 var clipPathElProto = svg.newEl("clipPath", {
     "id": "titleClipPath"
@@ -1283,7 +1286,19 @@ clipPathElProto.appendChild(svg.newEl("rect", {
 function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, onDetailsOverlayShow) {
     var y = rectData.y;
     var requestBarHeight = rectData.height;
-    var rowItem = svg.newG("row-item");
+    var rowCssClass = ["row-item"];
+    if (indicators.isInStatusCodeRange(block.rawResource, 500, 599)) {
+        rowCssClass.push("status5xx");
+    }
+    if (indicators.isInStatusCodeRange(block.rawResource, 400, 499)) {
+        rowCssClass.push("status4xx");
+    }
+    else if (block.rawResource.response.status !== 304 &&
+        indicators.isInStatusCodeRange(block.rawResource, 300, 399)) {
+        //304 == Not Modified, so not an issue
+        rowCssClass.push("status3xx");
+    }
+    var rowItem = svg.newG(rowCssClass.join(" "));
     var leftFixedHolder = svg.newSvg("left-fixed-holder", {
         "x": "0",
         "width": leftFixedWidthPerc + "%"
@@ -1301,11 +1316,11 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
     //create and attach request block
     rowBar.appendChild(rect);
     //Add create and add warnings
-    svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
+    indicators.getIndicators(block, docIsSsl).forEach(function (value) {
         rowName.appendChild(icons[value.type](value.x, y + 3, value.title));
     });
     //Add create and add warnings
-    svg_indicators_1.getIndicators(block, docIsSsl).forEach(function (value) {
+    indicators.getIndicators(block, docIsSsl).forEach(function (value) {
         rowName.appendChild(icons[value.type](value.x, y + 3, value.title));
     });
     rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel);

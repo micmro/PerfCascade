@@ -4,10 +4,7 @@ import * as svg from "../../helpers/svg"
 import * as icons from "../../helpers/icons"
 import * as misc from "../../helpers/misc"
 import * as rowSubComponents from "./svg-row-subcomponents"
-import {
-  Indicator,
-  getIndicators
-} from "./svg-indicators"
+import * as indicators from "./svg-indicators"
 
 
 //initial clip path
@@ -29,7 +26,19 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
   const y = rectData.y
   const requestBarHeight = rectData.height
 
-  let rowItem = svg.newG("row-item")
+  let rowCssClass = ["row-item"]
+  if (indicators.isInStatusCodeRange(block.rawResource, 500, 599)) {
+    rowCssClass.push("status5xx")
+  }
+  if (indicators.isInStatusCodeRange(block.rawResource, 400, 499)) {
+    rowCssClass.push("status4xx")
+  } else if (block.rawResource.response.status !== 304 &&
+    indicators.isInStatusCodeRange(block.rawResource, 300, 399)) {
+    //304 == Not Modified, so not an issue
+    rowCssClass.push("status3xx")
+  }
+
+  let rowItem = svg.newG(rowCssClass.join(" "))
   let leftFixedHolder = svg.newSvg("left-fixed-holder", {
     "x": "0",
     "width": `${leftFixedWidthPerc}%`
@@ -52,12 +61,12 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
   rowBar.appendChild(rect)
 
   //Add create and add warnings
-  getIndicators(block, docIsSsl).forEach((value: Indicator) => {
+  indicators.getIndicators(block, docIsSsl).forEach((value: indicators.Indicator) => {
     rowName.appendChild(icons[value.type](value.x, y + 3, value.title))
   })
 
   //Add create and add warnings
-  getIndicators(block, docIsSsl).forEach((value: Indicator) => {
+  indicators.getIndicators(block, docIsSsl).forEach((value: indicators.Indicator) => {
     rowName.appendChild(icons[value.type](value.x, y + 3, value.title))
   })
   rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel)
