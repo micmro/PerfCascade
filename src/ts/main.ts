@@ -2,7 +2,7 @@ import {createWaterfallSvg} from "./waterfall/svg-chart"
 import {Har} from "./typing/har.d"
 import * as dom  from "./helpers/dom"
 import HarTransformer from "./transformers/har"
-
+import {ChartOptions} from "./typing/options.d"
 
 function showErrorMsg(msg) {
   alert(msg)
@@ -13,7 +13,10 @@ const outputHolder = document.getElementById("output")
 function renderHar(logData: Har) {
   const data = HarTransformer.transfrom(logData)
   dom.removeAllChildren(outputHolder)
-  outputHolder.appendChild(createWaterfallSvg(data, 23))
+  let options = {
+    rowHeight: 23
+  } as ChartOptions
+  outputHolder.appendChild(createWaterfallSvg(data, options))
 }
 
 function onFileSubmit(evt) {

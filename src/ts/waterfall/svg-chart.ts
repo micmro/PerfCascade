@@ -1,5 +1,6 @@
 import {WaterfallData} from "../typing/waterfall-data.d"
 import {RectData} from "../typing/rect-data.d"
+import {ChartOptions} from "../typing/options.d"
 import TimeBlock from "../typing/time-block"
 import * as svg from "../helpers/svg"
 import {
@@ -33,12 +34,11 @@ function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: numb
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
-
- * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
+ * @param {options} ChartOptions   Config options
  * @return {SVGSVGElement}            SVG Element ready to render
  */
-export function createWaterfallSvg(data: WaterfallData, requestBarHeight: number = 23): SVGSVGElement {
-
+export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): SVGSVGElement {
+  let requestBarHeight = options.rowHeight
   //constants
 
   /** Width of bar on left in percentage */
