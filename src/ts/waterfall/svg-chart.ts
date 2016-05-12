@@ -3,6 +3,7 @@ import {RectData} from "../typing/rect-data.d"
 import {ChartOptions} from "../typing/options.d"
 import TimeBlock from "../typing/time-block"
 import * as svg from "../helpers/svg"
+import * as misc from "../helpers/misc"
 import {
   createBgRect,
   createTimeScale,
@@ -37,8 +38,13 @@ function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: numb
  * @param {options} ChartOptions   Config options
  * @return {SVGSVGElement}            SVG Element ready to render
  */
-export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): SVGSVGElement {
-  let requestBarHeight = options.rowHeight
+export function createWaterfallSvg(data: WaterfallData, options?: ChartOptions): SVGSVGElement {
+  options = misc.assign({
+    rowHeight : 23
+  }, options || {})
+
+ console.log(options)
+  let requestBarHeight = options.rowHeight || 23
   //constants
 
   /** Width of bar on left in percentage */

@@ -1,4 +1,4 @@
-/*PerfCascade build:10/05/2016 */
+/*PerfCascade build:12/05/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -185,6 +185,34 @@ function roundNumber(num, decimals) {
     return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }
 exports.roundNumber = roundNumber;
+/**
+ *
+ * Helper to polyfill `Object.assign` since the target is not ES6
+ * @param  {Object} target
+ * @param  {Object[]} ...sources
+ */
+function assign(target) {
+    var sources = [];
+    for (var _i = 1; _i < arguments.length; _i++) {
+        sources[_i - 1] = arguments[_i];
+    }
+    if (target === undefined || target === null) {
+        throw new TypeError("Cannot convert undefined or null to object");
+    }
+    var output = Object(target);
+    for (var index = 1; index < arguments.length; index++) {
+        var source = arguments[index];
+        if (source !== undefined && source !== null) {
+            for (var nextKey in source) {
+                if (source.hasOwnProperty(nextKey)) {
+                    output[nextKey] = source[nextKey];
+                }
+            }
+        }
+    }
+    return output;
+}
+exports.assign = assign;
 
 },{}],4:[function(require,module,exports){
 /**
@@ -319,7 +347,10 @@ var outputHolder = document.getElementById("output");
 function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
     dom.removeAllChildren(outputHolder);
-    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, 23));
+    var options = {
+        rowHeight: 23
+    };
+    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, options));
 }
 function onFileSubmit(evt) {
     var files = evt.target.files;
@@ -1336,6 +1367,7 @@ exports.createRow = createRow;
 
 },{"../../helpers/icons":2,"../../helpers/misc":3,"../../helpers/svg":4,"./svg-indicators":14,"./svg-row-subcomponents":15}],17:[function(require,module,exports){
 var svg = require("../helpers/svg");
+var misc = require("../helpers/misc");
 var svg_general_components_1 = require("./svg-general-components");
 var svg_row_1 = require("./row/svg-row");
 var svg_indicators_1 = require("./row/svg-indicators");
@@ -1357,13 +1389,16 @@ function getSvgHeight(marks, barsToShow, diagramHeight) {
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
-
- * @param {requestBarHeight} number   Height of every request bar block plus spacer pixel
+ * @param {options} ChartOptions   Config options
  * @return {SVGSVGElement}            SVG Element ready to render
  */
-function createWaterfallSvg(data, requestBarHeight) {
+function createWaterfallSvg(data, options) {
+    options = misc.assign({
+        rowHeight: 23
+    }, options || {});
+    console.log(options);
+    var requestBarHeight = options.rowHeight || 23;
     //constants
-    if (requestBarHeight === void 0) { requestBarHeight = 23; }
     /** Width of bar on left in percentage */
     var leftFixedWidthPerc = 25;
     /** horizontal unit (duration in ms of 1%) */
@@ -1449,7 +1484,7 @@ function createWaterfallSvg(data, requestBarHeight) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11,"./details-overlay/svg-details-overlay-manager":12,"./row/svg-indicators":14,"./row/svg-row":16,"./svg-general-components":18}],18:[function(require,module,exports){
+},{"../helpers/misc":3,"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11,"./details-overlay/svg-details-overlay-manager":12,"./row/svg-indicators":14,"./row/svg-row":16,"./svg-general-components":18}],18:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
