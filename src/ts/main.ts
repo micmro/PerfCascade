@@ -15,7 +15,9 @@ function renderHar(logData: Har) {
   dom.removeAllChildren(outputHolder)
   let options = {
     rowHeight: 23,
-    showAlignmentHelpers : true
+    showAlignmentHelpers : true,
+    showIndicatorIcons: true,
+    leftColumnWith: 25
   } as ChartOptions
   outputHolder.appendChild(createWaterfallSvg(data, options))
 }
