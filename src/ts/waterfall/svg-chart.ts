@@ -2,13 +2,14 @@ import {WaterfallData} from "../typing/waterfall-data.d"
 import {RectData} from "../typing/rect-data.d"
 import {ChartOptions} from "../typing/options.d"
 import TimeBlock from "../typing/time-block"
+
 import * as svg from "../helpers/svg"
 import * as misc from "../helpers/misc"
 import * as generalComponents from "./sub-components/svg-general-components"
 import * as alignmentHelper from  "./sub-components/svg-alignment-helper"
 import * as marks from  "./sub-components/svg-marks"
-import {createRow} from "./row/svg-row"
-import {getIndicators} from "./row/svg-indicators"
+import * as row from "./row/svg-row"
+import * as indicators from "./row/svg-indicators"
 import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
 import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
 
@@ -96,7 +97,7 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
 
   //calculate x position for label based on number of icons
   const labelXPos = barsToShow.reduce((prev: number, curr: TimeBlock) => {
-    const i = getIndicators(curr, docIsSsl)
+    const i = indicators.getIndicators(curr, docIsSsl)
     const lastIndicator = i[i.length - 1]
     const x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0)
     return Math.max(prev, x)
@@ -133,7 +134,7 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
       overlayManager.openOverlay(i, x, y + options.rowHeight, accordeonHeight, block, overlayHolder, barEls, unit)
     }
 
-    let rowItem = createRow(i, rectData, block, labelXPos,
+    let rowItem = row.createRow(i, rectData, block, labelXPos,
       leftFixedWidthPerc, docIsSsl,
       showDetailsOverlay)
 
@@ -144,7 +145,7 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
   //Main loop to render rows with blocks
   barsToShow.forEach(renderRow)
 
-  if (options.showAlignmentHelpers){
+  if (options.showAlignmentHelpers) {
     scaleAndMarksHolder.appendChild(hoverOverlayHolder)
   }
   timeLineHolder.appendChild(scaleAndMarksHolder)

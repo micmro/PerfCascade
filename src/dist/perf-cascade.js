@@ -1579,8 +1579,8 @@ var misc = require("../helpers/misc");
 var generalComponents = require("./sub-components/svg-general-components");
 var alignmentHelper = require("./sub-components/svg-alignment-helper");
 var marks = require("./sub-components/svg-marks");
-var svg_row_1 = require("./row/svg-row");
-var svg_indicators_1 = require("./row/svg-indicators");
+var row = require("./row/svg-row");
+var indicators = require("./row/svg-indicators");
 var overlayManager = require("./details-overlay/svg-details-overlay-manager");
 var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
 /**
@@ -1653,7 +1653,7 @@ function createWaterfallSvg(data, chartOptions) {
     });
     //calculate x position for label based on number of icons
     var labelXPos = barsToShow.reduce(function (prev, curr) {
-        var i = svg_indicators_1.getIndicators(curr, docIsSsl);
+        var i = indicators.getIndicators(curr, docIsSsl);
         var lastIndicator = i[i.length - 1];
         var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
         return Math.max(prev, x);
@@ -1685,7 +1685,7 @@ function createWaterfallSvg(data, chartOptions) {
         var showDetailsOverlay = function (evt) {
             overlayManager.openOverlay(i, x, y + options.rowHeight, accordeonHeight, block, overlayHolder, barEls, unit);
         };
-        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay);
+        var rowItem = row.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay);
         barEls.push(rowItem);
         rowHolder.appendChild(rowItem);
     }
