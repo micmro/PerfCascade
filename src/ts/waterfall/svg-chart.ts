@@ -4,13 +4,9 @@ import {ChartOptions} from "../typing/options.d"
 import TimeBlock from "../typing/time-block"
 import * as svg from "../helpers/svg"
 import * as misc from "../helpers/misc"
-import {
-  createBgRect,
-  createTimeScale,
-  createMarks,
-  makeHoverEvtListeners,
-  createAlignmentLines
-} from "./svg-general-components"
+import * as generalComponents from "./sub-components/svg-general-components"
+import * as alignmentHelper from  "./sub-components/svg-alignment-helper"
+import * as marks from  "./sub-components/svg-marks"
 import {createRow} from "./row/svg-row"
 import {getIndicators} from "./row/svg-indicators"
 import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
@@ -67,8 +63,7 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
   let timeLineHolder = svg.newSvg("water-fall-chart", {
     "height": chartHolderHeight
   })
-  /** Holder for on-hover vertical comparison bars */
-  let hoverOverlayHolder = svg.newG("hover-overlays")
+
   /** Holder of request-details overlay */
   let overlayHolder = svg.newG("overlays")
   /** Holder for scale, event and marks */
@@ -79,21 +74,24 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
   /** Holds all rows */
   let rowHolder = svg.newG("rows-holder")
 
+  /** Holder for on-hover vertical comparison bars */
+  let hoverOverlayHolder
   let mouseListeners
   if (options.showAlignmentHelpers) {
-    let hoverEl = createAlignmentLines(diagramHeight)
+    hoverOverlayHolder = svg.newG("hover-overlays")
+    let hoverEl = alignmentHelper.createAlignmentLines(diagramHeight)
     hoverOverlayHolder.appendChild(hoverEl.startline)
     hoverOverlayHolder.appendChild(hoverEl.endline)
-    mouseListeners = makeHoverEvtListeners(hoverEl)
+    mouseListeners = alignmentHelper.makeHoverEvtListeners(hoverEl)
   }
 
   //Start appending SVG elements to the holder element (timeLineHolder)
 
-  scaleAndMarksHolder.appendChild(createTimeScale(data.durationMs, diagramHeight))
-  scaleAndMarksHolder.appendChild(createMarks(data.marks, unit, diagramHeight))
+  scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(data.durationMs, diagramHeight))
+  scaleAndMarksHolder.appendChild(marks.createMarks(data.marks, unit, diagramHeight))
 
   data.lines.forEach((block, i) => {
-    timeLineHolder.appendChild(createBgRect(block, unit, diagramHeight))
+    timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight))
   })
 
   //calculate x position for label based on number of icons
@@ -146,7 +144,9 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
   //Main loop to render rows with blocks
   barsToShow.forEach(renderRow)
 
-  scaleAndMarksHolder.appendChild(hoverOverlayHolder)
+  if (options.showAlignmentHelpers){
+    scaleAndMarksHolder.appendChild(hoverOverlayHolder)
+  }
   timeLineHolder.appendChild(scaleAndMarksHolder)
   timeLineHolder.appendChild(rowHolder)
   timeLineHolder.appendChild(overlayHolder)

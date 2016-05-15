@@ -388,7 +388,7 @@ exports.default = {
     createWaterfallSvg: svg_chart_1.createWaterfallSvg
 };
 
-},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":17}],6:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":20}],6:[function(require,module,exports){
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
@@ -1369,134 +1369,10 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
 exports.createRow = createRow;
 
 },{"../../helpers/icons":2,"../../helpers/misc":3,"../../helpers/svg":4,"./svg-indicators":14,"./svg-row-subcomponents":15}],17:[function(require,module,exports){
-var svg = require("../helpers/svg");
-var misc = require("../helpers/misc");
-var svg_general_components_1 = require("./svg-general-components");
-var svg_row_1 = require("./row/svg-row");
-var svg_indicators_1 = require("./row/svg-indicators");
-var overlayManager = require("./details-overlay/svg-details-overlay-manager");
-var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
 /**
- * Calculate the height of the SVG chart in px
- * @param {any[]}       marks      [description]
- * @param {TimeBlock[]} barsToShow [description]
- * @param  {number} diagramHeight
- * @returns Number
- */
-function getSvgHeight(marks, barsToShow, diagramHeight) {
-    var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
-        return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0)));
-    }, 0);
-    return Math.floor(diagramHeight + maxMarkTextLength + 35);
-}
-/** default options to use if not set in `options` parameter */
-var defaultOptions = {
-    rowHeight: 23,
-    showAlignmentHelpers: true
-};
-/**
- * Entry point to start rendering the full waterfall SVG
- * @param {WaterfallData} data  Object containing the setup parameter
- * @param {chartOptions} ChartOptions   Config options
- * @return {SVGSVGElement}            SVG Element ready to render
- */
-function createWaterfallSvg(data, chartOptions) {
-    var options = misc.assign(defaultOptions, chartOptions || {});
-    //constants
-    /** Width of bar on left in percentage */
-    var leftFixedWidthPerc = 25;
-    /** horizontal unit (duration in ms of 1%) */
-    var unit = data.durationMs / 100;
-    var barsToShow = data.blocks
-        .filter(function (block) { return (typeof block.start === "number" && typeof block.total === "number"); })
-        .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
-    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
-    /** height of the requests part of the diagram in px */
-    var diagramHeight = (barsToShow.length + 1) * options.rowHeight;
-    /** full height of the SVG chart in px */
-    var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
-    /** Main SVG Element that holds all data */
-    var timeLineHolder = svg.newSvg("water-fall-chart", {
-        "height": chartHolderHeight
-    });
-    /** Holder for on-hover vertical comparison bars */
-    var hoverOverlayHolder = svg.newG("hover-overlays");
-    /** Holder of request-details overlay */
-    var overlayHolder = svg.newG("overlays");
-    /** Holder for scale, event and marks */
-    var scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
-        "x": leftFixedWidthPerc + "%",
-        "width": (100 - leftFixedWidthPerc) + "%"
-    });
-    /** Holds all rows */
-    var rowHolder = svg.newG("rows-holder");
-    var mouseListeners;
-    if (options.showAlignmentHelpers) {
-        var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
-        hoverOverlayHolder.appendChild(hoverEl.startline);
-        hoverOverlayHolder.appendChild(hoverEl.endline);
-        mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
-    }
-    //Start appending SVG elements to the holder element (timeLineHolder)
-    scaleAndMarksHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
-    scaleAndMarksHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
-    data.lines.forEach(function (block, i) {
-        timeLineHolder.appendChild(svg_general_components_1.createBgRect(block, unit, diagramHeight));
-    });
-    //calculate x position for label based on number of icons
-    var labelXPos = barsToShow.reduce(function (prev, curr) {
-        var i = svg_indicators_1.getIndicators(curr, docIsSsl);
-        var lastIndicator = i[i.length - 1];
-        var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
-        return Math.max(prev, x);
-    }, 5);
-    var barEls = [];
-    function getChartHeight() {
-        return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px";
-    }
-    overlayChangesPubSub.subscribeToOvelayChanges(function (evt) {
-        timeLineHolder.style.height = getChartHeight();
-    });
-    /** Renders single row and hooks up behaviour */
-    function renderRow(block, i) {
-        var blockWidth = block.total || 1;
-        var y = options.rowHeight * i;
-        var x = (block.start || 0.001);
-        var accordeonHeight = 450;
-        var rectData = {
-            "width": blockWidth,
-            "height": options.rowHeight,
-            "x": x,
-            "y": y,
-            "cssClass": block.cssClass,
-            "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
-            "unit": unit,
-            "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
-            "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined
-        };
-        var showDetailsOverlay = function (evt) {
-            overlayManager.openOverlay(i, x, y + options.rowHeight, accordeonHeight, block, overlayHolder, barEls, unit);
-        };
-        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay);
-        barEls.push(rowItem);
-        rowHolder.appendChild(rowItem);
-    }
-    //Main loop to render rows with blocks
-    barsToShow.forEach(renderRow);
-    scaleAndMarksHolder.appendChild(hoverOverlayHolder);
-    timeLineHolder.appendChild(scaleAndMarksHolder);
-    timeLineHolder.appendChild(rowHolder);
-    timeLineHolder.appendChild(overlayHolder);
-    return timeLineHolder;
-}
-exports.createWaterfallSvg = createWaterfallSvg;
-
-},{"../helpers/misc":3,"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11,"./details-overlay/svg-details-overlay-manager":12,"./row/svg-indicators":14,"./row/svg-row":16,"./svg-general-components":18}],18:[function(require,module,exports){
-/**
- * Creation of sub-components of the waterfall chart
- */
-var svg = require("../helpers/svg");
-var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
+ * vertical alignment helper lines
+ * */
+var svg = require("../../helpers/svg");
 /**
  * Creates verticale alignment bars
  * @param {number} diagramHeight  height of the requests part of the diagram in px
@@ -1552,6 +1428,13 @@ function makeHoverEvtListeners(hoverEl) {
     };
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
+
+},{"../../helpers/svg":4}],18:[function(require,module,exports){
+/**
+ * Creation of sub-components of the waterfall chart
+ */
+var svg = require("../../helpers/svg");
+var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
 /**
  * Renders the time-scale SVG elements (1sec, 2sec...)
  * @param {number} durationMs    Full duration of the waterfall
@@ -1604,6 +1487,10 @@ function createBgRect(block, unit, diagramHeight) {
     return rect;
 }
 exports.createBgRect = createBgRect;
+
+},{"../../helpers/svg":4,"../details-overlay/overlay-changes-pub-sub":11}],19:[function(require,module,exports){
+var svg = require("../../helpers/svg");
+var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
 /**
  * Renders global markes for events like the onLoad event etc
  * @param {Array<Mark>} marks         [description]
@@ -1686,4 +1573,132 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11}]},{},[5]);
+},{"../../helpers/svg":4,"../details-overlay/overlay-changes-pub-sub":11}],20:[function(require,module,exports){
+var svg = require("../helpers/svg");
+var misc = require("../helpers/misc");
+var generalComponents = require("./sub-components/svg-general-components");
+var alignmentHelper = require("./sub-components/svg-alignment-helper");
+var marks = require("./sub-components/svg-marks");
+var svg_row_1 = require("./row/svg-row");
+var svg_indicators_1 = require("./row/svg-indicators");
+var overlayManager = require("./details-overlay/svg-details-overlay-manager");
+var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
+/**
+ * Calculate the height of the SVG chart in px
+ * @param {any[]}       marks      [description]
+ * @param {TimeBlock[]} barsToShow [description]
+ * @param  {number} diagramHeight
+ * @returns Number
+ */
+function getSvgHeight(marks, barsToShow, diagramHeight) {
+    var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
+        return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0)));
+    }, 0);
+    return Math.floor(diagramHeight + maxMarkTextLength + 35);
+}
+/** default options to use if not set in `options` parameter */
+var defaultOptions = {
+    rowHeight: 23,
+    showAlignmentHelpers: true
+};
+/**
+ * Entry point to start rendering the full waterfall SVG
+ * @param {WaterfallData} data  Object containing the setup parameter
+ * @param {chartOptions} ChartOptions   Config options
+ * @return {SVGSVGElement}            SVG Element ready to render
+ */
+function createWaterfallSvg(data, chartOptions) {
+    var options = misc.assign(defaultOptions, chartOptions || {});
+    //constants
+    /** Width of bar on left in percentage */
+    var leftFixedWidthPerc = 25;
+    /** horizontal unit (duration in ms of 1%) */
+    var unit = data.durationMs / 100;
+    var barsToShow = data.blocks
+        .filter(function (block) { return (typeof block.start === "number" && typeof block.total === "number"); })
+        .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
+    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
+    /** height of the requests part of the diagram in px */
+    var diagramHeight = (barsToShow.length + 1) * options.rowHeight;
+    /** full height of the SVG chart in px */
+    var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
+    /** Main SVG Element that holds all data */
+    var timeLineHolder = svg.newSvg("water-fall-chart", {
+        "height": chartHolderHeight
+    });
+    /** Holder of request-details overlay */
+    var overlayHolder = svg.newG("overlays");
+    /** Holder for scale, event and marks */
+    var scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
+        "x": leftFixedWidthPerc + "%",
+        "width": (100 - leftFixedWidthPerc) + "%"
+    });
+    /** Holds all rows */
+    var rowHolder = svg.newG("rows-holder");
+    /** Holder for on-hover vertical comparison bars */
+    var hoverOverlayHolder;
+    var mouseListeners;
+    if (options.showAlignmentHelpers) {
+        hoverOverlayHolder = svg.newG("hover-overlays");
+        var hoverEl = alignmentHelper.createAlignmentLines(diagramHeight);
+        hoverOverlayHolder.appendChild(hoverEl.startline);
+        hoverOverlayHolder.appendChild(hoverEl.endline);
+        mouseListeners = alignmentHelper.makeHoverEvtListeners(hoverEl);
+    }
+    //Start appending SVG elements to the holder element (timeLineHolder)
+    scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(data.durationMs, diagramHeight));
+    scaleAndMarksHolder.appendChild(marks.createMarks(data.marks, unit, diagramHeight));
+    data.lines.forEach(function (block, i) {
+        timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight));
+    });
+    //calculate x position for label based on number of icons
+    var labelXPos = barsToShow.reduce(function (prev, curr) {
+        var i = svg_indicators_1.getIndicators(curr, docIsSsl);
+        var lastIndicator = i[i.length - 1];
+        var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
+        return Math.max(prev, x);
+    }, 5);
+    var barEls = [];
+    function getChartHeight() {
+        return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px";
+    }
+    overlayChangesPubSub.subscribeToOvelayChanges(function (evt) {
+        timeLineHolder.style.height = getChartHeight();
+    });
+    /** Renders single row and hooks up behaviour */
+    function renderRow(block, i) {
+        var blockWidth = block.total || 1;
+        var y = options.rowHeight * i;
+        var x = (block.start || 0.001);
+        var accordeonHeight = 450;
+        var rectData = {
+            "width": blockWidth,
+            "height": options.rowHeight,
+            "x": x,
+            "y": y,
+            "cssClass": block.cssClass,
+            "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+            "unit": unit,
+            "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
+            "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined
+        };
+        var showDetailsOverlay = function (evt) {
+            overlayManager.openOverlay(i, x, y + options.rowHeight, accordeonHeight, block, overlayHolder, barEls, unit);
+        };
+        var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay);
+        barEls.push(rowItem);
+        rowHolder.appendChild(rowItem);
+    }
+    //Main loop to render rows with blocks
+    barsToShow.forEach(renderRow);
+    if (options.showAlignmentHelpers) {
+        scaleAndMarksHolder.appendChild(hoverOverlayHolder);
+    }
+    timeLineHolder.appendChild(scaleAndMarksHolder);
+    timeLineHolder.appendChild(rowHolder);
+    timeLineHolder.appendChild(overlayHolder);
+    return timeLineHolder;
+}
+exports.createWaterfallSvg = createWaterfallSvg;
+
+},{"../helpers/misc":3,"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11,"./details-overlay/svg-details-overlay-manager":12,"./row/svg-indicators":14,"./row/svg-row":16,"./sub-components/svg-alignment-helper":17,"./sub-components/svg-general-components":18,"./sub-components/svg-marks":19}]},{},[5]);
