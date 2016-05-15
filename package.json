@@ -5,6 +5,7 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "grunt tslint",
     "start": "live-server --wait=50 --open=src/index.html --ignore=src/ts/",
     "watch": "npm run start & grunt",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
