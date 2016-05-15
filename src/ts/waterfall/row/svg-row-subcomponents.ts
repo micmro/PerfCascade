@@ -28,8 +28,10 @@ function makeBlock(rectData: RectData, className: string) {
       "text": rectData.label
     })) // Add tile to wedge path
   }
-  rect.addEventListener("mouseenter", rectData.showOverlay(rectData))
-  rect.addEventListener("mouseleave", rectData.hideOverlay(rectData))
+  if (rectData.showOverlay && rectData.hideOverlay) {
+    rect.addEventListener("mouseenter", rectData.showOverlay(rectData))
+    rect.addEventListener("mouseleave", rectData.hideOverlay(rectData))
+  }
 
   return rect
 }
