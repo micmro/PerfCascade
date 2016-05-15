@@ -33,7 +33,9 @@ function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: numb
 /** default options to use if not set in `options` parameter */
 const defaultOptions: ChartOptions = {
   rowHeight: 23,
-  showAlignmentHelpers: true
+  showAlignmentHelpers: true,
+  showIndicatorIcons: true,
+  leftColumnWith: 25
 }
 
 /**
@@ -47,8 +49,6 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
 
   //constants
 
-  /** Width of bar on left in percentage */
-  const leftFixedWidthPerc: number = 25
   /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100
   const barsToShow = data.blocks
@@ -69,8 +69,8 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
   let overlayHolder = svg.newG("overlays")
   /** Holder for scale, event and marks */
   let scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
-    "x": `${leftFixedWidthPerc}%`,
-    "width": `${100 - leftFixedWidthPerc}%`
+    "x": `${options.leftColumnWith}%`,
+    "width": `${100 - options.leftColumnWith}%`
   })
   /** Holds all rows */
   let rowHolder = svg.newG("rows-holder")
@@ -95,13 +95,18 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
     timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight))
   })
 
+  let labelXPos;
   //calculate x position for label based on number of icons
-  const labelXPos = barsToShow.reduce((prev: number, curr: TimeBlock) => {
-    const i = indicators.getIndicators(curr, docIsSsl)
-    const lastIndicator = i[i.length - 1]
-    const x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0)
-    return Math.max(prev, x)
-  }, 5)
+  if (options.showIndicatorIcons) {
+    labelXPos = barsToShow.reduce((prev: number, curr: TimeBlock) => {
+      const i = indicators.getIndicators(curr, docIsSsl)
+      const lastIndicator = i[i.length - 1]
+      const x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0)
+      return Math.max(prev, x)
+    }, 5)
+  } else {
+    labelXPos = 5
+  }
 
   let barEls: SVGGElement[] = []
 
@@ -135,8 +140,7 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
     }
 
     let rowItem = row.createRow(i, rectData, block, labelXPos,
-      leftFixedWidthPerc, docIsSsl,
-      showDetailsOverlay)
+      options, docIsSsl, showDetailsOverlay)
 
     barEls.push(rowItem)
     rowHolder.appendChild(rowItem)

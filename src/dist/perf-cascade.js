@@ -36,6 +36,89 @@ function filter(els, predicat) {
 exports.filter = filter;
 
 },{}],2:[function(require,module,exports){
+var misc = require("./misc");
+function getResponseHeader(entry, headerName) {
+    return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
+}
+exports.getResponseHeader = getResponseHeader;
+function getResponseHeaderValue(entry, headerName) {
+    var header = getResponseHeader(entry, headerName);
+    if (header !== undefined) {
+        return header.value;
+    }
+    else {
+        return "";
+    }
+}
+exports.getResponseHeaderValue = getResponseHeaderValue;
+/**
+ *
+ * Checks if `entry.response.status` code is `>= lowerBound` and `<= upperBound`
+ * @param  {Entry} entry
+ * @param  {number} lowerBound - inclusive lower bound
+ * @param  {number} upperBound - inclusive upper bound
+ */
+function isInStatusCodeRange(entry, lowerBound, upperBound) {
+    return entry.response.status >= lowerBound && entry.response.status <= upperBound;
+}
+exports.isInStatusCodeRange = isInStatusCodeRange;
+function isCompressable(block) {
+    var entry = block.rawResource;
+    var minCompressionSize = 1000;
+    //small responses
+    if (entry.response.bodySize < minCompressionSize) {
+        return false;
+    }
+    if (misc.contains(["html", "css", "javascript", "svg", "plain"], block.requestType)) {
+        return true;
+    }
+    var mime = entry.response.content.mimeType;
+    var compressableMimes = ["application/vnd.ms-fontobject",
+        "application/x-font-opentype",
+        "application/x-font-truetype",
+        "application/x-font-ttf",
+        "application/xml",
+        "font/eot",
+        "font/opentype",
+        "font/otf",
+        "image/vnd.microsoft.icon"];
+    if (misc.contains(["text"], mime.split("/")[0]) || misc.contains(compressableMimes, mime.split(";")[0])) {
+        return true;
+    }
+    return false;
+}
+function isCachable(block) {
+    var entry = block.rawResource;
+    //do not cache non-gets,204 and non 2xx status codes
+    if (entry.request.method.toLocaleLowerCase() !== "get" ||
+        entry.response.status === 204 ||
+        !isInStatusCodeRange(entry, 200, 299)) {
+        return false;
+    }
+    if (getResponseHeader(entry, "Cache-Control") === undefined
+        && getResponseHeader(entry, "Expires") === undefined) {
+        return true;
+    }
+    if (getResponseHeaderValue(entry, "Cache-Control").indexOf("no-cache") > -1
+        || getResponseHeaderValue(entry, "Pragma") === "no-cache") {
+        return true;
+    }
+    return false;
+}
+function hasCacheIssue(block) {
+    return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCachable(block));
+}
+exports.hasCacheIssue = hasCacheIssue;
+function hasCompressionIssue(block) {
+    return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCompressable(block));
+}
+exports.hasCompressionIssue = hasCompressionIssue;
+function isSecure(block) {
+    return block.name.indexOf("https://") === 0;
+}
+exports.isSecure = isSecure;
+
+},{"./misc":4}],3:[function(require,module,exports){
 /**
  *  SVG Icons
  */
@@ -125,7 +208,7 @@ function flash(x, y, title, scale) {
 }
 exports.flash = flash;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /**
  *  Misc Helpers
  */
@@ -214,7 +297,7 @@ function assign(target) {
 }
 exports.assign = assign;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /**
  *  SVG Helpers
  */
@@ -349,7 +432,7 @@ function removeClass(el, className) {
 }
 exports.removeClass = removeClass;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var svg_chart_1 = require("./waterfall/svg-chart");
 var dom = require("./helpers/dom");
 var har_1 = require("./transformers/har");
@@ -362,7 +445,9 @@ function renderHar(logData) {
     dom.removeAllChildren(outputHolder);
     var options = {
         rowHeight: 23,
-        showAlignmentHelpers: true
+        showAlignmentHelpers: true,
+        showIndicatorIcons: true,
+        leftColumnWith: 25
     };
     outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, options));
 }
@@ -401,7 +486,7 @@ exports.default = {
     createWaterfallSvg: svg_chart_1.createWaterfallSvg
 };
 
-},{"./helpers/dom":1,"./transformers/har":6,"./waterfall/svg-chart":20}],6:[function(require,module,exports){
+},{"./helpers/dom":1,"./transformers/har":7,"./waterfall/svg-chart":21}],7:[function(require,module,exports){
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
@@ -508,7 +593,7 @@ var HarTransformer = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = HarTransformer;
 
-},{"../typing/time-block":8,"./styling-converters":7}],7:[function(require,module,exports){
+},{"../typing/time-block":9,"./styling-converters":8}],8:[function(require,module,exports){
 /**
  * Convert a MIME type into it's WPT style request type (font, script etc)
  * @param {string} mimeType
@@ -554,7 +639,7 @@ function mimeToCssClass(mimeType) {
 }
 exports.mimeToCssClass = mimeToCssClass;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var TimeBlock = (function () {
     function TimeBlock(name, start, end, cssClass, segments, rawResource, requestType) {
         if (cssClass === void 0) { cssClass = ""; }
@@ -573,7 +658,7 @@ var TimeBlock = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  * Data to show in overlay tabs
  * @param  {number} requestID - request number
@@ -718,7 +803,7 @@ function getKeys(requestID, block) {
 }
 exports.getKeys = getKeys;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues) {
     return Object.keys(dlKeyValues)
@@ -772,7 +857,7 @@ function createDetailsBody(requestID, block, accordeonHeight) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":9}],11:[function(require,module,exports){
+},{"./extract-details-keys":10}],12:[function(require,module,exports){
 //simple pub/sub for change to the overlay
 exports.eventTypes = {
     "OPEN": "open",
@@ -789,7 +874,7 @@ function publishToOvelayChanges(change) {
 }
 exports.publishToOvelayChanges = publishToOvelayChanges;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var overlayChangesPubSub = require("./overlay-changes-pub-sub");
 /** Collection of currely open overlays */
@@ -894,7 +979,7 @@ function renderOverlays(barX, accordeonHeight, overlayHolder, unit) {
     });
 }
 
-},{"./overlay-changes-pub-sub":11,"./svg-details-overlay":13}],13:[function(require,module,exports){
+},{"./overlay-changes-pub-sub":12,"./svg-details-overlay":14}],14:[function(require,module,exports){
 var svg = require("../../helpers/svg");
 var dom = require("../../helpers/dom");
 var html_details_body_1 = require("./html-details-body");
@@ -977,74 +1062,11 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/dom":1,"../../helpers/svg":4,"./html-details-body":10}],14:[function(require,module,exports){
-var misc = require("../../helpers/misc");
-function getResponseHeader(entry, headerName) {
-    return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
-}
-function getResponseHeaderValue(entry, headerName) {
-    var header = getResponseHeader(entry, headerName);
-    if (header !== undefined) {
-        return header.value;
-    }
-    else {
-        return "";
-    }
-}
+},{"../../helpers/dom":1,"../../helpers/svg":5,"./html-details-body":11}],15:[function(require,module,exports){
 /**
- *
- * Checks if `entry.response.status` code is `>= lowerBound` and `<= upperBound`
- * @param  {Entry} entry
- * @param  {number} lowerBound - inclusive lower bound
- * @param  {number} upperBound - inclusive upper bound
+ * Creation of sub-components used in a ressource request row
  */
-function isInStatusCodeRange(entry, lowerBound, upperBound) {
-    return entry.response.status >= lowerBound && entry.response.status <= upperBound;
-}
-exports.isInStatusCodeRange = isInStatusCodeRange;
-function isCompressable(block) {
-    var entry = block.rawResource;
-    var minCompressionSize = 1000;
-    //small responses
-    if (entry.response.bodySize < minCompressionSize) {
-        return false;
-    }
-    if (misc.contains(["html", "css", "javascript", "svg", "plain"], block.requestType)) {
-        return true;
-    }
-    var mime = entry.response.content.mimeType;
-    var compressableMimes = ["application/vnd.ms-fontobject",
-        "application/x-font-opentype",
-        "application/x-font-truetype",
-        "application/x-font-ttf",
-        "application/xml",
-        "font/eot",
-        "font/opentype",
-        "font/otf",
-        "image/vnd.microsoft.icon"];
-    if (misc.contains(["text"], mime.split("/")[0]) || misc.contains(compressableMimes, mime.split(";")[0])) {
-        return true;
-    }
-    return false;
-}
-function isCachable(block) {
-    var entry = block.rawResource;
-    //do not cache non-gets,204 and non 2xx status codes
-    if (entry.request.method.toLocaleLowerCase() !== "get" ||
-        entry.response.status === 204 ||
-        !isInStatusCodeRange(entry, 200, 299)) {
-        return false;
-    }
-    if (getResponseHeader(entry, "Cache-Control") === undefined
-        && getResponseHeader(entry, "Expires") === undefined) {
-        return true;
-    }
-    if (getResponseHeaderValue(entry, "Cache-Control").indexOf("no-cache") > -1
-        || getResponseHeaderValue(entry, "Pragma") === "no-cache") {
-        return true;
-    }
-    return false;
-}
+var heuristics = require("../../helpers/heuristics");
 /**
  * Scan the request for errors or portential issues and highlight them
  * @param  {TimeBlock} block
@@ -1052,7 +1074,6 @@ function isCachable(block) {
  * @returns IconMetadata
  */
 function getIndicators(block, docIsSsl) {
-    var isSecure = block.name.indexOf("https://") === 0;
     var iconWidth = 20;
     var entry = block.rawResource;
     var output = [];
@@ -1068,32 +1089,32 @@ function getIndicators(block, docIsSsl) {
         var url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
         makeIcon("err3xx", entry.response.status + " response status: Redirect to " + url + "...");
     }
-    if (!docIsSsl && isSecure) {
+    if (!docIsSsl && heuristics.isSecure(block)) {
         makeIcon("lock", "Secure Connection");
     }
-    else if (docIsSsl && !isSecure) {
+    else if (docIsSsl && !heuristics.isSecure(block)) {
         makeIcon("noTls", "Insecure Connection");
     }
-    if (getResponseHeader(entry, "Content-Encoding") === undefined && isCachable(block)) {
+    if (heuristics.hasCacheIssue(block)) {
         makeIcon("noCache", "Response not cached");
     }
-    if (getResponseHeader(entry, "Content-Encoding") === undefined && isCompressable(block)) {
+    if (heuristics.hasCompressionIssue(block)) {
         makeIcon("noGzip", "no gzip");
     }
-    if (isInStatusCodeRange(entry, 400, 499)) {
+    if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
         makeIcon("err4xx", entry.response.status + " response status: " + entry.response.statusText);
     }
-    if (isInStatusCodeRange(entry, 500, 599)) {
+    if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
         makeIcon("err5xx", entry.response.status + " response status: " + entry.response.statusText);
     }
-    if (!entry.response.content.mimeType && isInStatusCodeRange(entry, 200, 299)) {
+    if (!entry.response.content.mimeType && heuristics.isInStatusCodeRange(entry, 200, 299)) {
         makeIcon("warning", "No MIME Type defined");
     }
     return output;
 }
 exports.getIndicators = getIndicators;
 
-},{"../../helpers/misc":3}],15:[function(require,module,exports){
+},{"../../helpers/heuristics":2}],16:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1284,13 +1305,13 @@ function createBgStripe(y, height, isEven) {
     });
 }
 exports.createBgStripe = createBgStripe;
-function createNameRowBg(y, requestBarHeight, onClick, leftFixedWidthPerc) {
+function createNameRowBg(y, rowHeight, onClick, leftColumnWith) {
     var rowFixed = svg.newEl("g", {
         "class": "row row-fixed"
     });
     rowFixed.appendChild(svg.newEl("rect", {
         "width": "100%",
-        "height": requestBarHeight,
+        "height": rowHeight,
         "x": "0",
         "y": y,
         "opacity": "0"
@@ -1299,13 +1320,13 @@ function createNameRowBg(y, requestBarHeight, onClick, leftFixedWidthPerc) {
     return rowFixed;
 }
 exports.createNameRowBg = createNameRowBg;
-function createRequestBarRowBg(y, requestBarHeight, onClick) {
+function createRowBg(y, rowHeight, onClick) {
     var rowFixed = svg.newEl("g", {
         "class": "row row-flex"
     });
     rowFixed.appendChild(svg.newEl("rect", {
         "width": "100%",
-        "height": requestBarHeight,
+        "height": rowHeight,
         "x": "0",
         "y": y,
         "opacity": "0"
@@ -1313,12 +1334,13 @@ function createRequestBarRowBg(y, requestBarHeight, onClick) {
     rowFixed.addEventListener("click", onClick);
     return rowFixed;
 }
-exports.createRequestBarRowBg = createRequestBarRowBg;
+exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":3,"../../helpers/svg":4}],16:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":5}],17:[function(require,module,exports){
 var svg = require("../../helpers/svg");
 var icons = require("../../helpers/icons");
 var misc = require("../../helpers/misc");
+var heuristics = require("../../helpers/heuristics");
 var rowSubComponents = require("./svg-row-subcomponents");
 var indicators = require("./svg-indicators");
 //initial clip path
@@ -1330,46 +1352,45 @@ clipPathElProto.appendChild(svg.newEl("rect", {
     "height": "100%"
 }));
 //Creates single reques's row
-function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, onDetailsOverlayShow) {
+function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetailsOverlayShow) {
     var y = rectData.y;
-    var requestBarHeight = rectData.height;
+    var rowHeight = rectData.height;
+    var leftColumnWith = options.leftColumnWith;
     var rowCssClass = ["row-item"];
-    if (indicators.isInStatusCodeRange(block.rawResource, 500, 599)) {
+    if (heuristics.isInStatusCodeRange(block.rawResource, 500, 599)) {
         rowCssClass.push("status5xx");
     }
-    if (indicators.isInStatusCodeRange(block.rawResource, 400, 499)) {
+    if (heuristics.isInStatusCodeRange(block.rawResource, 400, 499)) {
         rowCssClass.push("status4xx");
     }
     else if (block.rawResource.response.status !== 304 &&
-        indicators.isInStatusCodeRange(block.rawResource, 300, 399)) {
+        heuristics.isInStatusCodeRange(block.rawResource, 300, 399)) {
         //304 == Not Modified, so not an issue
         rowCssClass.push("status3xx");
     }
     var rowItem = svg.newG(rowCssClass.join(" "));
     var leftFixedHolder = svg.newSvg("left-fixed-holder", {
         "x": "0",
-        "width": leftFixedWidthPerc + "%"
+        "width": leftColumnWith + "%"
     });
     var flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
-        "x": leftFixedWidthPerc + "%",
-        "width": (100 - leftFixedWidthPerc) + "%"
+        "x": leftColumnWith + "%",
+        "width": (100 - leftColumnWith) + "%"
     });
     var rect = rowSubComponents.createRect(rectData, block.segments, block.total);
-    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, misc.ressourceUrlFormater(block.name), requestBarHeight, "clipPath");
-    var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, requestBarHeight);
-    var rowName = rowSubComponents.createNameRowBg(y, requestBarHeight, onDetailsOverlayShow, leftFixedWidthPerc);
-    var rowBar = rowSubComponents.createRequestBarRowBg(y, requestBarHeight, onDetailsOverlayShow);
-    var bgStripe = rowSubComponents.createBgStripe(y, requestBarHeight, (index % 2 === 0));
+    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, misc.ressourceUrlFormater(block.name), rowHeight, "clipPath");
+    var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, rowHeight);
+    var rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow, leftColumnWith);
+    var rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow);
+    var bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
     //create and attach request block
     rowBar.appendChild(rect);
-    //Add create and add warnings
-    indicators.getIndicators(block, docIsSsl).forEach(function (value) {
-        rowName.appendChild(icons[value.type](value.x, y + 3, value.title));
-    });
-    //Add create and add warnings
-    indicators.getIndicators(block, docIsSsl).forEach(function (value) {
-        rowName.appendChild(icons[value.type](value.x, y + 3, value.title));
-    });
+    if (options.showIndicatorIcons) {
+        //Create and add warnings for potential issues
+        indicators.getIndicators(block, docIsSsl).forEach(function (value) {
+            rowName.appendChild(icons[value.type](value.x, y + 3, value.title));
+        });
+    }
     rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel);
     flexScaleHolder.appendChild(rowBar);
     leftFixedHolder.appendChild(clipPathElProto.cloneNode(true));
@@ -1381,7 +1402,7 @@ function createRow(index, rectData, block, labelXPos, leftFixedWidthPerc, docIsS
 }
 exports.createRow = createRow;
 
-},{"../../helpers/icons":2,"../../helpers/misc":3,"../../helpers/svg":4,"./svg-indicators":14,"./svg-row-subcomponents":15}],17:[function(require,module,exports){
+},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":15,"./svg-row-subcomponents":16}],18:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  * */
@@ -1442,7 +1463,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/svg":4}],18:[function(require,module,exports){
+},{"../../helpers/svg":5}],19:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1501,7 +1522,7 @@ function createBgRect(block, unit, diagramHeight) {
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/svg":4,"../details-overlay/overlay-changes-pub-sub":11}],19:[function(require,module,exports){
+},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":12}],20:[function(require,module,exports){
 var svg = require("../../helpers/svg");
 var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
 /**
@@ -1585,7 +1606,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/svg":4,"../details-overlay/overlay-changes-pub-sub":11}],20:[function(require,module,exports){
+},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":12}],21:[function(require,module,exports){
 var svg = require("../helpers/svg");
 var misc = require("../helpers/misc");
 var generalComponents = require("./sub-components/svg-general-components");
@@ -1611,7 +1632,9 @@ function getSvgHeight(marks, barsToShow, diagramHeight) {
 /** default options to use if not set in `options` parameter */
 var defaultOptions = {
     rowHeight: 23,
-    showAlignmentHelpers: true
+    showAlignmentHelpers: true,
+    showIndicatorIcons: true,
+    leftColumnWith: 25
 };
 /**
  * Entry point to start rendering the full waterfall SVG
@@ -1622,8 +1645,6 @@ var defaultOptions = {
 function createWaterfallSvg(data, chartOptions) {
     var options = misc.assign(defaultOptions, chartOptions || {});
     //constants
-    /** Width of bar on left in percentage */
-    var leftFixedWidthPerc = 25;
     /** horizontal unit (duration in ms of 1%) */
     var unit = data.durationMs / 100;
     var barsToShow = data.blocks
@@ -1642,8 +1663,8 @@ function createWaterfallSvg(data, chartOptions) {
     var overlayHolder = svg.newG("overlays");
     /** Holder for scale, event and marks */
     var scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
-        "x": leftFixedWidthPerc + "%",
-        "width": (100 - leftFixedWidthPerc) + "%"
+        "x": options.leftColumnWith + "%",
+        "width": (100 - options.leftColumnWith) + "%"
     });
     /** Holds all rows */
     var rowHolder = svg.newG("rows-holder");
@@ -1663,13 +1684,19 @@ function createWaterfallSvg(data, chartOptions) {
     data.lines.forEach(function (block, i) {
         timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight));
     });
+    var labelXPos;
     //calculate x position for label based on number of icons
-    var labelXPos = barsToShow.reduce(function (prev, curr) {
-        var i = indicators.getIndicators(curr, docIsSsl);
-        var lastIndicator = i[i.length - 1];
-        var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
-        return Math.max(prev, x);
-    }, 5);
+    if (options.showIndicatorIcons) {
+        labelXPos = barsToShow.reduce(function (prev, curr) {
+            var i = indicators.getIndicators(curr, docIsSsl);
+            var lastIndicator = i[i.length - 1];
+            var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
+            return Math.max(prev, x);
+        }, 5);
+    }
+    else {
+        labelXPos = 5;
+    }
     var barEls = [];
     function getChartHeight() {
         return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px";
@@ -1697,7 +1724,7 @@ function createWaterfallSvg(data, chartOptions) {
         var showDetailsOverlay = function (evt) {
             overlayManager.openOverlay(i, x, y + options.rowHeight, accordeonHeight, block, overlayHolder, barEls, unit);
         };
-        var rowItem = row.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay);
+        var rowItem = row.createRow(i, rectData, block, labelXPos, options, docIsSsl, showDetailsOverlay);
         barEls.push(rowItem);
         rowHolder.appendChild(rowItem);
     }
@@ -1713,4 +1740,4 @@ function createWaterfallSvg(data, chartOptions) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/misc":3,"../helpers/svg":4,"./details-overlay/overlay-changes-pub-sub":11,"./details-overlay/svg-details-overlay-manager":12,"./row/svg-indicators":14,"./row/svg-row":16,"./sub-components/svg-alignment-helper":17,"./sub-components/svg-general-components":18,"./sub-components/svg-marks":19}]},{},[5]);
+},{"../helpers/misc":4,"../helpers/svg":5,"./details-overlay/overlay-changes-pub-sub":12,"./details-overlay/svg-details-overlay-manager":13,"./row/svg-indicators":15,"./row/svg-row":17,"./sub-components/svg-alignment-helper":18,"./sub-components/svg-general-components":19,"./sub-components/svg-marks":20}]},{},[6]);

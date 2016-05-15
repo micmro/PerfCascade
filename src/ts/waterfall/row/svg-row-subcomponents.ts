@@ -223,14 +223,14 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
 
 
 
-export function createNameRowBg(y: number, requestBarHeight: number, onClick: EventListener, leftFixedWidthPerc: number): SVGGElement {
+export function createNameRowBg(y: number, rowHeight: number, onClick: EventListener, leftColumnWith: number): SVGGElement {
   let rowFixed = svg.newEl("g", {
     "class": "row row-fixed"
   }) as SVGGElement
 
   rowFixed.appendChild(svg.newEl("rect", {
-    "width": "100%", //leftFixedWidthPerc
-    "height": requestBarHeight,
+    "width": "100%",
+    "height": rowHeight,
     "x": "0",
     "y": y,
     "opacity": "0"
@@ -243,14 +243,14 @@ export function createNameRowBg(y: number, requestBarHeight: number, onClick: Ev
 
 
 
-export function createRequestBarRowBg(y: number, requestBarHeight: number, onClick: EventListener): SVGGElement {
+export function createRowBg(y: number, rowHeight: number, onClick: EventListener): SVGGElement {
   let rowFixed = svg.newEl("g", {
     "class": "row row-flex"
   }) as SVGGElement
 
   rowFixed.appendChild(svg.newEl("rect", {
     "width": "100%",
-    "height": requestBarHeight,
+    "height": rowHeight,
     "x": "0",
     "y": y,
     "opacity": "0"
