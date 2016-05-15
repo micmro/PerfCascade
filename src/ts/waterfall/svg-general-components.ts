@@ -42,16 +42,9 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
 
 /**
  * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover
- * @param {HoverElements} hoverEl?  verticale alignment bars SVG Elements
+ * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
  */
-export function makeHoverEvtListeners(hoverEl?: HoverElements) {
-  // return empty functions if
-  if (!hoverEl) {
-    return {
-      onMouseEnterPartial : () => {},
-      onMouseLeavePartial : () => {}
-    }
-  }
+export function makeHoverEvtListeners(hoverEl: HoverElements) {
   return {
     onMouseEnterPartial: function () {
       return function (evt: MouseEvent) {

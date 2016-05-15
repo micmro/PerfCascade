@@ -46,7 +46,7 @@ const defaultOptions: ChartOptions = {
  * @return {SVGSVGElement}            SVG Element ready to render
  */
 export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOptions): SVGSVGElement {
-  const options = misc.assign(defaultOptions, chartOptions || {})
+  const options: ChartOptions = misc.assign(defaultOptions, chartOptions || {})
 
   //constants
 
@@ -85,8 +85,6 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
     hoverOverlayHolder.appendChild(hoverEl.startline)
     hoverOverlayHolder.appendChild(hoverEl.endline)
     mouseListeners = makeHoverEvtListeners(hoverEl)
-  } else {
-    mouseListeners = makeHoverEvtListeners()
   }
 
   //Start appending SVG elements to the holder element (timeLineHolder)
@@ -121,7 +119,6 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
     const y = options.rowHeight * i
     const x = (block.start || 0.001)
     const accordeonHeight = 450
-
     const rectData = {
       "width": blockWidth,
       "height": options.rowHeight,
@@ -130,8 +127,8 @@ export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOpti
       "cssClass": block.cssClass,
       "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
       "unit": unit,
-      "showOverlay": mouseListeners.onMouseEnterPartial,
-      "hideOverlay": mouseListeners.onMouseLeavePartial
+      "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
+      "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined
     } as RectData
 
     let showDetailsOverlay = (evt) => {

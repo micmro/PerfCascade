@@ -1105,8 +1105,10 @@ function makeBlock(rectData, className) {
             "text": rectData.label
         })); // Add tile to wedge path
     }
-    rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
-    rect.addEventListener("mouseleave", rectData.hideOverlay(rectData));
+    if (rectData.showOverlay && rectData.hideOverlay) {
+        rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
+        rect.addEventListener("mouseleave", rectData.hideOverlay(rectData));
+    }
     return rect;
 }
 /**
@@ -1435,9 +1437,6 @@ function createWaterfallSvg(data, chartOptions) {
         hoverOverlayHolder.appendChild(hoverEl.endline);
         mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
     }
-    else {
-        mouseListeners = svg_general_components_1.makeHoverEvtListeners();
-    }
     //Start appending SVG elements to the holder element (timeLineHolder)
     scaleAndMarksHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
     scaleAndMarksHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
@@ -1472,8 +1471,8 @@ function createWaterfallSvg(data, chartOptions) {
             "cssClass": block.cssClass,
             "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
             "unit": unit,
-            "showOverlay": mouseListeners.onMouseEnterPartial,
-            "hideOverlay": mouseListeners.onMouseLeavePartial
+            "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
+            "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined
         };
         var showDetailsOverlay = function (evt) {
             overlayManager.openOverlay(i, x, y + options.rowHeight, accordeonHeight, block, overlayHolder, barEls, unit);
@@ -1523,16 +1522,9 @@ function createAlignmentLines(diagramHeight) {
 exports.createAlignmentLines = createAlignmentLines;
 /**
  * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover
- * @param {HoverElements} hoverEl?  verticale alignment bars SVG Elements
+ * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
  */
 function makeHoverEvtListeners(hoverEl) {
-    // return empty functions if
-    if (!hoverEl) {
-        return {
-            onMouseEnterPartial: function () { },
-            onMouseLeavePartial: function () { }
-        };
-    }
     return {
         onMouseEnterPartial: function () {
             return function (evt) {
