@@ -1,4 +1,4 @@
-/*PerfCascade build:12/05/2016 */
+/*PerfCascade build:15/05/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -348,7 +348,8 @@ function renderHar(logData) {
     var data = har_1.default.transfrom(logData);
     dom.removeAllChildren(outputHolder);
     var options = {
-        rowHeight: 23
+        rowHeight: 23,
+        showAlignmentHelpers: true
     };
     outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, options));
 }
@@ -1386,18 +1387,19 @@ function getSvgHeight(marks, barsToShow, diagramHeight) {
     }, 0);
     return Math.floor(diagramHeight + maxMarkTextLength + 35);
 }
+/** default options to use if not set in `options` parameter */
+var defaultOptions = {
+    rowHeight: 23,
+    showAlignmentHelpers: true
+};
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
- * @param {options} ChartOptions   Config options
+ * @param {chartOptions} ChartOptions   Config options
  * @return {SVGSVGElement}            SVG Element ready to render
  */
-function createWaterfallSvg(data, options) {
-    options = misc.assign({
-        rowHeight: 23
-    }, options || {});
-    console.log(options);
-    var requestBarHeight = options.rowHeight || 23;
+function createWaterfallSvg(data, chartOptions) {
+    var options = misc.assign(defaultOptions, chartOptions || {});
     //constants
     /** Width of bar on left in percentage */
     var leftFixedWidthPerc = 25;
@@ -1408,7 +1410,7 @@ function createWaterfallSvg(data, options) {
         .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
     var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
     /** height of the requests part of the diagram in px */
-    var diagramHeight = (barsToShow.length + 1) * requestBarHeight;
+    var diagramHeight = (barsToShow.length + 1) * options.rowHeight;
     /** full height of the SVG chart in px */
     var chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight);
     /** Main SVG Element that holds all data */
@@ -1426,10 +1428,16 @@ function createWaterfallSvg(data, options) {
     });
     /** Holds all rows */
     var rowHolder = svg.newG("rows-holder");
-    var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
-    hoverOverlayHolder.appendChild(hoverEl.startline);
-    hoverOverlayHolder.appendChild(hoverEl.endline);
-    var mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
+    var mouseListeners;
+    if (options.showAlignmentHelpers) {
+        var hoverEl = svg_general_components_1.createAlignmentLines(diagramHeight);
+        hoverOverlayHolder.appendChild(hoverEl.startline);
+        hoverOverlayHolder.appendChild(hoverEl.endline);
+        mouseListeners = svg_general_components_1.makeHoverEvtListeners(hoverEl);
+    }
+    else {
+        mouseListeners = svg_general_components_1.makeHoverEvtListeners();
+    }
     //Start appending SVG elements to the holder element (timeLineHolder)
     scaleAndMarksHolder.appendChild(svg_general_components_1.createTimeScale(data.durationMs, diagramHeight));
     scaleAndMarksHolder.appendChild(svg_general_components_1.createMarks(data.marks, unit, diagramHeight));
@@ -1453,12 +1461,12 @@ function createWaterfallSvg(data, options) {
     /** Renders single row and hooks up behaviour */
     function renderRow(block, i) {
         var blockWidth = block.total || 1;
-        var y = requestBarHeight * i;
+        var y = options.rowHeight * i;
         var x = (block.start || 0.001);
         var accordeonHeight = 450;
         var rectData = {
             "width": blockWidth,
-            "height": requestBarHeight,
+            "height": options.rowHeight,
             "x": x,
             "y": y,
             "cssClass": block.cssClass,
@@ -1468,7 +1476,7 @@ function createWaterfallSvg(data, options) {
             "hideOverlay": mouseListeners.onMouseLeavePartial
         };
         var showDetailsOverlay = function (evt) {
-            overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, overlayHolder, barEls, unit);
+            overlayManager.openOverlay(i, x, y + options.rowHeight, accordeonHeight, block, overlayHolder, barEls, unit);
         };
         var rowItem = svg_row_1.createRow(i, rectData, block, labelXPos, leftFixedWidthPerc, docIsSsl, showDetailsOverlay);
         barEls.push(rowItem);
@@ -1515,9 +1523,16 @@ function createAlignmentLines(diagramHeight) {
 exports.createAlignmentLines = createAlignmentLines;
 /**
  * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover
- * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
+ * @param {HoverElements} hoverEl?  verticale alignment bars SVG Elements
  */
 function makeHoverEvtListeners(hoverEl) {
+    // return empty functions if
+    if (!hoverEl) {
+        return {
+            onMouseEnterPartial: function () { },
+            onMouseLeavePartial: function () { }
+        };
+    }
     return {
         onMouseEnterPartial: function () {
             return function (evt) {

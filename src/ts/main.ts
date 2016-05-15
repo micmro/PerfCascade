@@ -14,7 +14,8 @@ function renderHar(logData: Har) {
   const data = HarTransformer.transfrom(logData)
   dom.removeAllChildren(outputHolder)
   let options = {
-    rowHeight: 23
+    rowHeight: 23,
+    showAlignmentHelpers : true
   } as ChartOptions
   outputHolder.appendChild(createWaterfallSvg(data, options))
 }

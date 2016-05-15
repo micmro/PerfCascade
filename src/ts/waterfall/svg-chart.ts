@@ -32,19 +32,22 @@ function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: numb
   return Math.floor(diagramHeight + maxMarkTextLength + 35)
 }
 
+
+/** default options to use if not set in `options` parameter */
+const defaultOptions: ChartOptions = {
+  rowHeight: 23,
+  showAlignmentHelpers: true
+}
+
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
- * @param {options} ChartOptions   Config options
+ * @param {chartOptions} ChartOptions   Config options
  * @return {SVGSVGElement}            SVG Element ready to render
  */
-export function createWaterfallSvg(data: WaterfallData, options?: ChartOptions): SVGSVGElement {
-  options = misc.assign({
-    rowHeight : 23
-  }, options || {})
+export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOptions): SVGSVGElement {
+  const options = misc.assign(defaultOptions, chartOptions || {})
 
- console.log(options)
-  let requestBarHeight = options.rowHeight || 23
   //constants
 
   /** Width of bar on left in percentage */
@@ -56,7 +59,7 @@ export function createWaterfallSvg(data: WaterfallData, options?: ChartOptions):
     .sort((a, b) => (a.start || 0) - (b.start || 0))
   const docIsSsl = (data.blocks[0].name.indexOf("https://") === 0)
   /** height of the requests part of the diagram in px */
-  const diagramHeight = (barsToShow.length + 1) * requestBarHeight
+  const diagramHeight = (barsToShow.length + 1) * options.rowHeight
   /** full height of the SVG chart in px */
   const chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight)
 
@@ -76,12 +79,15 @@ export function createWaterfallSvg(data: WaterfallData, options?: ChartOptions):
   /** Holds all rows */
   let rowHolder = svg.newG("rows-holder")
 
-
-  let hoverEl = createAlignmentLines(diagramHeight)
-  hoverOverlayHolder.appendChild(hoverEl.startline)
-  hoverOverlayHolder.appendChild(hoverEl.endline)
-  let mouseListeners = makeHoverEvtListeners(hoverEl)
-
+  let mouseListeners
+  if (options.showAlignmentHelpers) {
+    let hoverEl = createAlignmentLines(diagramHeight)
+    hoverOverlayHolder.appendChild(hoverEl.startline)
+    hoverOverlayHolder.appendChild(hoverEl.endline)
+    mouseListeners = makeHoverEvtListeners(hoverEl)
+  } else {
+    mouseListeners = makeHoverEvtListeners()
+  }
 
   //Start appending SVG elements to the holder element (timeLineHolder)
 
@@ -112,13 +118,13 @@ export function createWaterfallSvg(data: WaterfallData, options?: ChartOptions):
   /** Renders single row and hooks up behaviour */
   function renderRow(block: TimeBlock, i: number) {
     const blockWidth = block.total || 1
-    const y = requestBarHeight * i
+    const y = options.rowHeight * i
     const x = (block.start || 0.001)
     const accordeonHeight = 450
 
     const rectData = {
       "width": blockWidth,
-      "height": requestBarHeight,
+      "height": options.rowHeight,
       "x": x,
       "y": y,
       "cssClass": block.cssClass,
@@ -129,7 +135,7 @@ export function createWaterfallSvg(data: WaterfallData, options?: ChartOptions):
     } as RectData
 
     let showDetailsOverlay = (evt) => {
-      overlayManager.openOverlay(i, x, y + requestBarHeight, accordeonHeight, block, overlayHolder, barEls, unit)
+      overlayManager.openOverlay(i, x, y + options.rowHeight, accordeonHeight, block, overlayHolder, barEls, unit)
     }
 
     let rowItem = createRow(i, rectData, block, labelXPos,
