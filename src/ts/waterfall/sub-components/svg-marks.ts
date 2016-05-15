@@ -1,5 +1,6 @@
 import {Mark} from "../../typing/waterfall-data.d"
 import {OverlayChangeEvent} from "../../typing/open-overlay.d"
+
 import * as svg from "../../helpers/svg"
 import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
 
@@ -30,7 +31,6 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
     })
     mark.x = x
     let lineLabel = svg.newTextEl(mark.name, diagramHeight + 25)
-    //lineLabel.setAttribute("writing-mode", "tb")
     lineLabel.setAttribute("x", x + "%")
     lineLabel.setAttribute("stroke", "")
 

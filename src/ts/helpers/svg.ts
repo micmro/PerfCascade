@@ -86,10 +86,20 @@ let getTestSVGEl = (() => {
   }
 })()
 
-
-export function getNodeTextWidth(textNode: SVGTextElement): number {
+/**
+ * Measure the width of a SVGTextElement in px
+ * @param  {SVGTextElement} textNode
+ * @param  {boolean=false} skipClone - do not clone `textNode` and use original
+ * @returns number
+ */
+export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = false): number {
   let tmp = getTestSVGEl()
-  let tmpTextNode = textNode.cloneNode(false) as SVGTextElement
+  let tmpTextNode
+  if (skipClone) {
+    tmpTextNode = textNode
+  } else {
+    tmpTextNode = textNode.cloneNode(false) as SVGTextElement
+  }
   tmp.appendChild(tmpTextNode)
   //make sure to turn of shadow for performance
   tmpTextNode.style.textShadow = "0"

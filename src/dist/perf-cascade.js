@@ -292,9 +292,22 @@ var getTestSVGEl = (function () {
         return svgTestEl;
     };
 })();
-function getNodeTextWidth(textNode) {
+/**
+ * Measure the width of a SVGTextElement in px
+ * @param  {SVGTextElement} textNode
+ * @param  {boolean=false} skipClone - do not clone `textNode` and use original
+ * @returns number
+ */
+function getNodeTextWidth(textNode, skipClone) {
+    if (skipClone === void 0) { skipClone = false; }
     var tmp = getTestSVGEl();
-    var tmpTextNode = textNode.cloneNode(false);
+    var tmpTextNode;
+    if (skipClone) {
+        tmpTextNode = textNode;
+    }
+    else {
+        tmpTextNode = textNode.cloneNode(false);
+    }
     tmp.appendChild(tmpTextNode);
     //make sure to turn of shadow for performance
     tmpTextNode.style.textShadow = "0";
@@ -1516,7 +1529,6 @@ function createMarks(marks, unit, diagramHeight) {
         });
         mark.x = x;
         var lineLabel = svg.newTextEl(mark.name, diagramHeight + 25);
-        //lineLabel.setAttribute("writing-mode", "tb")
         lineLabel.setAttribute("x", x + "%");
         lineLabel.setAttribute("stroke", "");
         var line = svg.newEl("line", {
@@ -1592,7 +1604,7 @@ var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
  */
 function getSvgHeight(marks, barsToShow, diagramHeight) {
     var maxMarkTextLength = marks.reduce(function (currMax, currValue) {
-        return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0)));
+        return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0), true));
     }, 0);
     return Math.floor(diagramHeight + maxMarkTextLength + 35);
 }
