@@ -1,6 +1,53 @@
-/*PerfCascade build:15/05/2016 */
+/*PerfCascade build:16/05/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var main_1 = require("./main");
+var dom = require("./helpers/dom");
+function showErrorMsg(msg) {
+    alert(msg);
+}
+var outputHolder = document.getElementById("output");
+function renderHar(logData) {
+    dom.removeAllChildren(outputHolder);
+    var options = {
+        rowHeight: 23,
+        showAlignmentHelpers: true,
+        showIndicatorIcons: true,
+        leftColumnWith: 25
+    };
+    var perfCascadeSvg = main_1.default.newPerfCascadeHar(logData, options);
+    // const data = HarTransformer.transfrom(logData)
+    outputHolder.appendChild(perfCascadeSvg);
+}
+function onFileSubmit(evt) {
+    var files = evt.target.files;
+    if (!files) {
+        showErrorMsg("Failed to load HAR file");
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = (function (e) {
+        var harData;
+        try {
+            //TODO: add proper check for HAR files and later other formats
+            harData = JSON.parse(e.target["result"]);
+        }
+        catch (e) {
+            showErrorMsg("File does not seem to be a valid HAR file");
+            return undefined;
+        }
+        renderHar(harData.log);
+    });
+    reader.readAsText(files[0]);
+}
+if (location.host.indexOf("127.0.0.1") === 0) {
+    //http://www.webpagetest.org/result/151226_X7_b43d35e592fab70e0ba012fe11a41020/
+    window["fetch"]("test-data/github.com.MODIFIED.151226_X7_b43d35e592fab70e0ba012fe11a41020.har")
+        .then(function (f) { return f.json().then(function (j) { return renderHar(j.log); }); });
+}
+document.getElementById("fileinput").addEventListener("change", onFileSubmit, false);
+
+},{"./helpers/dom":2,"./main":7}],2:[function(require,module,exports){
 /**
  *  DOM Helpers
  */
@@ -35,7 +82,7 @@ function filter(els, predicat) {
 }
 exports.filter = filter;
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var misc = require("./misc");
 function getResponseHeader(entry, headerName) {
     return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
@@ -118,7 +165,7 @@ function isSecure(block) {
 }
 exports.isSecure = isSecure;
 
-},{"./misc":4}],3:[function(require,module,exports){
+},{"./misc":5}],4:[function(require,module,exports){
 /**
  *  SVG Icons
  */
@@ -208,7 +255,7 @@ function flash(x, y, title, scale) {
 }
 exports.flash = flash;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /**
  *  Misc Helpers
  */
@@ -297,7 +344,7 @@ function assign(target) {
 }
 exports.assign = assign;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /**
  *  SVG Helpers
  */
@@ -432,61 +479,32 @@ function removeClass(el, className) {
 }
 exports.removeClass = removeClass;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var svg_chart_1 = require("./waterfall/svg-chart");
-var dom = require("./helpers/dom");
 var har_1 = require("./transformers/har");
-function showErrorMsg(msg) {
-    alert(msg);
-}
-var outputHolder = document.getElementById("output");
-function renderHar(logData) {
+/**
+ * Create new PerfCascade from HAR data
+ * @param  {Har} logData - HAR object
+ * @param  {ChartOptions} options - PerfCascade options object
+ * @returns {SVGSVGElement} - Chart SVG Element
+ */
+function PerfCascade(logData, options) {
     var data = har_1.default.transfrom(logData);
-    dom.removeAllChildren(outputHolder);
-    var options = {
-        rowHeight: 23,
-        showAlignmentHelpers: true,
-        showIndicatorIcons: true,
-        leftColumnWith: 25
-    };
-    outputHolder.appendChild(svg_chart_1.createWaterfallSvg(data, options));
+    return svg_chart_1.createWaterfallSvg(data, options);
 }
-function onFileSubmit(evt) {
-    var files = evt.target.files;
-    if (!files) {
-        showErrorMsg("Failed to load HAR file");
-        return;
-    }
-    var reader = new FileReader();
-    reader.onload = (function (e) {
-        var harData;
-        try {
-            //TODO: add proper check for HAR files and later other formats
-            harData = JSON.parse(e.target["result"]);
-        }
-        catch (e) {
-            showErrorMsg("File does not seem to be a valid HAR file");
-            return undefined;
-        }
-        renderHar(harData.log);
-    });
-    reader.readAsText(files[0]);
-}
-document.getElementById("fileinput").addEventListener("change", onFileSubmit, false);
+var exportMembers = {
+    newPerfCascadeHar: PerfCascade,
+    newPerfCascadeCustom: svg_chart_1.createWaterfallSvg,
+    transformHar: har_1.default.transfrom
+};
 // TEMP: create public and renderHar
 if (window["define"] === undefined) {
-    window["perfCascade"] = {
-        renderHar: renderHar,
-        createWaterfallSvg: svg_chart_1.createWaterfallSvg
-    };
+    window["perfCascade"] = exportMembers;
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = {
-    renderHar: renderHar,
-    createWaterfallSvg: svg_chart_1.createWaterfallSvg
-};
+exports.default = exportMembers;
 
-},{"./helpers/dom":1,"./transformers/har":7,"./waterfall/svg-chart":21}],7:[function(require,module,exports){
+},{"./transformers/har":8,"./waterfall/svg-chart":22}],8:[function(require,module,exports){
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
@@ -593,7 +611,7 @@ var HarTransformer = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = HarTransformer;
 
-},{"../typing/time-block":9,"./styling-converters":8}],8:[function(require,module,exports){
+},{"../typing/time-block":10,"./styling-converters":9}],9:[function(require,module,exports){
 /**
  * Convert a MIME type into it's WPT style request type (font, script etc)
  * @param {string} mimeType
@@ -639,7 +657,7 @@ function mimeToCssClass(mimeType) {
 }
 exports.mimeToCssClass = mimeToCssClass;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var TimeBlock = (function () {
     function TimeBlock(name, start, end, cssClass, segments, rawResource, requestType) {
         if (cssClass === void 0) { cssClass = ""; }
@@ -658,7 +676,7 @@ var TimeBlock = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /**
  * Data to show in overlay tabs
  * @param  {number} requestID - request number
@@ -803,7 +821,7 @@ function getKeys(requestID, block) {
 }
 exports.getKeys = getKeys;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues) {
     return Object.keys(dlKeyValues)
@@ -857,7 +875,7 @@ function createDetailsBody(requestID, block, accordeonHeight) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":10}],12:[function(require,module,exports){
+},{"./extract-details-keys":11}],13:[function(require,module,exports){
 //simple pub/sub for change to the overlay
 exports.eventTypes = {
     "OPEN": "open",
@@ -874,7 +892,7 @@ function publishToOvelayChanges(change) {
 }
 exports.publishToOvelayChanges = publishToOvelayChanges;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var overlayChangesPubSub = require("./overlay-changes-pub-sub");
 /** Collection of currely open overlays */
@@ -979,7 +997,7 @@ function renderOverlays(barX, accordeonHeight, overlayHolder, unit) {
     });
 }
 
-},{"./overlay-changes-pub-sub":12,"./svg-details-overlay":14}],14:[function(require,module,exports){
+},{"./overlay-changes-pub-sub":13,"./svg-details-overlay":15}],15:[function(require,module,exports){
 var svg = require("../../helpers/svg");
 var dom = require("../../helpers/dom");
 var html_details_body_1 = require("./html-details-body");
@@ -1062,7 +1080,7 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/dom":1,"../../helpers/svg":5,"./html-details-body":11}],15:[function(require,module,exports){
+},{"../../helpers/dom":2,"../../helpers/svg":6,"./html-details-body":12}],16:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1114,7 +1132,7 @@ function getIndicators(block, docIsSsl) {
 }
 exports.getIndicators = getIndicators;
 
-},{"../../helpers/heuristics":2}],16:[function(require,module,exports){
+},{"../../helpers/heuristics":3}],17:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1336,7 +1354,7 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":4,"../../helpers/svg":5}],17:[function(require,module,exports){
+},{"../../helpers/misc":5,"../../helpers/svg":6}],18:[function(require,module,exports){
 var svg = require("../../helpers/svg");
 var icons = require("../../helpers/icons");
 var misc = require("../../helpers/misc");
@@ -1402,7 +1420,7 @@ function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetai
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":15,"./svg-row-subcomponents":16}],18:[function(require,module,exports){
+},{"../../helpers/heuristics":3,"../../helpers/icons":4,"../../helpers/misc":5,"../../helpers/svg":6,"./svg-indicators":16,"./svg-row-subcomponents":17}],19:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  * */
@@ -1463,7 +1481,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/svg":5}],19:[function(require,module,exports){
+},{"../../helpers/svg":6}],20:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1522,7 +1540,7 @@ function createBgRect(block, unit, diagramHeight) {
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":12}],20:[function(require,module,exports){
+},{"../../helpers/svg":6,"../details-overlay/overlay-changes-pub-sub":13}],21:[function(require,module,exports){
 var svg = require("../../helpers/svg");
 var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
 /**
@@ -1606,7 +1624,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":12}],21:[function(require,module,exports){
+},{"../../helpers/svg":6,"../details-overlay/overlay-changes-pub-sub":13}],22:[function(require,module,exports){
 var svg = require("../helpers/svg");
 var misc = require("../helpers/misc");
 var generalComponents = require("./sub-components/svg-general-components");
@@ -1740,4 +1758,4 @@ function createWaterfallSvg(data, chartOptions) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/misc":4,"../helpers/svg":5,"./details-overlay/overlay-changes-pub-sub":12,"./details-overlay/svg-details-overlay-manager":13,"./row/svg-indicators":15,"./row/svg-row":17,"./sub-components/svg-alignment-helper":18,"./sub-components/svg-general-components":19,"./sub-components/svg-marks":20}]},{},[6]);
+},{"../helpers/misc":5,"../helpers/svg":6,"./details-overlay/overlay-changes-pub-sub":13,"./details-overlay/svg-details-overlay-manager":14,"./row/svg-indicators":16,"./row/svg-row":18,"./sub-components/svg-alignment-helper":19,"./sub-components/svg-general-components":20,"./sub-components/svg-marks":21}]},{},[1]);
