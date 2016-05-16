@@ -31,12 +31,7 @@ module.exports = function( grunt ) {
         files: {
           "src/dist/perf-cascade.js": ["src/ts/main.ts"],
         }
-      },
-      example: {
-        files: {
-          "src/dist/example-dist.js": ["src/ts/example.ts"],
-        }
-     }
+      }
     },
     tslint: {
         options: {
@@ -102,8 +97,8 @@ module.exports = function( grunt ) {
     },
   });
 
-  grunt.registerTask("distBase", ["clean:dist", "browserify:example", "concat:dist"]);
-  grunt.registerTask("dist", ["tslint", "distBase", "browserify:dist", "uglify:dist"]);
+  grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist"]);
+  grunt.registerTask("dist", ["tslint", "distBase", "uglify:dist"]);
   grunt.registerTask("ghPages", ["clean:pages", "dist", "concat:pages", "copy:pages", "gh-pages"]);
 
   grunt.registerTask("default", ["distBase", "watch"]);
