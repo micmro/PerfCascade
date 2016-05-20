@@ -7,21 +7,90 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- import PerfCascade styles --->
     <link rel="stylesheet" href="dist/perf-cascade-full.css">
   </head>
   <body>
 
     <input type="file" id="fileinput" />
 
+
     <div id="output"></div>
+
+    <!-- import PerfCascade JS --->
     <script src="dist/perf-cascade.js"></script>
+
     <script>
-      //TODO: remove Dev/Test only - load test file
-      if (location.host.indexOf("127.0.0.1") === 0) {
-        //http://www.webpagetest.org/result/151226_X7_b43d35e592fab70e0ba012fe11a41020/
+       /**
+        * functionality for example page
+        * `perfCascade` is a global object if not running in AMD or CommonJS context
+       */
+      (function(perfCascade){
+
+        /** holder DOM element to render PerfCascade into */
+        var outputHolder = document.getElementById("output")
+
+
+        /**
+         * This is where the magic happens
+         */
+        function renderPerfCascadeChart(logData) {
+          /** remove all children of `outputHolder`,
+           * so you can upload new HAR files and get a new SVG  */
+          while (outputHolder.childNodes.length > 0) {
+            outputHolder.removeChild(outputHolder.childNodes[0])
+          }
+
+          /** options for PerfCascade (all have defaults) */
+          var options = {
+            rowHeight: 23, //default: 23
+            showAlignmentHelpers : true, //default: true
+            showIndicatorIcons: true, //default: true
+            leftColumnWith: 25 //default: 25
+          }
+
+          /** pass HAR and options to `newPerfCascadeHar` to generate the SVG element*/
+          var perfCascadeSvg =  perfCascade.fromHar(logData, options)
+
+          /** append SVG to page - that's it */
+          outputHolder.appendChild(perfCascadeSvg)
+        }
+
+
+        /** handle client side file upload */
+        function onFileSubmit(evt) {
+          var files = evt.target.files
+          if (!files) {
+            alert("Failed to load HAR file")
+            return
+          }
+
+          var reader = new FileReader()
+
+          /** try to parse the file once uploaded to browser */
+          reader.onload = (e => {
+            var harData
+            try {
+              harData = JSON.parse(e.target["result"])
+            } catch (e) {
+              alert("File does not seem to be a valid HAR file")
+              return undefined
+            }
+            renderPerfCascadeChart(harData.log)
+          })
+
+          /** start reading the file */
+          reader.readAsText(files[0])
+        }
+
+        /** load an initial HAR when opening the page */
+        //Source: http://www.webpagetest.org/result/151226_X7_b43d35e592fab70e0ba012fe11a41020/
         window["fetch"]("test-data/github.com.MODIFIED.151226_X7_b43d35e592fab70e0ba012fe11a41020.har")
-          .then(f => f.json().then(j => perfCascade.renderHar(j.log)))
-      }
+          .then(f => f.json().then(j => renderPerfCascadeChart(j.log)))
+
+        /** hook up file input events */
+        document.getElementById("fileinput").addEventListener("change", onFileSubmit, false)
+      })(window.perfCascade)
     </script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-module.exports = function( grunt ) {
+module.exports = function (grunt) {
   "use strict";
 
   require("load-grunt-tasks")(grunt);
@@ -6,7 +6,7 @@ module.exports = function( grunt ) {
   var banner = "/*PerfCascade build:<%= grunt.template.today(\"dd/mm/yyyy\") %> */\n";
 
   grunt.initConfig({
-    clean : {
+    clean: {
       dist: ["temp/", "src/dist/"],
       pages: ["gh-pages/"],
       js: ["src/ts/**/*.js", "src/ts/**/*.js.map"]
@@ -25,7 +25,10 @@ module.exports = function( grunt ) {
     browserify: {
       options: {
         plugin: [['tsify']],
-        banner: banner
+        banner: banner,
+        browserifyOptions: {
+          standalone: "perfCascade"
+        }
       },
       dist: {
         files: {
@@ -34,17 +37,17 @@ module.exports = function( grunt ) {
       }
     },
     tslint: {
-        options: {
-            // can be a configuration object or a filepath to tslint.json
-            configuration: "tslint.json"
-        },
-        files: {
-            src: [
-                "src/ts/**/*.ts"
-            ]
-        }
+      options: {
+        // can be a configuration object or a filepath to tslint.json
+        configuration: "tslint.json"
+      },
+      files: {
+        src: [
+          "src/ts/**/*.ts"
+        ]
+      }
     },
-    uglify : {
+    uglify: {
       options: {
         compress: {
           global_defs: {
@@ -61,7 +64,7 @@ module.exports = function( grunt ) {
       }
     },
     watch: {
-      babel: {
+      ts: {
         files: ["src/ts/**/*.ts", "Gruntfile.js"],
         tasks: ["distBase"],
         options: {
@@ -97,8 +100,12 @@ module.exports = function( grunt ) {
   });
 
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist"]);
-  grunt.registerTask("dist", ["tslint", "distBase", "uglify:dist"]);
-  grunt.registerTask("ghPages", ["clean:pages", "dist", "concat:pages", "copy:pages", "gh-pages"]);
+
+  //build uptimized release file
+  grunt.registerTask("releaseBuild", ["tslint", "distBase", "uglify:dist"]);
+
+  //releases the current version on master to github-pages (gh-pages branch)
+  grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
 
   grunt.registerTask("default", ["distBase", "watch"]);
 };

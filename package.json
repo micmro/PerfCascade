@@ -1,16 +1,16 @@
 {
   "name": "perf-cascade",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Har file visualizer",
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "grunt tslint",
+    "watch": "npm run start & grunt default",
+    "build": "grunt releaseBuild",
     "start": "live-server --wait=50 --open=src/index.html --ignore=src/ts/",
-    "watch": "npm run start & grunt",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
-    "ghPages": "grunt ghPages",
-    "build": "grunt dist"
+    "ghPages": "grunt ghPages"
   },
   "author": {
     "name": "Michael Mrowetz",
@@ -23,21 +23,20 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "babelify": "^7.2.0",
-    "grunt": "^0.4.5",
+    "grunt": "^1.0.1",
     "grunt-banner": "^0.6.0",
-    "grunt-browserify": "^4.0.1",
-    "grunt-contrib-clean": "^0.7.0",
-    "grunt-contrib-concat": "^0.5.1",
-    "grunt-contrib-copy": "^0.8.2",
-    "grunt-contrib-uglify": "^0.11.0",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-gh-pages": "^1.0.0",
-    "grunt-tslint": "^3.0.2",
-    "live-server": "^0.9.0",
-    "load-grunt-tasks": "^3.3.0",
-    "tsify": "^0.13.1",
-    "tslint": "^3.3.0",
-    "typescript": "^1.7.5"
+    "grunt-browserify": "^5.0.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-gh-pages": "^1.1.0",
+    "grunt-tslint": "^3.1.0",
+    "live-server": "^1.0.0",
+    "load-grunt-tasks": "^3.5.0",
+    "tsify": "^0.15.6",
+    "tslint": "^3.10.2",
+    "typescript": "^1.8.10"
   }
 }
