@@ -11,6 +11,9 @@ src/dist/perf-cascade-gh-page.css
 *.sublime-project
 *.sublime-workspace
 .vscode/
+.tscache/
+src/ts/**/*.js
+src/ts/**/*.js.map
 
 # Runtime data
 pids

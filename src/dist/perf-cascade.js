@@ -1,9 +1,10 @@
-/*PerfCascade build:16/05/2016 */
+/*PerfCascade build:20/05/2016 */
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  *  DOM Helpers
  */
+"use strict";
 /**
  * Remove all child nodes from `el`
  * @param  {HTMLElement|SVGElement} el
@@ -36,6 +37,7 @@ function filter(els, predicat) {
 exports.filter = filter;
 
 },{}],2:[function(require,module,exports){
+"use strict";
 var misc = require("./misc");
 function getResponseHeader(entry, headerName) {
     return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
@@ -122,6 +124,7 @@ exports.isSecure = isSecure;
 /**
  *  SVG Icons
  */
+"use strict";
 var toSvg = function (x, y, title, className, scale, svgDoc) {
     var parser = new DOMParser();
     var doc = parser.parseFromString("<svg x=\"" + x + "\" y=\"" + y + "\" xmlns=\"http://www.w3.org/2000/svg\">\n    <g class=\"icon " + className + "\" transform=\"scale(" + scale + ")\">\n      " + svgDoc + "\n      <title>" + title + "</title>\n    </g>\n  </svg>", "image/svg+xml");
@@ -212,6 +215,7 @@ exports.flash = flash;
 /**
  *  Misc Helpers
  */
+"use strict";
 /**
  * Parses URL into it's components
  * @param  {string} url
@@ -301,6 +305,7 @@ exports.assign = assign;
 /**
  *  SVG Helpers
  */
+"use strict";
 function newEl(tagName, settings, css) {
     var el = document.createElementNS("http://www.w3.org/2000/svg", tagName);
     settings = settings || {};
@@ -433,6 +438,7 @@ function removeClass(el, className) {
 exports.removeClass = removeClass;
 
 },{}],6:[function(require,module,exports){
+"use strict";
 var svg_chart_1 = require("./waterfall/svg-chart");
 var har_1 = require("./transformers/har");
 /**
@@ -458,6 +464,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = exportMembers;
 
 },{"./transformers/har":7,"./waterfall/svg-chart":21}],7:[function(require,module,exports){
+"use strict";
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
 var HarTransformer = (function () {
@@ -560,11 +567,12 @@ var HarTransformer = (function () {
         };
     };
     return HarTransformer;
-})();
+}());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = HarTransformer;
 
 },{"../typing/time-block":9,"./styling-converters":8}],8:[function(require,module,exports){
+"use strict";
 /**
  * Convert a MIME type into it's WPT style request type (font, script etc)
  * @param {string} mimeType
@@ -611,6 +619,7 @@ function mimeToCssClass(mimeType) {
 exports.mimeToCssClass = mimeToCssClass;
 
 },{}],9:[function(require,module,exports){
+"use strict";
 var TimeBlock = (function () {
     function TimeBlock(name, start, end, cssClass, segments, rawResource, requestType) {
         if (cssClass === void 0) { cssClass = ""; }
@@ -625,11 +634,12 @@ var TimeBlock = (function () {
         this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
     }
     return TimeBlock;
-})();
+}());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
 },{}],10:[function(require,module,exports){
+"use strict";
 /**
  * Data to show in overlay tabs
  * @param  {number} requestID - request number
@@ -775,6 +785,7 @@ function getKeys(requestID, block) {
 exports.getKeys = getKeys;
 
 },{}],11:[function(require,module,exports){
+"use strict";
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues) {
     return Object.keys(dlKeyValues)
@@ -830,6 +841,7 @@ exports.createDetailsBody = createDetailsBody;
 
 },{"./extract-details-keys":10}],12:[function(require,module,exports){
 //simple pub/sub for change to the overlay
+"use strict";
 exports.eventTypes = {
     "OPEN": "open",
     "CLOSE": "closed"
@@ -846,6 +858,7 @@ function publishToOvelayChanges(change) {
 exports.publishToOvelayChanges = publishToOvelayChanges;
 
 },{}],13:[function(require,module,exports){
+"use strict";
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var overlayChangesPubSub = require("./overlay-changes-pub-sub");
 /** Collection of currely open overlays */
@@ -951,6 +964,7 @@ function renderOverlays(barX, accordeonHeight, overlayHolder, unit) {
 }
 
 },{"./overlay-changes-pub-sub":12,"./svg-details-overlay":14}],14:[function(require,module,exports){
+"use strict";
 var svg = require("../../helpers/svg");
 var dom = require("../../helpers/dom");
 var html_details_body_1 = require("./html-details-body");
@@ -1037,6 +1051,7 @@ exports.createRowInfoOverlay = createRowInfoOverlay;
 /**
  * Creation of sub-components used in a ressource request row
  */
+"use strict";
 var heuristics = require("../../helpers/heuristics");
 /**
  * Scan the request for errors or portential issues and highlight them
@@ -1089,6 +1104,7 @@ exports.getIndicators = getIndicators;
 /**
  * Creation of sub-components used in a ressource request row
  */
+"use strict";
 var svg = require("../../helpers/svg");
 var misc = require("../../helpers/misc");
 /**
@@ -1308,6 +1324,7 @@ function createRowBg(y, rowHeight, onClick) {
 exports.createRowBg = createRowBg;
 
 },{"../../helpers/misc":4,"../../helpers/svg":5}],17:[function(require,module,exports){
+"use strict";
 var svg = require("../../helpers/svg");
 var icons = require("../../helpers/icons");
 var misc = require("../../helpers/misc");
@@ -1377,6 +1394,7 @@ exports.createRow = createRow;
 /**
  * vertical alignment helper lines
  * */
+"use strict";
 var svg = require("../../helpers/svg");
 /**
  * Creates verticale alignment bars
@@ -1438,6 +1456,7 @@ exports.makeHoverEvtListeners = makeHoverEvtListeners;
 /**
  * Creation of sub-components of the waterfall chart
  */
+"use strict";
 var svg = require("../../helpers/svg");
 var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
 /**
@@ -1494,6 +1513,7 @@ function createBgRect(block, unit, diagramHeight) {
 exports.createBgRect = createBgRect;
 
 },{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":12}],20:[function(require,module,exports){
+"use strict";
 var svg = require("../../helpers/svg");
 var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
 /**
@@ -1578,6 +1598,7 @@ function createMarks(marks, unit, diagramHeight) {
 exports.createMarks = createMarks;
 
 },{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":12}],21:[function(require,module,exports){
+"use strict";
 var svg = require("../helpers/svg");
 var misc = require("../helpers/misc");
 var generalComponents = require("./sub-components/svg-general-components");
