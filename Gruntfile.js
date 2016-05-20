@@ -59,8 +59,7 @@ module.exports = function (grunt) {
       },
       dist: {
         files: {
-          "src/dist/perf-cascade.min.js": ["src/dist/perf-cascade.js"],
-          "src/dist/example.min.js": ["src/dist/example.js"]
+          "src/dist/perf-cascade.min.js": ["src/dist/perf-cascade.js"]
         }
       }
     },
@@ -101,8 +100,12 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist"]);
-  grunt.registerTask("dist", ["tslint", "distBase", "uglify:dist"]);
-  grunt.registerTask("ghPages", ["clean:pages", "dist", "concat:pages", "copy:pages", "gh-pages"]);
+
+  //build uptimized release file
+  grunt.registerTask("releaseBuild", ["tslint", "distBase", "uglify:dist"]);
+
+  //releases the current version on master to github-pages (gh-pages branch)
+  grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
 
   grunt.registerTask("default", ["distBase", "watch"]);
 };

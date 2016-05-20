@@ -1,6 +1,5 @@
 import {createWaterfallSvg} from "./waterfall/svg-chart"
 import {Har} from "./typing/har.d"
-import * as dom  from "./helpers/dom"
 import HarTransformer from "./transformers/har"
 import {ChartOptions} from "./typing/options.d"
 
