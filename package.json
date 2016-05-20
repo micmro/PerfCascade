@@ -6,11 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "grunt tslint",
+    "watch": "npm run start & grunt default",
+    "build": "grunt releaseBuild",
     "start": "live-server --wait=50 --open=src/index.html --ignore=src/ts/",
-    "watch": "npm run start & grunt",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
-    "ghPages": "grunt ghPages",
-    "build": "grunt dist"
+    "ghPages": "grunt ghPages"
   },
   "author": {
     "name": "Michael Mrowetz",
