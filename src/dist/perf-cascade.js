@@ -1,6 +1,6 @@
 /*PerfCascade build:20/05/2016 */
 
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  *  DOM Helpers
  */
@@ -451,17 +451,11 @@ function PerfCascade(logData, options) {
     var data = har_1.default.transfrom(logData);
     return svg_chart_1.createWaterfallSvg(data, options);
 }
-var exportMembers = {
+module.exports = {
     newPerfCascadeHar: PerfCascade,
     newPerfCascadeCustom: svg_chart_1.createWaterfallSvg,
     transformHar: har_1.default.transfrom
 };
-// TEMP: create public and renderHar
-if (window["define"] === undefined) {
-    window["perfCascade"] = exportMembers;
-}
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = exportMembers;
 
 },{"./transformers/har":7,"./waterfall/svg-chart":21}],7:[function(require,module,exports){
 "use strict";
@@ -1732,4 +1726,5 @@ function createWaterfallSvg(data, chartOptions) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/misc":4,"../helpers/svg":5,"./details-overlay/overlay-changes-pub-sub":12,"./details-overlay/svg-details-overlay-manager":13,"./row/svg-indicators":15,"./row/svg-row":17,"./sub-components/svg-alignment-helper":18,"./sub-components/svg-general-components":19,"./sub-components/svg-marks":20}]},{},[6]);
+},{"../helpers/misc":4,"../helpers/svg":5,"./details-overlay/overlay-changes-pub-sub":12,"./details-overlay/svg-details-overlay-manager":13,"./row/svg-indicators":15,"./row/svg-row":17,"./sub-components/svg-alignment-helper":18,"./sub-components/svg-general-components":19,"./sub-components/svg-marks":20}]},{},[6])(6)
+});

@@ -25,7 +25,10 @@ module.exports = function (grunt) {
     browserify: {
       options: {
         plugin: [['tsify']],
-        banner: banner
+        banner: banner,
+        browserifyOptions: {
+          standalone: "perfCascade"
+        }
       },
       dist: {
         files: {
