@@ -452,9 +452,9 @@ function PerfCascade(logData, options) {
     return svg_chart_1.createWaterfallSvg(data, options);
 }
 module.exports = {
-    newPerfCascadeHar: PerfCascade,
-    newPerfCascadeCustom: svg_chart_1.createWaterfallSvg,
-    transformHar: har_1.default.transfrom
+    fromHar: PerfCascade,
+    fromPerfCascadeFormat: svg_chart_1.createWaterfallSvg,
+    transformHarToPerfCascade: har_1.default.transfrom
 };
 
 },{"./transformers/har":7,"./waterfall/svg-chart":21}],7:[function(require,module,exports){

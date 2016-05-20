@@ -50,7 +50,7 @@
           }
 
           /** pass HAR and options to `newPerfCascadeHar` to generate the SVG element*/
-          var perfCascadeSvg =  perfCascade.newPerfCascadeHar(logData, options)
+          var perfCascadeSvg =  perfCascade.fromHar(logData, options)
 
           /** append SVG to page - that's it */
           outputHolder.appendChild(perfCascadeSvg)

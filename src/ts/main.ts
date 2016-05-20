@@ -17,7 +17,7 @@ function PerfCascade(logData: Har, options?: ChartOptions): SVGSVGElement {
 
 //global members that get exported via UMD
 export = {
-  newPerfCascadeHar : PerfCascade,
-  newPerfCascadeCustom: createWaterfallSvg,
-  transformHar: HarTransformer.transfrom
+  fromHar : PerfCascade,
+  fromPerfCascadeFormat: createWaterfallSvg,
+  transformHarToPerfCascade: HarTransformer.transfrom
 }
