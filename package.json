@@ -1,6 +1,6 @@
 {
   "name": "perf-cascade",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Har file visualizer",
   "main": "index.html",
   "scripts": {
@@ -10,7 +10,8 @@
     "build": "grunt releaseBuild",
     "start": "live-server --wait=50 --open=src/index.html --ignore=src/ts/",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
-    "ghPages": "grunt ghPages"
+    "ghPages": "grunt ghPages",
+    "release": "grunt release"
   },
   "author": {
     "name": "Michael Mrowetz",
@@ -26,6 +27,7 @@
     "grunt": "^1.0.1",
     "grunt-banner": "^0.6.0",
     "grunt-browserify": "^5.0.0",
+    "grunt-bump": "^0.8.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",

@@ -3,15 +3,20 @@ module.exports = function (grunt) {
 
   require("load-grunt-tasks")(grunt);
 
-  var banner = "/*PerfCascade build:<%= grunt.template.today(\"dd/mm/yyyy\") %> */\n";
+  /** Version banner for static files (keep version format for "grunt-bump") */
+  var banner = "/*! github.com/micmro/PerfCascade Version:<%= pkg.version %> <%= grunt.template.today(\"(dd/mm/yyyy)\") %> */\n";
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
     clean: {
       dist: ["temp/", "src/dist/"],
       pages: ["gh-pages/"],
       js: ["src/ts/**/*.js", "src/ts/**/*.js.map"]
     },
     concat: {
+      options: {
+        banner: banner
+      },
       dist: {
         src: ["src/css-raw/normalize.css", "src/css-raw/page.css", "src/css-raw/main.css"],
         dest: "src/dist/perf-cascade-full.css",
@@ -38,7 +43,6 @@ module.exports = function (grunt) {
     },
     tslint: {
       options: {
-        // can be a configuration object or a filepath to tslint.json
         configuration: "tslint.json"
       },
       files: {
@@ -93,10 +97,33 @@ module.exports = function (grunt) {
     "gh-pages": {
       options: {
         base: "gh-pages",
-        add: true
+        add: true,
+        // tag: '<%= pkg.version %>'
       },
       src: ["**/*"]
     },
+    bump: {
+      //to test run: grunt bump --dry-run
+      options :{
+        files: [
+            "package.json",
+            "src/dist/perf-cascade.js",
+            "src/dist/perf-cascade.min.js",
+            "src/dist/perf-cascade-full.css"
+        ],
+        updateConfigs: ['pkg'],
+        commit: true,
+        push: true,
+        createTag: true,
+        // dryRun: true,
+        commitFiles: [
+            "package.json",
+            "src/dist/perf-cascade.js",
+            "src/dist/perf-cascade.min.js",
+            "src/dist/perf-cascade-full.css"
+        ],
+      }
+    }
   });
 
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist"]);
@@ -106,6 +133,9 @@ module.exports = function (grunt) {
 
   //releases the current version on master to github-pages (gh-pages branch)
   grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
+
+  //releases master and gh-pages at the same time (with auto-version bump)
+  grunt.registerTask("release", ["clean:pages", "releaseBuild", "bump", "concat:pages", "copy:pages", "gh-pages"]);
 
   grunt.registerTask("default", ["distBase", "watch"]);
 };
