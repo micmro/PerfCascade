@@ -2,16 +2,18 @@ import {createWaterfallSvg} from "./waterfall/svg-chart"
 import {Har} from "./typing/har.d"
 import HarTransformer from "./transformers/har"
 import {ChartOptions} from "./typing/options.d"
+import * as harStore from "./paging/har-store"
 
 
 /**
  * Create new PerfCascade from HAR data
- * @param  {Har} logData - HAR object
+ * @param  {Har} harData - HAR object
  * @param  {ChartOptions} options - PerfCascade options object
  * @returns {SVGSVGElement} - Chart SVG Element
  */
-function PerfCascade(logData: Har, options?: ChartOptions): SVGSVGElement {
-  const data = HarTransformer.transfrom(logData)
+function PerfCascade(harData: Har, options?: ChartOptions): SVGSVGElement {
+  harStore.storeHar(harData)
+  const data = HarTransformer.transfrom(harData)
   return createWaterfallSvg(data, options)
 }
 
