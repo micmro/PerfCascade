@@ -18,3 +18,7 @@ export interface WaterfallData {
   marks: Array<Mark>,
   lines: Array<TimeBlock>
 }
+
+export interface WaterfallDocs {
+  pages: Array<WaterfallData>
+}

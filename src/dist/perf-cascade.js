@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.1.1 (23/05/2016) */
+/*! github.com/micmro/PerfCascade Version:0.1.1 (29/05/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -440,24 +440,134 @@ exports.removeClass = removeClass;
 },{}],6:[function(require,module,exports){
 "use strict";
 var svg_chart_1 = require("./waterfall/svg-chart");
+var paging = require("./paging/paging");
 var har_1 = require("./transformers/har");
+var waterfallDocsStore = require("./state/waterfall-docs-store");
+function PerfCascade(options) {
+    var doc = svg_chart_1.createWaterfallSvg(paging.getSelectedPage(), options);
+    //page update behaviour
+    paging.onPageUpdate(function (pageIndex, pageDoc) {
+        console.log("Change Page to", pageIndex);
+        var el = doc.parentElement;
+        var newDoc = svg_chart_1.createWaterfallSvg(pageDoc, options);
+        el.replaceChild(newDoc, doc);
+        doc = newDoc;
+    });
+    return doc;
+}
 /**
  * Create new PerfCascade from HAR data
- * @param  {Har} logData - HAR object
+ * @param  {Har} harData - HAR object
  * @param  {ChartOptions} options - PerfCascade options object
  * @returns {SVGSVGElement} - Chart SVG Element
  */
-function PerfCascade(logData, options) {
-    var data = har_1.default.transfrom(logData);
-    return svg_chart_1.createWaterfallSvg(data, options);
+function fromHar(harData, options) {
+    waterfallDocsStore.storeDocs(har_1.default.transformDoc(harData));
+    return PerfCascade(options);
+}
+/**
+ * Create new PerfCascade from PerfCascade's internal WaterfallData format
+ * @param {WaterfallDocs} waterfallDocsData Object containing data to render
+ * @param  {ChartOptions} options - PerfCascade options object
+ * @returns {SVGSVGElement} - Chart SVG Element
+ */
+function fromPerfCascadeFormat(waterfallDocsData, options) {
+    waterfallDocsStore.storeDocs(waterfallDocsData);
+    return PerfCascade(options);
 }
 module.exports = {
-    fromHar: PerfCascade,
-    fromPerfCascadeFormat: svg_chart_1.createWaterfallSvg,
-    transformHarToPerfCascade: har_1.default.transfrom
+    fromHar: fromHar,
+    fromPerfCascadeFormat: fromPerfCascadeFormat,
+    transformHarToPerfCascade: har_1.default.transformDoc,
+    changePage: paging.setSelectedPageIndex
 };
 
-},{"./transformers/har":7,"./waterfall/svg-chart":21}],7:[function(require,module,exports){
+},{"./paging/paging":7,"./state/waterfall-docs-store":8,"./transformers/har":9,"./waterfall/svg-chart":23}],7:[function(require,module,exports){
+"use strict";
+var waterfallDocsStore = require("../state/waterfall-docs-store");
+var selectedPageIndex = 0;
+var onPageUpdateCbs = [];
+/**
+ * Returns number of pages
+ * @returns number - number of pages in current doc
+ */
+function getPageCount() {
+    return waterfallDocsStore.getDocs().pages.length;
+}
+exports.getPageCount = getPageCount;
+/**
+ * Returns selected pages
+ * @returns WaterfallData - currerently selected page
+ */
+function getSelectedPage() {
+    return waterfallDocsStore.getDocs().pages[selectedPageIndex];
+}
+exports.getSelectedPage = getSelectedPage;
+/**
+ * Returns index of currently selected page
+ * @returns number - index of current page (0 based)
+ */
+function getSelectedPageIndex() {
+    return selectedPageIndex;
+}
+exports.getSelectedPageIndex = getSelectedPageIndex;
+/**
+ * Update which pageIndex is currently update.
+ * Published `onPageUpdate`
+ * @param  {number} pageIndex
+ */
+function setSelectedPageIndex(pageIndex) {
+    if (selectedPageIndex === pageIndex) {
+        return;
+    }
+    if (pageIndex < 0 || pageIndex >= getPageCount()) {
+        throw new Error("Page does not exist - Invalid pageIndex selected");
+    }
+    selectedPageIndex = pageIndex;
+    var selectedPage = waterfallDocsStore.getDocs().pages[selectedPageIndex];
+    onPageUpdateCbs.forEach(function (cd) {
+        cd(selectedPageIndex, selectedPage);
+    });
+}
+exports.setSelectedPageIndex = setSelectedPageIndex;
+/**
+ * Register subscriber callbacks to be called when the pageindex updates
+ * @param  {onPagingCb} cb
+ * @returns number - index of the callback
+ */
+function onPageUpdate(cb) {
+    if (getPageCount() > 1) {
+        return onPageUpdateCbs.push(cb);
+    }
+    return undefined;
+}
+exports.onPageUpdate = onPageUpdate;
+
+},{"../state/waterfall-docs-store":8}],8:[function(require,module,exports){
+"use strict";
+/*
+* Central service to store HAR data
+* and make it accessible everywhere by importing this module
+*/
+var docs;
+/**
+ * Store Waterfall-Docs data centrally for Multi-page HARs
+ * @param  {WaterfallDocs} waterfallDocs
+ */
+function storeDocs(waterfallDocs) {
+    docs = waterfallDocs;
+}
+exports.storeDocs = storeDocs;
+/**
+ * Get stored Waterfall-Docs
+ * @returns WaterfallDocs
+ */
+function getDocs() {
+    return docs;
+}
+exports.getDocs = getDocs;
+
+},{}],9:[function(require,module,exports){
 "use strict";
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
@@ -465,15 +575,35 @@ var HarTransformer = (function () {
     function HarTransformer() {
     }
     /**
+     * Trasforms the full HAR doc, including all pages
+     * @param  {Har} harData - raw hhar object
+     * @returns WaterfallDocs
+     */
+    HarTransformer.transformDoc = function (harData) {
+        var _this = this;
+        //make sure it's the *.log base node
+        var data = (harData["log"] !== undefined ? harData["log"] : harData);
+        console.time("transform HAR Doc");
+        var waterfallDocs = {
+            pages: data.pages.map(function (page, i) { return _this.transformPage(data, i); })
+        };
+        console.timeEnd("transform HAR Doc");
+        return waterfallDocs;
+    };
+    /**
      * Transforms a HAR object into the format needed to render the PerfCascade
-     * @param  {Har} data
+     * @param  {Har} harData - HAR document
+     * @param {number=0} pageIndex - page to parse (for multi-page HAR)
      * @returns WaterfallData
      */
-    HarTransformer.transfrom = function (data) {
+    HarTransformer.transformPage = function (harData, pageIndex) {
         var _this = this;
-        console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length);
+        if (pageIndex === void 0) { pageIndex = 0; }
+        //make sure it's the *.log base node
+        var data = (harData["log"] !== undefined ? harData["log"] : harData);
+        console.log("HAR created by %s(%s) %s of %s page(s)", data.creator.name, data.creator.version, pageIndex + 1, data.pages.length);
         //only support one page (first) for now
-        var currentPageIndex = 0;
+        var currentPageIndex = pageIndex;
         var currPage = data.pages[currentPageIndex];
         var pageStartTime = new Date(currPage.startedDateTime).getTime();
         var pageTimings = currPage.pageTimings;
@@ -565,7 +695,7 @@ var HarTransformer = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = HarTransformer;
 
-},{"../typing/time-block":9,"./styling-converters":8}],8:[function(require,module,exports){
+},{"../typing/time-block":11,"./styling-converters":10}],10:[function(require,module,exports){
 "use strict";
 /**
  * Convert a MIME type into it's WPT style request type (font, script etc)
@@ -612,7 +742,7 @@ function mimeToCssClass(mimeType) {
 }
 exports.mimeToCssClass = mimeToCssClass;
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 var TimeBlock = (function () {
     function TimeBlock(name, start, end, cssClass, segments, rawResource, requestType) {
@@ -632,7 +762,7 @@ var TimeBlock = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 /**
  * Data to show in overlay tabs
@@ -778,7 +908,7 @@ function getKeys(requestID, block) {
 }
 exports.getKeys = getKeys;
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues) {
@@ -833,7 +963,7 @@ function createDetailsBody(requestID, block, accordeonHeight) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":10}],12:[function(require,module,exports){
+},{"./extract-details-keys":12}],14:[function(require,module,exports){
 //simple pub/sub for change to the overlay
 "use strict";
 exports.eventTypes = {
@@ -851,7 +981,7 @@ function publishToOvelayChanges(change) {
 }
 exports.publishToOvelayChanges = publishToOvelayChanges;
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var overlayChangesPubSub = require("./overlay-changes-pub-sub");
@@ -957,7 +1087,7 @@ function renderOverlays(barX, accordeonHeight, overlayHolder, unit) {
     });
 }
 
-},{"./overlay-changes-pub-sub":12,"./svg-details-overlay":14}],14:[function(require,module,exports){
+},{"./overlay-changes-pub-sub":14,"./svg-details-overlay":16}],16:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var dom = require("../../helpers/dom");
@@ -1041,7 +1171,7 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/dom":1,"../../helpers/svg":5,"./html-details-body":11}],15:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":5,"./html-details-body":13}],17:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1094,7 +1224,7 @@ function getIndicators(block, docIsSsl) {
 }
 exports.getIndicators = getIndicators;
 
-},{"../../helpers/heuristics":2}],16:[function(require,module,exports){
+},{"../../helpers/heuristics":2}],18:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1317,7 +1447,7 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":4,"../../helpers/svg":5}],17:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":5}],19:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var icons = require("../../helpers/icons");
@@ -1384,7 +1514,7 @@ function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetai
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":15,"./svg-row-subcomponents":16}],18:[function(require,module,exports){
+},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":17,"./svg-row-subcomponents":18}],20:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  * */
@@ -1446,7 +1576,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/svg":5}],19:[function(require,module,exports){
+},{"../../helpers/svg":5}],21:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1506,7 +1636,7 @@ function createBgRect(block, unit, diagramHeight) {
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":12}],20:[function(require,module,exports){
+},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":14}],22:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
@@ -1591,7 +1721,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":12}],21:[function(require,module,exports){
+},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":14}],23:[function(require,module,exports){
 "use strict";
 var svg = require("../helpers/svg");
 var misc = require("../helpers/misc");
@@ -1629,6 +1759,7 @@ var defaultOptions = {
  * @return {SVGSVGElement}            SVG Element ready to render
  */
 function createWaterfallSvg(data, chartOptions) {
+    //TODO: move to global-state.ts
     var options = misc.assign(defaultOptions, chartOptions || {});
     //constants
     /** horizontal unit (duration in ms of 1%) */
@@ -1726,5 +1857,5 @@ function createWaterfallSvg(data, chartOptions) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/misc":4,"../helpers/svg":5,"./details-overlay/overlay-changes-pub-sub":12,"./details-overlay/svg-details-overlay-manager":13,"./row/svg-indicators":15,"./row/svg-row":17,"./sub-components/svg-alignment-helper":18,"./sub-components/svg-general-components":19,"./sub-components/svg-marks":20}]},{},[6])(6)
+},{"../helpers/misc":4,"../helpers/svg":5,"./details-overlay/overlay-changes-pub-sub":14,"./details-overlay/svg-details-overlay-manager":15,"./row/svg-indicators":17,"./row/svg-row":19,"./sub-components/svg-alignment-helper":20,"./sub-components/svg-general-components":21,"./sub-components/svg-marks":22}]},{},[6])(6)
 });
