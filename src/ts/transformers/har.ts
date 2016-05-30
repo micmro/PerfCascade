@@ -24,12 +24,11 @@ export default class HarTransformer {
   public static transformDoc(harData: Har): WaterfallDocs {
     //make sure it's the *.log base node
     let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
+    console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length)
 
-    console.time("transform HAR Doc")
     let waterfallDocs = {
       pages: data.pages.map((page, i) => this.transformPage(data, i))
     } as WaterfallDocs
-    console.timeEnd("transform HAR Doc")
     return waterfallDocs
   }
   /**
@@ -41,13 +40,15 @@ export default class HarTransformer {
   public static transformPage(harData: Har, pageIndex: number = 0): WaterfallData {
     //make sure it's the *.log base node
     let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
-    console.log("HAR created by %s(%s) %s of %s page(s)", data.creator.name, data.creator.version, pageIndex + 1, data.pages.length)
+
 
     //only support one page (first) for now
     const currentPageIndex = pageIndex
     const currPage = data.pages[currentPageIndex]
     const pageStartTime = new Date(currPage.startedDateTime).getTime()
     const pageTimings = currPage.pageTimings
+
+    console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length)
 
     let doneTime = 0;
     const blocks = data.entries
@@ -81,12 +82,12 @@ export default class HarTransformer {
           "startTime": startRelative
         } as Mark
       })
-
     return {
       durationMs: doneTime,
       blocks: blocks,
       marks: marks,
       lines: [],
+      title: currPage.title,
     }
   }
   /**

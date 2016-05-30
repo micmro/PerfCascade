@@ -1,10 +1,8 @@
 import {WaterfallData} from "../typing/waterfall-data.d"
 import {RectData} from "../typing/rect-data.d"
-import {ChartOptions} from "../typing/options.d"
 import TimeBlock from "../typing/time-block"
 
 import * as svg from "../helpers/svg"
-import * as misc from "../helpers/misc"
 import * as generalComponents from "./sub-components/svg-general-components"
 import * as alignmentHelper from  "./sub-components/svg-alignment-helper"
 import * as marks from  "./sub-components/svg-marks"
@@ -12,7 +10,7 @@ import * as row from "./row/svg-row"
 import * as indicators from "./row/svg-indicators"
 import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
 import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
-
+import * as globalStateService from "../state/global-state"
 
 /**
  * Calculate the height of the SVG chart in px
@@ -30,22 +28,14 @@ function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: numb
 }
 
 
-/** default options to use if not set in `options` parameter */
-const defaultOptions: ChartOptions = {
-  rowHeight: 23,
-  showAlignmentHelpers: true,
-  showIndicatorIcons: true,
-  leftColumnWith: 25
-}
 
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
- * @param {chartOptions} ChartOptions   Config options
  * @return {SVGSVGElement}            SVG Element ready to render
  */
-export function createWaterfallSvg(data: WaterfallData, chartOptions?: ChartOptions): SVGSVGElement {
-  const options: ChartOptions = misc.assign(defaultOptions, chartOptions || {})
+export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
+  const options = globalStateService.getOptions()
 
   //constants
 

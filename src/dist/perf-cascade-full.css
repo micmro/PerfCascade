@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.1.1 (23/05/2016) */
+/*! github.com/micmro/PerfCascade Version:0.1.1 (30/05/2016) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -471,6 +471,7 @@ textarea {
 * {box-sizing: border-box;}
 
 #output {margin: 2em 0; font-size: 12px; line-height: 1em;}
+#page-selector {display: none;}
 
 .water-fall-holder {fill:#ccc;}
 

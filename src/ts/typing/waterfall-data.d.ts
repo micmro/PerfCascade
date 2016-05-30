@@ -13,6 +13,7 @@ export interface Mark extends UserTiming {
 
 
 export interface WaterfallData {
+  title: string,
   durationMs: number,
   blocks: Array<TimeBlock>,
   marks: Array<Mark>,

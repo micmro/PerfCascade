@@ -4,21 +4,38 @@ import {ChartOptions} from "./typing/options.d"
 import {createWaterfallSvg} from "./waterfall/svg-chart"
 import * as paging from "./paging/paging"
 import HarTransformer from "./transformers/har"
-import * as waterfallDocsStore from "./state/waterfall-docs-store"
+import * as waterfallDocsService from "./state/waterfall-docs-service"
+import * as globalStateService from "./state/global-state"
+import * as misc from "./helpers/misc"
 
 
+/** default options to use if not set in `options` parameter */
+const defaultOptions: ChartOptions = {
+  rowHeight: 23,
+  showAlignmentHelpers: true,
+  showIndicatorIcons: true,
+  leftColumnWith: 25
+}
 
-function PerfCascade(options?: ChartOptions): SVGSVGElement {
-  let doc = createWaterfallSvg(paging.getSelectedPage(), options)
+
+function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions?: ChartOptions): SVGSVGElement {
+  const options: ChartOptions = misc.assign(defaultOptions, chartOptions || {})
+
+  //setup state setvices
+  globalStateService.init(options)
+  waterfallDocsService.storeDocs(waterfallDocsData)
+
+  let doc = createWaterfallSvg(paging.getSelectedPage())
 
   //page update behaviour
   paging.onPageUpdate((pageIndex, pageDoc) => {
     console.log("Change Page to", pageIndex)
     let el = doc.parentElement
-    let newDoc = createWaterfallSvg(pageDoc, options)
+    let newDoc = createWaterfallSvg(pageDoc)
     el.replaceChild(newDoc, doc)
     doc = newDoc
   })
+  paging.initPagingSelectBox(options.pageSelector)
   return doc
 }
 
@@ -29,8 +46,7 @@ function PerfCascade(options?: ChartOptions): SVGSVGElement {
  * @returns {SVGSVGElement} - Chart SVG Element
  */
 function fromHar(harData: Har, options?: ChartOptions): SVGSVGElement {
-  waterfallDocsStore.storeDocs(HarTransformer.transformDoc(harData))
-  return PerfCascade(options)
+  return PerfCascade(HarTransformer.transformDoc(harData), options)
 }
 
 /**
@@ -40,8 +56,7 @@ function fromHar(harData: Har, options?: ChartOptions): SVGSVGElement {
  * @returns {SVGSVGElement} - Chart SVG Element
  */
 function fromPerfCascadeFormat(waterfallDocsData: WaterfallDocs, options?: ChartOptions): SVGSVGElement {
-  waterfallDocsStore.storeDocs(waterfallDocsData)
-  return PerfCascade(options)
+  return PerfCascade(waterfallDocsData, options)
 }
 
 //global members that get exported via UMD
