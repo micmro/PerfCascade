@@ -38,3 +38,6 @@ fieldset {
 textarea {
     resize: vertical;
 }
+
+
+#page-selector {display: none; clear: both; margin: 1em 0;}

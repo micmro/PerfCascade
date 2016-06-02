@@ -29,13 +29,15 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions?: ChartOptio
 
   //page update behaviour
   paging.onPageUpdate((pageIndex, pageDoc) => {
-    console.log("Change Page to", pageIndex)
     let el = doc.parentElement
     let newDoc = createWaterfallSvg(pageDoc)
     el.replaceChild(newDoc, doc)
     doc = newDoc
   })
-  paging.initPagingSelectBox(options.pageSelector)
+
+  if (options.pageSelector) {
+    paging.initPagingSelectBox(options.pageSelector)
+  }
   return doc
 }
 
