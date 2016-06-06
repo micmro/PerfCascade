@@ -6,6 +6,8 @@
 
   /** holder DOM element to render PerfCascade into */
   var outputHolder = document.getElementById("output")
+  /** Select box for multi-page HARs */
+  var pageSelectorEl = document.getElementById("page-selector")
 
   /** options for PerfCascade (all have defaults)
    * Source: /src/ts/typing/options.d.ts
@@ -14,7 +16,8 @@
     rowHeight: 23, //default: 23
     showAlignmentHelpers: true, //default: true
     showIndicatorIcons: true, //default: true
-    leftColumnWith: 25 //default: 25
+    leftColumnWith: 25, //default: 25
+    pageSelector: pageSelectorEl //default: undefined
   }
 
   /**

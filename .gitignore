@@ -2,3 +2,5 @@
 node_modules/
 .vscode
 .grunt/
+/gh-pages/
+/src/dist/
