@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.1.1 (02/06/2016) */
+/*! github.com/micmro/PerfCascade Version:0.1.1 (06/06/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -244,10 +244,10 @@ exports.contains = contains;
 /**
  * formats and shortes a url for ui
  * @param  {string} url
+ * @param  {number} maxLength - max length of shortened url
  * @returns string
  */
-function ressourceUrlFormater(url) {
-    var maxLength = 40;
+function ressourceUrlFormater(url, maxLength) {
     if (url.length < maxLength) {
         return url.replace(/http[s]\:\/\//, "");
     }
@@ -255,12 +255,14 @@ function ressourceUrlFormater(url) {
     if ((matches.authority + matches.path).length < maxLength) {
         return matches.authority + matches.path;
     }
+    var maxAuthLength = Math.floor(maxLength / 2) - 3;
+    var maxPathLenth = Math.floor(maxLength / 2) - 5;
     // maybe we could finetune these numbers
     var p = matches.path.split("/");
-    if (matches.authority.length > 17) {
-        return matches.authority.substr(0, 17) + "..." + p[p.length - 1].substr(-15);
+    if (matches.authority.length > maxAuthLength) {
+        return matches.authority.substr(0, maxAuthLength) + "..." + p[p.length - 1].substr(-maxPathLenth);
     }
-    return matches.authority + "..." + p[p.length - 1].substr(-15);
+    return matches.authority + "..." + p[p.length - 1].substr(-maxPathLenth);
 }
 exports.ressourceUrlFormater = ressourceUrlFormater;
 /**
@@ -1415,7 +1417,7 @@ function createRequestLabelFull(x, y, name, height) {
 exports.createRequestLabelFull = createRequestLabelFull;
 // private helper
 function createRequestLabel(x, y, name, height) {
-    var blockName = name.replace(/http[s]\:\/\//, "");
+    var blockName = misc.ressourceUrlFormater(name, 125);
     var blockLabel = svg.newTextEl(blockName, (y + Math.round(height / 2) + 5));
     blockLabel.appendChild(svg.newEl("title", {
         "text": name
@@ -1542,7 +1544,7 @@ function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetai
         "width": (100 - leftColumnWith) + "%"
     });
     var rect = rowSubComponents.createRect(rectData, block.segments, block.total);
-    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, misc.ressourceUrlFormater(block.name), rowHeight, "clipPath");
+    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, misc.ressourceUrlFormater(block.name, 40), rowHeight, "clipPath");
     var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, rowHeight);
     var rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow, leftColumnWith);
     var rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow);
