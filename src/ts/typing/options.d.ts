@@ -7,4 +7,6 @@ export interface ChartOptions {
   showIndicatorIcons?: boolean
   /** relative width of the info column on the left (in percent) */
   leftColumnWith: number
+  /** select element to use for paging  */
+  pageSelector?: HTMLSelectElement
 }

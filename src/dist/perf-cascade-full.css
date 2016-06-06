@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.1.1 (23/05/2016) */
+/*! github.com/micmro/PerfCascade Version:0.1.1 (06/06/2016) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -467,6 +467,9 @@ fieldset {
 textarea {
     resize: vertical;
 }
+
+
+#page-selector {display: none; clear: both; margin: 1em 0;}
 
 * {box-sizing: border-box;}
 

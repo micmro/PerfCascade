@@ -3,6 +3,7 @@ import {
   Entry
 } from "../typing/har.d"
 import {
+  WaterfallDocs,
   WaterfallData,
   Mark
 } from "../typing/waterfall-data.d"
@@ -14,19 +15,40 @@ import {
 
 
 export default class HarTransformer {
+
+  /**
+   * Trasforms the full HAR doc, including all pages
+   * @param  {Har} harData - raw hhar object
+   * @returns WaterfallDocs
+   */
+  public static transformDoc(harData: Har): WaterfallDocs {
+    //make sure it's the *.log base node
+    let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
+    console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length)
+
+    let waterfallDocs = {
+      pages: data.pages.map((page, i) => this.transformPage(data, i))
+    } as WaterfallDocs
+    return waterfallDocs
+  }
   /**
    * Transforms a HAR object into the format needed to render the PerfCascade
-   * @param  {Har} data
+   * @param  {Har} harData - HAR document
+   * @param {number=0} pageIndex - page to parse (for multi-page HAR)
    * @returns WaterfallData
    */
-  public static transfrom(data: Har): WaterfallData {
-    console.log("HAR created by %s(%s) of %s page(s)", data.creator.name, data.creator.version, data.pages.length)
+  public static transformPage(harData: Har, pageIndex: number = 0): WaterfallData {
+    //make sure it's the *.log base node
+    let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
+
 
     //only support one page (first) for now
-    const currentPageIndex = 0
+    const currentPageIndex = pageIndex
     const currPage = data.pages[currentPageIndex]
     const pageStartTime = new Date(currPage.startedDateTime).getTime()
     const pageTimings = currPage.pageTimings
+
+    console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length)
 
     let doneTime = 0;
     const blocks = data.entries
@@ -60,12 +82,12 @@ export default class HarTransformer {
           "startTime": startRelative
         } as Mark
       })
-
     return {
       durationMs: doneTime,
       blocks: blocks,
       marks: marks,
       lines: [],
+      title: currPage.title,
     }
   }
   /**

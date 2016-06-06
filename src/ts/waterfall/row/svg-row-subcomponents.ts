@@ -158,7 +158,7 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
 
 // private helper
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
-  const blockName = name.replace(/http[s]\:\/\//, "")
+  const blockName = misc.ressourceUrlFormater(name, 125)
   let blockLabel = svg.newTextEl(blockName, (y + Math.round(height / 2) + 5))
 
   blockLabel.appendChild(svg.newEl("title", {

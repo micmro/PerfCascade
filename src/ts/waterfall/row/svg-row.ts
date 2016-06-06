@@ -53,7 +53,7 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
 
   let rect = rowSubComponents.createRect(rectData, block.segments, block.total)
   let shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y,
-    misc.ressourceUrlFormater(block.name), rowHeight, "clipPath")
+    misc.ressourceUrlFormater(block.name, 40), rowHeight, "clipPath")
   let fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, rowHeight)
 
   let rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow, leftColumnWith)
