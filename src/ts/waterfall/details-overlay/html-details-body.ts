@@ -1,11 +1,18 @@
 import TimeBlock from "../../typing/time-block"
 import {getKeys} from "./extract-details-keys"
 
-function makeDefinitionList(dlKeyValues) {
+function makeDefinitionList(dlKeyValues: Object, addClass: boolean = false) {
+  let makeClass = (key: string) => {
+    if (!addClass) {
+      return ""
+    }
+    let className = key.toLowerCase().replace(/[^a-z-]/g, "")
+    return `class="${className || "no-colour"}"`
+  }
   return Object.keys(dlKeyValues)
     .filter(key => (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""))
     .map(key => `
-      <dt>${key}</dt>
+      <dt ${makeClass(key)}>${key}</dt>
       <dd>${dlKeyValues[key]}</dd>
     `).join("")
 }
@@ -38,14 +45,10 @@ export function createDetailsBody(requestID: number, block: TimeBlock, accordeon
   let body = document.createElement("body");
   body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
   html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/")
-  // html.style.overflow = "crop"
-  // body.style.height = `${accordeonHeight}px`
-  // body.style.overflow = "crop"
-  // body.style.overflow = "scroll"
 
   const tabsData = getKeys(requestID, block)
   const generalTab = makeTab(makeDefinitionList(tabsData.general))
-  const timingsTab = makeTab(makeDefinitionList(tabsData.timings))
+  const timingsTab = makeTab(makeDefinitionList(tabsData.timings, true))
   const requestDl = makeDefinitionList(tabsData.request)
   const requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce((pre, curr) => {
     pre[curr.name] = curr.value
