@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.1.3 (06/06/2016) */
+/*! github.com/micmro/PerfCascade Version:0.1.3 (11/06/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -838,6 +838,13 @@ function getKeys(requestID, block) {
     var formatTime = function (size) { return ifValueDefined(size, function (s) {
         return (s + "ms");
     }); };
+    var formatDate = function (date) {
+        if (!date) {
+            return "";
+        }
+        var dateToFormat = new Date(date);
+        return date + " </br>(local time: " + dateToFormat.toLocaleString() + ")";
+    };
     var getRequestHeader = function (name) {
         var header = entry.request.headers.filter(function (h) { return h.name.toLowerCase() === name.toLowerCase(); })[0];
         return header ? header.value : "";
@@ -845,6 +852,13 @@ function getKeys(requestID, block) {
     var getResponseHeader = function (name) {
         var header = entry.response.headers.filter(function (h) { return h.name.toLowerCase() === name.toLowerCase(); })[0];
         return header ? header.value : "";
+    };
+    var getContentType = function () {
+        var respContentType = getResponseHeader("Content-Type");
+        if (entry._contentType && entry._contentType !== respContentType) {
+            return respContentType + " | " + entry._contentType;
+        }
+        return respContentType;
     };
     /** get experimental feature */
     var getExp = function (name) {
@@ -933,11 +947,11 @@ function getKeys(requestID, block) {
             "HTTP Version": entry.response.httpVersion,
             "Header Size": formatBytes(entry.response.headersSize),
             "Body Size": formatBytes(entry.response.bodySize),
-            "Content-Type": getResponseHeader("Content-Type") + " | " + entry._contentType,
+            "Content-Type": getContentType(),
             "Cache-Control": getResponseHeader("Cache-Control"),
             "Content-Encoding": getResponseHeader("Content-Encoding"),
-            "Expires": getResponseHeader("Expires"),
-            "Last-Modified": getResponseHeader("Last-Modified"),
+            "Expires": formatDate(getResponseHeader("Expires")),
+            "Last-Modified": formatDate(getResponseHeader("Last-Modified")),
             "Pragma": getResponseHeader("Pragma"),
             "Content-Length": getResponseHeader("Content-Length"),
             "Content Size": entry.response.content.size,
@@ -965,10 +979,18 @@ exports.getKeys = getKeys;
 },{}],14:[function(require,module,exports){
 "use strict";
 var extract_details_keys_1 = require("./extract-details-keys");
-function makeDefinitionList(dlKeyValues) {
+function makeDefinitionList(dlKeyValues, addClass) {
+    if (addClass === void 0) { addClass = false; }
+    var makeClass = function (key) {
+        if (!addClass) {
+            return "";
+        }
+        var className = key.toLowerCase().replace(/[^a-z-]/g, "");
+        return "class=\"" + (className || "no-colour") + "\"";
+    };
     return Object.keys(dlKeyValues)
         .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""); })
-        .map(function (key) { return ("\n      <dt>" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
+        .map(function (key) { return ("\n      <dt " + makeClass(key) + ">" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
 }
 function makeTab(innerHtml, renderDl) {
     if (renderDl === void 0) { renderDl = true; }
@@ -993,13 +1015,9 @@ function createDetailsBody(requestID, block, accordeonHeight) {
     var body = document.createElement("body");
     body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
-    // html.style.overflow = "crop"
-    // body.style.height = `${accordeonHeight}px`
-    // body.style.overflow = "crop"
-    // body.style.overflow = "scroll"
     var tabsData = extract_details_keys_1.getKeys(requestID, block);
     var generalTab = makeTab(makeDefinitionList(tabsData.general));
-    var timingsTab = makeTab(makeDefinitionList(tabsData.timings));
+    var timingsTab = makeTab(makeDefinitionList(tabsData.timings, true));
     var requestDl = makeDefinitionList(tabsData.request);
     var requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce(function (pre, curr) {
         pre[curr.name] = curr.value;

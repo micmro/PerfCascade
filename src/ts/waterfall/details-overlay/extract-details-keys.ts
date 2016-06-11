@@ -21,6 +21,13 @@ export function getKeys(requestID: number, block: TimeBlock) {
     `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
   let formatTime = (size?: number) => ifValueDefined(size, s =>
     `${s}ms`)
+  let formatDate = (date?: string) => {
+    if (!date) {
+      return "";
+    }
+    let dateToFormat = new Date(date);
+    return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`
+  }
 
   let getRequestHeader = (name: string): string => {
     let header = entry.request.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
@@ -32,19 +39,27 @@ export function getKeys(requestID: number, block: TimeBlock) {
     return header ? header.value : ""
   }
 
+  let getContentType = () => {
+    let respContentType = getResponseHeader("Content-Type")
+    if (entry._contentType && entry._contentType !== respContentType) {
+      return respContentType + " | " + entry._contentType
+    }
+    return respContentType
+  }
+
   /** get experimental feature */
   let getExp = (name: string): string => {
-    return entry[name] || entry["_" + name] || entry.request[name] ||  entry.request["_" + name] || ""
+    return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || ""
   }
 
   let getExpNotNull = (name: string): string => {
     let resp = getExp(name)
-    return  resp !== "0" ? resp : ""
+    return resp !== "0" ? resp : ""
   }
 
   let getExpAsByte = (name: string): string => {
     let resp = parseInt(getExp(name), 10)
-    return  (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp)
+    return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp)
   }
 
   let getExpTimeRange = (name: string): string => {
@@ -79,8 +94,8 @@ export function getKeys(requestID: number, block: TimeBlock) {
       "Cache Time": getExp("cache_time"),
       "CDN Provider": getExp("cdn_provider"),
       "ObjectSize": getExp("objectSize"),
-      "Bytes In (downloaded)":  getExpAsByte("bytesIn"),
-      "Bytes Out (uploaded)":  getExpAsByte("bytesOut"),
+      "Bytes In (downloaded)": getExpAsByte("bytesIn"),
+      "Bytes Out (uploaded)": getExpAsByte("bytesOut"),
       "JPEG Scan Count": getExpNotNull("jpeg_scan_count"),
       "Gzip Total": getExpAsByte("gzip_total"),
       "Gzip Save": getExpAsByte("gzip_safe"),
@@ -123,11 +138,11 @@ export function getKeys(requestID: number, block: TimeBlock) {
       "HTTP Version": entry.response.httpVersion,
       "Header Size": formatBytes(entry.response.headersSize),
       "Body Size": formatBytes(entry.response.bodySize),
-      "Content-Type": getResponseHeader("Content-Type") + " | " + entry._contentType,
+      "Content-Type": getContentType(),
       "Cache-Control": getResponseHeader("Cache-Control"),
       "Content-Encoding": getResponseHeader("Content-Encoding"),
-      "Expires": getResponseHeader("Expires"),
-      "Last-Modified": getResponseHeader("Last-Modified"),
+      "Expires": formatDate(getResponseHeader("Expires")),
+      "Last-Modified": formatDate(getResponseHeader("Last-Modified")),
       "Pragma": getResponseHeader("Pragma"),
       "Content-Length": getResponseHeader("Content-Length"),
       "Content Size": entry.response.content.size,
