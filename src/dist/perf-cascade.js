@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.1.4 (11/06/2016) */
+/*! github.com/micmro/PerfCascade Version:0.1.4 (12/06/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -818,6 +818,25 @@ exports.default = TimeBlock;
 
 },{}],13:[function(require,module,exports){
 "use strict";
+var ifValueDefined = function (value, fn) {
+    if (typeof value !== "number" || value <= 0) {
+        return undefined;
+    }
+    return fn(value);
+};
+var formatBytes = function (size) { return ifValueDefined(size, function (s) { return (s + " byte (~" + Math.round(s / 1024 * 10) / 10 + "kb)"); }); };
+var formatTime = function (size) { return ifValueDefined(size, function (s) { return (s + "ms"); }); };
+var formatDate = function (date) {
+    if (!date) {
+        return "";
+    }
+    var dateToFormat = new Date(date);
+    return date + " </br>(local time: " + dateToFormat.toLocaleString() + ")";
+};
+var asIntPartial = function (val, ifIntFn) {
+    var v = parseInt(val, 10);
+    return ifValueDefined(v, ifIntFn);
+};
 /**
  * Data to show in overlay tabs
  * @param  {number} requestID - request number
@@ -826,25 +845,6 @@ exports.default = TimeBlock;
 function getKeys(requestID, block) {
     //TODO: dodgy casting - will not work for other adapters
     var entry = block.rawResource;
-    var ifValueDefined = function (value, fn) {
-        if (typeof value !== "number" || value <= 0) {
-            return undefined;
-        }
-        return fn(value);
-    };
-    var formatBytes = function (size) { return ifValueDefined(size, function (s) {
-        return (s + " byte (~" + Math.round(s / 1024 * 10) / 10 + "kb)");
-    }); };
-    var formatTime = function (size) { return ifValueDefined(size, function (s) {
-        return (s + "ms");
-    }); };
-    var formatDate = function (date) {
-        if (!date) {
-            return "";
-        }
-        var dateToFormat = new Date(date);
-        return date + " </br>(local time: " + dateToFormat.toLocaleString() + ")";
-    };
     var getRequestHeader = function (name) {
         var header = entry.request.headers.filter(function (h) { return h.name.toLowerCase() === name.toLowerCase(); })[0];
         return header ? header.value : "";
@@ -926,6 +926,7 @@ function getKeys(requestID, block) {
         "request": {
             "Method": entry.request.method,
             "HTTP Version": entry.request.httpVersion,
+            "Bytes Out (uploaded)": getExpAsByte("bytesOut"),
             "Headers Size": formatBytes(entry.request.headersSize),
             "Body Size": formatBytes(entry.request.bodySize),
             "Comment": entry.request.comment,
@@ -945,6 +946,7 @@ function getKeys(requestID, block) {
         "response": {
             "Status": entry.response.status + " " + entry.response.statusText,
             "HTTP Version": entry.response.httpVersion,
+            "Bytes In (downloaded)": getExpAsByte("bytesIn"),
             "Header Size": formatBytes(entry.response.headersSize),
             "Body Size": formatBytes(entry.response.bodySize),
             "Content-Type": getContentType(),
@@ -953,9 +955,10 @@ function getKeys(requestID, block) {
             "Expires": formatDate(getResponseHeader("Expires")),
             "Last-Modified": formatDate(getResponseHeader("Last-Modified")),
             "Pragma": getResponseHeader("Pragma"),
-            "Content-Length": getResponseHeader("Content-Length"),
-            "Content Size": entry.response.content.size,
-            "Content Compression": entry.response.content.compression,
+            "Content-Length": asIntPartial(getResponseHeader("Content-Length"), formatBytes),
+            "Content Size": getResponseHeader("Content-Length") !== entry.response.content.size.toString() ?
+                formatBytes(entry.response.content.size) : "",
+            "Content Compression": formatBytes(entry.response.content.compression),
             "Connection": getResponseHeader("Connection"),
             "ETag": getResponseHeader("ETag"),
             "Accept-Patch": getResponseHeader("Accept-Patch"),

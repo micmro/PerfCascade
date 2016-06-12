@@ -1,6 +1,34 @@
 import TimeBlock from "../../typing/time-block"
 import {Entry} from "../../typing/har.d" //TODO: Delete - temp only - need to greate source agnostic data structure
 
+
+
+let ifValueDefined = (value: number, fn: (number) => any) => {
+  if (typeof value !== "number" || value <= 0) {
+    return undefined
+  }
+  return fn(value)
+}
+
+let formatBytes = (size?: number) => ifValueDefined(size, s => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
+
+let formatTime = (size?: number) => ifValueDefined(size, s => `${s}ms`)
+
+let formatDate = (date?: string) => {
+  if (!date) {
+    return "";
+  }
+  let dateToFormat = new Date(date);
+  return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`
+}
+
+
+let asIntPartial = (val: string, ifIntFn: (number) => any) => {
+  let v = parseInt(val, 10);
+  return ifValueDefined(v, ifIntFn)
+}
+
+
 /**
  * Data to show in overlay tabs
  * @param  {number} requestID - request number
@@ -9,25 +37,6 @@ import {Entry} from "../../typing/har.d" //TODO: Delete - temp only - need to gr
 export function getKeys(requestID: number, block: TimeBlock) {
   //TODO: dodgy casting - will not work for other adapters
   let entry = block.rawResource as Entry
-
-  let ifValueDefined = (value: number, fn: (number) => any) => {
-    if (typeof value !== "number" || value <= 0) {
-      return undefined
-    }
-    return fn(value)
-  }
-
-  let formatBytes = (size?: number) => ifValueDefined(size, s =>
-    `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
-  let formatTime = (size?: number) => ifValueDefined(size, s =>
-    `${s}ms`)
-  let formatDate = (date?: string) => {
-    if (!date) {
-      return "";
-    }
-    let dateToFormat = new Date(date);
-    return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`
-  }
 
   let getRequestHeader = (name: string): string => {
     let header = entry.request.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
@@ -117,6 +126,7 @@ export function getKeys(requestID: number, block: TimeBlock) {
     "request": {
       "Method": entry.request.method,
       "HTTP Version": entry.request.httpVersion,
+      "Bytes Out (uploaded)": getExpAsByte("bytesOut"),
       "Headers Size": formatBytes(entry.request.headersSize),
       "Body Size": formatBytes(entry.request.bodySize),
       "Comment": entry.request.comment,
@@ -136,6 +146,7 @@ export function getKeys(requestID: number, block: TimeBlock) {
     "response": {
       "Status": entry.response.status + " " + entry.response.statusText,
       "HTTP Version": entry.response.httpVersion,
+      "Bytes In (downloaded)": getExpAsByte("bytesIn"),
       "Header Size": formatBytes(entry.response.headersSize),
       "Body Size": formatBytes(entry.response.bodySize),
       "Content-Type": getContentType(),
@@ -144,9 +155,10 @@ export function getKeys(requestID: number, block: TimeBlock) {
       "Expires": formatDate(getResponseHeader("Expires")),
       "Last-Modified": formatDate(getResponseHeader("Last-Modified")),
       "Pragma": getResponseHeader("Pragma"),
-      "Content-Length": getResponseHeader("Content-Length"),
-      "Content Size": entry.response.content.size,
-      "Content Compression": entry.response.content.compression,
+      "Content-Length": asIntPartial(getResponseHeader("Content-Length"), formatBytes),
+      "Content Size": getResponseHeader("Content-Length") !== entry.response.content.size.toString() ?
+        formatBytes(entry.response.content.size) : "",
+      "Content Compression": formatBytes(entry.response.content.compression),
       "Connection": getResponseHeader("Connection"),
       "ETag": getResponseHeader("ETag"),
       "Accept-Patch": getResponseHeader("Accept-Patch"),
