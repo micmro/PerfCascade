@@ -21,6 +21,10 @@ module.exports = function (grunt) {
         src: ["src/css-raw/normalize.css", "src/css-raw/page.css", "src/css-raw/main.css"],
         dest: "src/dist/perf-cascade-full.css",
       },
+      fileReader: {
+        src: ["src/zip/zip.js", "src/zip/inflate.js", "src/dist/temp/perf-cascade-file-reader.js"],
+        dest: "src/dist/perf-cascade-file-reader.js",
+      },
       pages: {
         src: ["src/css-raw/normalize.css", "src/css-raw/gh-page.css", "src/css-raw/main.css"],
         dest: "src/dist/perf-cascade-gh-page.css",
@@ -38,6 +42,16 @@ module.exports = function (grunt) {
       dist: {
         files: {
           "src/dist/perf-cascade.js": ["src/ts/main.ts"],
+        }
+      },
+      fileReader: {
+        files: {
+          "src/dist/temp/perf-cascade-file-reader.js": ["src/ts/file-reader.ts"],
+        },
+        options:{
+          browserifyOptions: {
+            standalone: "perfCascadeFileReader"
+          }
         }
       }
     },
@@ -63,7 +77,8 @@ module.exports = function (grunt) {
       },
       dist: {
         files: {
-          "src/dist/perf-cascade.min.js": ["src/dist/perf-cascade.js"]
+          "src/dist/perf-cascade.min.js": ["src/dist/perf-cascade.js"],
+          "src/dist/perf-cascade-file-reader.min.js": ["src/zip/zip.js", "src/zip/inflate.js", "src/dist/temp/perf-cascade-file-reader.js"]
         }
       }
     },
@@ -126,7 +141,8 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist"]);
+  grunt.registerTask("distFileReader", ["browserify:fileReader", "concat:fileReader"]);
+  grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist", "distFileReader"]);
 
   //build uptimized release file
   grunt.registerTask("releaseBuild", ["tslint", "distBase", "uglify:dist"]);

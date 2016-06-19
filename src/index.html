@@ -1,26 +1,29 @@
 <!doctype html>
 <html class="no-js" lang="">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>PerfCascade - HAR and more Waterfall viewer</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- import PerfCascade styles --->
-    <link rel="stylesheet" href="dist/perf-cascade-full.css">
-  </head>
-  <body>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>PerfCascade - HAR and more Waterfall viewer</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <input type="file" id="fileinput" />
+  <!-- import PerfCascade styles --->
+  <link rel="stylesheet" href="dist/perf-cascade-full.css">
+</head>
 
-    <select id="page-selector"></select>
-    <div id="output"></div>
+<body>
 
-    <!-- import PerfCascade JS --->
-    <script src="dist/perf-cascade.js"></script>
+  <input type="file" id="fileinput" />
 
-    <script>
+  <select id="page-selector"></select>
+  <div id="output"></div>
+
+  <!-- import PerfCascade JS --->
+  <script src="dist/perf-cascade.js"></script>
+  <script src="dist/perf-cascade-file-reader.js"></script>
+
+  <script>
        /**
         * functionality for example page
         * `perfCascade` is a global object if not running in AMD or CommonJS context
@@ -59,7 +62,7 @@
         }
 
 
-        /** handle client side file upload */
+        /** handle client side file upload via file-reader */
         function onFileSubmit(evt) {
           var files = evt.target.files
           if (!files) {
@@ -67,22 +70,14 @@
             return
           }
 
-          var reader = new FileReader()
-
-          /** try to parse the file once uploaded to browser */
-          reader.onload = (e => {
-            var harData
-            try {
-              harData = JSON.parse(e.target["result"])
-            } catch (e) {
-              alert("File does not seem to be a valid HAR file")
-              return undefined
+          // Just needed for gzipped *.zhar files, you can use the standard FileReader api for normal .har files
+          perfCascadeFileReader.readFile(files[0], evt.target.value, function(data){
+            if(!data){
+              console.error("Can't read file")
+            }else{
+              renderPerfCascadeChart(data)
             }
-            renderPerfCascadeChart(harData.log)
           })
-
-          /** start reading the file */
-          reader.readAsText(files[0])
         }
 
         /** load an initial HAR when opening the page */
@@ -94,5 +89,6 @@
         document.getElementById("fileinput").addEventListener("change", onFileSubmit, false)
       })(window.perfCascade)
     </script>
-  </body>
+</body>
+
 </html>
