@@ -3154,7 +3154,7 @@ function readFile(file, fileName, onDone) {
                 x[0].getData(new zip.TextWriter(), function (txt) {
                     parseJson(txt);
                     // close the zip reader
-                    // zipReader.close();
+                    zipReader.close();
                 }, function (progress) {
                     console.log("unzip progress: " + progress / 100 + "%");
                 });

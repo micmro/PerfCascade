@@ -30,7 +30,7 @@ export function readFile(file: File, fileName: string, onDone: Function) {
         x[0].getData(new zip.TextWriter(), function (txt) {
           parseJson(txt)
           // close the zip reader
-          // zipReader.close();
+          zipReader.close();
         }, (progress: number) => {
           console.log(`unzip progress: ${progress / 100}%`)
         });
