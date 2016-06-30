@@ -18,15 +18,15 @@ module.exports = function (grunt) {
         banner: banner
       },
       dist: {
-        src: ["src/css-raw/normalize.css", "src/css-raw/page.css", "src/css-raw/main.css"],
-        dest: "src/dist/perf-cascade-full.css",
+        src: ["src/css-raw/normalize.css", "src/css-raw/page.css", "src/css-raw/perf-cascade.css"],
+        dest: "src/dist/perf-cascade-demo.css",
       },
       fileReader: {
         src: ["src/zip/zip.js", "src/zip/inflate.js", "src/dist/temp/perf-cascade-file-reader.js"],
         dest: "src/dist/perf-cascade-file-reader.js",
       },
       pages: {
-        src: ["src/css-raw/normalize.css", "src/css-raw/gh-page.css", "src/css-raw/main.css"],
+        src: ["src/css-raw/normalize.css", "src/css-raw/gh-page.css", "src/css-raw/perf-cascade.css"],
         dest: "src/dist/perf-cascade-gh-page.css",
       }
 
@@ -111,8 +111,8 @@ module.exports = function (grunt) {
       dist: {
         expand: true,
         flatten: true,
-        src: ["src/css-raw/main.css"],
-        dest: "src/dist/perf-cascade.css",
+        src: "src/css-raw/perf-cascade.css",
+        dest: "src/dist/",
         filter: "isFile",
       }
     },
@@ -131,7 +131,7 @@ module.exports = function (grunt) {
             "package.json",
             "src/dist/perf-cascade.js",
             "src/dist/perf-cascade.min.js",
-            "src/dist/perf-cascade-full.css"
+            "src/dist/perf-cascade-demo.css"
         ],
         updateConfigs: ['pkg'],
         commit: true,
@@ -142,7 +142,7 @@ module.exports = function (grunt) {
             "package.json",
             "src/dist/perf-cascade.js",
             "src/dist/perf-cascade.min.js",
-            "src/dist/perf-cascade-full.css"
+            "src/dist/perf-cascade-demo.css"
         ],
       }
     }
