@@ -17,9 +17,13 @@ module.exports = function (grunt) {
       options: {
         banner: banner
       },
-      dist: {
+      demoCss: {
         src: ["src/css-raw/normalize.css", "src/css-raw/page.css", "src/css-raw/perf-cascade.css"],
         dest: "src/dist/perf-cascade-demo.css",
+      },
+      mainCss: {
+        src: ["src/css-raw/perf-cascade.css"],
+        dest: "src/dist/perf-cascade.css",
       },
       fileReader: {
         src: ["src/zip/zip.js", "src/zip/inflate.js", "src/dist/temp/perf-cascade-file-reader.js"],
@@ -93,7 +97,7 @@ module.exports = function (grunt) {
       },
       css: {
         files: ["src/css-raw/**/*.css"],
-        tasks: ["concat:dist"],
+        tasks: ["concat:demoCss"],
         options: {
           spawn: false,
           interrupt: true
@@ -106,13 +110,6 @@ module.exports = function (grunt) {
         flatten: true,
         src: ["src/dist/perf-cascade-gh-page.css", "src/dist/perf-cascade.min.js"],
         dest: "gh-pages/src/",
-        filter: "isFile",
-      },
-      dist: {
-        expand: true,
-        flatten: true,
-        src: "src/css-raw/perf-cascade.css",
-        dest: "src/dist/",
         filter: "isFile",
       }
     },
@@ -134,7 +131,7 @@ module.exports = function (grunt) {
             "src/dist/perf-cascade-file-reader.js",
             "src/dist/perf-cascade-file-reader.min.js",
             "src/dist/perf-cascade-demo.css",
-            // "src/dist/perf-cascade.css"
+            "src/dist/perf-cascade.css"
         ],
         updateConfigs: ['pkg'],
         commit: true,
@@ -155,10 +152,10 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask("distFileReader", ["browserify:fileReader", "concat:fileReader"]);
-  grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist", "distFileReader"]);
+  grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:demoCss", "distFileReader"]);
 
   //build uptimized release file
-  grunt.registerTask("releaseBuild", ["tslint", "distBase", "copy:dist", "uglify:dist"]);
+  grunt.registerTask("releaseBuild", ["tslint", "distBase", "concat:mainCss", "uglify:dist"]);
 
   //releases the current version on master to github-pages (gh-pages branch)
   grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
