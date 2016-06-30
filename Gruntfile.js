@@ -108,7 +108,7 @@ module.exports = function (grunt) {
       pages: {
         expand: true,
         flatten: true,
-        src: ["src/dist/perf-cascade-gh-page.css", "src/dist/perf-cascade.min.js"],
+        src: ["src/dist/perf-cascade-gh-page.css", "src/dist/perf-cascade.min.js", "perf-cascade-file-reader.min.js"],
         dest: "gh-pages/src/",
         filter: "isFile",
       }
