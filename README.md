@@ -22,6 +22,8 @@ var options = {
 var perfCascadeSvg =  perfCascade.fromHar(harData.log, options)
 ```
 
+You can find the compiled (and minified) JS in [`src/dist`](https://github.com/micmro/PerfCascade/tree/master/src/dist). Yor the basic version without zHAR support you need [`perf-cascade.min.js`](https://github.com/micmro/PerfCascade/blob/master/src/dist/perf-cascade.min.js) and some basic CSS styles [`main.css`](https://github.com/micmro/PerfCascade/blob/master/src/css-raw/main.css).
+
 ## Options
 see [options.d.ts](https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/options.d.ts) for source
 
@@ -40,6 +42,21 @@ Show warning icons for potential issues on the left
 ### `leftColumnWith`
 `number` default: `25`
 Relative width of the info column on the left (in percent)
+
+## *.zhar - zipped HAR files
+By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/master/src/index.html#L73-L80) you can use `perfCascadeFileReader.readFile` to read a gzip and convert it to a JSON HAR object.
+
+```
+perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(data){
+  if(!data){
+    // handle error
+    console.error("Can't read file")
+  }else{
+    // handle success
+    renderPerfCascadeChart(data)
+  }
+})
+```
 
 ## Dev
 - Start live-reload server and Typescript compiler with watch: `npm run watch`
