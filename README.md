@@ -1,5 +1,3 @@
-*Under active development - API, UI and features are not fully completed yet*
-
 # PerfCascade
 Extensible waterfall-viewer that works with HAR and other formats (in the future).
 
