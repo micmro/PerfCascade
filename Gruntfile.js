@@ -108,6 +108,13 @@ module.exports = function (grunt) {
         dest: "gh-pages/src/",
         filter: "isFile",
       },
+      dist: {
+        expand: true,
+        flatten: true,
+        src: ["src/css-raw/main.css"],
+        dest: "src/dist/perf-cascade.css",
+        filter: "isFile",
+      }
     },
     "gh-pages": {
       options: {
@@ -145,7 +152,7 @@ module.exports = function (grunt) {
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:dist", "distFileReader"]);
 
   //build uptimized release file
-  grunt.registerTask("releaseBuild", ["tslint", "distBase", "uglify:dist"]);
+  grunt.registerTask("releaseBuild", ["tslint", "distBase", "copy:dist", "uglify:dist"]);
 
   //releases the current version on master to github-pages (gh-pages branch)
   grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
