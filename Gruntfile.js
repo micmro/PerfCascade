@@ -131,7 +131,10 @@ module.exports = function (grunt) {
             "package.json",
             "src/dist/perf-cascade.js",
             "src/dist/perf-cascade.min.js",
-            "src/dist/perf-cascade-demo.css"
+            "src/dist/perf-cascade-file-reader.js",
+            "src/dist/perf-cascade-file-reader.min.js",
+            "src/dist/perf-cascade-demo.css",
+            // "src/dist/perf-cascade.css"
         ],
         updateConfigs: ['pkg'],
         commit: true,
@@ -142,7 +145,10 @@ module.exports = function (grunt) {
             "package.json",
             "src/dist/perf-cascade.js",
             "src/dist/perf-cascade.min.js",
-            "src/dist/perf-cascade-demo.css"
+            "src/dist/perf-cascade-file-reader.js",
+            "src/dist/perf-cascade-file-reader.min.js",
+            "src/dist/perf-cascade-demo.css",
+            "src/dist/perf-cascade.css"
         ],
       }
     }
