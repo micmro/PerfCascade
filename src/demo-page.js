@@ -5,9 +5,9 @@
 (function (perfCascade) {
 
   /** holder DOM element to render PerfCascade into */
-  var outputHolder = document.getElementById("output")
+  var outputHolder = document.getElementById("output");
   /** Select box for multi-page HARs */
-  var pageSelectorEl = document.getElementById("page-selector")
+  var pageSelectorEl = document.getElementById("page-selector");
 
   /** options for PerfCascade (all have defaults)
    * Source: /src/ts/typing/options.d.ts
@@ -18,54 +18,59 @@
     showIndicatorIcons: true, //default: true
     leftColumnWith: 25, //default: 25
     pageSelector: pageSelectorEl //default: undefined
-  }
+  };
 
-  /**
-   * THIS IS WHERE THE MAGIC HAPPENS
-   */
-  function renderPerfCascadeChart(harData) {
+  /** renders the har (passing in the har.log node) */
+  function renderPerfCascadeChart(harLogData) {
     /** remove all children of `outputHolder`,
      * so you can upload new HAR files and get a new SVG  */
     while (outputHolder.childNodes.length > 0) {
-      outputHolder.removeChild(outputHolder.childNodes[0])
+      outputHolder.removeChild(outputHolder.childNodes[0]);
     }
 
     /**
      * THIS IS WHERE THE MAGIC HAPPENS
      * pass HAR and options to `newPerfCascadeHar` to generate the SVG element
      */
-    var perfCascadeSvg = perfCascade.fromHar(harData.log, perfCascadeOptions)
+    var perfCascadeSvg = perfCascade.fromHar(harLogData, perfCascadeOptions);
 
     /** append SVG to page - that's it */
-    outputHolder.appendChild(perfCascadeSvg)
+    outputHolder.appendChild(perfCascadeSvg);
   }
 
   /** handle client side file upload */
   function onFileSubmit(evt) {
-    var files = evt.target.files
+    var files = evt.target.files;
     if (!files) {
-      alert("Failed to load HAR file")
+      alert("Failed to load HAR file");
       return
     }
 
-    var reader = new FileReader()
+    // USE THIS when not supporting compressed *.zhar files
+    // var reader = new FileReader();
+    // reader.onload = function(loadEvt){
+    //   var harData
+    //   try {
+    //     harData = JSON.parse(loadEvt.target["result"]);
+    //   } catch (err) {
+    //     alert("File does not seem to be a valid HAR file");
+    //     console.error(err)
+    //     return undefined
+    //   }
+    //   renderPerfCascadeChart(harData.log);
+    // };
+    // reader.readAsText(files[0]);
 
-    /** try to parse the file once uploaded to browser */
-    reader.onload = (e => {
-      var harData
-      try {
-        harData = JSON.parse(e.target["result"])
-      } catch (e) {
-        alert("File does not seem to be a valid HAR file")
-        return undefined
+    // Just needed for gzipped *.zhar files, you can use the standard FileReader api for normal .har files
+    perfCascadeFileReader.readFile(files[0], evt.target.value, function (data) {
+      if (!data) {
+        console.error("Can't read file");
+      } else {
+        renderPerfCascadeChart(data);
       }
-      renderPerfCascadeChart(harData)
-    })
-
-    /** start reading the file */
-    reader.readAsText(files[0])
+    });
   }
-  document.getElementById("fileinput").addEventListener("change", onFileSubmit, false)
+  document.getElementById("fileinput").addEventListener("change", onFileSubmit, false);
 
 
 
@@ -73,14 +78,14 @@
   function getExampleHar() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', "./src/github.com.prep.har", true);
-    xhr.addEventListener("readystatechange", function(){
+    xhr.addEventListener("readystatechange", function () {
       if (xhr.readyState == 4 && xhr.status == 200) {
         var response = JSON.parse(xhr.responseText);
-        renderPerfCascadeChart(response)
+        renderPerfCascadeChart(response);
       }
     })
     xhr.send();
   }
   document.getElementById("use-example").addEventListener("click", getExampleHar, false);
 
-})(window.perfCascade)
+})(window.perfCascade);

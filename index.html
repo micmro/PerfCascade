@@ -21,7 +21,7 @@
   <section class="main-content">
     <fieldset>
       <legend>Try it!</legend>
-      <label for="fileinput">Upload a <code>*.har</code> file to visualize it</label>
+      <label for="fileinput">Upload a <code>*.har</code> or <code>*.zhar</code> file to visualize it</label>
       <input type="file" id="fileinput" />
       <span>or</span>
       <button type="button" id="use-example">use example HAR</button>
@@ -33,19 +33,19 @@
   </section>
 
   <script src="src/perf-cascade.min.js"></script>
+  <script src="src/perf-cascade-file-reader.min.js"></script>
   <script src="src/demo-page.js"></script>
-
 
   <!-- Google Analytics -->
   <script type="text/javascript">
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
   </script>
   <script type="text/javascript">
     try {
-            var pageTracker = _gat._getTracker("UA-72364598-1");
-            pageTracker._trackPageview();
-        } catch (err) {}
+      var pageTracker = _gat._getTracker("UA-72364598-1");
+      pageTracker._trackPageview();
+    } catch (err) {}
   </script>
 </body>
 
