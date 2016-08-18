@@ -3,7 +3,8 @@
  * @param {string} mimeType
  */
 export function mimeToRequestType(mimeType: string) {
-
+  if (mimeType === undefined)
+    return "other"
   let types = mimeType.split("/")
   let part2 = types[1]
   // take care of text/css; charset=UTF-8 etc
