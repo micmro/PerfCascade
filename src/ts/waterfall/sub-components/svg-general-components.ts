@@ -17,7 +17,7 @@ export function createTimeScale(durationMs: number, diagramHeight: number): SVGG
   let timeHolder = svg.newEl("g", { class: "time-scale full-width" }) as SVGGElement
   for (let i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
     ((i, secs, secPerc) => {
-      const lineLabel = svg.newTextEl(i + "sec", diagramHeight)
+      const lineLabel = svg.newTextEl(i + "s", diagramHeight)
       if (i > secs - 0.2) {
         lineLabel.setAttribute("x", secPerc * i - 0.5 + "%")
         lineLabel.setAttribute("text-anchor", "end")
@@ -66,6 +66,3 @@ export function createBgRect(block: TimeBlock, unit: number, diagramHeight: numb
 
   return rect
 }
-
-
-
