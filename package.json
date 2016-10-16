@@ -1,6 +1,6 @@
 {
   "name": "perf-cascade",
-  "version": "0.1.6",
+  "version": "0.2.1",
   "description": "Har file visualizer",
   "main": "index.html",
   "scripts": {
@@ -11,7 +11,7 @@
     "start": "live-server --wait=50 --open=src/index.html --ignore=src/ts/",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
     "ghPages": "grunt ghPages",
-    "release": "grunt release"
+    "release": "grunt release && npm publish"
   },
   "author": {
     "name": "Michael Mrowetz",
@@ -22,6 +22,9 @@
     "type": "git",
     "url": "https://github.com/micmro/PerfCascade.git"
   },
+  "directories": {
+    "lib": "./lib"
+  },
   "license": "MIT",
   "devDependencies": {
     "grunt": "^1.0.1",
@@ -31,14 +34,14 @@
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-gh-pages": "^1.1.0",
-    "grunt-tslint": "^3.1.0",
-    "live-server": "^1.0.0",
-    "load-grunt-tasks": "^3.5.0",
-    "tsify": "^0.15.6",
-    "tslint": "^3.10.2",
-    "typescript": "^1.8.10"
+    "grunt-gh-pages": "^2.0.0",
+    "grunt-tslint": "^3.3.0",
+    "live-server": "^1.1.0",
+    "load-grunt-tasks": "^3.5.2",
+    "tsify": "^2.0.2",
+    "tslint": "^3.15.1",
+    "typescript": "^2.0.3"
   }
 }
