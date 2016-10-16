@@ -1,22 +1,23 @@
+#GH page and regular files not used in npm package
+gh-pages/
+src/
+stylesheets/
+Gruntfile.js
+tslint.json
+tsconfig.json
+
+### misc basics
+
 .DS_Store
 
 #Temp files
 temp/
-
-#GH page dist
-gh-pages/
-src/dist/perf-cascade-gh-page.css
-
-#npm dist base
-lib/
 
 # Editor Project Files
 *.sublime-project
 *.sublime-workspace
 .vscode/
 .tscache/
-src/ts/**/*.js
-src/ts/**/*.js.map
 
 # Runtime data
 pids
