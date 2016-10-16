@@ -52,7 +52,7 @@ module.exports = function (grunt) {
         files: {
           "src/dist/temp/perf-cascade-file-reader.js": ["src/ts/file-reader.ts"],
         },
-        options:{
+        options: {
           browserifyOptions: {
             standalone: "perfCascadeFileReader"
           }
@@ -130,15 +130,18 @@ module.exports = function (grunt) {
     },
     bump: {
       //to test run: grunt bump --dry-run
-      options :{
+      options: {
         files: [
-            "package.json",
-            "src/dist/perf-cascade.js",
-            "src/dist/perf-cascade.min.js",
-            "src/dist/perf-cascade-file-reader.js",
-            "src/dist/perf-cascade-file-reader.min.js",
-            "src/dist/perf-cascade-demo.css",
-            "src/dist/perf-cascade.css"
+          "package.json",
+          "src/dist/perf-cascade.js",
+          "src/dist/perf-cascade.min.js",
+          "src/dist/perf-cascade-file-reader.js",
+          "src/dist/perf-cascade-file-reader.min.js",
+          "src/dist/perf-cascade-demo.css",
+          "src/dist/perf-cascade.css",
+          "lib/perf-cascade.js",
+          "lib/perf-cascade-file-reader.js",
+          "lib/perf-cascade.css",
         ],
         updateConfigs: ['pkg'],
         commit: true,
@@ -146,13 +149,13 @@ module.exports = function (grunt) {
         createTag: true,
         // dryRun: true,
         commitFiles: [
-            "package.json",
-            "src/dist/perf-cascade.js",
-            "src/dist/perf-cascade.min.js",
-            "src/dist/perf-cascade-file-reader.js",
-            "src/dist/perf-cascade-file-reader.min.js",
-            "src/dist/perf-cascade-demo.css",
-            "src/dist/perf-cascade.css"
+          "package.json",
+          "src/dist/perf-cascade.js",
+          "src/dist/perf-cascade.min.js",
+          "src/dist/perf-cascade-file-reader.js",
+          "src/dist/perf-cascade-file-reader.min.js",
+          "src/dist/perf-cascade-demo.css",
+          "src/dist/perf-cascade.css"
         ],
       }
     }
