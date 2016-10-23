@@ -17,7 +17,7 @@ import {
 export default class HarTransformer {
 
   /**
-   * Trasforms the full HAR doc, including all pages
+   * Transforms the full HAR doc, including all pages
    * @param  {Har} harData - raw hhar object
    * @returns WaterfallDocs
    */
