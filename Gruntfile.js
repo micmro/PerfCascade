@@ -67,6 +67,10 @@ module.exports = function (grunt) {
       tscEs6: {
         cmd: 'npm',
         args: 'run tsc -- src/ts/main.ts --outDir ./lib/ --module es6 --declaration --declarationDir ./types'.split(' ')
+      },
+      publish: {
+        cmd: 'npm',
+        args: ['publish']
       }
     },
     tslint: {
@@ -182,7 +186,7 @@ module.exports = function (grunt) {
   grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
 
   //releases master and gh-pages at the same time (with auto-version bump)
-  grunt.registerTask("release", ["clean:pages", "releaseBuild", "bump", "concat:pages", "copy:pages", "gh-pages"]);
+  grunt.registerTask("release", ["clean:pages", "releaseBuild", "bump", "concat:pages", "copy:pages", "gh-pages", "run:publish"]);
 
   grunt.registerTask("default", ["distBase", "watch"]);
 };

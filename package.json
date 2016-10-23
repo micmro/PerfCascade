@@ -11,7 +11,7 @@
     "start": "live-server --wait=50 --open=src/index.html --ignore=src/ts/",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
     "ghPages": "grunt ghPages",
-    "release": "grunt release && npm publish",
+    "release": "grunt release",
     "tsc": "tsc"
   },
   "author": {
