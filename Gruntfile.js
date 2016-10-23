@@ -11,6 +11,7 @@ module.exports = function (grunt) {
     clean: {
       dist: ["temp/", "src/dist/"],
       pages: ["gh-pages/"],
+      lib: ["lib/", "types/"],
       js: ["src/ts/**/*.js", "src/ts/**/*.js.map"]
     },
     concat: {
@@ -33,7 +34,6 @@ module.exports = function (grunt) {
         src: ["src/css-raw/normalize.css", "src/css-raw/gh-page.css", "src/css-raw/perf-cascade.css"],
         dest: "src/dist/perf-cascade-gh-page.css",
       }
-
     },
     browserify: {
       options: {
@@ -57,6 +57,16 @@ module.exports = function (grunt) {
             standalone: "perfCascadeFileReader"
           }
         }
+      }
+    },
+    run: {
+      options: {
+        failOnError: true
+      },
+      //run typescrip compiler directly since all tools don't support latest flags
+      tscEs6: {
+        cmd: 'npm',
+        args: 'run tsc -- src/ts/main.ts --outDir ./lib/ --module es6 --declaration --declarationDir ./types'.split(' ')
       }
     },
     tslint: {
@@ -111,11 +121,11 @@ module.exports = function (grunt) {
         src: ["src/dist/perf-cascade-gh-page.css", "src/dist/perf-cascade.min.js", "src/dist/perf-cascade-file-reader.min.js"],
         dest: "gh-pages/src/",
         filter: "isFile",
-      },
+        },
       npm: {
         expand: true,
         flatten: true,
-        src: ["src/dist/perf-cascade.js", "src/dist/perf-cascade-file-reader.js", "src/dist/perf-cascade.css"],
+        src: ["src/dist/perf-cascade-file-reader.js", "src/dist/perf-cascade.css"],
         dest: "lib/",
         filter: "isFile",
       }
@@ -163,9 +173,10 @@ module.exports = function (grunt) {
 
   grunt.registerTask("distFileReader", ["browserify:fileReader", "concat:fileReader"]);
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:demoCss", "distFileReader"]);
+  grunt.registerTask("npmEs6", ["clean:lib", "run:tscEs6", "copy:npm"]);
 
   //build uptimized release file
-  grunt.registerTask("releaseBuild", ["tslint", "distBase", "concat:mainCss", "uglify:dist", "copy:npm"]);
+  grunt.registerTask("releaseBuild", ["tslint", "distBase", "concat:mainCss", "uglify:dist"]);
 
   //releases the current version on master to github-pages (gh-pages branch)
   grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);

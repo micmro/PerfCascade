@@ -1,7 +1,7 @@
-import {Har} from "./typing/har.d"
-import {WaterfallDocs} from "./typing/waterfall-data.d"
-import {ChartOptions} from "./typing/options.d"
-import {createWaterfallSvg} from "./waterfall/svg-chart"
+import { Har } from "./typing/har.d"
+import { WaterfallDocs } from "./typing/waterfall-data.d"
+import { ChartOptions } from "./typing/options.d"
+import { createWaterfallSvg } from "./waterfall/svg-chart"
 import * as paging from "./paging/paging"
 import HarTransformer from "./transformers/har"
 import * as waterfallDocsService from "./state/waterfall-docs-service"
@@ -61,10 +61,10 @@ function fromPerfCascadeFormat(waterfallDocsData: WaterfallDocs, options?: Chart
   return PerfCascade(waterfallDocsData, options)
 }
 
+let transformHarToPerfCascade = HarTransformer.transformDoc
+
 //global members that get exported via UMD
-export = {
-  fromHar : fromHar,
-  fromPerfCascadeFormat: fromPerfCascadeFormat,
-  transformHarToPerfCascade: HarTransformer.transformDoc,
-  changePage: paging.setSelectedPageIndex
-}
+export { fromHar }
+export { fromPerfCascadeFormat }
+export { transformHarToPerfCascade }
+export {setSelectedPageIndex as changePage } from "./paging/paging"

@@ -2,7 +2,7 @@
   "name": "perf-cascade",
   "version": "0.2.1",
   "description": "Har file visualizer",
-  "main": "index.html",
+  "main": "./lib/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "grunt tslint",
@@ -11,7 +11,8 @@
     "start": "live-server --wait=50 --open=src/index.html --ignore=src/ts/",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
     "ghPages": "grunt ghPages",
-    "release": "grunt release && npm publish"
+    "release": "grunt release && npm publish",
+    "tsc": "tsc"
   },
   "author": {
     "name": "Michael Mrowetz",
@@ -25,6 +26,7 @@
   "directories": {
     "lib": "./lib"
   },
+  "types": "./lib/main.d.ts",
   "license": "MIT",
   "devDependencies": {
     "grunt": "^1.0.1",
@@ -37,6 +39,7 @@
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-gh-pages": "^2.0.0",
+    "grunt-run": "^0.6.0",
     "grunt-tslint": "^3.3.0",
     "live-server": "^1.1.0",
     "load-grunt-tasks": "^3.5.2",
