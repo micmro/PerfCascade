@@ -11,7 +11,7 @@ module.exports = function (grunt) {
     clean: {
       dist: ["temp/", "src/dist/"],
       pages: ["gh-pages/"],
-      lib: ["lib/", "types/"],
+      lib: ["lib/", "types/", "./index.js", "./index.d.ts"],
       js: ["src/ts/**/*.js", "src/ts/**/*.js.map"]
     },
     concat: {
@@ -66,7 +66,7 @@ module.exports = function (grunt) {
       //run typescrip compiler directly since all tools don't support latest flags
       tscEs6: {
         cmd: 'npm',
-        args: 'run tsc -- src/ts/main.ts --outDir ./lib/ --module es6 --declaration --declarationDir ./types'.split(' ')
+        args: 'run tsc -- src/ts/main.ts src/ts/file-reader.ts --outDir ./lib/ --module es6 --declaration --declarationDir ./types'.split(' ')
       },
       publish: {
         cmd: 'npm',
@@ -132,6 +132,13 @@ module.exports = function (grunt) {
         src: ["src/dist/perf-cascade-file-reader.js", "src/dist/perf-cascade.css"],
         dest: "lib/",
         filter: "isFile",
+      },
+      npmBase: {
+        expand: true,
+        flatten: true,
+        src: ["npm-export/index.js", "npm-export/index.d.ts"],
+        dest: "./",
+        filter: "isFile",
       }
     },
     "gh-pages": {
@@ -177,7 +184,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask("distFileReader", ["browserify:fileReader", "concat:fileReader"]);
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:demoCss", "distFileReader"]);
-  grunt.registerTask("npmEs6", ["clean:lib", "run:tscEs6", "copy:npm"]);
+  grunt.registerTask("npmEs6", ["clean:lib", "run:tscEs6", "copy:npm", "copy:npmBase"]);
 
   //build uptimized release file
   grunt.registerTask("releaseBuild", ["tslint", "distBase", "concat:mainCss", "uglify:dist"]);

@@ -1,8 +1,8 @@
 {
   "name": "perf-cascade",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "description": "Har file visualizer",
-  "main": "./lib/main.js",
+  "main": "./index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "grunt tslint",
@@ -26,7 +26,7 @@
   "directories": {
     "lib": "./lib"
   },
-  "types": "./lib/main.d.ts",
+  "types": "./index.d.ts",
   "license": "MIT",
   "devDependencies": {
     "grunt": "^1.0.1",

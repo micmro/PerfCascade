@@ -68,3 +68,5 @@ export { fromHar }
 export { fromPerfCascadeFormat }
 export { transformHarToPerfCascade }
 export {setSelectedPageIndex as changePage } from "./paging/paging"
+//export typings
+export * from "./typing/index.d"

@@ -1,6 +1,7 @@
 #GH page and regular files not used in npm package
 gh-pages/
 src/
+npm-export/
 stylesheets/
 Gruntfile.js
 tslint.json
