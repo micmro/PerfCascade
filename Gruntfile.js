@@ -9,7 +9,7 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     clean: {
-      dist: ["temp/", "src/dist/"],
+      dist: ["temp/", "src/dist/", "./index.js", "./index.d.ts"],
       pages: ["gh-pages/"],
       lib: ["lib/", "types/", "./index.js", "./index.d.ts"],
       js: ["src/ts/**/*.js", "src/ts/**/*.js.map"]
