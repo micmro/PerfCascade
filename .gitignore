@@ -10,6 +10,7 @@ src/dist/perf-cascade-gh-page.css
 
 #npm dist base (relative to root)
 /lib/
+/dist/
 /types/
 /index.js
 /index.d.ts

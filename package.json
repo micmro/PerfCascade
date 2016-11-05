@@ -24,7 +24,8 @@
     "url": "https://github.com/micmro/PerfCascade.git"
   },
   "directories": {
-    "lib": "./lib"
+    "lib": "./lib",
+    "dist": "./dist"
   },
   "types": "./index.d.ts",
   "license": "MIT",
@@ -45,6 +46,6 @@
     "load-grunt-tasks": "^3.5.2",
     "tsify": "^2.0.2",
     "tslint": "^3.15.1",
-    "typescript": "^2.0.3"
+    "typescript": "^2.0.7"
   }
 }

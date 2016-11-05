@@ -122,15 +122,25 @@ module.exports = function (grunt) {
       pages: {
         expand: true,
         flatten: true,
-        src: ["src/dist/perf-cascade-gh-page.css", "src/dist/perf-cascade.min.js", "src/dist/perf-cascade-file-reader.min.js"],
+        src: [
+          "src/dist/perf-cascade-gh-page.css",
+          "src/dist/perf-cascade.min.js",
+          "src/dist/perf-cascade-file-reader.min.js"
+        ],
         dest: "gh-pages/src/",
         filter: "isFile",
         },
       npm: {
         expand: true,
         flatten: true,
-        src: ["src/dist/perf-cascade-file-reader.js", "src/dist/perf-cascade.css"],
-        dest: "lib/",
+        src: [
+          "src/dist/perf-cascade.js",
+          "src/dist/perf-cascade.min.js",
+          "src/dist/perf-cascade-file-reader.js",
+          "src/dist/perf-cascade-file-reader.min.js",
+          "src/dist/perf-cascade.css"
+        ],
+        dest: "dist/",
         filter: "isFile",
       },
       npmBase: {
@@ -184,16 +194,17 @@ module.exports = function (grunt) {
 
   grunt.registerTask("distFileReader", ["browserify:fileReader", "concat:fileReader"]);
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:demoCss", "distFileReader"]);
-  grunt.registerTask("npmEs6", ["clean:lib", "run:tscEs6", "copy:npm", "copy:npmBase"]);
+  grunt.registerTask("npmRelease", ["tslint", "clean:lib", "run:tscEs6", "distBase", "concat:mainCss", "uglify:dist", "copy:npm", "copy:npmBase"]);
 
-  //build uptimized release file
-  grunt.registerTask("releaseBuild", ["tslint", "distBase", "concat:mainCss", "uglify:dist"]);
+  //build optimized release files
+  // grunt.registerTask("releaseBuild", ["npmEs6"]);
 
+  //TODO Fix
   //releases the current version on master to github-pages (gh-pages branch)
-  grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
+  // grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
 
   //releases master and gh-pages at the same time (with auto-version bump)
-  grunt.registerTask("release", ["clean:pages", "releaseBuild", "bump", "concat:pages", "copy:pages", "gh-pages", "run:publish"]);
+  grunt.registerTask("release", ["clean:pages", "npmRelease", "bump", "concat:pages", "copy:pages", "gh-pages", "run:publish"]);
 
   grunt.registerTask("default", ["distBase", "watch"]);
 };
