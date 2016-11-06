@@ -149,6 +149,20 @@ module.exports = function (grunt) {
         src: ["npm-export/index.js", "npm-export/index.d.ts"],
         dest: "./",
         filter: "isFile",
+      },
+      npmZipLib: {
+        expand: true,
+        cwd: "src/",
+        src: ["zip/**/*"],
+        dest: "./lib/",
+        filter: "isFile",
+      },
+      npmTypings: {
+        expand: true,
+        cwd: "src/ts/",
+        src: ["**/*.d.ts"],
+        dest: "./types",
+        filter: "isFile",
       }
     },
     "gh-pages": {
@@ -192,16 +206,19 @@ module.exports = function (grunt) {
     }
   });
 
+  //build for the file reader
   grunt.registerTask("distFileReader", ["browserify:fileReader", "concat:fileReader"]);
+  // builds the TS into a single file
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:demoCss", "distFileReader"]);
-  grunt.registerTask("npmRelease", ["tslint", "clean:lib", "run:tscEs6", "distBase", "concat:mainCss", "uglify:dist", "copy:npm", "copy:npmBase"]);
 
-  //build optimized release files
-  // grunt.registerTask("releaseBuild", ["npmEs6"]);
+  //Post build work, copying and combining files for NPM and regular release
+  grunt.registerTask("releasePrep", ["concat:mainCss", "uglify:dist", "copy:npm", "copy:npmBase", "copy:npmTypings", "copy:npmZipLib"])
+  //build a single file and a library of ES6 Modules for the NPM package
+  grunt.registerTask("npmRelease", ["tslint", "clean:lib", "run:tscEs6", "distBase", "releasePrep"]);
 
-  //TODO Fix
+
   //releases the current version on master to github-pages (gh-pages branch)
-  // grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
+  grunt.registerTask("ghPages", ["clean:pages", "npmRelease", "concat:pages", "copy:pages", "gh-pages"]);
 
   //releases master and gh-pages at the same time (with auto-version bump)
   grunt.registerTask("release", ["clean:pages", "npmRelease", "bump", "concat:pages", "copy:pages", "gh-pages", "run:publish"]);
