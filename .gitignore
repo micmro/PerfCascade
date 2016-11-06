@@ -2,13 +2,18 @@
 
 #Temp files
 temp/
+src/ts/.baseDir.ts
 
 #GH page dist
 gh-pages/
 src/dist/perf-cascade-gh-page.css
 
-#npm dist base
-lib/
+#npm dist base (relative to root)
+/lib/
+/dist/
+/types/
+/index.js
+/index.d.ts
 
 # Editor Project Files
 *.sublime-project

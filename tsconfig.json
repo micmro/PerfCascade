@@ -9,6 +9,9 @@
   },
   "exclude": [
     "node_modules",
-    "temp"
+    "temp",
+    "types",
+    "npm-export",
+    "lib"
   ]
 }
