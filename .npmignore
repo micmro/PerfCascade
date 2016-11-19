@@ -6,6 +6,7 @@ stylesheets/
 Gruntfile.js
 tslint.json
 tsconfig.json
+bower.json
 
 ### misc basics
 
