@@ -67,16 +67,15 @@ export function createDetailsBody(requestID: number, block: TimeBlock, accordeon
         <h3><strong>#${requestID}</strong> ${block.name}</h3>
         <nav class="tab-nav">
         <ul>
-          ${makeTabBtn("Preview", imgTab)}
           ${makeTabBtn("General", generalTab)}
           <li><button class="tab-button">Request</button></li>
           <li><button class="tab-button">Response</button></li>
           ${makeTabBtn("Timings", timingsTab)}
           <li><button class="tab-button">Raw Data</button></li>
+          ${makeTabBtn("Preview", imgTab)}
         </ul>
         </nav>
       </header>
-      ${imgTab}
       ${generalTab}
       <div class="tab">
         <dl>
@@ -102,6 +101,7 @@ export function createDetailsBody(requestID: number, block: TimeBlock, accordeon
           <pre>${JSON.stringify(block.rawResource, null, 2)}</pre>
         </code>
       </div>
+      ${imgTab}
     </div>
     `
 
