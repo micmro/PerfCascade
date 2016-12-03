@@ -51,10 +51,12 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
     "width": `${100 - leftColumnWith}%`
   })
 
+  let requestNumber = `${index+1}. `
+
   let rect = rowSubComponents.createRect(rectData, block.segments, block.total)
   let shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y,
-    misc.ressourceUrlFormater(block.name, 40), rowHeight, "clipPath")
-  let fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, rowHeight)
+    requestNumber + misc.ressourceUrlFormater(block.name, 40), rowHeight, "clipPath")
+  let fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, requestNumber + block.name, rowHeight)
 
   let rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow, leftColumnWith)
   let rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow)
