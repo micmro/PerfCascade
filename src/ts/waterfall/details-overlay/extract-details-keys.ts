@@ -12,7 +12,7 @@ let ifValueDefined = (value: number, fn: (number) => any) => {
 
 let formatBytes = (size?: number) => ifValueDefined(size, s => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
 
-let formatTime = (size?: number) => ifValueDefined(size, s => `${s}ms`)
+let formatTime = (size?: number) => ifValueDefined(size, s => `${s} ms`)
 
 let formatDate = (date?: string) => {
   if (!date) {
@@ -88,7 +88,7 @@ export function getKeys(requestID: number, block: TimeBlock) {
   return {
     "general": {
       "Request Number": `#${requestID}`,
-      "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page reqest started)",
+      "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page request started)",
       "Duration": formatTime(entry.time),
       "Error/Status Code": entry.response.status + " " + entry.response.statusText,
       "Server IPAddress": entry.serverIPAddress,
