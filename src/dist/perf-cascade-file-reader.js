@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.7 (04/12/2016) */
+/*! github.com/micmro/PerfCascade Version:0.2.8 (04/12/2016) */
 /*
  Copyright (c) 2013 Gildas Lormeau. All rights reserved.
 
