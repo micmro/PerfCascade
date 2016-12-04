@@ -178,12 +178,8 @@ module.exports = function (grunt) {
       options: {
         files: [
           "package.json",
-          "src/dist/perf-cascade.js",
-          "src/dist/perf-cascade.min.js",
-          "src/dist/perf-cascade-file-reader.js",
-          "src/dist/perf-cascade-file-reader.min.js",
-          "src/dist/perf-cascade-demo.css",
-          "src/dist/perf-cascade.css",
+          "src/dist/*.js",
+          "src/dist/*.css",
           "lib/perf-cascade.js",
           "lib/perf-cascade-file-reader.js",
           "lib/perf-cascade.css",
@@ -195,12 +191,8 @@ module.exports = function (grunt) {
         // dryRun: true,
         commitFiles: [
           "package.json",
-          "src/dist/perf-cascade.js",
-          "src/dist/perf-cascade.min.js",
-          "src/dist/perf-cascade-file-reader.js",
-          "src/dist/perf-cascade-file-reader.min.js",
-          "src/dist/perf-cascade-demo.css",
-          "src/dist/perf-cascade.css"
+          "src/dist/*.js",
+          "src/dist/*.css",
         ],
       }
     }
