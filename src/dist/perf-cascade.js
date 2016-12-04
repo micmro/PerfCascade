@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.6 (19/11/2016) */
+/*! github.com/micmro/PerfCascade Version:0.2.7 (04/12/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -1037,7 +1037,7 @@ function createDetailsBody(requestID, block, accordeonHeight) {
         return pre;
     }, {}));
     var imgTab = makeImgTab(accordeonHeight, block);
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + block.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> " + block.name + "</h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("Preview", imgTab) + "\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n        </ul>\n        </nav>\n      </header>\n      " + imgTab + "\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n    </div>\n    ";
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + block.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> " + block.name + "</h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n          " + makeTabBtn("Preview", imgTab) + "\n        </ul>\n        </nav>\n      </header>\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n      " + imgTab + "\n    </div>\n    ";
     html.appendChild(body);
     return html;
 }
@@ -1569,9 +1569,10 @@ function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetai
         "x": leftColumnWith + "%",
         "width": (100 - leftColumnWith) + "%"
     });
+    var requestNumber = (index + 1) + ". ";
     var rect = rowSubComponents.createRect(rectData, block.segments, block.total);
-    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, misc.ressourceUrlFormater(block.name, 40), rowHeight, "clipPath");
-    var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, block.name, rowHeight);
+    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, requestNumber + misc.ressourceUrlFormater(block.name, 40), rowHeight, "clipPath");
+    var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, requestNumber + block.name, rowHeight);
     var rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow, leftColumnWith);
     var rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow);
     var bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
@@ -1664,38 +1665,70 @@ exports.makeHoverEvtListeners = makeHoverEvtListeners;
 var svg = require("../../helpers/svg");
 var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
 /**
+ * Renders a per-second marker line and appends it to `timeHolder`
+ *
+ * @param  {SVGGElement} timeHolder element that the second marker is appended to
+ * @param  {number} diagramHeight  Full height of SVG in px
+ * @param  {number} secsTotal  total number of seconds in the timeline
+ * @param  {number} sec second of the time marker to render
+ * @param  {boolean} addLabel  if true a time label is added to the marker-line
+ */
+var appendSecond = function (timeHolder, diagramHeight, secsTotal, sec, addLabel) {
+    if (addLabel === void 0) { addLabel = false; }
+    var secPerc = 100 / secsTotal;
+    /** just used if `addLabel` is `true` - for full seconds */
+    var lineLabel;
+    var lineClass = "sub-second-line";
+    if (addLabel) {
+        lineClass = "second-line";
+        lineLabel = svg.newTextEl(sec + "s", diagramHeight);
+        if (sec > secsTotal - 0.2) {
+            lineLabel.setAttribute("x", secPerc * sec - 0.5 + "%");
+            lineLabel.setAttribute("text-anchor", "end");
+        }
+        else {
+            lineLabel.setAttribute("x", secPerc * sec + 0.5 + "%");
+        }
+    }
+    var lineEl = svg.newEl("line", {
+        "class": lineClass,
+        "x1": secPerc * sec + "%",
+        "y1": "0",
+        "x2": secPerc * sec + "%",
+        "y2": diagramHeight
+    });
+    overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
+        var offset = change.combinedOverlayHeight;
+        //figure out why there is an offset
+        var scale = (diagramHeight + offset) / (diagramHeight);
+        lineEl.setAttribute("transform", "scale(1, " + scale + ")");
+        if (addLabel) {
+            lineLabel.setAttribute("transform", "translate(0, " + offset + ")");
+        }
+    });
+    timeHolder.appendChild(lineEl);
+    if (addLabel) {
+        timeHolder.appendChild(lineLabel);
+    }
+};
+/**
  * Renders the time-scale SVG elements (1sec, 2sec...)
  * @param {number} durationMs    Full duration of the waterfall
  * @param {number} diagramHeight Full height of SVG in px
+ * @param {number} subSecondStepMs  Distant (time in ms) between sub-second time-scales
  */
-function createTimeScale(durationMs, diagramHeight) {
+function createTimeScale(durationMs, diagramHeight, subSecondStepMs) {
+    if (subSecondStepMs === void 0) { subSecondStepMs = 200; }
     var timeHolder = svg.newEl("g", { class: "time-scale full-width" });
-    for (var i = 0, secs = durationMs / 1000, secPerc = 100 / secs; i <= secs; i++) {
-        (function (i, secs, secPerc) {
-            var lineLabel = svg.newTextEl(i + "s", diagramHeight);
-            if (i > secs - 0.2) {
-                lineLabel.setAttribute("x", secPerc * i - 0.5 + "%");
-                lineLabel.setAttribute("text-anchor", "end");
-            }
-            else {
-                lineLabel.setAttribute("x", secPerc * i + 0.5 + "%");
-            }
-            var lineEl = svg.newEl("line", {
-                "x1": secPerc * i + "%",
-                "y1": "0",
-                "x2": secPerc * i + "%",
-                "y2": diagramHeight
-            });
-            overlayChangesPubSub.subscribeToOvelayChanges(function (change) {
-                var offset = change.combinedOverlayHeight;
-                //figure out why there is an offset
-                var scale = (diagramHeight + offset) / (diagramHeight);
-                lineEl.setAttribute("transform", "scale(1, " + scale + ")");
-                lineLabel.setAttribute("transform", "translate(0, " + offset + ")");
-            });
-            timeHolder.appendChild(lineEl);
-            timeHolder.appendChild(lineLabel);
-        })(i, secs, secPerc);
+    /** steps between each second marker */
+    var subSecondSteps = 1000 / subSecondStepMs;
+    var secs = durationMs / 1000;
+    var steps = durationMs / subSecondStepMs;
+    for (var i = 0; i <= steps; i++) {
+        console.log(secs);
+        var isFullSec = i % subSecondSteps === 0;
+        var secValue = i / subSecondSteps;
+        appendSecond(timeHolder, diagramHeight, secs, secValue, isFullSec);
     }
     return timeHolder;
 }
