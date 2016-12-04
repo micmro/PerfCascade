@@ -4,6 +4,7 @@ import { ChartOptions } from "./typing/options.d"
 import { createWaterfallSvg } from "./waterfall/svg-chart"
 import * as paging from "./paging/paging"
 import HarTransformer from "./transformers/har"
+import { makeLegend } from "./legend/legend"
 import * as waterfallDocsService from "./state/waterfall-docs-service"
 import * as globalStateService from "./state/global-state"
 import * as misc from "./helpers/misc"
@@ -38,6 +39,10 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions?: ChartOptio
   if (options.pageSelector) {
     paging.initPagingSelectBox(options.pageSelector)
   }
+
+  if (options.legendHolder) {
+    options.legendHolder.appendChild(makeLegend())
+  }
   return doc
 }
 
@@ -67,6 +72,7 @@ let transformHarToPerfCascade = HarTransformer.transformDoc
 export { fromHar }
 export { fromPerfCascadeFormat }
 export { transformHarToPerfCascade }
-export {setSelectedPageIndex as changePage } from "./paging/paging"
+export { setSelectedPageIndex as changePage } from "./paging/paging"
+export { makeLegend }
 //export typings
 export * from "./typing/index.d"
