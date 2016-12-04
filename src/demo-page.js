@@ -8,6 +8,8 @@
   var outputHolder = document.getElementById("output");
   /** Select box for multi-page HARs */
   var pageSelectorEl = document.getElementById("page-selector");
+  /** Holder element for legend HTML */
+  var legendHolderEl = document.getElementById("legend-holder");
 
   /** options for PerfCascade (all have defaults)
    * Source: /src/ts/typing/options.d.ts
@@ -17,7 +19,8 @@
     showAlignmentHelpers: true, //default: true
     showIndicatorIcons: true, //default: true
     leftColumnWith: 25, //default: 25
-    pageSelector: pageSelectorEl //default: undefined
+    pageSelector: pageSelectorEl, //default: undefined
+    legendHolder: legendHolderEl //default: undefined (hide-legend)
   };
 
   /** renders the har (passing in the har.log node) */

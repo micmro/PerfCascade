@@ -2,5 +2,12 @@
 node_modules/
 .vscode
 .grunt/
+.tscache/
 /gh-pages/
 /src/dist/
+/dist/
+/src/ts/
+/lib/
+/types/
+index.d.ts
+index.js
