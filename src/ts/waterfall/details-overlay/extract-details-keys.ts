@@ -76,11 +76,11 @@ export function getKeys(requestID: number, block: TimeBlock) {
     let start = getExp(name + "_start")
     let end = getExp(name + "_end")
     let resp = []
-    if (start && end && start < end) {
-      resp.push(`${start}ms - ${end}ms`)
-    }
     if (ms && ms !== "-1") {
-      resp.push(`(${ms}ms)`)
+      resp.push(`${ms} ms`)
+    }
+    if (start && end && start < end) {
+      resp.push(`(${start} ms - ${end} ms)`)
     }
     return resp.join(" ")
   }
@@ -115,7 +115,7 @@ export function getKeys(requestID: number, block: TimeBlock) {
     },
     "timings": {
       "Server RTT": getExpTimeRange("server_rtt"),
-      "all (combined)": getExpTimeRange("all"),
+      "Total": getExpTimeRange("all"),
       "DNS": getExpTimeRange("dns"),
       "Connect": getExpTimeRange("connect"),
       "TLS/SSL": getExpTimeRange("ssl"),
