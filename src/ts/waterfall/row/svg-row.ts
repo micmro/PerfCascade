@@ -1,5 +1,5 @@
-import {RectData} from "../../typing/rect-data.d"
-import {ChartOptions} from "../../typing/options"
+import { RectData } from "../../typing/rect-data.d"
+import { ChartOptions } from "../../typing/options"
 import TimeBlock from "../../typing/time-block"
 
 import * as svg from "../../helpers/svg"
@@ -51,7 +51,7 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
     "width": `${100 - leftColumnWith}%`
   })
 
-  let requestNumber = `${index+1}. `
+  let requestNumber = `${index + 1}. `
 
   let rect = rowSubComponents.createRect(rectData, block.segments, block.total)
   let shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y,
