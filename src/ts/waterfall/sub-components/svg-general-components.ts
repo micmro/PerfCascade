@@ -73,7 +73,6 @@ export function createTimeScale(durationMs: number, diagramHeight: number, subSe
   const steps = durationMs / subSecondStepMs
 
   for (let i = 0; i <= steps; i++) {
-    console.log(secs)
     const isFullSec = i % subSecondSteps === 0
     const secValue = i / subSecondSteps
 

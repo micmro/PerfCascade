@@ -441,9 +441,24 @@ exports.removeClass = removeClass;
 
 },{}],6:[function(require,module,exports){
 "use strict";
+/**
+ * Creates the html for diagrams legend
+ */
+function makeLegend() {
+    var ulNode = document.createElement("ul");
+    ulNode.className = "resource-legend";
+    ulNode.innerHTML = "\n        <li class=\"legend-stalled\">Stalled/Blocking</li>\n        <li class=\"legend-redirect\">Redirect</li>\n        <li class=\"legend-app-cache\">App Cache</li>\n        <li class=\"legend-dns-lookup\">DNS Lookup</li>\n        <li class=\"legend-tcp\">Initial Connection (TCP)</li>\n        <li class=\"legend-tls\">TLS/SSL Negotiation</li>\n        <li class=\"legend-ttfb\">Time to First Byte</li>\n        <li class=\"legend-download\">Content Download</li>";
+    return ulNode;
+}
+exports.makeLegend = makeLegend;
+
+},{}],7:[function(require,module,exports){
+"use strict";
 var svg_chart_1 = require("./waterfall/svg-chart");
 var paging = require("./paging/paging");
 var har_1 = require("./transformers/har");
+var legend_1 = require("./legend/legend");
+exports.makeLegend = legend_1.makeLegend;
 var waterfallDocsService = require("./state/waterfall-docs-service");
 var globalStateService = require("./state/global-state");
 var misc = require("./helpers/misc");
@@ -469,6 +484,9 @@ function PerfCascade(waterfallDocsData, chartOptions) {
     });
     if (options.pageSelector) {
         paging.initPagingSelectBox(options.pageSelector);
+    }
+    if (options.legendHolder) {
+        options.legendHolder.appendChild(legend_1.makeLegend());
     }
     return doc;
 }
@@ -499,7 +517,7 @@ var paging_1 = require("./paging/paging");
 exports.changePage = paging_1.setSelectedPageIndex;
 //export typings
 
-},{"./helpers/misc":4,"./paging/paging":7,"./state/global-state":8,"./state/waterfall-docs-service":9,"./transformers/har":10,"./waterfall/svg-chart":24}],7:[function(require,module,exports){
+},{"./helpers/misc":4,"./legend/legend":6,"./paging/paging":8,"./state/global-state":9,"./state/waterfall-docs-service":10,"./transformers/har":11,"./waterfall/svg-chart":25}],8:[function(require,module,exports){
 "use strict";
 var waterfallDocsService = require("../state/waterfall-docs-service");
 var selectedPageIndex = 0;
@@ -579,7 +597,7 @@ function initPagingSelectBox(selectbox) {
 }
 exports.initPagingSelectBox = initPagingSelectBox;
 
-},{"../state/waterfall-docs-service":9}],8:[function(require,module,exports){
+},{"../state/waterfall-docs-service":10}],9:[function(require,module,exports){
 "use strict";
 var optionsStore;
 /**
@@ -599,7 +617,7 @@ function getOptions() {
 }
 exports.getOptions = getOptions;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 /*
 * Central service to store HAR data
@@ -623,7 +641,7 @@ function getDocs() {
 }
 exports.getDocs = getDocs;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 var time_block_1 = require("../typing/time-block");
 var styling_converters_1 = require("./styling-converters");
@@ -751,7 +769,7 @@ var HarTransformer = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = HarTransformer;
 
-},{"../typing/time-block":12,"./styling-converters":11}],11:[function(require,module,exports){
+},{"../typing/time-block":13,"./styling-converters":12}],12:[function(require,module,exports){
 "use strict";
 /**
  * Convert a MIME type into it's WPT style request type (font, script etc)
@@ -801,7 +819,7 @@ function mimeToCssClass(mimeType) {
 }
 exports.mimeToCssClass = mimeToCssClass;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 var TimeBlock = (function () {
     function TimeBlock(name, start, end, cssClass, segments, rawResource, requestType) {
@@ -821,7 +839,7 @@ var TimeBlock = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = TimeBlock;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 var ifValueDefined = function (value, fn) {
     if (typeof value !== "number" || value <= 0) {
@@ -984,7 +1002,7 @@ function getKeys(requestID, block) {
 }
 exports.getKeys = getKeys;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues, addClass) {
@@ -1043,7 +1061,7 @@ function createDetailsBody(requestID, block, accordeonHeight) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":13}],15:[function(require,module,exports){
+},{"./extract-details-keys":14}],16:[function(require,module,exports){
 //simple pub/sub for change to the overlay
 "use strict";
 exports.eventTypes = {
@@ -1061,7 +1079,7 @@ function publishToOvelayChanges(change) {
 }
 exports.publishToOvelayChanges = publishToOvelayChanges;
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 var svg_details_overlay_1 = require("./svg-details-overlay");
 var overlayChangesPubSub = require("./overlay-changes-pub-sub");
@@ -1167,7 +1185,7 @@ function renderOverlays(barX, accordeonHeight, overlayHolder, unit) {
     });
 }
 
-},{"./overlay-changes-pub-sub":15,"./svg-details-overlay":17}],17:[function(require,module,exports){
+},{"./overlay-changes-pub-sub":16,"./svg-details-overlay":18}],18:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var dom = require("../../helpers/dom");
@@ -1251,7 +1269,7 @@ function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onCl
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/dom":1,"../../helpers/svg":5,"./html-details-body":14}],18:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":5,"./html-details-body":15}],19:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1304,7 +1322,7 @@ function getIndicators(block, docIsSsl) {
 }
 exports.getIndicators = getIndicators;
 
-},{"../../helpers/heuristics":2}],19:[function(require,module,exports){
+},{"../../helpers/heuristics":2}],20:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1527,7 +1545,7 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":4,"../../helpers/svg":5}],20:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":5}],21:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var icons = require("../../helpers/icons");
@@ -1595,7 +1613,7 @@ function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetai
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":18,"./svg-row-subcomponents":19}],21:[function(require,module,exports){
+},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":19,"./svg-row-subcomponents":20}],22:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  * */
@@ -1657,7 +1675,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/svg":5}],22:[function(require,module,exports){
+},{"../../helpers/svg":5}],23:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1725,7 +1743,6 @@ function createTimeScale(durationMs, diagramHeight, subSecondStepMs) {
     var secs = durationMs / 1000;
     var steps = durationMs / subSecondStepMs;
     for (var i = 0; i <= steps; i++) {
-        console.log(secs);
         var isFullSec = i % subSecondSteps === 0;
         var secValue = i / subSecondSteps;
         appendSecond(timeHolder, diagramHeight, secs, secValue, isFullSec);
@@ -1749,7 +1766,7 @@ function createBgRect(block, unit, diagramHeight) {
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":15}],23:[function(require,module,exports){
+},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":16}],24:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
@@ -1834,7 +1851,7 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":15}],24:[function(require,module,exports){
+},{"../../helpers/svg":5,"../details-overlay/overlay-changes-pub-sub":16}],25:[function(require,module,exports){
 "use strict";
 var svg = require("../helpers/svg");
 var generalComponents = require("./sub-components/svg-general-components");
@@ -1961,5 +1978,5 @@ function createWaterfallSvg(data) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":5,"../state/global-state":8,"./details-overlay/overlay-changes-pub-sub":15,"./details-overlay/svg-details-overlay-manager":16,"./row/svg-indicators":18,"./row/svg-row":20,"./sub-components/svg-alignment-helper":21,"./sub-components/svg-general-components":22,"./sub-components/svg-marks":23}]},{},[6])(6)
+},{"../helpers/svg":5,"../state/global-state":9,"./details-overlay/overlay-changes-pub-sub":16,"./details-overlay/svg-details-overlay-manager":17,"./row/svg-indicators":19,"./row/svg-row":21,"./sub-components/svg-alignment-helper":22,"./sub-components/svg-general-components":23,"./sub-components/svg-marks":24}]},{},[7])(7)
 });

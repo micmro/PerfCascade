@@ -9,4 +9,6 @@ export interface ChartOptions {
   leftColumnWith: number
   /** select element to use for paging  */
   pageSelector?: HTMLSelectElement
+  /** element that holds the Legend (if not set no Legend is shown) */
+  legendHolder?: HTMLElement
 }
