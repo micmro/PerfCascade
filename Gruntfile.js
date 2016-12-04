@@ -214,14 +214,14 @@ module.exports = function (grunt) {
   //Post build work, copying and combining files for NPM and regular release
   grunt.registerTask("releasePrep", ["concat:mainCss", "uglify:dist", "copy:npm", "copy:npmBase", "copy:npmTypings", "copy:npmZipLib"])
   //build a single file and a library of ES6 Modules for the NPM package
-  grunt.registerTask("npmRelease", ["tslint", "clean:lib", "run:tscEs6", "distBase", "releasePrep"]);
+  grunt.registerTask("releaseBuild", ["tslint", "clean:lib", "run:tscEs6", "distBase", "releasePrep"]);
 
 
   //releases the current version on master to github-pages (gh-pages branch)
-  grunt.registerTask("ghPages", ["clean:pages", "npmRelease", "concat:pages", "copy:pages", "gh-pages"]);
+  grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
 
   //releases master and gh-pages at the same time (with auto-version bump)
-  grunt.registerTask("release", ["clean:pages", "npmRelease", "bump", "concat:pages", "copy:pages", "gh-pages", "run:publish"]);
+  grunt.registerTask("release", ["clean:pages", "releaseBuild", "bump", "concat:pages", "copy:pages", "gh-pages", "run:publish"]);
 
   grunt.registerTask("default", ["distBase", "watch"]);
 };
