@@ -54,6 +54,14 @@ Show warning icons for potential issues on the left
 `number` default: `25`
 Relative width of the info column on the left (in percent)
 
+### `pageSelector`
+`HTMLSelectElement` default: `undefined`
+DOM `<select>` element to use to select a run if the HAR contains multiple runs.
+
+### `legendHolder`
+`HTMLElement` (DOM element) default: `undefined` (not shown)
+If set a legend explaining the waterfall colours is rendered in the `legendHolder` DOM element.
+
 ## *.zhar - zipped HAR files
 By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/master/src/index.html#L73-L80) you can use `perfCascadeFileReader.readFile` to read a gzip and convert it to a JSON HAR object.
 
