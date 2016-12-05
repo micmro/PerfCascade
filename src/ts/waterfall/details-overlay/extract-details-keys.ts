@@ -12,7 +12,7 @@ let ifValueDefined = (value: number, fn: (number) => any) => {
 
 let formatBytes = (size?: number) => ifValueDefined(size, s => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
 
-let formatTime = (size?: number) => ifValueDefined(size, s => `${s}ms`)
+let formatTime = (size?: number) => ifValueDefined(size, s => `${s} ms`)
 
 let formatDate = (date?: string) => {
   if (!date) {
@@ -76,11 +76,11 @@ export function getKeys(requestID: number, block: TimeBlock) {
     let start = getExp(name + "_start")
     let end = getExp(name + "_end")
     let resp = []
-    if (start && end && start < end) {
-      resp.push(`${start}ms - ${end}ms`)
-    }
     if (ms && ms !== "-1") {
-      resp.push(`(${ms}ms)`)
+      resp.push(`${ms} ms`)
+    }
+    if (start && end && start < end) {
+      resp.push(`(${start} ms - ${end} ms)`)
     }
     return resp.join(" ")
   }
@@ -88,7 +88,7 @@ export function getKeys(requestID: number, block: TimeBlock) {
   return {
     "general": {
       "Request Number": `#${requestID}`,
-      "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page reqest started)",
+      "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page request started)",
       "Duration": formatTime(entry.time),
       "Error/Status Code": entry.response.status + " " + entry.response.statusText,
       "Server IPAddress": entry.serverIPAddress,
@@ -115,7 +115,7 @@ export function getKeys(requestID: number, block: TimeBlock) {
     },
     "timings": {
       "Server RTT": getExpTimeRange("server_rtt"),
-      "all (combined)": getExpTimeRange("all"),
+      "Total": getExpTimeRange("all"),
       "DNS": getExpTimeRange("dns"),
       "Connect": getExpTimeRange("connect"),
       "TLS/SSL": getExpTimeRange("ssl"),
