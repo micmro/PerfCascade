@@ -61,6 +61,10 @@ export function getKeys(requestID: number, block: TimeBlock) {
     return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || ""
   }
 
+  let getExpTimings = (name: string): string => {
+    return entry.timings[name] || ""
+  }
+
   let getExpNotNull = (name: string): string => {
     let resp = getExp(name)
     return resp !== "0" ? resp : ""
@@ -69,20 +73,6 @@ export function getKeys(requestID: number, block: TimeBlock) {
   let getExpAsByte = (name: string): string => {
     let resp = parseInt(getExp(name), 10)
     return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp)
-  }
-
-  let getExpTimeRange = (name: string): string => {
-    let ms = getExp(name + "_ms").toString()
-    let start = getExp(name + "_start")
-    let end = getExp(name + "_end")
-    let resp = []
-    if (ms && ms !== "-1") {
-      resp.push(`${ms} ms`)
-    }
-    if (start && end && start < end) {
-      resp.push(`(${start} ms - ${end} ms)`)
-    }
-    return resp.join(" ")
   }
 
   return {
@@ -114,14 +104,13 @@ export function getKeys(requestID: number, block: TimeBlock) {
       "Image Save": getExpAsByte("image_save"),
     },
     "timings": {
-      "Server RTT": getExpTimeRange("server_rtt"),
-      "Total": getExpTimeRange("all"),
-      "DNS": getExpTimeRange("dns"),
-      "Connect": getExpTimeRange("connect"),
-      "TLS/SSL": getExpTimeRange("ssl"),
-      "Load": getExpTimeRange("load"),
-      "TTFB": getExpTimeRange("ttfb"),
-      "Download": getExpTimeRange("download"),
+      "Blocked": getExpTimings("blocked"),
+      "Connect": getExpTimings("connect"),
+      "DNS": getExpTimings("dns"),
+      "Receive": getExpTimings("receive"),
+      "Send": getExpTimings("send"),
+      "SSL": getExpTimings("ssl"),
+      "Wait": getExpTimings("wait"),
     },
     "request": {
       "Method": entry.request.method,

@@ -119,13 +119,13 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .info-overlay-holder .no-colour,
 .info-overlay-holder .serverrtt,
 .info-overlay-holder .allcombined,
-.info-overlay-holder .load {border-right: solid 5px transparent; padding-right: 5px;}
-.info-overlay-holder .blocked {border-right: solid 5px #ccc; padding-right: 5px;}
-.info-overlay-holder .dns {border-right: solid 5px #1f7c83; padding-right: 5px;}
 .info-overlay-holder .connect {border-right: solid 5px #e58226; padding-right: 5px;}
-.info-overlay-holder .tlsssl {border-right: solid 5px #c141cd; padding-right: 5px;}
-.info-overlay-holder .ttfb {border-right: solid 5px #1fe11f; padding-right: 5px;}
-.info-overlay-holder .download {border-right: solid 5px #1977dd; padding-right: 5px;}
+.info-overlay-holder .blocked {border-right: solid 5px #ccc; padding-right: 5px;}
+.info-overlay-holder .ssl {border-right: solid 5px #c141cd; padding-right: 5px;}
+.info-overlay-holder .send {border-right: solid 5px #1fe110; padding-right: 5px;}
+.info-overlay-holder .wait {border-right: solid 5px #1fe11f; padding-right: 5px;}
+.info-overlay-holder .receive {border-right: solid 5px #1977dd; padding-right: 5px;}
+.info-overlay-holder .dns {border-right: solid 5px #1f7c83; padding-right: 5px;}
 
 /* Info overlay HTML - types */
 .type-css {background: #406B29;}/*a6d18f - 40%*/
@@ -182,11 +182,10 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .resource-legend li {margin: 0 1em 0 0; padding: 0; white-space: nowrap; display: inline-block;}
 .resource-legend li:before {content:''; width: 1em; height: 1em; margin: 0 0.5em 0 0; vertical-align: text-top; display: inline-block; }
 
-.resource-legend .legend-stalled:before { background: #cdcdcd;}
-.resource-legend .legend-redirect:before { background: #ffff60;}
-.resource-legend .legend-app-cache:before { background: #1f831f; }
-.resource-legend .legend-dns-lookup:before { background: #1f7c83; }
-.resource-legend .legend-tcp:before { background: #e58226; }
-.resource-legend .legend-tls:before { background: #c141cd; }
-.resource-legend .legend-ttfb:before { background: #1fe11f; }
-.resource-legend .legend-download:before { background: #1977dd; }
+.resource-legend .legend-blocked:before { background: #ccc;}
+.resource-legend .legend-dns:before { background: #1f7c83;}
+.resource-legend .legend-connect:before { background: #e58226; }
+.resource-legend .legend-ssl:before { background: #c141cd; }
+.resource-legend .legend-send:before { background: #1fe110; }
+.resource-legend .legend-wait:before { background: #c141cd; }
+.resource-legend .legend-receive:before { background: #1977dd; }
