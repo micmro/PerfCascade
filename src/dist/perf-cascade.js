@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.8 (04/12/2016) */
+/*! github.com/micmro/PerfCascade Version:0.2.9 (05/12/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -848,7 +848,7 @@ var ifValueDefined = function (value, fn) {
     return fn(value);
 };
 var formatBytes = function (size) { return ifValueDefined(size, function (s) { return (s + " byte (~" + Math.round(s / 1024 * 10) / 10 + "kb)"); }); };
-var formatTime = function (size) { return ifValueDefined(size, function (s) { return (s + "ms"); }); };
+var formatTime = function (size) { return ifValueDefined(size, function (s) { return (s + " ms"); }); };
 var formatDate = function (date) {
     if (!date) {
         return "";
@@ -900,18 +900,18 @@ function getKeys(requestID, block) {
         var start = getExp(name + "_start");
         var end = getExp(name + "_end");
         var resp = [];
-        if (start && end && start < end) {
-            resp.push(start + "ms - " + end + "ms");
-        }
         if (ms && ms !== "-1") {
-            resp.push("(" + ms + "ms)");
+            resp.push(ms + " ms");
+        }
+        if (start && end && start < end) {
+            resp.push("(" + start + " ms - " + end + " ms)");
         }
         return resp.join(" ");
     };
     return {
         "general": {
             "Request Number": "#" + requestID,
-            "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page reqest started)",
+            "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page request started)",
             "Duration": formatTime(entry.time),
             "Error/Status Code": entry.response.status + " " + entry.response.statusText,
             "Server IPAddress": entry.serverIPAddress,
@@ -938,7 +938,7 @@ function getKeys(requestID, block) {
         },
         "timings": {
             "Server RTT": getExpTimeRange("server_rtt"),
-            "all (combined)": getExpTimeRange("all"),
+            "Total": getExpTimeRange("all"),
             "DNS": getExpTimeRange("dns"),
             "Connect": getExpTimeRange("connect"),
             "TLS/SSL": getExpTimeRange("ssl"),
@@ -1233,7 +1233,7 @@ function createHolder(y, accordeonHeight) {
     return innerHolder;
 }
 function createRowInfoOverlay(indexBackup, barX, y, accordeonHeight, block, onClose, unit) {
-    var requestID = parseInt(block.rawResource._index, 10) || indexBackup;
+    var requestID = parseInt(block.rawResource._index + 1, 10) || indexBackup + 1;
     var wrapper = svg.newG("outer-info-overlay-holder", {
         "width": "100%"
     });
