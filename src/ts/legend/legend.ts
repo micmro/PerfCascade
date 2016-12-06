@@ -6,13 +6,12 @@ export function makeLegend(): HTMLUListElement {
   ulNode.className = "resource-legend"
 
   ulNode.innerHTML = `
-        <li class="legend-stalled">Stalled/Blocking</li>
-        <li class="legend-redirect">Redirect</li>
-        <li class="legend-app-cache">App Cache</li>
-        <li class="legend-dns-lookup">DNS Lookup</li>
-        <li class="legend-tcp">Initial Connection (TCP)</li>
-        <li class="legend-tls">TLS/SSL Negotiation</li>
-        <li class="legend-ttfb">Time to First Byte</li>
-        <li class="legend-download">Content Download</li>`
+        <li class="legend-blocked">Blocked</li>
+        <li class="legend-dns">DNS</li>
+        <li class="legend-ssl">SSL (TLS)</li>
+        <li class="legend-connect">Connect</li>
+        <li class="legend-send">Send</li>
+        <li class="legend-wait">Wait</li>
+        <li class="legend-receive">Receive</li>`
   return ulNode
 }
