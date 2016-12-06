@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.9 (05/12/2016) */
+/*! github.com/micmro/PerfCascade Version:0.2.10 (06/12/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -447,7 +447,7 @@ exports.removeClass = removeClass;
 function makeLegend() {
     var ulNode = document.createElement("ul");
     ulNode.className = "resource-legend";
-    ulNode.innerHTML = "\n        <li class=\"legend-stalled\">Stalled/Blocking</li>\n        <li class=\"legend-redirect\">Redirect</li>\n        <li class=\"legend-app-cache\">App Cache</li>\n        <li class=\"legend-dns-lookup\">DNS Lookup</li>\n        <li class=\"legend-tcp\">Initial Connection (TCP)</li>\n        <li class=\"legend-tls\">TLS/SSL Negotiation</li>\n        <li class=\"legend-ttfb\">Time to First Byte</li>\n        <li class=\"legend-download\">Content Download</li>";
+    ulNode.innerHTML = "\n        <li class=\"legend-blocked\" title=\"Time spent in a queue waiting for a network connection.\">Blocked</li>\n        <li class=\"legend-dns\" title=\"DNS resolution time.\">DNS</li>\n        <li class=\"legend-connect\" title=\"Time required to create TCP connection.\">Connect</li>\n        <li class=\"legend-ssl\" title=\"Time required for SSL/TLS negotiation.\">SSL (TLS)</li>\n        <li class=\"legend-send\" title=\"Time required to send HTTP request to the server.\">Send</li>\n        <li class=\"legend-wait\" title=\"Waiting for a response from the server.\">Wait</li>\n        <li class=\"legend-receive\" title=\"Time required to read entire response from the server (or cache).\">Receive</li>";
     return ulNode;
 }
 exports.makeLegend = makeLegend;
@@ -674,7 +674,6 @@ var HarTransformer = (function () {
         if (pageIndex === void 0) { pageIndex = 0; }
         //make sure it's the *.log base node
         var data = (harData["log"] !== undefined ? harData["log"] : harData);
-        //only support one page (first) for now
         var currentPageIndex = pageIndex;
         var currPage = data.pages[currentPageIndex];
         var pageStartTime = new Date(currPage.startedDateTime).getTime();
@@ -887,6 +886,12 @@ function getKeys(requestID, block) {
     var getExp = function (name) {
         return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || "";
     };
+    var getExpTimings = function (name) {
+        if (entry.timings[name] && entry.timings[name] > 0) {
+            return entry.timings[name] + " ms";
+        }
+        return "";
+    };
     var getExpNotNull = function (name) {
         var resp = getExp(name);
         return resp !== "0" ? resp : "";
@@ -894,19 +899,6 @@ function getKeys(requestID, block) {
     var getExpAsByte = function (name) {
         var resp = parseInt(getExp(name), 10);
         return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
-    };
-    var getExpTimeRange = function (name) {
-        var ms = getExp(name + "_ms").toString();
-        var start = getExp(name + "_start");
-        var end = getExp(name + "_end");
-        var resp = [];
-        if (ms && ms !== "-1") {
-            resp.push(ms + " ms");
-        }
-        if (start && end && start < end) {
-            resp.push("(" + start + " ms - " + end + " ms)");
-        }
-        return resp.join(" ");
     };
     return {
         "general": {
@@ -937,14 +929,13 @@ function getKeys(requestID, block) {
             "Image Save": getExpAsByte("image_save"),
         },
         "timings": {
-            "Server RTT": getExpTimeRange("server_rtt"),
-            "Total": getExpTimeRange("all"),
-            "DNS": getExpTimeRange("dns"),
-            "Connect": getExpTimeRange("connect"),
-            "TLS/SSL": getExpTimeRange("ssl"),
-            "Load": getExpTimeRange("load"),
-            "TTFB": getExpTimeRange("ttfb"),
-            "Download": getExpTimeRange("download"),
+            "Blocked": getExpTimings("blocked"),
+            "Connect": getExpTimings("connect"),
+            "DNS": getExpTimings("dns"),
+            "Receive": getExpTimings("receive"),
+            "Send": getExpTimings("send"),
+            "SSL": getExpTimings("ssl"),
+            "Wait": getExpTimings("wait"),
         },
         "request": {
             "Method": entry.request.method,
@@ -1384,13 +1375,14 @@ function createTimingLable(rectData, timeTotal, firstX) {
     var minWidth = 500; // minimum supported diagram width that should show the timing lable uncropped
     var spacingPerc = (5 / minWidth * 100);
     var y = rectData.y + rectData.height / 1.5;
+    var totalLabel = Math.round(timeTotal) + " ms";
     var percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc;
-    var txtEl = svg.newTextEl(timeTotal + "ms", y, misc.roundNumber(percStart, 2) + "%");
+    var txtEl = svg.newTextEl(totalLabel, y, misc.roundNumber(percStart, 2) + "%");
     //(pessimistic) estimation of text with to avoid performance penalty of `getBBox`
-    var roughTxtWidth = (timeTotal + "ms").length * 8;
+    var roughTxtWidth = totalLabel.length * 8;
     if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
         percStart = firstX / rectData.unit - spacingPerc;
-        txtEl = svg.newTextEl(timeTotal + "ms", y, misc.roundNumber(percStart, 2) + "%", { "textAnchor": "end" });
+        txtEl = svg.newTextEl(totalLabel, y, misc.roundNumber(percStart, 2) + "%", { "textAnchor": "end" });
     }
     return txtEl;
 }
