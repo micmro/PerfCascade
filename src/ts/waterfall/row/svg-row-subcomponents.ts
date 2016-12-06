@@ -67,16 +67,17 @@ function createTimingLable(rectData: RectData, timeTotal: number, firstX: number
   const minWidth = 500 // minimum supported diagram width that should show the timing lable uncropped
   const spacingPerc = (5 / minWidth * 100)
   const y = rectData.y + rectData.height / 1.5
+  const totalLabel = `${Math.round(timeTotal)} ms`
 
   let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc
-  let txtEl = svg.newTextEl(`${timeTotal}ms`, y, `${misc.roundNumber(percStart, 2)}%`)
+  let txtEl = svg.newTextEl(totalLabel, y, `${misc.roundNumber(percStart, 2)}%`)
 
   //(pessimistic) estimation of text with to avoid performance penalty of `getBBox`
-  let roughTxtWidth = `${timeTotal}ms`.length * 8
+  let roughTxtWidth = totalLabel.length * 8
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
     percStart = firstX / rectData.unit - spacingPerc
-    txtEl = svg.newTextEl(`${timeTotal}ms`, y, `${misc.roundNumber(percStart, 2)}%`, { "textAnchor": "end" })
+    txtEl = svg.newTextEl(totalLabel, y, `${misc.roundNumber(percStart, 2)}%`, { "textAnchor": "end" })
   }
 
   return txtEl
