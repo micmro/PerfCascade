@@ -57,7 +57,7 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 
 .lables { overflow: hidden;}
 
-/*block colours*/
+/*block colours for MIME types*/
 .block-css {fill: #a6d18f;}
 .block-iframe,
 .block-html,
@@ -77,35 +77,15 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .block-plain,
 .block-other {fill: #b3b3b3;}
 
-.block-total {fill: #ccc;}
-.block-unload {fill: #909;}
-.block-redirect {fill: #ffff60;}
-.block-appcache {fill: #1ec659;}
-.block-wait {fill: #1ec659;}
-.block-dns {fill: #159588;}
-.block-tcp {fill: #fd9727;}
-.block-ttfb {fill: #1fe11f;}
-.block-response {fill: #1eaaf1;}
-.block-dom {fill: #9cc;}
-.block-dom-content-loaded {fill: #d888df;}
-.block-onload {fill: #c0c0ff;}
-
-.block-ssl {fill: #c141cd; }
-.block-ms-first-paint-event {fill: #8fbc83; }
-.block-dom-interactive-event {fill: #d888df; }
-.block-network-server {fill: #8cd18c; }
-.block-custom-measure {fill: #f00; }
-
-.block-navigation-api-total {fill: #ccc;}
-.block-blocking,
+/*block colours for Timing*/
 .block-blocked {fill: #aaa;}
-.block-undefined {fill: #0f0;}
 .block-dns {fill: #159588;}
 .block-connect {fill: #fd9727;}
 .block-ssl {fill:#c141cd;}
 .block-send {fill: #b0bec5;}
 .block-wait {fill: #1ec659;}
 .block-receive {fill: #1eaaf1;}
+.block-undefined {fill: #0f0;}
 
 /* Info overlay SVG - wrapper */
 .info-overlay {fill: #fff; stroke: #cdcdcd; }
