@@ -41,8 +41,6 @@ export default class HarTransformer {
     //make sure it's the *.log base node
     let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
 
-
-    //only support one page (first) for now
     const currentPageIndex = pageIndex
     const currPage = data.pages[currentPageIndex]
     const pageStartTime = new Date(currPage.startedDateTime).getTime()
@@ -98,7 +96,7 @@ export default class HarTransformer {
    */
   public static buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<TimeBlock> {
     let t = entry.timings
-    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<TimeBlock>, key) => {
+    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<TimeBlock>, key: string) => {
 
       const time = this.getTimePair(key, entry, collect, startRelative)
 
@@ -118,7 +116,6 @@ export default class HarTransformer {
       }
 
       return collect.concat([new TimeBlock(key, time.start, time.end, "block-" + key)])
-
     }, [])
   }
 

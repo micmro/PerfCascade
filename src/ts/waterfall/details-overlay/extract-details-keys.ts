@@ -1,5 +1,5 @@
 import TimeBlock from "../../typing/time-block"
-import {Entry} from "../../typing/har.d" //TODO: Delete - temp only - need to greate source agnostic data structure
+import { Entry } from "../../typing/har.d"
 
 
 
@@ -62,7 +62,10 @@ export function getKeys(requestID: number, block: TimeBlock) {
   }
 
   let getExpTimings = (name: string): string => {
-    return entry.timings[name] || ""
+    if (entry.timings[name] && entry.timings[name] > 0) {
+      return entry.timings[name] + " ms"
+    }
+    return ""
   }
 
   let getExpNotNull = (name: string): string => {
