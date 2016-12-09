@@ -87,6 +87,7 @@ export function getKeys(requestID: number, block: TimeBlock) {
       "Server IPAddress": entry.serverIPAddress,
       "Connection": entry.connection,
       "Browser Priority": getExp("priority") || getExp("initialPriority"),
+      "Was pushed": getExp("was_pushed"),
       "Initiator (Loaded by)": getExp("initiator"),
       "Initiator Line": getExp("initiator_line"),
       "Host": getRequestHeader("Host"),
