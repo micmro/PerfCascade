@@ -1,7 +1,8 @@
 import TimeBlock from "../../typing/time-block"
-import {getKeys} from "./extract-details-keys"
+import { KvTuple } from "../../typing/misc.d"
+import { getKeys } from "./extract-details-keys"
 
-function makeDefinitionList(dlKeyValues: Object, addClass: boolean = false) {
+function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
   let makeClass = (key: string) => {
     if (!addClass) {
       return ""
@@ -9,11 +10,11 @@ function makeDefinitionList(dlKeyValues: Object, addClass: boolean = false) {
     let className = key.toLowerCase().replace(/[^a-z-]/g, "")
     return `class="${className || "no-colour"}"`
   }
-  return Object.keys(dlKeyValues)
-    .filter(key => (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""))
-    .map(key => `
-      <dt ${makeClass(key)}>${key}</dt>
-      <dd>${dlKeyValues[key]}</dd>
+  return dlKeyValues
+    .filter(tuple => (tuple[1] !== undefined && tuple[1] !== -1 && tuple[1] !== 0 && tuple[1] !== ""))
+    .map(tuple => `
+      <dt ${makeClass(tuple[0])}>${tuple[0]}</dt>
+      <dd>${tuple[1]}</dd>
     `).join("")
 }
 
@@ -50,15 +51,10 @@ export function createDetailsBody(requestID: number, block: TimeBlock, accordeon
   const generalTab = makeTab(makeDefinitionList(tabsData.general))
   const timingsTab = makeTab(makeDefinitionList(tabsData.timings, true))
   const requestDl = makeDefinitionList(tabsData.request)
-  const requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce((pre, curr) => {
-    pre[curr.name] = curr.value
-    return pre
-  }, {}))
+
+  const requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.map(h => [h.name, h.value] as KvTuple))
   const responseDl = makeDefinitionList(tabsData.response)
-  const responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.reduce((pre, curr) => {
-    pre[curr.name] = curr.value
-    return pre
-  }, {}))
+  const responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.map(h => [h.name, h.value] as KvTuple))
   const imgTab = makeImgTab(accordeonHeight, block)
 
   body.innerHTML = `
