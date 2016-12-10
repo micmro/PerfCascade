@@ -57,23 +57,25 @@ export function getKeys(requestID: number, block: TimeBlock) {
     return respContentType
   }
 
-  /** get experimental feature */
+  /** get experimental feature (usually WebPageTest) */
   let getExp = (name: string): string => {
     return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || ""
   }
 
-  let getExpTimings = (name: string): string => {
+  let getHarTiming = (name: string): string => {
     if (entry.timings[name] && entry.timings[name] > 0) {
       return entry.timings[name] + " ms"
     }
     return ""
   }
 
+  /** get experimental feature and ensure it's not a sting of `0` or `` */
   let getExpNotNull = (name: string): string => {
     let resp = getExp(name)
     return resp !== "0" ? resp : ""
   }
 
+  /** get experimental feature and format it as byte */
   let getExpAsByte = (name: string): string => {
     let resp = parseInt(getExp(name), 10)
     return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp)
@@ -109,13 +111,14 @@ export function getKeys(requestID: number, block: TimeBlock) {
       ["Image Save", getExpAsByte("image_save")],
     ] as KvTuple[],
     "timings": [
-      ["Blocked", getExpTimings("blocked")],
-      ["DNS", getExpTimings("dns")],
-      ["Connect", getExpTimings("connect")],
-      ["SSL (TLS)", getExpTimings("ssl")],
-      ["Send", getExpTimings("send")],
-      ["Wait", getExpTimings("wait")],
-      ["Receive", getExpTimings("receive")],
+      ["Total", `${block.total} ms`],
+      ["Blocked", getHarTiming("blocked")],
+      ["DNS", getHarTiming("dns")],
+      ["Connect", getHarTiming("connect")],
+      ["SSL (TLS)", getHarTiming("ssl")],
+      ["Send", getHarTiming("send")],
+      ["Wait", getHarTiming("wait")],
+      ["Receive", getHarTiming("receive")],
     ] as KvTuple[],
     "request": [
       ["Method", entry.request.method],
