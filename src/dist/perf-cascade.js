@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.10 (06/12/2016) */
+/*! github.com/micmro/PerfCascade Version:0.2.11 (10/12/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -512,10 +512,8 @@ function fromPerfCascadeFormat(waterfallDocsData, options) {
 exports.fromPerfCascadeFormat = fromPerfCascadeFormat;
 var transformHarToPerfCascade = har_1.default.transformDoc;
 exports.transformHarToPerfCascade = transformHarToPerfCascade;
-//global members that get exported via UMD
 var paging_1 = require("./paging/paging");
 exports.changePage = paging_1.setSelectedPageIndex;
-//export typings
 
 },{"./helpers/misc":4,"./legend/legend":6,"./paging/paging":8,"./state/global-state":9,"./state/waterfall-docs-service":10,"./transformers/har":11,"./waterfall/svg-chart":25}],8:[function(require,module,exports){
 "use strict";
@@ -754,8 +752,8 @@ var HarTransformer = (function () {
                 break;
             default: wptKey = key;
         }
-        var preciseStart = parseInt(entry[("_" + wptKey + "_start")], 10);
-        var preciseEnd = parseInt(entry[("_" + wptKey + "_end")], 10);
+        var preciseStart = parseInt(entry["_" + wptKey + "_start"], 10);
+        var preciseEnd = parseInt(entry["_" + wptKey + "_end"], 10);
         var start = isNaN(preciseStart) ? ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart;
         var end = isNaN(preciseEnd) ? (start + entry.timings[key]) : preciseEnd;
         return {
@@ -846,8 +844,8 @@ var ifValueDefined = function (value, fn) {
     }
     return fn(value);
 };
-var formatBytes = function (size) { return ifValueDefined(size, function (s) { return (s + " byte (~" + Math.round(s / 1024 * 10) / 10 + "kb)"); }); };
-var formatTime = function (size) { return ifValueDefined(size, function (s) { return (s + " ms"); }); };
+var formatBytes = function (size) { return ifValueDefined(size, function (s) { return s + " byte (~" + Math.round(s / 1024 * 10) / 10 + "kb)"; }); };
+var formatTime = function (size) { return ifValueDefined(size, function (s) { return s + " ms"; }); };
 var formatDate = function (date) {
     if (!date) {
         return "";
@@ -882,113 +880,117 @@ function getKeys(requestID, block) {
         }
         return respContentType;
     };
-    /** get experimental feature */
+    /** get experimental feature (usually WebPageTest) */
     var getExp = function (name) {
         return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || "";
     };
-    var getExpTimings = function (name) {
+    var getHarTiming = function (name) {
         if (entry.timings[name] && entry.timings[name] > 0) {
             return entry.timings[name] + " ms";
         }
         return "";
     };
+    /** get experimental feature and ensure it's not a sting of `0` or `` */
     var getExpNotNull = function (name) {
         var resp = getExp(name);
         return resp !== "0" ? resp : "";
     };
+    /** get experimental feature and format it as byte */
     var getExpAsByte = function (name) {
         var resp = parseInt(getExp(name), 10);
         return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
     };
     return {
-        "general": {
-            "Request Number": "#" + requestID,
-            "Started": new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page request started)",
-            "Duration": formatTime(entry.time),
-            "Error/Status Code": entry.response.status + " " + entry.response.statusText,
-            "Server IPAddress": entry.serverIPAddress,
-            "Connection": entry.connection,
-            "Browser Priority": getExp("priority") || getExp("initialPriority"),
-            "Initiator (Loaded by)": getExp("initiator"),
-            "Initiator Line": getExp("initiator_line"),
-            "Host": getRequestHeader("Host"),
-            "IP": getExp("ip_addr"),
-            "Client Port": getExpNotNull("client_port"),
-            "Expires": getExp("expires"),
-            "Cache Time": getExp("cache_time"),
-            "CDN Provider": getExp("cdn_provider"),
-            "ObjectSize": getExp("objectSize"),
-            "Bytes In (downloaded)": getExpAsByte("bytesIn"),
-            "Bytes Out (uploaded)": getExpAsByte("bytesOut"),
-            "JPEG Scan Count": getExpNotNull("jpeg_scan_count"),
-            "Gzip Total": getExpAsByte("gzip_total"),
-            "Gzip Save": getExpAsByte("gzip_safe"),
-            "Minify Total": getExpAsByte("minify_total"),
-            "Minify Save": getExpAsByte("minify_save"),
-            "Image Total": getExpAsByte("image_total"),
-            "Image Save": getExpAsByte("image_save"),
-        },
-        "timings": {
-            "Blocked": getExpTimings("blocked"),
-            "Connect": getExpTimings("connect"),
-            "DNS": getExpTimings("dns"),
-            "Receive": getExpTimings("receive"),
-            "Send": getExpTimings("send"),
-            "SSL": getExpTimings("ssl"),
-            "Wait": getExpTimings("wait"),
-        },
-        "request": {
-            "Method": entry.request.method,
-            "HTTP Version": entry.request.httpVersion,
-            "Bytes Out (uploaded)": getExpAsByte("bytesOut"),
-            "Headers Size": formatBytes(entry.request.headersSize),
-            "Body Size": formatBytes(entry.request.bodySize),
-            "Comment": entry.request.comment,
-            "User-Agent": getRequestHeader("User-Agent"),
-            "Host": getRequestHeader("Host"),
-            "Connection": getRequestHeader("Connection"),
-            "Accept": getRequestHeader("Accept"),
-            "Accept-Encoding": getRequestHeader("Accept-Encoding"),
-            "Expect": getRequestHeader("Expect"),
-            "Forwarded": getRequestHeader("Forwarded"),
-            "If-Modified-Since": getRequestHeader("If-Modified-Since"),
-            "If-Range": getRequestHeader("If-Range"),
-            "If-Unmodified-Since": getRequestHeader("If-Unmodified-Since"),
-            "Querystring parameters count": entry.request.queryString.length,
-            "Cookies count": entry.request.cookies.length
-        },
-        "response": {
-            "Status": entry.response.status + " " + entry.response.statusText,
-            "HTTP Version": entry.response.httpVersion,
-            "Bytes In (downloaded)": getExpAsByte("bytesIn"),
-            "Header Size": formatBytes(entry.response.headersSize),
-            "Body Size": formatBytes(entry.response.bodySize),
-            "Content-Type": getContentType(),
-            "Cache-Control": getResponseHeader("Cache-Control"),
-            "Content-Encoding": getResponseHeader("Content-Encoding"),
-            "Expires": formatDate(getResponseHeader("Expires")),
-            "Last-Modified": formatDate(getResponseHeader("Last-Modified")),
-            "Pragma": getResponseHeader("Pragma"),
-            "Content-Length": asIntPartial(getResponseHeader("Content-Length"), formatBytes),
-            "Content Size": getResponseHeader("Content-Length") !== entry.response.content.size.toString() ?
-                formatBytes(entry.response.content.size) : "",
-            "Content Compression": formatBytes(entry.response.content.compression),
-            "Connection": getResponseHeader("Connection"),
-            "ETag": getResponseHeader("ETag"),
-            "Accept-Patch": getResponseHeader("Accept-Patch"),
-            "Age": getResponseHeader("Age"),
-            "Allow": getResponseHeader("Allow"),
-            "Content-Disposition": getResponseHeader("Content-Disposition"),
-            "Location": getResponseHeader("Location"),
-            "Strict-Transport-Security": getResponseHeader("Strict-Transport-Security"),
-            "Trailer (for chunked transfer coding)": getResponseHeader("Trailer"),
-            "Transfer-Encoding": getResponseHeader("Transfer-Encoding"),
-            "Upgrade": getResponseHeader("Upgrade"),
-            "Vary": getResponseHeader("Vary"),
-            "Timing-Allow-Origin": getResponseHeader("Timing-Allow-Origin"),
-            "Redirect URL": entry.response.redirectURL,
-            "Comment": entry.response.comment
-        }
+        "general": [
+            ["Request Number", "#" + requestID],
+            ["Started", new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page request started)"],
+            ["Duration", formatTime(entry.time)],
+            ["Error/Status Code", entry.response.status + " " + entry.response.statusText],
+            ["Server IPAddress", entry.serverIPAddress],
+            ["Connection", entry.connection],
+            ["Browser Priority", getExp("priority") || getExp("initialPriority")],
+            ["Was pushed", getExp("was_pushed")],
+            ["Initiator (Loaded by)", getExp("initiator")],
+            ["Initiator Line", getExp("initiator_line")],
+            ["Host", getRequestHeader("Host")],
+            ["IP", getExp("ip_addr")],
+            ["Client Port", getExpNotNull("client_port")],
+            ["Expires", getExp("expires")],
+            ["Cache Time", getExp("cache_time")],
+            ["CDN Provider", getExp("cdn_provider")],
+            ["ObjectSize", getExp("objectSize")],
+            ["Bytes In (downloaded)", getExpAsByte("bytesIn")],
+            ["Bytes Out (uploaded)", getExpAsByte("bytesOut")],
+            ["JPEG Scan Count", getExpNotNull("jpeg_scan_count")],
+            ["Gzip Total", getExpAsByte("gzip_total")],
+            ["Gzip Save", getExpAsByte("gzip_safe")],
+            ["Minify Total", getExpAsByte("minify_total")],
+            ["Minify Save", getExpAsByte("minify_save")],
+            ["Image Total", getExpAsByte("image_total")],
+            ["Image Save", getExpAsByte("image_save")],
+        ],
+        "timings": [
+            ["Total", block.total + " ms"],
+            ["Blocked", getHarTiming("blocked")],
+            ["DNS", getHarTiming("dns")],
+            ["Connect", getHarTiming("connect")],
+            ["SSL (TLS)", getHarTiming("ssl")],
+            ["Send", getHarTiming("send")],
+            ["Wait", getHarTiming("wait")],
+            ["Receive", getHarTiming("receive")],
+        ],
+        "request": [
+            ["Method", entry.request.method],
+            ["HTTP Version", entry.request.httpVersion],
+            ["Bytes Out (uploaded)", getExpAsByte("bytesOut")],
+            ["Headers Size", formatBytes(entry.request.headersSize)],
+            ["Body Size", formatBytes(entry.request.bodySize)],
+            ["Comment", entry.request.comment],
+            ["User-Agent", getRequestHeader("User-Agent")],
+            ["Host", getRequestHeader("Host")],
+            ["Connection", getRequestHeader("Connection")],
+            ["Accept", getRequestHeader("Accept")],
+            ["Accept-Encoding", getRequestHeader("Accept-Encoding")],
+            ["Expect", getRequestHeader("Expect")],
+            ["Forwarded", getRequestHeader("Forwarded")],
+            ["If-Modified-Since", getRequestHeader("If-Modified-Since")],
+            ["If-Range", getRequestHeader("If-Range")],
+            ["If-Unmodified-Since", getRequestHeader("If-Unmodified-Since")],
+            ["Querystring parameters count", entry.request.queryString.length],
+            ["Cookies count", entry.request.cookies.length],
+        ],
+        "response": [
+            ["Status", entry.response.status + " " + entry.response.statusText],
+            ["HTTP Version", entry.response.httpVersion],
+            ["Bytes In (downloaded)", getExpAsByte("bytesIn")],
+            ["Header Size", formatBytes(entry.response.headersSize)],
+            ["Body Size", formatBytes(entry.response.bodySize)],
+            ["Content-Type", getContentType()],
+            ["Cache-Control", getResponseHeader("Cache-Control")],
+            ["Content-Encoding", getResponseHeader("Content-Encoding")],
+            ["Expires", formatDate(getResponseHeader("Expires"))],
+            ["Last-Modified", formatDate(getResponseHeader("Last-Modified"))],
+            ["Pragma", getResponseHeader("Pragma")],
+            ["Content-Length", asIntPartial(getResponseHeader("Content-Length"), formatBytes)],
+            ["Content Size", (getResponseHeader("Content-Length") !== entry.response.content.size.toString() ?
+                    formatBytes(entry.response.content.size) : "")],
+            ["Content Compression", formatBytes(entry.response.content.compression)],
+            ["Connection", getResponseHeader("Connection")],
+            ["ETag", getResponseHeader("ETag")],
+            ["Accept-Patch", getResponseHeader("Accept-Patch")],
+            ["Age", getResponseHeader("Age")],
+            ["Allow", getResponseHeader("Allow")],
+            ["Content-Disposition", getResponseHeader("Content-Disposition")],
+            ["Location", getResponseHeader("Location")],
+            ["Strict-Transport-Security", getResponseHeader("Strict-Transport-Security")],
+            ["Trailer (for chunked transfer coding)", getResponseHeader("Trailer")],
+            ["Transfer-Encoding", getResponseHeader("Transfer-Encoding")],
+            ["Upgrade", getResponseHeader("Upgrade")],
+            ["Vary", getResponseHeader("Vary")],
+            ["Timing-Allow-Origin", getResponseHeader("Timing-Allow-Origin")],
+            ["Redirect URL", entry.response.redirectURL],
+            ["Comment", entry.response.comment],
+        ]
     };
 }
 exports.getKeys = getKeys;
@@ -1005,9 +1007,9 @@ function makeDefinitionList(dlKeyValues, addClass) {
         var className = key.toLowerCase().replace(/[^a-z-]/g, "");
         return "class=\"" + (className || "no-colour") + "\"";
     };
-    return Object.keys(dlKeyValues)
-        .filter(function (key) { return (dlKeyValues[key] !== undefined && dlKeyValues[key] !== -1 && dlKeyValues[key] !== 0 && dlKeyValues[key] !== ""); })
-        .map(function (key) { return ("\n      <dt " + makeClass(key) + ">" + key + "</dt>\n      <dd>" + dlKeyValues[key] + "</dd>\n    "); }).join("");
+    return dlKeyValues
+        .filter(function (tuple) { return (tuple[1] !== undefined && tuple[1] !== -1 && tuple[1] !== 0 && tuple[1] !== ""); })
+        .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + tuple[0] + "</dt>\n      <dd>" + tuple[1] + "</dd>\n    "; }).join("");
 }
 function makeTab(innerHtml, renderDl) {
     if (renderDl === void 0) { renderDl = true; }
@@ -1036,15 +1038,9 @@ function createDetailsBody(requestID, block, accordeonHeight) {
     var generalTab = makeTab(makeDefinitionList(tabsData.general));
     var timingsTab = makeTab(makeDefinitionList(tabsData.timings, true));
     var requestDl = makeDefinitionList(tabsData.request);
-    var requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.reduce(function (pre, curr) {
-        pre[curr.name] = curr.value;
-        return pre;
-    }, {}));
+    var requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.map(function (h) { return [h.name, h.value]; }));
     var responseDl = makeDefinitionList(tabsData.response);
-    var responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.reduce(function (pre, curr) {
-        pre[curr.name] = curr.value;
-        return pre;
-    }, {}));
+    var responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.map(function (h) { return [h.name, h.value]; }));
     var imgTab = makeImgTab(accordeonHeight, block);
     body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + block.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> " + block.name + "</h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n          " + makeTabBtn("Preview", imgTab) + "\n        </ul>\n        </nav>\n      </header>\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <code>\n          <pre>" + JSON.stringify(block.rawResource, null, 2) + "</pre>\n        </code>\n      </div>\n      " + imgTab + "\n    </div>\n    ";
     html.appendChild(body);
@@ -1577,9 +1573,9 @@ function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetai
     });
     var flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
         "x": leftColumnWith + "%",
-        "width": (100 - leftColumnWith) + "%"
+        "width": 100 - leftColumnWith + "%"
     });
-    var requestNumber = (index + 1) + ". ";
+    var requestNumber = index + 1 + ". ";
     var rect = rowSubComponents.createRect(rectData, block.segments, block.total);
     var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, requestNumber + misc.ressourceUrlFormater(block.name, 40), rowHeight, "clipPath");
     var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, requestNumber + block.name, rowHeight);
@@ -1894,7 +1890,7 @@ function createWaterfallSvg(data) {
     /** Holder for scale, event and marks */
     var scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
         "x": options.leftColumnWith + "%",
-        "width": (100 - options.leftColumnWith) + "%"
+        "width": 100 - options.leftColumnWith + "%"
     });
     /** Holds all rows */
     var rowHolder = svg.newG("rows-holder");
