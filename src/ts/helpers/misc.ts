@@ -35,7 +35,7 @@ export function contains<T>(arr: Array<T>, item: T): boolean {
  */
 export function ressourceUrlFormater(url: string, maxLength: number): string {
   if (url.length < maxLength) {
-    return url.replace(/http[s]\:\/\//, "")
+    return url.replace(/https?:\/\//, "")
   }
 
   let matches = parseUrl(url)
