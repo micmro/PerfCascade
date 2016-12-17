@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.12 (17/12/2016) */
+/*! github.com/micmro/PerfCascade Version:0.2.13 (18/12/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -466,6 +466,7 @@ var misc = require("./helpers/misc");
 var defaultOptions = {
     rowHeight: 23,
     showAlignmentHelpers: true,
+    showMimeType: true,
     showIndicatorIcons: true,
     leftColumnWith: 25
 };
@@ -1262,52 +1263,57 @@ exports.createRowInfoOverlay = createRowInfoOverlay;
  */
 "use strict";
 var heuristics = require("../../helpers/heuristics");
+// helper to avoid typing out all key of the helper object
+function makeIcon(type, title) {
+    return { "type": type, "title": title, "width": 20 };
+}
+/**
+ * Scan the request for errors or portential issues and highlight them
+ * @param  {TimeBlock} block
+ * @returns {Icon}
+ */
+function getMimeTypeIcon(block) {
+    return makeIcon(block.requestType, block.requestType);
+}
+exports.getMimeTypeIcon = getMimeTypeIcon;
 /**
  * Scan the request for errors or portential issues and highlight them
  * @param  {TimeBlock} block
  * @param  {boolean} docIsSsl
- * @returns IconMetadata
+ * @returns {Icon[]}
  */
-function getIndicators(block, docIsSsl) {
-    var iconWidth = 20;
+function getIndicatorIcons(block, docIsSsl) {
     var entry = block.rawResource;
     var output = [];
-    var xPos = 3;
-    // helper to avoid typing out all key of the helper object
-    var makeIcon = function (type, title) {
-        output.push({ "type": type, "x": xPos, "title": title });
-        xPos += iconWidth;
-    };
-    makeIcon(block.requestType, block.requestType);
     //highlight redirects
     if (!!entry.response.redirectURL) {
         var url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
-        makeIcon("err3xx", entry.response.status + " response status: Redirect to " + url + "...");
+        output.push(makeIcon("err3xx", entry.response.status + " response status: Redirect to " + url + "..."));
     }
     if (!docIsSsl && heuristics.isSecure(block)) {
-        makeIcon("lock", "Secure Connection");
+        output.push(makeIcon("lock", "Secure Connection"));
     }
     else if (docIsSsl && !heuristics.isSecure(block)) {
-        makeIcon("noTls", "Insecure Connection");
+        output.push(makeIcon("noTls", "Insecure Connection"));
     }
     if (heuristics.hasCacheIssue(block)) {
-        makeIcon("noCache", "Response not cached");
+        output.push(makeIcon("noCache", "Response not cached"));
     }
     if (heuristics.hasCompressionIssue(block)) {
-        makeIcon("noGzip", "no gzip");
+        output.push(makeIcon("noGzip", "no gzip"));
     }
     if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
-        makeIcon("err4xx", entry.response.status + " response status: " + entry.response.statusText);
+        output.push(makeIcon("err4xx", entry.response.status + " response status: " + entry.response.statusText));
     }
     if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
-        makeIcon("err5xx", entry.response.status + " response status: " + entry.response.statusText);
+        output.push(makeIcon("err5xx", entry.response.status + " response status: " + entry.response.statusText));
     }
     if (!entry.response.content.mimeType && heuristics.isInStatusCodeRange(entry, 200, 299)) {
-        makeIcon("warning", "No MIME Type defined");
+        output.push(makeIcon("warning", "No MIME Type defined"));
     }
     return output;
 }
-exports.getIndicators = getIndicators;
+exports.getIndicatorIcons = getIndicatorIcons;
 
 },{"../../helpers/heuristics":2}],20:[function(require,module,exports){
 /**
@@ -1584,10 +1590,17 @@ function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetai
     var bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
     //create and attach request block
     rowBar.appendChild(rect);
+    var x = 3;
+    if (options.showMimeType) {
+        var icon = indicators.getMimeTypeIcon(block);
+        rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
+        x += icon.width;
+    }
     if (options.showIndicatorIcons) {
         //Create and add warnings for potential issues
-        indicators.getIndicators(block, docIsSsl).forEach(function (value) {
-            rowName.appendChild(icons[value.type](value.x, y + 3, value.title));
+        indicators.getIndicatorIcons(block, docIsSsl).forEach(function (icon) {
+            rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
+            x += icon.width;
         });
     }
     rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel);
@@ -1910,18 +1923,15 @@ function createWaterfallSvg(data) {
     data.lines.forEach(function (block, i) {
         timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight));
     });
-    var labelXPos;
-    //calculate x position for label based on number of icons
-    if (options.showIndicatorIcons) {
-        labelXPos = barsToShow.reduce(function (prev, curr) {
-            var i = indicators.getIndicators(curr, docIsSsl);
-            var lastIndicator = i[i.length - 1];
-            var x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0);
-            return Math.max(prev, x);
-        }, 5);
+    var labelXPos = 5;
+    // This assumes all icons (mime and indicators) have the same width
+    var iconWidth = indicators.getMimeTypeIcon(barsToShow[0]).width;
+    if (options.showMimeType) {
+        labelXPos += iconWidth;
     }
-    else {
-        labelXPos = 5;
+    if (options.showIndicatorIcons) {
+        var iconsPerBlock = barsToShow.map(function (block) { return indicators.getIndicatorIcons(block, docIsSsl).length; });
+        labelXPos += iconWidth * Math.max.apply(null, iconsPerBlock);
     }
     var barEls = [];
     function getChartHeight() {
