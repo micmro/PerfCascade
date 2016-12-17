@@ -85,17 +85,18 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight))
   })
 
-  let labelXPos;
-  //calculate x position for label based on number of icons
+  let labelXPos = 5;
+
+  // This assumes all icons (mime and indicators) have the same width
+  const iconWidth = indicators.getMimeTypeIcon(barsToShow[0]).width
+
+  if (options.showMimeType) {
+    labelXPos += iconWidth
+  }
+
   if (options.showIndicatorIcons) {
-    labelXPos = barsToShow.reduce((prev: number, curr: TimeBlock) => {
-      const i = indicators.getIndicators(curr, docIsSsl)
-      const lastIndicator = i[i.length - 1]
-      const x = (!!lastIndicator ? (lastIndicator.x + lastIndicator.x / Math.max(i.length - 1, 1)) : 0)
-      return Math.max(prev, x)
-    }, 5)
-  } else {
-    labelXPos = 5
+    const iconsPerBlock = barsToShow.map((block: TimeBlock) => indicators.getIndicatorIcons(block, docIsSsl).length)
+    labelXPos += iconWidth * Math.max.apply(null, iconsPerBlock)
   }
 
   let barEls: SVGGElement[] = []
