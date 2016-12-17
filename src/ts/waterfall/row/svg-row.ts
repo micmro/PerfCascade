@@ -65,10 +65,19 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
   //create and attach request block
   rowBar.appendChild(rect)
 
+  let x = 3
+
+  if (options.showMimeType) {
+    const icon = indicators.getMimeTypeIcon(block)
+    rowName.appendChild(icons[icon.type](x, y + 3, icon.title))
+    x += icon.width
+  }
+
   if (options.showIndicatorIcons) {
     //Create and add warnings for potential issues
-    indicators.getIndicators(block, docIsSsl).forEach((value: indicators.Indicator) => {
-      rowName.appendChild(icons[value.type](value.x, y + 3, value.title))
+    indicators.getIndicatorIcons(block, docIsSsl).forEach((icon: indicators.Icon) => {
+      rowName.appendChild(icons[icon.type](x, y + 3, icon.title))
+      x += icon.width
     })
   }
   rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel)
