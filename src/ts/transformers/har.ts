@@ -7,7 +7,7 @@ import {
   WaterfallData,
   Mark
 } from "../typing/waterfall-data"
-import TimeBlock from "../typing/time-block"
+import { WaterfallEntry } from "../typing/time-block"
 import {
   mimeToCssClass,
   mimeToRequestType
@@ -56,7 +56,7 @@ export default class HarTransformer {
 
         doneTime = Math.max(doneTime, startRelative + entry.time)
 
-        return new TimeBlock(entry.request.url,
+        return new WaterfallEntry(entry.request.url,
           startRelative,
           parseInt(entry._all_end, 10) || (startRelative + entry.time),
           mimeToCssClass(entry.response.content.mimeType),
@@ -93,14 +93,14 @@ export default class HarTransformer {
     }
   }
   /**
-   * Create `TimeBlock`s to represent the subtimings of a request ("blocked", "dns", "connect", "send", "wait", "receive")
+   * Create `WaterfallEntry`s to represent the subtimings of a request ("blocked", "dns", "connect", "send", "wait", "receive")
    * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
    * @param  {Entry} entry
    * @returns Array
    */
-  public static buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<TimeBlock> {
+  public static buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<WaterfallEntry> {
     let t = entry.timings
-    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<TimeBlock>, key: string) => {
+    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<WaterfallEntry>, key: string) => {
 
       const time = this.getTimePair(key, entry, collect, startRelative)
 
@@ -115,11 +115,11 @@ export default class HarTransformer {
         const sslEnd = parseInt(entry[`_ssl_end`], 10) || time.start + t.ssl
         const connectStart = (!!parseInt(entry[`_ssl_start`], 10)) ? time.start : sslEnd
         return collect
-          .concat([new TimeBlock("ssl", sslStart, sslEnd, "block-ssl")])
-          .concat([new TimeBlock(key, connectStart, time.end, "block-" + key)])
+          .concat([new WaterfallEntry("ssl", sslStart, sslEnd, "block-ssl")])
+          .concat([new WaterfallEntry(key, connectStart, time.end, "block-" + key)])
       }
 
-      return collect.concat([new TimeBlock(key, time.start, time.end, "block-" + key)])
+      return collect.concat([new WaterfallEntry(key, time.start, time.end, "block-" + key)])
     }, [])
   }
 
@@ -128,11 +128,11 @@ export default class HarTransformer {
    *
    * @param  {string} key
    * @param  {Entry} entry
-   * @param  {Array<TimeBlock>} collect
+   * @param  {Array<WaterfallEntry>} collect
    * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
    * @returns {Object}
    */
-  private static getTimePair(key: string, entry: Entry, collect: Array<TimeBlock>, startRelative: number) {
+  private static getTimePair(key: string, entry: Entry, collect: Array<WaterfallEntry>, startRelative: number) {
     let wptKey;
     switch (key) {
       case "wait": wptKey = "ttfb"; break

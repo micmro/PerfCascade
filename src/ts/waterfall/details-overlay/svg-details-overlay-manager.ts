@@ -1,5 +1,5 @@
 import {OpenOverlay, OverlayChangeEvent} from "../../typing/open-overlay.d"
-import TimeBlock from "../../typing/time-block"
+import { WaterfallEntry } from "../../typing/time-block"
 import {createRowInfoOverlay} from "./svg-details-overlay"
 import * as overlayChangesPubSub from "./overlay-changes-pub-sub"
 
@@ -44,7 +44,7 @@ export function closeOverlay(index: number, overlayHolder: SVGGElement,
 /**
  * Opens an overlay - rerenders others internaly
  */
-export function openOverlay(index: number, barX: number,  y: number, accordionHeight: number, block: TimeBlock,
+export function openOverlay(index: number, barX: number,  y: number, accordionHeight: number, block: WaterfallEntry,
   overlayHolder: SVGGElement, barEls: SVGGElement[], unit: number) {
 
   if (openOverlays.filter((o) => o.index === index).length > 0) {

@@ -1,9 +1,9 @@
-import TimeBlock from "./time-block"
+import { WaterfallEntry } from "./time-block"
 
 export interface OpenOverlay {
   index: number
   defaultY: number
-  block: TimeBlock
+  block: WaterfallEntry
   onClose: Function
    /* instance  info **/
   actualY?: number

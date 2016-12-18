@@ -1,6 +1,6 @@
 import {WaterfallData} from "../typing/waterfall-data"
 import {RectData} from "../typing/rect-data"
-import TimeBlock from "../typing/time-block"
+import { WaterfallEntry } from "../typing/time-block"
 import {ChartOptions} from "../typing/options"
 
 import * as svg from "../helpers/svg"
@@ -15,12 +15,12 @@ import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
- * @param {TimeBlock[]} _barsToShow [description]
+ * @param {WaterfallEntry[]} _barsToShow [description]
  * @param  {number} diagramHeight
  * @returns Number
  */
-function getSvgHeight(marks: any[], _barsToShow: TimeBlock[], diagramHeight: number): number {
-  const maxMarkTextLength = marks.reduce((currMax: number, currValue: TimeBlock) => {
+function getSvgHeight(marks: any[], _barsToShow: WaterfallEntry[], diagramHeight: number): number {
+  const maxMarkTextLength = marks.reduce((currMax: number, currValue: WaterfallEntry) => {
     return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0, 0), true))
   }, 0)
 
@@ -94,7 +94,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   }
 
   if (options.showIndicatorIcons) {
-    const iconsPerBlock = barsToShow.map((block: TimeBlock) => indicators.getIndicatorIcons(block, docIsSsl).length)
+    const iconsPerBlock = barsToShow.map((block: WaterfallEntry) => indicators.getIndicatorIcons(block, docIsSsl).length)
     labelXPos += iconWidth * Math.max.apply(null, iconsPerBlock)
   }
 
@@ -108,7 +108,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   })
 
   /** Renders single row and hooks up behaviour */
-  function renderRow(block: TimeBlock, i: number) {
+  function renderRow(block: WaterfallEntry, i: number) {
     const blockWidth = block.total || 1
     const y = options.rowHeight * i
     const x = (block.start || 0.001)

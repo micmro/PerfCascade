@@ -1,4 +1,4 @@
-import TimeBlock from "../../typing/time-block"
+import { WaterfallEntry } from "../../typing/time-block"
 import { Entry } from "../../typing/har.d"
 import { KvTuple } from "../../typing/misc.d"
 
@@ -33,9 +33,9 @@ let asIntPartial = (val: string, ifIntFn: (number) => any) => {
 /**
  * Data to show in overlay tabs
  * @param  {number} requestID - request number
- * @param  {TimeBlock} block
+ * @param  {WaterfallEntry} block
  */
-export function getKeys(requestID: number, block: TimeBlock) {
+export function getKeys(requestID: number, block: WaterfallEntry) {
   //TODO: dodgy casting - will not work for other adapters
   let entry = block.rawResource as Entry
 

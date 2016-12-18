@@ -3,7 +3,7 @@
  */
 
 import { OverlayChangeEvent } from "../../typing/open-overlay.d"
-import TimeBlock from "../../typing/time-block"
+import { WaterfallEntry } from "../../typing/time-block"
 import * as svg from "../../helpers/svg"
 import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
 
@@ -85,7 +85,7 @@ export function createTimeScale(durationMs: number, diagramHeight: number, subSe
 
 
 //TODO: Implement - data for this not parsed yet
-export function createBgRect(block: TimeBlock, unit: number, diagramHeight: number): SVGRectElement {
+export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight: number): SVGRectElement {
   let rect = svg.newRect({
     "width": ((block.total || 1) / unit) + "%",
     "height": diagramHeight,
