@@ -67,7 +67,7 @@ export function createRow(index: number, rectData: RectData, block: TimeBlock,
 
   let x = 3
 
-  if (options.showMimeType) {
+  if (options.showMimeTypeIcon) {
     const icon = indicators.getMimeTypeIcon(block)
     rowName.appendChild(icons[icon.type](x, y + 3, icon.title))
     x += icon.width

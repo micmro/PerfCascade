@@ -14,7 +14,7 @@ import * as misc from "./helpers/misc"
 const defaultOptions: ChartOptions = {
   rowHeight: 23,
   showAlignmentHelpers: true,
-  showMimeType: true,
+  showMimeTypeIcon: true,
   showIndicatorIcons: true,
   leftColumnWith: 25
 }
