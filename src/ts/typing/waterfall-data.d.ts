@@ -1,4 +1,4 @@
-import TimeBlock from "../typing/time-block"
+import { WaterfallEntry } from "../typing/time-block"
 
 interface UserTiming {
   duration?: number
@@ -15,9 +15,9 @@ export interface Mark extends UserTiming {
 export interface WaterfallData {
   title: string,
   durationMs: number,
-  blocks: Array<TimeBlock>,
+  blocks: Array<WaterfallEntry>,
   marks: Array<Mark>,
-  lines: Array<TimeBlock>
+  lines: Array<WaterfallEntry>
 }
 
 export interface WaterfallDocs {

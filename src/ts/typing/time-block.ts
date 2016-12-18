@@ -1,13 +1,13 @@
 import {Entry} from "./har.d"
 
-export default class TimeBlock {
+export class WaterfallEntry {
   public total: number
   constructor(
       public name: string,
       public start: number,
       public end: number,
       public cssClass: string = "",
-      public segments: Array<TimeBlock> = [],
+      public segments: Array<WaterfallEntry> = [],
       public rawResource?: Entry,
       public requestType?: string
     ) {

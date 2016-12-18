@@ -3,7 +3,7 @@
  */
 
 import {RectData} from "../../typing/rect-data.d"
-import TimeBlock from "../../typing/time-block"
+import { WaterfallEntry } from "../../typing/time-block"
 import * as svg from "../../helpers/svg"
 import * as misc from "../../helpers/misc"
 
@@ -36,11 +36,11 @@ function makeBlock(rectData: RectData, className: string) {
 
 /**
  * Converts a segment to RectData
- * @param  {TimeBlock} segment
+ * @param  {WaterfallEntry} segment
  * @param  {RectData} rectData
  * @returns RectData
  */
-function segmentToRectData(segment: TimeBlock, rectData: RectData): RectData {
+function segmentToRectData(segment: WaterfallEntry, rectData: RectData): RectData {
   return {
     "width": segment.total,
     "height": (rectData.height - 6),
@@ -84,11 +84,11 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
 /**
  * Render the block and timings for a request
  * @param  {RectData}         rectData Basic dependencys and globals
- * @param  {Array<TimeBlock>} segments Request and Timing Data
+ * @param  {Array<WaterfallEntry>} segments Request and Timing Data
  * @param  {number} timeTotal  - total time of the request
  * @return {SVGElement}                Renerated SVG (rect or g element)
  */
-export function createRect(rectData: RectData, segments: Array<TimeBlock>, timeTotal: number): SVGElement {
+export function createRect(rectData: RectData, segments: Array<WaterfallEntry>, timeTotal: number): SVGElement {
   let rect = makeBlock(rectData, `time-block ${rectData.cssClass || "block-other"}`)
   let rectHolder = svg.newG("rect-holder")
   let firstX = rectData.x

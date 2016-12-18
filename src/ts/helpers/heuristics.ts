@@ -1,5 +1,5 @@
 import {Entry, Header} from "../typing/har"
-import TimeBlock from "../typing/time-block"
+import { WaterfallEntry } from "../typing/time-block"
 import * as misc from "./misc"
 
 export function getResponseHeader(entry: Entry, headerName: string): Header {
@@ -26,7 +26,7 @@ export function isInStatusCodeRange(entry: Entry, lowerBound: number, upperBound
   return entry.response.status >= lowerBound && entry.response.status <= upperBound
 }
 
-function isCompressible(block: TimeBlock): boolean {
+function isCompressible(block: WaterfallEntry): boolean {
   const entry = block.rawResource
   const minCompressionSize = 1000
   //small responses
@@ -53,7 +53,7 @@ function isCompressible(block: TimeBlock): boolean {
   return false
 }
 
-function isCachable(block: TimeBlock): boolean {
+function isCachable(block: WaterfallEntry): boolean {
   const entry = block.rawResource
   //do not cache non-gets,204 and non 2xx status codes
   if (entry.request.method.toLocaleLowerCase() !== "get" ||
@@ -73,14 +73,14 @@ function isCachable(block: TimeBlock): boolean {
   return false
 }
 
-export function hasCacheIssue(block: TimeBlock) {
+export function hasCacheIssue(block: WaterfallEntry) {
   return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCachable(block))
 }
 
-export function hasCompressionIssue(block: TimeBlock) {
+export function hasCompressionIssue(block: WaterfallEntry) {
   return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCompressible(block))
 }
 
-export function isSecure(block: TimeBlock) {
+export function isSecure(block: WaterfallEntry) {
   return block.name.indexOf("https://") === 0
 }

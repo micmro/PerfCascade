@@ -2,7 +2,7 @@
  * Creation of sub-components used in a resource request row
  */
 
-import TimeBlock from "../../typing/time-block"
+import { WaterfallEntry } from "../../typing/time-block"
 import * as heuristics from "../../helpers/heuristics"
 
 /**
@@ -21,10 +21,10 @@ function makeIcon(type: string, title: string): Icon {
 
 /**
  * Scan the request for errors or potential issues and highlight them
- * @param  {TimeBlock} block
+ * @param  {WaterfallEntry} block
  * @returns {Icon}
  */
-export function getMimeTypeIcon(block: TimeBlock): Icon {
+export function getMimeTypeIcon(block: WaterfallEntry): Icon {
   const entry = block.rawResource
   //highlight redirects
   if (!!entry.response.redirectURL) {
@@ -40,11 +40,11 @@ export function getMimeTypeIcon(block: TimeBlock): Icon {
 }
   /**
    * Scan the request for errors or portential issues and highlight them
-   * @param  {TimeBlock} block
+   * @param  {WaterfallEntry} block
    * @param  {boolean} docIsSsl
    * @returns {Icon[]}
    */
-  export function getIndicatorIcons(block: TimeBlock, docIsSsl: boolean): Icon[] {
+  export function getIndicatorIcons(block: WaterfallEntry, docIsSsl: boolean): Icon[] {
   const entry = block.rawResource
   let output = []
 

@@ -1,4 +1,4 @@
-import TimeBlock from "../../typing/time-block"
+import { WaterfallEntry } from "../../typing/time-block"
 import { KvTuple } from "../../typing/misc"
 import { getKeys } from "./extract-details-keys"
 
@@ -28,7 +28,7 @@ function makeTab(innerHtml: string, renderDl: boolean = true) {
   </div>`
 }
 
-function makeImgTab(accordeonHeight: number, block: TimeBlock) {
+function makeImgTab(accordeonHeight: number, block: WaterfallEntry) {
   if (block.requestType !== "image") {
     return ""
   }
@@ -40,7 +40,7 @@ function makeTabBtn(name: string, tab: string) {
   return !!tab ? `<li><button class="tab-button">${name}</button></li>` : ""
 }
 
-export function createDetailsBody(requestID: number, block: TimeBlock, accordeonHeight: number) {
+export function createDetailsBody(requestID: number, block: WaterfallEntry, accordeonHeight: number) {
 
   let html = document.createElement("html") as HTMLHtmlElement
   let body = document.createElement("body")

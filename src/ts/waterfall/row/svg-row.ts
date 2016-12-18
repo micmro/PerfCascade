@@ -1,6 +1,6 @@
 import { RectData } from "../../typing/rect-data"
 import { ChartOptions } from "../../typing/options"
-import TimeBlock from "../../typing/time-block"
+import { WaterfallEntry } from "../../typing/time-block"
 
 import * as svg from "../../helpers/svg"
 import * as icons from "../../helpers/icons"
@@ -19,7 +19,7 @@ clipPathElProto.appendChild(svg.newRect({
 
 
 //Creates single reques's row
-export function createRow(index: number, rectData: RectData, block: TimeBlock,
+export function createRow(index: number, rectData: RectData, block: WaterfallEntry,
   labelXPos: number, options: ChartOptions, docIsSsl: boolean,
   onDetailsOverlayShow: EventListener): SVGGElement {
 
