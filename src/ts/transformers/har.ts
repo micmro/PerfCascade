@@ -7,7 +7,7 @@ import {
   WaterfallData,
   Mark
 } from "../typing/waterfall-data"
-import { WaterfallEntry } from "../typing/time-block"
+import {WaterfallEntry, WaterfallEntryTiming} from "../typing/time-block"
 import {
   mimeToCssClass,
   mimeToRequestType
@@ -98,9 +98,9 @@ export default class HarTransformer {
    * @param  {Entry} entry
    * @returns Array
    */
-  public static buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<WaterfallEntry> {
+  public static buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<WaterfallEntryTiming> {
     let t = entry.timings
-    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<WaterfallEntry>, key: string) => {
+    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<WaterfallEntryTiming>, key: string) => {
 
       const time = this.getTimePair(key, entry, collect, startRelative)
 
@@ -115,11 +115,11 @@ export default class HarTransformer {
         const sslEnd = parseInt(entry[`_ssl_end`], 10) || time.start + t.ssl
         const connectStart = (!!parseInt(entry[`_ssl_start`], 10)) ? time.start : sslEnd
         return collect
-          .concat([new WaterfallEntry("ssl", sslStart, sslEnd, "block-ssl")])
-          .concat([new WaterfallEntry(key, connectStart, time.end, "block-" + key)])
+          .concat([new WaterfallEntryTiming("ssl", sslStart, sslEnd, "block-ssl")])
+          .concat([new WaterfallEntryTiming(key, connectStart, time.end, "block-" + key)])
       }
 
-      return collect.concat([new WaterfallEntry(key, time.start, time.end, "block-" + key)])
+      return collect.concat([new WaterfallEntryTiming(key, time.start, time.end, "block-" + key)])
     }, [])
   }
 
@@ -132,7 +132,7 @@ export default class HarTransformer {
    * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
    * @returns {Object}
    */
-  private static getTimePair(key: string, entry: Entry, collect: Array<WaterfallEntry>, startRelative: number) {
+  private static getTimePair(key: string, entry: Entry, collect: Array<WaterfallEntryTiming>, startRelative: number) {
     let wptKey;
     switch (key) {
       case "wait": wptKey = "ttfb"; break
