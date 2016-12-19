@@ -5,7 +5,7 @@ import { KvTuple } from "../../typing/misc.d"
 
 
 let ifValueDefined = (value: number, fn: (number) => any) => {
-  if (typeof value !== "number" || value <= 0) {
+  if (!isFinite(value) || value <= 0) {
     return undefined
   }
   return fn(value)
