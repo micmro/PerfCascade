@@ -90,7 +90,7 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   // This assumes all icons (mime and indicators) have the same width
   const iconWidth = indicators.getMimeTypeIcon(barsToShow[0]).width
 
-  if (options.showMimeType) {
+  if (options.showMimeTypeIcon) {
     labelXPos += iconWidth
   }
 

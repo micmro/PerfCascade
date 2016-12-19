@@ -46,6 +46,10 @@ Height of every request bar block plus spacer pixel (in px) default: 23
 `boolean`, default: `true`
 Show verticale lines to easier spot potential dependencies/blocking between requests
 
+### `showMimeTypeIcon`
+`boolean`, default: `true`
+Show mime type icon on the left
+
 ### `showIndicatorIcons`
 `boolean`, default: `true`
 Show warning icons for potential issues on the left
