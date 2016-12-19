@@ -26,7 +26,7 @@ export function isInStatusCodeRange(entry: Entry, lowerBound: number, upperBound
   return entry.response.status >= lowerBound && entry.response.status <= upperBound
 }
 
-function isCompressable(block: TimeBlock): boolean {
+function isCompressible(block: TimeBlock): boolean {
   const entry = block.rawResource
   const minCompressionSize = 1000
   //small responses
@@ -78,7 +78,7 @@ export function hasCacheIssue(block: TimeBlock) {
 }
 
 export function hasCompressionIssue(block: TimeBlock) {
-  return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCompressable(block))
+  return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCompressible(block))
 }
 
 export function isSecure(block: TimeBlock) {

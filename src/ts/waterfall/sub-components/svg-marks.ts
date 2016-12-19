@@ -56,7 +56,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
     lineHolder.appendChild(line)
     lineHolder.appendChild(lineConnection)
 
-    overlayChangesPubSub.subscribeToOvelayChanges((change: OverlayChangeEvent) => {
+    overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
       let offset = change.combinedOverlayHeight
       let scale = (diagramHeight + offset) / (diagramHeight)
 
@@ -67,7 +67,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
 
 
     let isActive = false
-    let onLableMouseEnter = function (evt) {
+    let onLabelMouseEnter = function (evt) {
       if (!isActive) {
         isActive = true
         svg.addClass(lineHolder, "active")
@@ -76,14 +76,14 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       }
     }
 
-    let onLableMouseLeave = function (evt) {
+    let onLabelMouseLeave = function (evt) {
       isActive = false
       svg.removeClass(lineHolder, "active")
     }
 
 
-    lineLabel.addEventListener("mouseenter", onLableMouseEnter)
-    lineLabel.addEventListener("mouseleave", onLableMouseLeave)
+    lineLabel.addEventListener("mouseenter", onLabelMouseEnter)
+    lineLabel.addEventListener("mouseleave", onLabelMouseLeave)
     lineLabelHolder.appendChild(lineLabel)
 
     markHolder.appendChild(svg.newEl("title", {

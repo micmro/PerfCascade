@@ -23,28 +23,28 @@ export function getOverlayOffset(rowIndex: number): number {
 
 
 /**
- * closes on overlay - rerenders others internaly
+ * closes on overlay - rerenders others internally
  */
-export function closeOvelay(index: number, holder: SVGElement, overlayHolder: SVGGElement,
-  barX: number, accordeonHeigh: number, barEls: SVGGElement[], unit: number) {
+export function closeOverlay(index: number, holder: SVGElement, overlayHolder: SVGGElement,
+                             barX: number, accordionHeight: number, barEls: SVGGElement[], unit: number) {
 
   openOverlays.splice(openOverlays.reduce((prev: number, curr, i) => {
     return (curr.index === index) ? i : prev
   }, -1), 1)
 
-  renderOverlays(barX, accordeonHeigh, overlayHolder, unit)
-  overlayChangesPubSub.publishToOvelayChanges({
+  renderOverlays(barX, accordionHeight, overlayHolder, unit)
+  overlayChangesPubSub.publishToOverlayChanges({
     "type" : overlayChangesPubSub.eventTypes.CLOSE,
     "openOverlays": openOverlays,
     "combinedOverlayHeight": getCombinedOverlayHeight()
   } as OverlayChangeEvent)
-  reAlignBars(barEls)
+  realignBars(barEls)
 }
 
 /**
  * Opens an overlay - rerenders others internaly
  */
-export function openOverlay(index: number, barX: number,  y: number, accordeonHeight: number, block: TimeBlock,
+export function openOverlay(index: number, barX: number,  y: number, accordionHeight: number, block: TimeBlock,
   overlayHolder: SVGGElement, barEls: SVGGElement[], unit: number) {
 
   if (openOverlays.filter((o) => o.index === index).length > 0) {
@@ -56,24 +56,24 @@ export function openOverlay(index: number, barX: number,  y: number, accordeonHe
     "defaultY": y,
     "block": block,
     "onClose": () => {
-      this.closeOvelay(index, null, overlayHolder, barX, accordeonHeight, barEls, unit)
+      this.closeOverlay(index, null, overlayHolder, barX, accordionHeight, barEls, unit)
     }
   })
 
-  renderOverlays(barX, accordeonHeight, overlayHolder, unit)
-  overlayChangesPubSub.publishToOvelayChanges({
+  renderOverlays(barX, accordionHeight, overlayHolder, unit)
+  overlayChangesPubSub.publishToOverlayChanges({
     "type" : overlayChangesPubSub.eventTypes.OPEN,
     "openOverlays": openOverlays,
     "combinedOverlayHeight": getCombinedOverlayHeight()
   } as OverlayChangeEvent)
-  reAlignBars(barEls)
+  realignBars(barEls)
 }
 
 /**
  * sets the offset for request-bars
  * @param  {SVGGElement[]} barEls
  */
-function reAlignBars(barEls: SVGGElement[]) {
+function realignBars(barEls: SVGGElement[]) {
   barEls.forEach((bar, j) => {
     let offset = getOverlayOffset(j)
     bar.style.transform = `translate(0, ${offset}px)`
@@ -87,11 +87,11 @@ function reAlignBars(barEls: SVGGElement[]) {
   * @summary this is to re-set the "y" position since there is a bug in chrome with
   * tranform of an SVG and positioning/scoll of a foreignObjects
   * @param  {number} barX
-  * @param  {number} accordeonHeight
+  * @param  {number} accordionHeight
   * @param  {SVGGElement} overlayHolder
   * @param  {number} unit
   */
-function renderOverlays(barX: number, accordeonHeight: number, overlayHolder: SVGGElement, unit: number) {
+function renderOverlays(barX: number, accordionHeight: number, overlayHolder: SVGGElement, unit: number) {
   while (overlayHolder.firstChild ) {
     overlayHolder.removeChild(overlayHolder.firstChild)
   }
@@ -101,7 +101,7 @@ function renderOverlays(barX: number, accordeonHeight: number, overlayHolder: SV
     .sort((a, b) => a.index > b.index ? 1 : -1)
     .forEach((overlay) => {
       let y = overlay.defaultY + currY
-      let infoOverlay = createRowInfoOverlay(overlay.index, barX, y, accordeonHeight, overlay.block, overlay.onClose, unit)
+      let infoOverlay = createRowInfoOverlay(overlay.index, barX, y, accordionHeight, overlay.block, overlay.onClose, unit)
       //if overlay has a preview image show it
       let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
       if (previewImg && !previewImg.src) {

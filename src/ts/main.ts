@@ -23,7 +23,7 @@ const defaultOptions: ChartOptions = {
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions?: ChartOptions): SVGSVGElement {
   const options: ChartOptions = misc.assign(defaultOptions, chartOptions || {})
 
-  //setup state setvices
+  //setup state services
   globalStateService.init(options)
   waterfallDocsService.storeDocs(waterfallDocsData)
 

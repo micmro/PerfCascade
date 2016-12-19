@@ -9,8 +9,8 @@ export interface RectData {
   cssClass: string
   label?: string
   unit: number
-  /** @type {Function} Partially appliable function (to capture row data) that return an event listener */
+  /** @type {Function} Partially applicable function (to capture row data) that return an event listener */
   showOverlay?: Function
-  /** @type {Function} Partially appliable function (to capture row data) that return an event listener */
+  /** @type {Function} Partially applicable function (to capture row data) that return an event listener */
   hideOverlay?: Function
 }

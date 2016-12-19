@@ -1,5 +1,5 @@
 /**
- * Creation of sub-components used in a ressource request row
+ * Creation of sub-components used in a resource request row
  */
 
 import TimeBlock from "../../typing/time-block"

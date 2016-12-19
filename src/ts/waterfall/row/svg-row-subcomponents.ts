@@ -63,8 +63,8 @@ function segmentToRectData(segment: TimeBlock, rectData: RectData): RectData {
  * @param  {number} firstX
  * @returns SVGTextElement
  */
-function createTimingLable(rectData: RectData, timeTotal: number, firstX: number): SVGTextElement {
-  const minWidth = 500 // minimum supported diagram width that should show the timing lable uncropped
+function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number): SVGTextElement {
+  const minWidth = 500 // minimum supported diagram width that should show the timing label uncropped
   const spacingPerc = (5 / minWidth * 100)
   const y = rectData.y + rectData.height / 1.5
   const totalLabel = `${Math.round(timeTotal)} ms`
@@ -109,7 +109,7 @@ export function createRect(rectData: RectData, segments: Array<TimeBlock>, timeT
       }
     })
 
-    rectHolder.appendChild(createTimingLable(rectData, timeTotal, firstX))
+    rectHolder.appendChild(createTimingLabel(rectData, timeTotal, firstX))
   }
 
   return rectHolder
@@ -122,7 +122,7 @@ export function createRect(rectData: RectData, segments: Array<TimeBlock>, timeT
  * @param  {number}         y                vertical position of related request block (in px)
  * @param  {string}         name             URL
  * @param  {number}         height           height of row
- * @return {SVGTextElement}                  lable SVG element
+ * @return {SVGTextElement}                  label SVG element
  */
 export function createRequestLabelClipped(x: number, y: number, name: string, height: number, clipPathId?: string) {
 
@@ -141,8 +141,8 @@ export function createRequestLabelClipped(x: number, y: number, name: string, he
  */
 export function createRequestLabelFull(x: number, y: number, name: string, height: number) {
   let blockLabel = createRequestLabel(x, y, name, height)
-  let lableHolder = svg.newG("full-lable")
-  lableHolder.appendChild(svg.newEl("rect", {
+  let labelHolder = svg.newG("full-label")
+  labelHolder.appendChild(svg.newEl("rect", {
     "class": "label-full-bg",
     "x": x - 3,
     "y": y + 3,
@@ -151,15 +151,15 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
     "rx": 5,
     "ry": 5
   }))
-  lableHolder.appendChild(blockLabel)
-  return lableHolder
+  labelHolder.appendChild(blockLabel)
+  return labelHolder
 }
 
 
 
 // private helper
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
-  const blockName = misc.ressourceUrlFormater(name, 125)
+  const blockName = misc.resourceUrlFormatter(name, 125)
   let blockLabel = svg.newTextEl(blockName, (y + Math.round(height / 2) + 5))
 
   blockLabel.appendChild(svg.newEl("title", {
@@ -181,8 +181,8 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
  * @param {SVGGElement}    fullLabel  [description]
  */
 export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextElement, fullLabel: SVGGElement) {
-  let lableFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement
-  let fullLableText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement
+  let labelFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement
+  let fullLabelText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement
 
   //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
   fullLabel.style.display = "none"
@@ -194,7 +194,7 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
     fullLabel.style.display = "block"
     shortLabel.style.display = "none"
     fullLabel.style.visibility = "visible"
-    lableFullBg.style.width = (fullLableText.clientWidth + 10).toString()
+    labelFullBg.style.width = (fullLabelText.clientWidth + 10).toString()
   })
   rowFixed.addEventListener("mouseleave", () => {
     shortLabel.style.display = "block"

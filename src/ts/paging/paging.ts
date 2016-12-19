@@ -17,7 +17,7 @@ export function getPageCount(): number {
 
 /**
  * Returns selected pages
- * @returns WaterfallData - currerently selected page
+ * @returns WaterfallData - currently selected page
  */
 export function getSelectedPage(): WaterfallData {
   return waterfallDocsService.getDocs().pages[selectedPageIndex]

@@ -55,7 +55,7 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .row-item.status3xx:hover .odd {opacity: 0.5}
 
 
-.lables { overflow: hidden;}
+.labels { overflow: hidden;}
 
 /*block colours for MIME types*/
 .block-css {fill: #a6d18f;}

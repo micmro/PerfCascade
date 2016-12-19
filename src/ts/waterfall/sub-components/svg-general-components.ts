@@ -41,7 +41,7 @@ let appendSecond = function (timeHolder: SVGGElement, diagramHeight: number, sec
     "y2": diagramHeight
   })
 
-  overlayChangesPubSub.subscribeToOvelayChanges((change: OverlayChangeEvent) => {
+  overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
     let offset = change.combinedOverlayHeight
     //figure out why there is an offset
     let scale = (diagramHeight + offset) / (diagramHeight)

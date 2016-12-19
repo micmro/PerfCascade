@@ -3,7 +3,7 @@
  */
 
 /**
- * Parses URL into it's components
+ * Parses URL into its components
  * @param  {string} url
  */
 export function parseUrl(url: string) {
@@ -28,12 +28,12 @@ export function contains<T>(arr: Array<T>, item: T): boolean {
 }
 
 /**
- * formats and shortes a url for ui
+ * Pormats and shortens a url for ui
  * @param  {string} url
  * @param  {number} maxLength - max length of shortened url
  * @returns string
  */
-export function ressourceUrlFormater(url: string, maxLength: number): string {
+export function resourceUrlFormatter(url: string, maxLength: number): string {
   if (url.length < maxLength) {
     return url.replace(/https?:\/\//, "")
   }
@@ -45,13 +45,13 @@ export function ressourceUrlFormater(url: string, maxLength: number): string {
   }
 
   const maxAuthLength = Math.floor(maxLength / 2) - 3;
-  const maxPathLenth = Math.floor(maxLength / 2) - 5
-  // maybe we could finetune these numbers
+  const maxPathLength = Math.floor(maxLength / 2) - 5
+  // maybe we could fine tune these numbers
   let p = matches.path.split("/")
   if (matches.authority.length > maxAuthLength) {
-    return matches.authority.substr(0, maxAuthLength) + "..." + p[p.length - 1].substr(-maxPathLenth)
+    return matches.authority.substr(0, maxAuthLength) + "..." + p[p.length - 1].substr(-maxPathLength)
   }
-  return matches.authority + "..." + p[p.length - 1].substr(-maxPathLenth)
+  return matches.authority + "..." + p[p.length - 1].substr(-maxPathLength)
 }
 
 /**

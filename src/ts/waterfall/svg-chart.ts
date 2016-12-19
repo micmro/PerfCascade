@@ -104,7 +104,7 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
   function getChartHeight(): string {
     return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px"
   }
-  overlayChangesPubSub.subscribeToOvelayChanges((evt) => {
+  overlayChangesPubSub.subscribeToOverlayChanges((evt) => {
     timeLineHolder.style.height = getChartHeight()
   })
 
@@ -113,7 +113,7 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     const blockWidth = block.total || 1
     const y = options.rowHeight * i
     const x = (block.start || 0.001)
-    const accordeonHeight = 450
+    const accordionHeight = 450
     const rectData = {
       "width": blockWidth,
       "height": options.rowHeight,
@@ -127,7 +127,7 @@ export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
     } as RectData
 
     let showDetailsOverlay = (evt) => {
-      overlayManager.openOverlay(i, x, y + options.rowHeight, accordeonHeight, block, overlayHolder, barEls, unit)
+      overlayManager.openOverlay(i, x, y + options.rowHeight, accordionHeight, block, overlayHolder, barEls, unit)
     }
 
     let rowItem = row.createRow(i, rectData, block, labelXPos,

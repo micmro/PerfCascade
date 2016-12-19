@@ -11,12 +11,12 @@ export const eventTypes = {
 let subscribers: OverlayChangeSubscriber[] = []
 
 
-export function subscribeToOvelayChanges(fn: OverlayChangeSubscriber) {
+export function subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {
   subscribers.push(fn)
 }
 
 //no need for unsubscribe in the moment
 
-export function publishToOvelayChanges(change: OverlayChangeEvent) {
+export function publishToOverlayChanges(change: OverlayChangeEvent) {
   subscribers.forEach(fn => fn(change))
 }
