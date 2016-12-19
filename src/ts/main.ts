@@ -1,5 +1,5 @@
 import { Har } from "./typing/har"
-import { WaterfallDocs } from "./typing/waterfall-data"
+import { WaterfallDocs } from "./typing/waterfall"
 import { ChartOptions } from "./typing/options"
 import { createWaterfallSvg } from "./waterfall/svg-chart"
 import * as paging from "./paging/paging"

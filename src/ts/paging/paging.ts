@@ -1,5 +1,5 @@
 import {OnPagingCb} from "../typing/paging"
-import {WaterfallData} from "../typing/waterfall-data"
+import {WaterfallData} from "../typing/waterfall"
 
 import * as waterfallDocsService from "../state/waterfall-docs-service"
 

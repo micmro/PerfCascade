@@ -1,4 +1,4 @@
-import {WaterfallData} from "../typing/waterfall-data"
+import {WaterfallData} from "../typing/waterfall"
 import {RectData} from "../typing/rect-data"
 import { WaterfallEntry } from "../typing/time-block"
 import {ChartOptions} from "../typing/options"

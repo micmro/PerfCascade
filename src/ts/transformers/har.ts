@@ -6,7 +6,7 @@ import {
   WaterfallDocs,
   WaterfallData,
   Mark
-} from "../typing/waterfall-data"
+} from "../typing/waterfall"
 import {WaterfallEntry, WaterfallEntryTiming} from "../typing/time-block"
 import {
   mimeToCssClass,

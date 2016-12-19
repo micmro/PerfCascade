@@ -1,4 +1,4 @@
-import { WaterfallEntry } from "../typing/time-block"
+import { WaterfallEntry } from "./time-block"
 
 interface UserTiming {
   duration?: number
