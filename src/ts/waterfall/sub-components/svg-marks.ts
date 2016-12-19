@@ -1,4 +1,4 @@
-import {Mark} from "../../typing/waterfall-data"
+import {Mark} from "../../typing/waterfall"
 import {OverlayChangeEvent} from "../../typing/open-overlay"
 
 import * as svg from "../../helpers/svg"
