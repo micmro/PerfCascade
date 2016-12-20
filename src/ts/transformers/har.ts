@@ -68,7 +68,7 @@ export default class HarTransformer {
 
 
     const marks = Object.keys(pageTimings)
-      .filter(k => (pageTimings[k] !== undefined && pageTimings[k] >= 0))
+      .filter(k => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
       .sort((a: string, b: string) => pageTimings[a] > pageTimings[b] ? 1 : -1)
       .map(k => {
         const startRelative = pageTimings[k]
