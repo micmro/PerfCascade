@@ -3,9 +3,9 @@
  */
 
 import {RectData} from "../../typing/rect-data.d"
-import {WaterfallEntryTiming} from "../../typing/time-block"
 import * as svg from "../../helpers/svg"
 import * as misc from "../../helpers/misc"
+import {WaterfallEntryTiming} from "../../typing/waterfall";
 
 
 

@@ -1,6 +1,5 @@
 import { RectData } from "../../typing/rect-data"
 import { ChartOptions } from "../../typing/options"
-import { WaterfallEntry } from "../../typing/time-block"
 
 import * as svg from "../../helpers/svg"
 import * as icons from "../../helpers/icons"
@@ -8,6 +7,7 @@ import * as misc from "../../helpers/misc"
 import * as heuristics from "../../helpers/heuristics"
 import * as rowSubComponents from "./svg-row-subcomponents"
 import * as indicators from "./svg-indicators"
+import {WaterfallEntry} from "../../typing/waterfall";
 
 //initial clip path
 const clipPathElProto = svg.newClipPath("titleClipPath")

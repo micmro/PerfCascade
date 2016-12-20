@@ -1,6 +1,5 @@
-import {WaterfallData} from "../typing/waterfall"
+import {WaterfallData, WaterfallEntry} from "../typing/waterfall"
 import {RectData} from "../typing/rect-data"
-import { WaterfallEntry } from "../typing/time-block"
 import {ChartOptions} from "../typing/options"
 
 import * as svg from "../helpers/svg"

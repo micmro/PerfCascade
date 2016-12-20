@@ -1,6 +1,6 @@
 import {Entry, Header} from "../typing/har"
-import { WaterfallEntry } from "../typing/time-block"
 import * as misc from "./misc"
+import {WaterfallEntry} from "../typing/waterfall";
 
 export function getResponseHeader(entry: Entry, headerName: string): Header {
   return entry.response.headers.filter(h => h.name.toLowerCase() === headerName.toLowerCase())[0]

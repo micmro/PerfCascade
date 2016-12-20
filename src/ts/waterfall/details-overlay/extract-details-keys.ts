@@ -1,6 +1,6 @@
-import { WaterfallEntry } from "../../typing/time-block"
 import { Entry } from "../../typing/har.d"
 import { KvTuple } from "../../typing/misc.d"
+import {WaterfallEntry} from "../../typing/waterfall";
 
 
 

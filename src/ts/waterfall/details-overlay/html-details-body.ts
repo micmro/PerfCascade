@@ -1,6 +1,6 @@
-import { WaterfallEntry } from "../../typing/time-block"
 import { KvTuple } from "../../typing/misc"
 import { getKeys } from "./extract-details-keys"
+import {WaterfallEntry} from "../../typing/waterfall";
 
 function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
   let makeClass = (key: string) => {

@@ -2,8 +2,8 @@
  * Creation of sub-components used in a resource request row
  */
 
-import { WaterfallEntry } from "../../typing/time-block"
 import * as heuristics from "../../helpers/heuristics"
+import {WaterfallEntry} from "../../typing/waterfall";
 
 /**
  * Interface for `Icon` metadata

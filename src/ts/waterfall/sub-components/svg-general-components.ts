@@ -3,9 +3,9 @@
  */
 
 import { OverlayChangeEvent } from "../../typing/open-overlay.d"
-import { WaterfallEntry } from "../../typing/time-block"
 import * as svg from "../../helpers/svg"
 import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
+import {WaterfallEntry} from "../../typing/waterfall";
 
 /**
  * Renders a per-second marker line and appends it to `timeHolder`
