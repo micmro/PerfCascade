@@ -22,7 +22,7 @@ var options = {
 var perfCascadeSvg =  perfCascade.fromHar(harData.log, options)
 ```
 
-You can find the compiled (and minified) JS in [`src/dist`](https://github.com/micmro/PerfCascade/tree/master/src/dist). Yor the basic version without zHAR support you need [`perf-cascade.min.js`](https://github.com/micmro/PerfCascade/blob/master/src/dist/perf-cascade.min.js) and some basic CSS styles [`perf-cascade.css`](https://github.com/micmro/PerfCascade/blob/master/src/dist/perf-cascade.css).
+You can find the compiled (and minified) JS in [`src/dist`](https://github.com/micmro/PerfCascade/tree/master/src/dist). For the basic version without zHAR support you need [`perf-cascade.min.js`](https://github.com/micmro/PerfCascade/blob/master/src/dist/perf-cascade.min.js) and some basic CSS styles [`perf-cascade.css`](https://github.com/micmro/PerfCascade/blob/master/src/dist/perf-cascade.css).
 
 ### Use via npm
 As of `2.0.5` you can install PerfCascade via NPM as well:
