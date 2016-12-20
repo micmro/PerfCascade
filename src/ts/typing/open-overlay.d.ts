@@ -1,4 +1,4 @@
-import { WaterfallEntry } from "./time-block"
+import {WaterfallEntry} from "./waterfall";
 
 export interface OpenOverlay {
   index: number

@@ -1,7 +1,7 @@
-import { WaterfallEntry } from "../../typing/time-block"
 import * as svg from "../../helpers/svg"
 import * as dom from "../../helpers/dom"
 import {createDetailsBody} from "./html-details-body"
+import {WaterfallEntry} from "../../typing/waterfall";
 
 
 function createCloseButtonSvg(y: number): SVGGElement {

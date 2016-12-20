@@ -7,21 +7,42 @@ import {
   WaterfallData,
   Mark
 } from "../typing/waterfall"
-import {WaterfallEntry, WaterfallEntryTiming} from "../typing/time-block"
 import {
   mimeToCssClass,
   mimeToRequestType
 } from "./styling-converters"
 
+class WaterfallEntry {
+  public total: number
+  constructor(public name: string,
+              public start: number,
+              public end: number,
+              public cssClass: string = "",
+              public segments: Array<WaterfallEntryTiming> = [],
+              public rawResource: Entry,
+              public requestType: string) {
+    this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
+  }
+}
 
-export default class HarTransformer {
+class WaterfallEntryTiming {
+  public total: number
+  constructor(public name: string,
+              public start: number,
+              public end: number,
+              public cssClass: string = "") {
+    this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
+  }
+}
+
+export namespace HarTransformer {
 
   /**
    * Transforms the full HAR doc, including all pages
    * @param  {Har} harData - raw hhar object
    * @returns WaterfallDocs
    */
-  public static transformDoc(harData: Har): WaterfallDocs {
+  export function transformDoc(harData: Har): WaterfallDocs {
     //make sure it's the *.log base node
     let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
     console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length)
@@ -37,7 +58,7 @@ export default class HarTransformer {
    * @param {number=0} pageIndex - page to parse (for multi-page HAR)
    * @returns WaterfallData
    */
-  public static transformPage(harData: Har, pageIndex: number = 0): WaterfallData {
+  export function transformPage(harData: Har, pageIndex: number = 0): WaterfallData {
     //make sure it's the *.log base node
     let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
 
@@ -60,7 +81,7 @@ export default class HarTransformer {
           startRelative,
           parseInt(entry._all_end, 10) || (startRelative + entry.time),
           mimeToCssClass(entry.response.content.mimeType),
-          this.buildDetailTimingBlocks(startRelative, entry),
+          buildDetailTimingBlocks(startRelative, entry),
           entry,
           mimeToRequestType(entry.response.content.mimeType)
         )
@@ -98,11 +119,11 @@ export default class HarTransformer {
    * @param  {Entry} entry
    * @returns Array
    */
-  public static buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<WaterfallEntryTiming> {
+  function buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<WaterfallEntryTiming> {
     let t = entry.timings
     return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<WaterfallEntryTiming>, key: string) => {
 
-      const time = this.getTimePair(key, entry, collect, startRelative)
+      const time = getTimePair(key, entry, collect, startRelative)
 
       if (time.end && time.start >= time.end) {
         return collect
@@ -132,7 +153,7 @@ export default class HarTransformer {
    * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
    * @returns {Object}
    */
-  private static getTimePair(key: string, entry: Entry, collect: Array<WaterfallEntryTiming>, startRelative: number) {
+  function getTimePair(key: string, entry: Entry, collect: Array<WaterfallEntryTiming>, startRelative: number) {
     let wptKey;
     switch (key) {
       case "wait": wptKey = "ttfb"; break

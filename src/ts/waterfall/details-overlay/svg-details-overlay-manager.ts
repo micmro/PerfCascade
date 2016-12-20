@@ -1,7 +1,7 @@
 import {OpenOverlay, OverlayChangeEvent} from "../../typing/open-overlay.d"
-import { WaterfallEntry } from "../../typing/time-block"
 import {createRowInfoOverlay} from "./svg-details-overlay"
 import * as overlayChangesPubSub from "./overlay-changes-pub-sub"
+import {WaterfallEntry} from "../../typing/waterfall";
 
 /** Collection of currely open overlays */
 let openOverlays: OpenOverlay[] = []

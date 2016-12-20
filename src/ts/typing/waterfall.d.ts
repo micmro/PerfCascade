@@ -1,4 +1,4 @@
-import { WaterfallEntry } from "./time-block"
+import {Entry} from "./har";
 
 interface UserTiming {
   duration?: number
@@ -11,6 +11,24 @@ export interface Mark extends UserTiming {
   x?: number
 }
 
+export interface WaterfallEntry {
+  total: number
+  name: string,
+  start: number,
+  end: number,
+  cssClass: string,
+  segments: Array<WaterfallEntryTiming>,
+  rawResource: Entry,
+  requestType: string
+}
+
+export interface WaterfallEntryTiming {
+  total: number
+  name: string,
+  start: number,
+  end: number,
+  cssClass: string
+}
 
 export interface WaterfallData {
   title: string,

@@ -3,7 +3,7 @@ import { WaterfallDocs } from "./typing/waterfall"
 import { ChartOptions } from "./typing/options"
 import { createWaterfallSvg } from "./waterfall/svg-chart"
 import * as paging from "./paging/paging"
-import HarTransformer from "./transformers/har"
+import {HarTransformer} from "./transformers/har"
 import { makeLegend } from "./legend/legend"
 import * as waterfallDocsService from "./state/waterfall-docs-service"
 
