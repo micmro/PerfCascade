@@ -54,9 +54,7 @@ export default class HarTransformer {
       .map((entry) => {
         const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime
 
-        if (doneTime < (startRelative + entry.time)) {
-          doneTime = startRelative + entry.time
-        }
+        doneTime = Math.max(doneTime, startRelative + entry.time)
 
         return new TimeBlock(entry.request.url,
           startRelative,
@@ -75,11 +73,17 @@ export default class HarTransformer {
       .map(k => {
         const startRelative = pageTimings[k]
 
+        doneTime = Math.max(doneTime, startRelative)
+
         return {
           "name": `${k.replace(/^[_]/, "")} (${startRelative}ms)`,
           "startTime": startRelative
         } as Mark
       })
+
+    // Add 100ms margin to make room for labels
+    doneTime += 100
+
     return {
       durationMs: doneTime,
       blocks: blocks,
