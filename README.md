@@ -1,6 +1,8 @@
 # PerfCascade
 Extensible waterfall-viewer that works with HAR and other formats (in the future).
 
+[![Build status][travis-image]][travis-url]
+
 Live example at: https://micmro.github.io/PerfCascade/
 
 ![example screenshot](https://raw.githubusercontent.com/micmro/PerfCascade/gh-pages/img/PerfCascade-sample1.png)
@@ -93,3 +95,6 @@ See `package.json` for other useful tasks like linting etc.
 - [W3C HAR Spec](https://w3c.github.io/web-performance/specs/HAR/Overview.html)
 - [HAR 1.2 Spec](http://www.softwareishard.com/blog/har-12-spec)
 - [HAR Resources](https://github.com/ahmadnassri/har-resources)
+
+[travis-image]: https://img.shields.io/travis/micmro/PerfCascade.svg?style=flat-square
+[travis-url]: https://travis-ci.org/micmro/PerfCascade
