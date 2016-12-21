@@ -30,17 +30,13 @@ export function getMimeTypeIcon(block: TimeBlock): Icon {
   if (!!entry.response.redirectURL) {
     const url = encodeURI(entry.response.redirectURL.split("?")[0] || "")
     return makeIcon("err3xx", `${entry.response.status} response status: Redirect to ${url}...`)
-  }
-
-  else if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
+  } else if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
     return makeIcon("err4xx", `${entry.response.status} response status: ${entry.response.statusText}`)
-  }
-
-  else if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
+  } else if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
     return makeIcon("err5xx", `${entry.response.status} response status: ${entry.response.statusText}`)
+  } else {
+    return makeIcon(block.requestType, block.requestType)
   }
-
-  else return makeIcon(block.requestType, block.requestType)
 }
   /**
    * Scan the request for errors or portential issues and highlight them
