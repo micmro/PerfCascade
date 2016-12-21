@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.14 (21/12/2016) */
+/*! github.com/micmro/PerfCascade Version:0.2.15 (22/12/2016) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
@@ -210,6 +210,16 @@ function flash(x, y, title, scale) {
     return toSvg(x, y, title, "icon-flash", scale, "<path d=\"m 13.724296,4.737962 q 0.194716,0.216309 0.07572,0.475924 L 7.958654,17.729559\n  Q 7.818031,18 7.504329,18 7.461078,18 7.352885,17.97846 7.16899,17.924378 7.0770425,17.772918 6.9850949,17.621512 7.0283513,17.4484 L\n  9.15937,8.708015 4.7675305,9.800549 q -0.043251,0.01077 -0.1298072,0.01077 -0.1947161,0 -0.3353388,-0.118981 -0.1947107,-0.162286\n  -0.140628,-0.4219 L 6.3360428,0.34617 Q 6.3792939,0.194711 6.5091226,0.097382 6.6389298,0 6.8120043,0 l 3.5480877,0 q 0.205532,0\n  0.346154,0.135193 0.140628,0.135248 0.140628,0.319132 0,0.08656 -0.05409,0.194711 l -1.849763,5.008456 4.283664,-1.06011 q\n  0.08654,-0.02154 0.129807,-0.02154 0.205532,0 0.367791,0.162285 z\" />");
 }
 exports.flash = flash;
+function video(x, y, title, scale) {
+    if (scale === void 0) { scale = 1; }
+    return toSvg(x, y, title, "icon-video", scale, "<path\n     d=\"m 17,4.106999 0,9.7143 q 0,0.3751 -0.348214,0.5268 -0.116071,0.044 -0.223214,0.044 -0.241072,0 -0.401786,-0.1696 l -3.598214,-3.5983\n     0,1.4822 q 0,1.0625 -0.754464,1.8169 -0.754465,0.7552 -1.8169652,0.7552 l -6.2857143,0 q -1.0625,0 -1.8169642,-0.7545 Q 1,13.169599\n     1,12.106999 l 0,-6.2857 q 0,-1.0624 0.7544643,-1.8169 0.7544642,-0.7544 1.8169642,-0.7544 l 6.2857143,0 q 1.0625002,0 1.8169652,0.7544\n     0.754464,0.7545 0.754464,1.8169 l 0,1.4733 3.598214,-3.5893 q 0.160714,-0.1696 0.401786,-0.1696 0.107143,0 0.223214,0.044 Q 17,3.732099\n     17,4.106999 Z\" /> ");
+}
+exports.video = video;
+function audio(x, y, title, scale) {
+    if (scale === void 0) { scale = 1; }
+    return toSvg(x, y, title, "icon-audio", scale, "<path d=\"m 8.384615,3.7559 0,10.4615 q 0,0.2501 -0.182692,0.4327 -0.182692,0.1827\n  -0.432692,0.1827 -0.25,0 -0.432692,-0.1827 l -3.201924,-3.2019 -2.51923,0 q -0.25,0 -0.432693,-0.1827 Q 1,11.0828 1,10.8328 L 1,7.1405 Q\n  1,6.8905 1.182692,6.7078 1.365385,6.5251 1.615385,6.5251 l 2.51923,0 3.201924,-3.2019 q 0.182692,-0.1827 0.432692,-0.1827 0.25,0\n  0.432692,0.1827 0.182692,0.1827 0.182692,0.4327 z m 3.692308,5.2308 q 0,0.7307 -0.408654,1.3605 -0.408654,0.6299 -1.08173,0.8991\n  -0.09615,0.048 -0.240385,0.048 -0.25,0 -0.432693,-0.1779 -0.182692,-0.1778 -0.182692,-0.4375 0,-0.2018 0.115385,-0.3413 0.115385,-0.1394\n  0.278846,-0.2404 0.163461,-0.1009 0.326923,-0.2211 0.163462,-0.1202 0.278846,-0.3414 0.115385,-0.2211 0.115385,-0.548 0,-0.327\n  -0.115385,-0.5481 Q 10.615385,8.2174 10.451923,8.0972 10.288461,7.9771 10.125,7.8761 9.961539,7.7751 9.846154,7.6357 9.730769,7.4963\n  9.730769,7.2943 q 0,-0.2596 0.182692,-0.4374 0.182693,-0.178 0.432693,-0.178 0.144231,0 0.240385,0.048 0.673076,0.2597 1.08173,0.8942\n  0.408654,0.6347 0.408654,1.3655 z m 2.461538,0 q 0,1.4711 -0.817307,2.7163 -0.817308,1.2452 -2.163462,1.8125 -0.125,0.048 -0.240384,0.048\n  -0.259616,0 -0.442308,-0.1827 -0.182692,-0.1827 -0.182692,-0.4327 0,-0.375 0.375,-0.5673 0.538461,-0.2789 0.730769,-0.4231\n  0.711538,-0.5192 1.110577,-1.3029 0.399038,-0.7836 0.399038,-1.6682 0,-0.8847 -0.399038,-1.6683 -0.399039,-0.7836 -1.110577,-1.3029\n  -0.192308,-0.1442 -0.730769,-0.4231 -0.375,-0.1923 -0.375,-0.5672 0,-0.2501 0.182692,-0.4328 0.182692,-0.1826 0.432692,-0.1826 0.125,0\n  0.25,0.048 1.346154,0.5674 2.163462,1.8125 0.817307,1.2452 0.817307,2.7164 z M 17,8.9867 q 0,2.2115 -1.221154,4.0624 -1.221154,1.851\n  -3.25,2.726 -0.125,0.048 -0.25,0.048 -0.25,0 -0.432692,-0.1827 -0.182693,-0.1827 -0.182693,-0.4327 0,-0.3461 0.375,-0.5673 0.06731,-0.038\n  0.216347,-0.1009 0.149038,-0.062 0.216346,-0.101 0.442307,-0.2404 0.788461,-0.4904 1.182693,-0.875 1.846154,-2.1827 0.663462,-1.3077\n  0.663462,-2.7788 0,-1.4712 -0.663462,-2.7789 Q 14.442308,4.9 13.259615,4.0251 12.913461,3.775 12.471154,3.5347 q -0.06731,-0.038\n  -0.216346,-0.101 -0.149039,-0.062 -0.216347,-0.101 -0.375,-0.2212 -0.375,-0.5673 0,-0.25 0.182693,-0.4327 0.182692,-0.1827\n  0.432692,-0.1827 0.125,0 0.25,0.048 2.028846,0.8751 3.25,2.726 Q 17,6.7751 17,8.9867 Z\" /> ");
+}
+exports.audio = audio;
 
 },{}],4:[function(require,module,exports){
 /**
@@ -787,6 +797,8 @@ function mimeToRequestType(mimeType) {
     switch (types[0]) {
         case "image": return "image";
         case "font": return "font";
+        case "video": return "video";
+        case "audio": return "audio";
     }
     switch (part2) {
         case "svg+xml": return "svg";
@@ -1274,7 +1286,21 @@ function makeIcon(type, title) {
  * @returns {Icon}
  */
 function getMimeTypeIcon(block) {
-    return makeIcon(block.requestType, block.requestType);
+    var entry = block.rawResource;
+    //highlight redirects
+    if (!!entry.response.redirectURL) {
+        var url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
+        return makeIcon("err3xx", entry.response.status + " response status: Redirect to " + url + "...");
+    }
+    else if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
+        return makeIcon("err4xx", entry.response.status + " response status: " + entry.response.statusText);
+    }
+    else if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
+        return makeIcon("err5xx", entry.response.status + " response status: " + entry.response.statusText);
+    }
+    else {
+        return makeIcon(block.requestType, block.requestType);
+    }
 }
 exports.getMimeTypeIcon = getMimeTypeIcon;
 /**
@@ -1286,11 +1312,6 @@ exports.getMimeTypeIcon = getMimeTypeIcon;
 function getIndicatorIcons(block, docIsSsl) {
     var entry = block.rawResource;
     var output = [];
-    //highlight redirects
-    if (!!entry.response.redirectURL) {
-        var url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
-        output.push(makeIcon("err3xx", entry.response.status + " response status: Redirect to " + url + "..."));
-    }
     if (!docIsSsl && heuristics.isSecure(block)) {
         output.push(makeIcon("lock", "Secure Connection"));
     }
@@ -1302,12 +1323,6 @@ function getIndicatorIcons(block, docIsSsl) {
     }
     if (heuristics.hasCompressionIssue(block)) {
         output.push(makeIcon("noGzip", "no gzip"));
-    }
-    if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
-        output.push(makeIcon("err4xx", entry.response.status + " response status: " + entry.response.statusText));
-    }
-    if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
-        output.push(makeIcon("err5xx", entry.response.status + " response status: " + entry.response.statusText));
     }
     if (!entry.response.content.mimeType && heuristics.isInStatusCodeRange(entry, 200, 299)) {
         output.push(makeIcon("warning", "No MIME Type defined"));
