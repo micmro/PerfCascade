@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.13 (18/12/2016) */
+/*! github.com/micmro/PerfCascade Version:0.2.14 (21/12/2016) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -676,7 +676,7 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .row-item.status3xx:hover .odd {opacity: 0.5}
 
 
-.lables { overflow: hidden;}
+.labels { overflow: hidden;}
 
 /*block colours for MIME types*/
 .block-css {fill: #a6d18f;}
@@ -785,3 +785,15 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .resource-legend .legend-send:before { background: #b0bec5; }
 .resource-legend .legend-wait:before { background: #1ec659; }
 .resource-legend .legend-receive:before { background: #1eaaf1; }
+
+.icon {
+  fill: #666;
+}
+
+.icon-4xx,
+.icon-5xx,
+.icon-no-cache,
+.icon-no-gzip,
+.icon-warning {
+  fill: #b55;
+}
