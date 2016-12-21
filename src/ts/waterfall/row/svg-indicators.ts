@@ -25,7 +25,22 @@ function makeIcon(type: string, title: string): Icon {
  * @returns {Icon}
  */
 export function getMimeTypeIcon(block: TimeBlock): Icon {
-  return makeIcon(block.requestType, block.requestType)
+  const entry = block.rawResource
+  //highlight redirects
+  if (!!entry.response.redirectURL) {
+    const url = encodeURI(entry.response.redirectURL.split("?")[0] || "")
+    return makeIcon("err3xx", `${entry.response.status} response status: Redirect to ${url}...`)
+  }
+
+  else if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
+    return makeIcon("err4xx", `${entry.response.status} response status: ${entry.response.statusText}`)
+  }
+
+  else if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
+    return makeIcon("err5xx", `${entry.response.status} response status: ${entry.response.statusText}`)
+  }
+
+  else return makeIcon(block.requestType, block.requestType)
 }
   /**
    * Scan the request for errors or portential issues and highlight them
@@ -36,12 +51,6 @@ export function getMimeTypeIcon(block: TimeBlock): Icon {
   export function getIndicatorIcons(block: TimeBlock, docIsSsl: boolean): Icon[] {
   const entry = block.rawResource
   let output = []
-
-  //highlight redirects
-  if (!!entry.response.redirectURL) {
-    const url = encodeURI(entry.response.redirectURL.split("?")[0] || "")
-    output.push(makeIcon("err3xx", `${entry.response.status} response status: Redirect to ${url}...`))
-  }
 
   if (!docIsSsl && heuristics.isSecure(block)) {
     output.push(makeIcon("lock", "Secure Connection"))
@@ -55,14 +64,6 @@ export function getMimeTypeIcon(block: TimeBlock): Icon {
 
   if (heuristics.hasCompressionIssue(block)) {
     output.push(makeIcon("noGzip", "no gzip"))
-  }
-
-  if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
-    output.push(makeIcon("err4xx", `${entry.response.status} response status: ${entry.response.statusText}`))
-  }
-
-  if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
-    output.push(makeIcon("err5xx", `${entry.response.status} response status: ${entry.response.statusText}`))
   }
 
   if (!entry.response.content.mimeType && heuristics.isInStatusCodeRange(entry, 200, 299)) {
