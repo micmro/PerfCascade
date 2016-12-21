@@ -15,6 +15,8 @@ export function mimeToRequestType(mimeType: string) {
   switch (types[0]) {
     case "image": return "image"
     case "font": return "font"
+    case "video": return "video"
+    case "audio": return "audio"
   }
   switch (part2) {
     case "svg+xml": return "svg"
