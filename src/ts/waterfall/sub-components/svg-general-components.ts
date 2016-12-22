@@ -66,7 +66,7 @@ let appendSecond = function (timeHolder: SVGGElement, diagramHeight: number, sec
  * @param {number} subSecondStepMs  Distant (time in ms) between sub-second time-scales
  */
 export function createTimeScale(durationMs: number, diagramHeight: number, subSecondStepMs = 200): SVGGElement {
-  let timeHolder = svg.newEl("g", { class: "time-scale full-width" }) as SVGGElement
+  let timeHolder = svg.newG("time-scale full-width")
   /** steps between each second marker */
   const subSecondSteps = 1000 / subSecondStepMs
   const secs = durationMs / 1000

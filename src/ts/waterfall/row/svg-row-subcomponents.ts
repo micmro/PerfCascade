@@ -92,9 +92,7 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
  */
 export function createRect(rectData: RectData, segments: Array<TimeBlock>, timeTotal: number): SVGElement {
   let rect = makeBlock(rectData, `time-block ${rectData.cssClass || "block-other"}`)
-  let rectHolder = svg.newEl("g", {
-    "class": "rect-holder"
-  })
+  let rectHolder = svg.newG("rect-holder")
   let firstX = rectData.x
 
   rectHolder.appendChild(rect)
@@ -225,9 +223,7 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
 
 
 export function createNameRowBg(y: number, rowHeight: number, onClick: EventListener, leftColumnWith: number): SVGGElement {
-  let rowFixed = svg.newEl("g", {
-    "class": "row row-fixed"
-  }) as SVGGElement
+  let rowFixed = svg.newG("row row-fixed")
 
   rowFixed.appendChild(svg.newEl("rect", {
     "width": "100%",
@@ -245,9 +241,7 @@ export function createNameRowBg(y: number, rowHeight: number, onClick: EventList
 
 
 export function createRowBg(y: number, rowHeight: number, onClick: EventListener): SVGGElement {
-  let rowFixed = svg.newEl("g", {
-    "class": "row row-flex"
-  }) as SVGGElement
+  let rowFixed = svg.newG("row row-flex")
 
   rowFixed.appendChild(svg.newEl("rect", {
     "width": "100%",

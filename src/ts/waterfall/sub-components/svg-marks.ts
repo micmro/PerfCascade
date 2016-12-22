@@ -12,21 +12,15 @@ import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-su
  * @param {number}      diagramHeight Full height of SVG in px
  */
 export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: number) {
-  let marksHolder = svg.newEl("g", {
-    "transform": "scale(1, 1)",
-    "class": "marker-holder"
+  let marksHolder = svg.newG("marker-holder", {
+    "transform": "scale(1, 1)"
   })
 
   marks.forEach((mark, i) => {
     let x = mark.startTime / unit
-    let markHolder = svg.newEl("g", {
-      "class": "mark-holder type-" + mark.name.toLowerCase()
-    })
-    let lineHolder = svg.newEl("g", {
-      "class": "line-holder"
-    })
-    let lineLabelHolder = svg.newEl("g", {
-      "class": "line-label-holder",
+    let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase())
+    let lineHolder = svg.newG("line-holder")
+    let lineLabelHolder = svg.newG("line-label-holder", {
       "x": x + "%"
     })
     mark.x = x
