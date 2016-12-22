@@ -19,7 +19,6 @@ export interface WaterfallEntry {
   name: string,
   start: number,
   end: number,
-  cssClass: string,
   segments: Array<WaterfallEntryTiming>,
   rawResource: Entry,
   requestType: RequestType
@@ -29,8 +28,7 @@ export interface WaterfallEntryTiming {
   total: number
   type: TimingType,
   start: number,
-  end: number,
-  cssClass: string
+  end: number
 }
 
 export interface WaterfallData {

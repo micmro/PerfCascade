@@ -6,6 +6,7 @@ import {RectData} from "../../typing/rect-data.d"
 import * as svg from "../../helpers/svg"
 import * as misc from "../../helpers/misc"
 import {WaterfallEntryTiming} from "../../typing/waterfall";
+import {timingTypeToCssClass} from "../../transformers/styling-converters";
 
 
 
@@ -46,7 +47,7 @@ function segmentToRectData(segment: WaterfallEntryTiming, rectData: RectData): R
     "height": (rectData.height - 6),
     "x": segment.start || 0.001,
     "y": rectData.y,
-    "cssClass": segment.cssClass,
+    "cssClass": timingTypeToCssClass(segment.type),
     "label": segment.type + " (" + Math.round(segment.start) + "ms - "
     + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
     "unit": rectData.unit,
@@ -89,7 +90,7 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
  * @return {SVGElement}                Renerated SVG (rect or g element)
  */
 export function createRect(rectData: RectData, segments: Array<WaterfallEntryTiming>, timeTotal: number): SVGElement {
-  let rect = makeBlock(rectData, `time-block ${rectData.cssClass || "block-other"}`)
+  let rect = makeBlock(rectData, `time-block ${rectData.cssClass}`)
   let rectHolder = svg.newG("rect-holder")
   let firstX = rectData.x
 
