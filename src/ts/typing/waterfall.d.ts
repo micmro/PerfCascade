@@ -1,5 +1,6 @@
 import {Entry} from "./har";
 
+export type TimingType = "blocked" | "dns" | "connect" | "send" | "wait" | "receive" | "ssl"
 export type RequestType = "other" | "image" | "video" | "audio" | "font" | "svg" |  "html" | "plain" | "css" | "javascript" | "flash"
 
 interface UserTiming {
@@ -26,7 +27,7 @@ export interface WaterfallEntry {
 
 export interface WaterfallEntryTiming {
   total: number
-  name: string,
+  type: TimingType,
   start: number,
   end: number,
   cssClass: string
