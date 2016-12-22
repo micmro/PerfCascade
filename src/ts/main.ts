@@ -6,7 +6,6 @@ import * as paging from "./paging/paging"
 import HarTransformer from "./transformers/har"
 import { makeLegend } from "./legend/legend"
 import * as waterfallDocsService from "./state/waterfall-docs-service"
-import * as globalStateService from "./state/global-state"
 import * as misc from "./helpers/misc"
 
 
@@ -24,15 +23,14 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions?: ChartOptio
   const options: ChartOptions = misc.assign(defaultOptions, chartOptions || {})
 
   //setup state services
-  globalStateService.init(options)
   waterfallDocsService.storeDocs(waterfallDocsData)
 
-  let doc = createWaterfallSvg(paging.getSelectedPage())
+  let doc = createWaterfallSvg(paging.getSelectedPage(), options)
 
   //page update behaviour
   paging.onPageUpdate((pageIndex, pageDoc) => {
     let el = doc.parentElement
-    let newDoc = createWaterfallSvg(pageDoc)
+    let newDoc = createWaterfallSvg(pageDoc, options)
     el.replaceChild(newDoc, doc)
     doc = newDoc
   })

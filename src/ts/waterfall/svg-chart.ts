@@ -1,6 +1,7 @@
 import {WaterfallData} from "../typing/waterfall-data.d"
 import {RectData} from "../typing/rect-data.d"
 import TimeBlock from "../typing/time-block"
+import {ChartOptions} from "../typing/options";
 
 import * as svg from "../helpers/svg"
 import * as generalComponents from "./sub-components/svg-general-components"
@@ -10,7 +11,6 @@ import * as row from "./row/svg-row"
 import * as indicators from "./row/svg-indicators"
 import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
 import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
-import * as globalStateService from "../state/global-state"
 
 /**
  * Calculate the height of the SVG chart in px
@@ -34,9 +34,7 @@ function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: numb
  * @param {WaterfallData} data  Object containing the setup parameter
  * @return {SVGSVGElement}            SVG Element ready to render
  */
-export function createWaterfallSvg(data: WaterfallData): SVGSVGElement {
-  const options = globalStateService.getOptions()
-
+export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): SVGSVGElement {
   //constants
 
   /** horizontal unit (duration in ms of 1%) */
