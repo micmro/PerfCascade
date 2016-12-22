@@ -68,7 +68,7 @@ export function roundNumber(num: number, decimals: number) {
  *
  * Helper to polyfill `Object.assign` since the target is not ES6
  * @param  {Object} target
- * @param  {Object[]} ...sources
+ * @param  {Object[]} sources
  */
 export function assign(target: Object, ...sources: Object[]) {
   if (target === undefined || target === null) {

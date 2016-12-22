@@ -32,6 +32,7 @@ function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: numb
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter
+ * @param {ChartOptions} options
  * @return {SVGSVGElement}            SVG Element ready to render
  */
 export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): SVGSVGElement {
