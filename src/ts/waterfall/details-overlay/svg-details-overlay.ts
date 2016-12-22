@@ -56,17 +56,17 @@ function createHolder(y: number, accordionHeight: number) {
   return innerHolder
 }
 
-export function createRowInfoOverlay(indexBackup: number, barX: number,  y: number, accordeonHeight: number, block: TimeBlock,
+export function createRowInfoOverlay(indexBackup: number, barX: number,  y: number, accordionHeight: number, block: TimeBlock,
   onClose: Function, unit: number): SVGGElement {
   const requestID =  parseInt(block.rawResource._index + 1, 10) || indexBackup + 1
   let wrapper = svg.newG("outer-info-overlay-holder", {
     "width": "100%"
   })
-  let holder = createHolder(y, accordeonHeight)
+  let holder = createHolder(y, accordionHeight)
 
   let foreignObject = svg.newEl("foreignObject", {
     "width": "100%",
-    "height": accordeonHeight,
+    "height": accordionHeight,
     "x": "0",
     "y": y,
     "dy": "5",
@@ -77,7 +77,7 @@ export function createRowInfoOverlay(indexBackup: number, barX: number,  y: numb
   let closeBtn = createCloseButtonSvg(y)
   closeBtn.addEventListener("click", evt => onClose(indexBackup, holder))
 
-  let body = createDetailsBody(requestID, block, accordeonHeight)
+  let body = createDetailsBody(requestID, block, accordionHeight)
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>
   let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>
 

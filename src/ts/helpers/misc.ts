@@ -28,7 +28,7 @@ export function contains<T>(arr: Array<T>, item: T): boolean {
 }
 
 /**
- * Pormats and shortens a url for ui
+ * Formats and shortens a url for ui
  * @param  {string} url
  * @param  {number} maxLength - max length of shortened url
  * @returns string

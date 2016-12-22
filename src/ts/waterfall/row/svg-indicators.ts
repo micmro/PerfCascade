@@ -20,7 +20,7 @@ function makeIcon(type: string, title: string): Icon {
 }
 
 /**
- * Scan the request for errors or portential issues and highlight them
+ * Scan the request for errors or potential issues and highlight them
  * @param  {TimeBlock} block
  * @returns {Icon}
  */
