@@ -1,5 +1,7 @@
 import {Entry} from "./har";
 
+export type RequestType = "other" | "image" | "video" | "audio" | "font" | "svg" |  "html" | "plain" | "css" | "javascript" | "flash"
+
 interface UserTiming {
   duration?: number
   name: string
@@ -19,7 +21,7 @@ export interface WaterfallEntry {
   cssClass: string,
   segments: Array<WaterfallEntryTiming>,
   rawResource: Entry,
-  requestType: string
+  requestType: RequestType
 }
 
 export interface WaterfallEntryTiming {

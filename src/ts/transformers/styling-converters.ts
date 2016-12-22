@@ -1,8 +1,9 @@
+import {RequestType} from "../typing/waterfall";
 /**
  * Convert a MIME type into it's WPT style request type (font, script etc)
  * @param {string} mimeType
  */
-export function mimeToRequestType(mimeType: string) {
+export function mimeToRequestType(mimeType: string): RequestType {
   if (mimeType === undefined) {
     return "other"
   }
@@ -40,9 +41,9 @@ export function mimeToRequestType(mimeType: string) {
 }
 
 /**
- * Convert a MIME type into a CSS class
- * @param {string} mimeType
+ * Convert a RequestType into a CSS class
+ * @param {RequestType} requestType
  */
-export function mimeToCssClass(mimeType: string) {
-  return "block-" + mimeToRequestType(mimeType)
+export function requestTypeToCssClass(requestType: RequestType) {
+  return "block-" + requestType
 }

@@ -5,10 +5,10 @@ import {
 import {
   WaterfallDocs,
   WaterfallData,
-  Mark
+  Mark, RequestType
 } from "../typing/waterfall"
 import {
-  mimeToCssClass,
+  requestTypeToCssClass,
   mimeToRequestType
 } from "./styling-converters"
 
@@ -20,7 +20,7 @@ class WaterfallEntry {
               public cssClass: string = "",
               public segments: Array<WaterfallEntryTiming> = [],
               public rawResource: Entry,
-              public requestType: string) {
+              public requestType: RequestType) {
     this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
   }
 }
@@ -77,13 +77,14 @@ export namespace HarTransformer {
 
         doneTime = Math.max(doneTime, startRelative + entry.time)
 
+        const requestType = mimeToRequestType(entry.response.content.mimeType);
         return new WaterfallEntry(entry.request.url,
           startRelative,
           parseInt(entry._all_end, 10) || (startRelative + entry.time),
-          mimeToCssClass(entry.response.content.mimeType),
+          requestTypeToCssClass(requestType),
           buildDetailTimingBlocks(startRelative, entry),
           entry,
-          mimeToRequestType(entry.response.content.mimeType)
+          requestType
         )
       })
 
