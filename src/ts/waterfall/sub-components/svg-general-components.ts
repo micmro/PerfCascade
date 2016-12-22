@@ -6,6 +6,7 @@ import { OverlayChangeEvent } from "../../typing/open-overlay.d"
 import * as svg from "../../helpers/svg"
 import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
 import {WaterfallEntry} from "../../typing/waterfall";
+import {requestTypeToCssClass} from "../../transformers/styling-converters";
 
 /**
  * Renders a per-second marker line and appends it to `timeHolder`
@@ -91,7 +92,7 @@ export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight:
     "height": diagramHeight,
     "x": ((block.start || 0.001) / unit) + "%",
     "y": 0,
-    "class": block.cssClass || "block-other"
+    "class": requestTypeToCssClass(block.requestType)
   })
 
   rect.appendChild(svg.newTitle(block.name)) // Add tile to wedge path

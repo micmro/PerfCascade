@@ -1,4 +1,4 @@
-import {RequestType} from "../typing/waterfall";
+import {RequestType, TimingType} from "../typing/waterfall";
 /**
  * Convert a MIME type into it's WPT style request type (font, script etc)
  * @param {string} mimeType
@@ -46,4 +46,12 @@ export function mimeToRequestType(mimeType: string): RequestType {
  */
 export function requestTypeToCssClass(requestType: RequestType) {
   return "block-" + requestType
+}
+
+/**
+ * Convert a TimingType into a CSS class
+ * @param {TimingType} timingType
+ */
+export function timingTypeToCssClass(timingType: TimingType) {
+  return "block-" + timingType
 }

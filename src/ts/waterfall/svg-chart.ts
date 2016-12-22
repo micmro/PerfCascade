@@ -10,6 +10,7 @@ import * as row from "./row/svg-row"
 import * as indicators from "./row/svg-indicators"
 import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
 import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
+import {requestTypeToCssClass} from "../transformers/styling-converters";
 
 /**
  * Calculate the height of the SVG chart in px
@@ -117,7 +118,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
       "height": options.rowHeight,
       "x": x,
       "y": y,
-      "cssClass": block.cssClass,
+      "cssClass": requestTypeToCssClass(block.requestType),
       "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
       "unit": unit,
       "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,

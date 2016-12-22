@@ -8,7 +8,6 @@ import {
   Mark, RequestType, TimingType
 } from "../typing/waterfall"
 import {
-  requestTypeToCssClass,
   mimeToRequestType
 } from "./styling-converters"
 
@@ -17,7 +16,6 @@ class WaterfallEntry {
   constructor(public name: string,
               public start: number,
               public end: number,
-              public cssClass: string = "",
               public segments: Array<WaterfallEntryTiming> = [],
               public rawResource: Entry,
               public requestType: RequestType) {
@@ -29,8 +27,7 @@ class WaterfallEntryTiming {
   public total: number
   constructor(public type: TimingType,
               public start: number,
-              public end: number,
-              public cssClass: string = "") {
+              public end: number) {
     this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
   }
 }
@@ -81,7 +78,6 @@ export namespace HarTransformer {
         return new WaterfallEntry(entry.request.url,
           startRelative,
           parseInt(entry._all_end, 10) || (startRelative + entry.time),
-          requestTypeToCssClass(requestType),
           buildDetailTimingBlocks(startRelative, entry),
           entry,
           requestType
@@ -137,11 +133,11 @@ export namespace HarTransformer {
         const sslEnd = parseInt(entry[`_ssl_end`], 10) || time.start + t.ssl
         const connectStart = (!!parseInt(entry[`_ssl_start`], 10)) ? time.start : sslEnd
         return collect
-          .concat([new WaterfallEntryTiming("ssl", sslStart, sslEnd, "block-ssl")])
-          .concat([new WaterfallEntryTiming(key, connectStart, time.end, "block-" + key)])
+          .concat([new WaterfallEntryTiming("ssl", sslStart, sslEnd)])
+          .concat([new WaterfallEntryTiming(key, connectStart, time.end)])
       }
 
-      return collect.concat([new WaterfallEntryTiming(key, time.start, time.end, "block-" + key)])
+      return collect.concat([new WaterfallEntryTiming(key, time.start, time.end)])
     }, [])
   }
 
