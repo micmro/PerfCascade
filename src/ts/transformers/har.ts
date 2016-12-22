@@ -5,7 +5,7 @@ import {
 import {
   WaterfallDocs,
   WaterfallData,
-  Mark, RequestType
+  Mark, RequestType, TimingType
 } from "../typing/waterfall"
 import {
   requestTypeToCssClass,
@@ -27,7 +27,7 @@ class WaterfallEntry {
 
 class WaterfallEntryTiming {
   public total: number
-  constructor(public name: string,
+  constructor(public type: TimingType,
               public start: number,
               public end: number,
               public cssClass: string = "") {
@@ -122,7 +122,7 @@ export namespace HarTransformer {
    */
   function buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<WaterfallEntryTiming> {
     let t = entry.timings
-    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<WaterfallEntryTiming>, key: string) => {
+    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<WaterfallEntryTiming>, key: TimingType) => {
 
       const time = getTimePair(key, entry, collect, startRelative)
 

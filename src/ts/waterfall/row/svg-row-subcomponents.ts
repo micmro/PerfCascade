@@ -47,7 +47,7 @@ function segmentToRectData(segment: WaterfallEntryTiming, rectData: RectData): R
     "x": segment.start || 0.001,
     "y": rectData.y,
     "cssClass": segment.cssClass,
-    "label": segment.name + " (" + Math.round(segment.start) + "ms - "
+    "label": segment.type + " (" + Math.round(segment.start) + "ms - "
     + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
     "unit": rectData.unit,
     "showOverlay": rectData.showOverlay,
