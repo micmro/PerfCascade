@@ -1,5 +1,5 @@
-import {Mark} from "../../typing/waterfall-data.d"
-import {OverlayChangeEvent} from "../../typing/open-overlay.d"
+import {Mark} from "../../typing/waterfall-data"
+import {OverlayChangeEvent} from "../../typing/open-overlay"
 
 import * as svg from "../../helpers/svg"
 import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"

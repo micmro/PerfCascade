@@ -1,5 +1,5 @@
 import TimeBlock from "../../typing/time-block"
-import { KvTuple } from "../../typing/misc.d"
+import { KvTuple } from "../../typing/misc"
 import { getKeys } from "./extract-details-keys"
 
 function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {

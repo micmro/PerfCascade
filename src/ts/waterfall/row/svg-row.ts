@@ -1,4 +1,4 @@
-import { RectData } from "../../typing/rect-data.d"
+import { RectData } from "../../typing/rect-data"
 import { ChartOptions } from "../../typing/options"
 import TimeBlock from "../../typing/time-block"
 

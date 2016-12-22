@@ -1,4 +1,4 @@
-import {WaterfallDocs} from "../typing/waterfall-data.d"
+import {WaterfallDocs} from "../typing/waterfall-data"
 
 /*
 * Central service to store HAR data

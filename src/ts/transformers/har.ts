@@ -1,12 +1,12 @@
 import {
   Har,
   Entry
-} from "../typing/har.d"
+} from "../typing/har"
 import {
   WaterfallDocs,
   WaterfallData,
   Mark
-} from "../typing/waterfall-data.d"
+} from "../typing/waterfall-data"
 import TimeBlock from "../typing/time-block"
 import {
   mimeToCssClass,

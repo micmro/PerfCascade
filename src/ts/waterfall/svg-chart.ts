@@ -1,5 +1,5 @@
-import {WaterfallData} from "../typing/waterfall-data.d"
-import {RectData} from "../typing/rect-data.d"
+import {WaterfallData} from "../typing/waterfall-data"
+import {RectData} from "../typing/rect-data"
 import TimeBlock from "../typing/time-block"
 import {ChartOptions} from "../typing/options";
 

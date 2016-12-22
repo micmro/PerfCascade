@@ -1,4 +1,4 @@
-import {Entry, Header} from "../typing/har.d"
+import {Entry, Header} from "../typing/har"
 import TimeBlock from "../typing/time-block"
 import * as misc from "./misc"
 
