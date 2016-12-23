@@ -6,7 +6,7 @@ zip.useWebWorkers = false
 /** handle client side file upload */
 export function readFile(file: File, fileName: string, callback: Function) {
   if (!file) {
-    callback(new Error("Failed to load HAR file"))
+    return callback(new Error("Failed to load HAR file"))
   }
 
   function parseJson(rawData) {
