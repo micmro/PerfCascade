@@ -40,7 +40,8 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions?: ChartOptio
   }
 
   if (options.legendHolder) {
-    options.legendHolder.appendChild(makeLegend())
+    options.legendHolder.innerHTML = "";
+    options.legendHolder.appendChild(makeLegend());
   }
   return doc
 }
