@@ -75,9 +75,9 @@
           }
 
           // Just needed for gzipped *.zhar files, you can use the standard FileReader api for normal .har files
-          perfCascadeFileReader.readFile(files[0], evt.target.value, function(data){
-            if(!data){
-              console.error("Can't read file")
+          perfCascadeFileReader.readFile(files[0], evt.target.value, function(error, data){
+            if(error){
+              console.error(e)
             }else{
               renderPerfCascadeChart(data)
             }
