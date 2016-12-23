@@ -1,7 +1,7 @@
 import {WaterfallData} from "../typing/waterfall-data"
 import {RectData} from "../typing/rect-data"
 import TimeBlock from "../typing/time-block"
-import {ChartOptions} from "../typing/options";
+import {ChartOptions} from "../typing/options"
 
 import * as svg from "../helpers/svg"
 import * as generalComponents from "./sub-components/svg-general-components"
@@ -84,7 +84,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
     timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight))
   })
 
-  let labelXPos = 5;
+  let labelXPos = 5
 
   // This assumes all icons (mime and indicators) have the same width
   const iconWidth = indicators.getMimeTypeIcon(barsToShow[0]).width

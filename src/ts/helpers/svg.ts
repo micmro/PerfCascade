@@ -3,8 +3,8 @@
  */
 
 export function newEl(tagName: string, settings?: Object, css?: Object): SVGElement {
-  let el = document.createElementNS("http://www.w3.org/2000/svg", tagName) as SVGGElement;
-  settings = settings || {};
+  let el = document.createElementNS("http://www.w3.org/2000/svg", tagName) as SVGGElement
+  settings = settings || {}
   for (let attr in settings) {
     if (attr !== "text") {
       el.setAttributeNS(null, attr, settings[attr])

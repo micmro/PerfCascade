@@ -96,7 +96,7 @@ function renderOverlays(barX: number, accordionHeight: number, overlayHolder: SV
     overlayHolder.removeChild(overlayHolder.firstChild)
   }
 
-  let currY = 0;
+  let currY = 0
   openOverlays
     .sort((a, b) => a.index > b.index ? 1 : -1)
     .forEach((overlay) => {

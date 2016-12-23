@@ -17,15 +17,15 @@ let formatTime = (size?: number) => ifValueDefined(size, s => `${s} ms`)
 
 let formatDate = (date?: string) => {
   if (!date) {
-    return "";
+    return ""
   }
-  let dateToFormat = new Date(date);
+  let dateToFormat = new Date(date)
   return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`
 }
 
 
 let asIntPartial = (val: string, ifIntFn: (number) => any) => {
-  let v = parseInt(val, 10);
+  let v = parseInt(val, 10)
   return ifValueDefined(v, ifIntFn)
 }
 

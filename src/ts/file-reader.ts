@@ -1,4 +1,4 @@
-declare var zip: any;
+declare var zip: any
 
 //use zip
 zip.useWebWorkers = false
@@ -22,7 +22,7 @@ export function readFile(file: File, fileName: string, onDone: Function) {
   }
 
   /** start reading the file */
-  let extension = fileName.match(/\.[0-9a-z]+$/i)[0];
+  let extension = fileName.match(/\.[0-9a-z]+$/i)[0]
   if ([".zhar", ".zip"].indexOf(extension) !== -1) {
     /** zhar */
     zip.createReader(new zip.BlobReader(file), function (zipReader) {
@@ -30,12 +30,12 @@ export function readFile(file: File, fileName: string, onDone: Function) {
         x[0].getData(new zip.TextWriter(), function (txt) {
           parseJson(txt)
           // close the zip reader
-          zipReader.close();
+          zipReader.close()
         }, (progress: number) => {
           console.log(`unzip progress: ${progress / 100}%`)
-        });
-      });
-    });
+        })
+      })
+    })
   } else {
 
     let reader = new FileReader()

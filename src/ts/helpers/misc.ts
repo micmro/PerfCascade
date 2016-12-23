@@ -7,8 +7,8 @@
  * @param  {string} url
  */
 export function parseUrl(url: string) {
-  let pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
-  let matches = url.match(pattern);
+  let pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?")
+  let matches = url.match(pattern)
   return {
     scheme: matches[2],
     authority: matches[4],
@@ -44,7 +44,7 @@ export function resourceUrlFormatter(url: string, maxLength: number): string {
     return matches.authority + matches.path
   }
 
-  const maxAuthLength = Math.floor(maxLength / 2) - 3;
+  const maxAuthLength = Math.floor(maxLength / 2) - 3
   const maxPathLength = Math.floor(maxLength / 2) - 5
   // maybe we could fine tune these numbers
   let p = matches.path.split("/")
@@ -60,7 +60,7 @@ export function resourceUrlFormatter(url: string, maxLength: number): string {
  * @param  {number} decimals - decimal precision to round to
  */
 export function roundNumber(num: number, decimals: number) {
-  return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
+  return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals)
 }
 
 
@@ -74,16 +74,16 @@ export function assign(target: Object, ...sources: Object[]) {
   if (target === undefined || target === null) {
     throw new TypeError("Cannot convert undefined or null to object")
   }
-  let output = Object(target);
+  let output = Object(target)
   for (let index = 1; index < arguments.length; index++) {
-    let source = arguments[index];
+    let source = arguments[index]
     if (source !== undefined && source !== null) {
       for (let nextKey in source) {
         if (source.hasOwnProperty(nextKey)) {
-          output[nextKey] = source[nextKey];
+          output[nextKey] = source[nextKey]
         }
       }
     }
   }
-  return output;
+  return output
 }

@@ -43,8 +43,8 @@ function makeTabBtn(name: string, tab: string) {
 export function createDetailsBody(requestID: number, block: TimeBlock, accordeonHeight: number) {
 
   let html = document.createElement("html") as HTMLHtmlElement
-  let body = document.createElement("body");
-  body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+  let body = document.createElement("body")
+  body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml")
   html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/")
 
   const tabsData = getKeys(requestID, block)
