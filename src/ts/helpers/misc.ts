@@ -62,28 +62,3 @@ export function resourceUrlFormatter(url: string, maxLength: number): string {
 export function roundNumber(num: number, decimals: number) {
   return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals)
 }
-
-
-/**
- *
- * Helper to polyfill `Object.assign` since the target is not ES6
- * @param  {Object} target
- * @param  {Object[]} sources
- */
-export function assign(target: Object, ...sources: Object[]) {
-  if (target === undefined || target === null) {
-    throw new TypeError("Cannot convert undefined or null to object")
-  }
-  let output = Object(target)
-  for (let index = 1; index < arguments.length; index++) {
-    let source = arguments[index]
-    if (source !== undefined && source !== null) {
-      for (let nextKey in source) {
-        if (source.hasOwnProperty(nextKey)) {
-          output[nextKey] = source[nextKey]
-        }
-      }
-    }
-  }
-  return output
-}

@@ -6,21 +6,20 @@ import * as paging from "./paging/paging"
 import HarTransformer from "./transformers/har"
 import { makeLegend } from "./legend/legend"
 import * as waterfallDocsService from "./state/waterfall-docs-service"
-import * as misc from "./helpers/misc"
-
 
 /** default options to use if not set in `options` parameter */
-const defaultOptions: ChartOptions = {
+const defaultOptions: Readonly<ChartOptions> = {
   rowHeight: 23,
   showAlignmentHelpers: true,
   showMimeTypeIcon: true,
   showIndicatorIcons: true,
-  leftColumnWith: 25
+  leftColumnWith: 25,
+  pageSelector: undefined,
+  legendHolder: undefined
 }
 
-
-function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions?: ChartOptions): SVGSVGElement {
-  const options: ChartOptions = misc.assign(defaultOptions, chartOptions || {})
+function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {
+  const options: ChartOptions = {...defaultOptions, ...chartOptions}
 
   //setup state services
   waterfallDocsService.storeDocs(waterfallDocsData)
@@ -52,7 +51,7 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions?: ChartOptio
  * @param  {ChartOptions} options - PerfCascade options object
  * @returns {SVGSVGElement} - Chart SVG Element
  */
-function fromHar(harData: Har, options?: ChartOptions): SVGSVGElement {
+function fromHar(harData: Har, options: Partial<ChartOptions> = {}): SVGSVGElement {
   return PerfCascade(HarTransformer.transformDoc(harData), options)
 }
 
@@ -62,7 +61,7 @@ function fromHar(harData: Har, options?: ChartOptions): SVGSVGElement {
  * @param  {ChartOptions} options - PerfCascade options object
  * @returns {SVGSVGElement} - Chart SVG Element
  */
-function fromPerfCascadeFormat(waterfallDocsData: WaterfallDocs, options?: ChartOptions): SVGSVGElement {
+function fromPerfCascadeFormat(waterfallDocsData: WaterfallDocs, options: Partial<ChartOptions> = {}): SVGSVGElement {
   return PerfCascade(waterfallDocsData, options)
 }
 

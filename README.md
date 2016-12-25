@@ -12,15 +12,13 @@ PerfCascade is exported with [UMD](https://github.com/umdjs/umd), so you can use
 
 If using it without any module system it exports as a global object `perfCascade`, you can use as following:
 ```
-/** options for PerfCascade (all have defaults) */
+/** override selected options for PerfCascade (all have defaults) */
 var options = {
-  rowHeight: 23, //default: 23
-  showAlignmentHelpers : true, //default: true
-  showIndicatorIcons: true, //default: true
-  leftColumnWith: 25 //default: 25
+  showIndicatorIcons: false, //default: true
+  leftColumnWith: 30 //default: 25
 }
 
-/** pass HAR and options to `newPerfCascadeHar` to generate the SVG element*/
+/** pass HAR and options to `perfCascade.fromHar` to generate the SVG element*/
 var perfCascadeSvg =  perfCascade.fromHar(harData.log, options)
 ```
 
