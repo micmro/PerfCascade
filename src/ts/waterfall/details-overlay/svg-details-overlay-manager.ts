@@ -25,7 +25,7 @@ export function getOverlayOffset(rowIndex: number): number {
 /**
  * closes on overlay - rerenders others internally
  */
-export function closeOverlay(index: number, holder: SVGElement, overlayHolder: SVGGElement,
+export function closeOverlay(index: number, overlayHolder: SVGGElement,
                              barX: number, accordionHeight: number, barEls: SVGGElement[], unit: number) {
 
   openOverlays.splice(openOverlays.reduce((prev: number, curr, i) => {
@@ -56,7 +56,7 @@ export function openOverlay(index: number, barX: number,  y: number, accordionHe
     "defaultY": y,
     "block": block,
     "onClose": () => {
-      this.closeOverlay(index, null, overlayHolder, barX, accordionHeight, barEls, unit)
+      this.closeOverlay(index, overlayHolder, barX, accordionHeight, barEls, unit)
     }
   })
 
