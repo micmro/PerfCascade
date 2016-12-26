@@ -56,8 +56,8 @@ function createHolder(y: number, accordionHeight: number) {
   return innerHolder
 }
 
-export function createRowInfoOverlay(indexBackup: number, barX: number,  y: number, accordionHeight: number, block: TimeBlock,
-  onClose: Function, unit: number): SVGGElement {
+export function createRowInfoOverlay(indexBackup: number, _barX: number,  y: number, accordionHeight: number, block: TimeBlock,
+  onClose: Function, _unit: number): SVGGElement {
   const requestID =  parseInt(block.rawResource._index + 1, 10) || indexBackup + 1
   let wrapper = svg.newG("outer-info-overlay-holder", {
     "width": "100%"

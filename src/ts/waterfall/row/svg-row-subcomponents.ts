@@ -122,7 +122,7 @@ export function createRect(rectData: RectData, segments: Array<TimeBlock>, timeT
  * @param  {number}         height           height of row
  * @return {SVGTextElement}                  label SVG element
  */
-export function createRequestLabelClipped(x: number, y: number, name: string, height: number, clipPathId?: string) {
+export function createRequestLabelClipped(x: number, y: number, name: string, height: number, _clipPathId?: string) {
 
   let blockLabel = createRequestLabel(x, y, name, height)
   blockLabel.style.clipPath = `url(#titleClipPath)`
@@ -222,7 +222,7 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
 
 
 
-export function createNameRowBg(y: number, rowHeight: number, onClick: EventListener, leftColumnWith: number): SVGGElement {
+export function createNameRowBg(y: number, rowHeight: number, onClick: EventListener, _leftColumnWith: number): SVGGElement {
   let rowFixed = svg.newG("row row-fixed")
 
   rowFixed.appendChild(svg.newEl("rect", {

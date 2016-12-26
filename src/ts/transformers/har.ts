@@ -27,7 +27,7 @@ export default class HarTransformer {
     console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length)
 
     let waterfallDocs = {
-      pages: data.pages.map((page, i) => this.transformPage(data, i))
+      pages: data.pages.map((_page, i) => this.transformPage(data, i))
     } as WaterfallDocs
     return waterfallDocs
   }
