@@ -80,7 +80,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(data.durationMs, diagramHeight))
   scaleAndMarksHolder.appendChild(marks.createMarks(data.marks, unit, diagramHeight))
 
-  data.lines.forEach((block, i) => {
+  data.lines.forEach((block) => {
     timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight))
   })
 
