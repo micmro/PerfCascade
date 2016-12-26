@@ -61,7 +61,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
 
 
     let isActive = false
-    let onLabelMouseEnter = function (evt) {
+    let onLabelMouseEnter = () => {
       if (!isActive) {
         isActive = true
         svg.addClass(lineHolder, "active")
@@ -70,7 +70,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       }
     }
 
-    let onLabelMouseLeave = function (evt) {
+    let onLabelMouseLeave = () => {
       isActive = false
       svg.removeClass(lineHolder, "active")
     }

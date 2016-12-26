@@ -103,7 +103,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   function getChartHeight(): string {
     return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px"
   }
-  overlayChangesPubSub.subscribeToOverlayChanges((evt) => {
+  overlayChangesPubSub.subscribeToOverlayChanges(() => {
     timeLineHolder.style.height = getChartHeight()
   })
 
@@ -125,7 +125,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
       "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined
     } as RectData
 
-    let showDetailsOverlay = (evt) => {
+    let showDetailsOverlay = () => {
       overlayManager.openOverlay(i, x, y + options.rowHeight, accordionHeight, block, overlayHolder, barEls, unit)
     }
 
