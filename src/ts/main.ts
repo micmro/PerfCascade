@@ -27,7 +27,7 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<Cha
   let doc = createWaterfallSvg(paging.getSelectedPage(), options)
 
   //page update behaviour
-  paging.onPageUpdate((pageIndex, pageDoc) => {
+  paging.onPageUpdate((_pageIndex, pageDoc) => {
     let el = doc.parentElement
     let newDoc = createWaterfallSvg(pageDoc, options)
     el.replaceChild(newDoc, doc)

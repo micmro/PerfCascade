@@ -15,11 +15,11 @@ import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub
 /**
  * Calculate the height of the SVG chart in px
  * @param {any[]}       marks      [description]
- * @param {TimeBlock[]} barsToShow [description]
+ * @param {TimeBlock[]} _barsToShow [description]
  * @param  {number} diagramHeight
  * @returns Number
  */
-function getSvgHeight(marks: any[], barsToShow: TimeBlock[], diagramHeight: number): number {
+function getSvgHeight(marks: any[], _barsToShow: TimeBlock[], diagramHeight: number): number {
   const maxMarkTextLength = marks.reduce((currMax: number, currValue: TimeBlock) => {
     return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0), true))
   }, 0)
