@@ -34,6 +34,10 @@ export function newG(cssClass: string, settings?: Object, css?: Object): SVGGEle
 }
 
 
+export function newClipPath(id: string): SVGClipPathElement {
+  return newEl("clipPath", {id}) as SVGClipPathElement
+}
+
 export function newRect(settings: Object): SVGRectElement {
   return newEl("rect", settings) as SVGRectElement
 }

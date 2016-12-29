@@ -10,9 +10,7 @@ import * as rowSubComponents from "./svg-row-subcomponents"
 import * as indicators from "./svg-indicators"
 
 //initial clip path
-let clipPathElProto = svg.newEl("clipPath", {
-  "id": "titleClipPath"
-}) as SVGClipPathElement
+const clipPathElProto = svg.newClipPath("titleClipPath")
 clipPathElProto.appendChild(svg.newRect({
   "width": "100%",
   "height": "100%"
