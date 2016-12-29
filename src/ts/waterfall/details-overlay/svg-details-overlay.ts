@@ -5,9 +5,7 @@ import {createDetailsBody} from "./html-details-body"
 
 
 function createCloseButtonSvg(y: number): SVGGElement {
-  let closeBtn = svg.newEl("a", {
-    "class": "info-overlay-close-btn"
-  }) as SVGGElement
+  let closeBtn = svg.newA("info-overlay-close-btn")
 
   closeBtn.appendChild(svg.newRect({
     "width": 23,
