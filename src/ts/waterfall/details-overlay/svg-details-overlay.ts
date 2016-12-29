@@ -9,7 +9,7 @@ function createCloseButtonSvg(y: number): SVGGElement {
     "class": "info-overlay-close-btn"
   }) as SVGGElement
 
-  closeBtn.appendChild(svg.newEl("rect", {
+  closeBtn.appendChild(svg.newRect({
     "width": 23,
     "height": 23,
     "x": "100%",
@@ -42,7 +42,7 @@ function createHolder(y: number, accordionHeight: number) {
     "width": "100%"
   })
 
-  let bg = svg.newEl("rect", {
+  let bg = svg.newRect({
     "width": "100%",
     "height": accordionHeight,
     "x": "0",

@@ -34,6 +34,11 @@ export function newG(cssClass: string, settings?: Object, css?: Object): SVGGEle
 }
 
 
+export function newRect(settings: Object): SVGRectElement {
+  return newEl("rect", settings) as SVGRectElement
+}
+
+
 export function newTextEl(text: string, y: number, x?: number | string, css?: Object): SVGTextElement {
   css = css || {}
   let opt = {

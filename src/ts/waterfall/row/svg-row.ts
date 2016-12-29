@@ -13,7 +13,7 @@ import * as indicators from "./svg-indicators"
 let clipPathElProto = svg.newEl("clipPath", {
   "id": "titleClipPath"
 }) as SVGClipPathElement
-clipPathElProto.appendChild(svg.newEl("rect", {
+clipPathElProto.appendChild(svg.newRect({
   "width": "100%",
   "height": "100%"
 }))

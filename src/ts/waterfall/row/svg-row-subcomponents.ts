@@ -16,7 +16,7 @@ import * as misc from "../../helpers/misc"
  */
 function makeBlock(rectData: RectData, className: string) {
   const blockHeight = rectData.height - 1
-  let rect = svg.newEl("rect", {
+  let rect = svg.newRect({
     "width": misc.roundNumber(rectData.width / rectData.unit, 2) + "%",
     "height": blockHeight,
     "x": misc.roundNumber(rectData.x / rectData.unit, 2) + "%",
@@ -140,7 +140,7 @@ export function createRequestLabelClipped(x: number, y: number, name: string, he
 export function createRequestLabelFull(x: number, y: number, name: string, height: number) {
   let blockLabel = createRequestLabel(x, y, name, height)
   let labelHolder = svg.newG("full-label")
-  labelHolder.appendChild(svg.newEl("rect", {
+  labelHolder.appendChild(svg.newRect({
     "class": "label-full-bg",
     "x": x - 3,
     "y": y + 3,
@@ -211,13 +211,13 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
  * @return {SVGRectElement}                [description]
  */
 export function createBgStripe(y: number, height: number, isEven: boolean): SVGRectElement {
-  return svg.newEl("rect", {
+  return svg.newRect({
     "width": "100%", //make up for the spacing
     "height": height,
     "x": 0,
     "y": y,
     "class": isEven ? "even" : "odd"
-  }) as SVGRectElement
+  })
 }
 
 
@@ -225,7 +225,7 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
 export function createNameRowBg(y: number, rowHeight: number, onClick: EventListener, _leftColumnWith: number): SVGGElement {
   let rowFixed = svg.newG("row row-fixed")
 
-  rowFixed.appendChild(svg.newEl("rect", {
+  rowFixed.appendChild(svg.newRect({
     "width": "100%",
     "height": rowHeight,
     "x": "0",
@@ -243,7 +243,7 @@ export function createNameRowBg(y: number, rowHeight: number, onClick: EventList
 export function createRowBg(y: number, rowHeight: number, onClick: EventListener): SVGGElement {
   let rowFixed = svg.newG("row row-flex")
 
-  rowFixed.appendChild(svg.newEl("rect", {
+  rowFixed.appendChild(svg.newRect({
     "width": "100%",
     "height": rowHeight,
     "x": "0",

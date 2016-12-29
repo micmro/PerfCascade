@@ -85,13 +85,13 @@ export function createTimeScale(durationMs: number, diagramHeight: number, subSe
 
 //TODO: Implement - data for this not parsed yet
 export function createBgRect(block: TimeBlock, unit: number, diagramHeight: number): SVGRectElement {
-  let rect = svg.newEl("rect", {
+  let rect = svg.newRect({
     "width": ((block.total || 1) / unit) + "%",
     "height": diagramHeight,
     "x": ((block.start || 0.001) / unit) + "%",
     "y": 0,
     "class": block.cssClass || "block-other"
-  }) as SVGRectElement
+  })
 
   rect.appendChild(svg.newEl("title", {
     "text": block.name
