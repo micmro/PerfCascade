@@ -23,14 +23,15 @@ let appendSecond = function (timeHolder: SVGGElement, diagramHeight: number, sec
   let lineClass = "sub-second-line"
 
   if (addLabel) {
+    const showTextBefore = (sec > secsTotal - 0.2)
     lineClass = "second-line"
-    lineLabel = svg.newTextEl(sec + "s", diagramHeight)
-    if (sec > secsTotal - 0.2) {
-      lineLabel.setAttribute("x", secPerc * sec - 0.5 + "%")
-      lineLabel.setAttribute("text-anchor", "end")
-    } else {
-      lineLabel.setAttribute("x", secPerc * sec + 0.5 + "%")
+    let x = secPerc * sec + 0.5 + "%"
+    let attributes = {}
+    if (showTextBefore) {
+      x = secPerc * sec - 0.5 + "%"
+      attributes["text-anchor"] = "end"
     }
+    lineLabel = svg.newTextEl(sec + "s", x, diagramHeight, attributes)
   }
 
   const lineEl = svg.newLine({

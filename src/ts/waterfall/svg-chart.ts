@@ -21,7 +21,7 @@ import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub
  */
 function getSvgHeight(marks: any[], _barsToShow: TimeBlock[], diagramHeight: number): number {
   const maxMarkTextLength = marks.reduce((currMax: number, currValue: TimeBlock) => {
-    return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0), true))
+    return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0, 0), true))
   }, 0)
 
   return Math.floor(diagramHeight + maxMarkTextLength + 35)

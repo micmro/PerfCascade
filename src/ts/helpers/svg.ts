@@ -49,17 +49,14 @@ export function newTitle(text: string): SVGTitleElement {
 }
 
 
-export function newTextEl(text: string, y: number, x?: number | string, css?: Object): SVGTextElement {
+export function newTextEl(text: string, x: number|string, y: number, settings?: Object, css?: Object): SVGTextElement {
   css = css || {}
-  let opt = {
-    fill: "#111",
-    y: y.toString(),
-    text: text
-  }
-  if (x !== undefined) {
-    opt["x"] = x
-  }
-  return newEl("text", opt, css) as SVGTextElement
+  settings = settings || {}
+  settings["fill"] = "#111"
+  settings["x"] = x.toString()
+  settings["y"] = y.toString()
+  settings["text"] = text
+  return newEl("text", settings, css) as SVGTextElement
 }
 
 

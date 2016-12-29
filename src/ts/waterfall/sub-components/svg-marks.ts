@@ -24,9 +24,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       "x": x + "%"
     })
     mark.x = x
-    let lineLabel = svg.newTextEl(mark.name, diagramHeight + 25)
-    lineLabel.setAttribute("x", x + "%")
-    lineLabel.setAttribute("stroke", "")
+    let lineLabel = svg.newTextEl(mark.name, x + "%", diagramHeight + 25)
 
     let line = svg.newLine({
       "x1": x + "%",

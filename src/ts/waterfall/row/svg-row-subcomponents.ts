@@ -68,14 +68,14 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
   const totalLabel = `${Math.round(timeTotal)} ms`
 
   let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc
-  let txtEl = svg.newTextEl(totalLabel, y, `${misc.roundNumber(percStart, 2)}%`)
+  let txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart, 2)}%`, y)
 
   //(pessimistic) estimation of text with to avoid performance penalty of `getBBox`
   let roughTxtWidth = totalLabel.length * 8
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
     percStart = firstX / rectData.unit - spacingPerc
-    txtEl = svg.newTextEl(totalLabel, y, `${misc.roundNumber(percStart, 2)}%`, { "textAnchor": "end" })
+    txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart, 2)}%`, y, {}, {"textAnchor": "end"})
   }
 
   return txtEl
@@ -156,11 +156,10 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
 // private helper
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
   const blockName = misc.resourceUrlFormatter(name, 125)
-  let blockLabel = svg.newTextEl(blockName, (y + Math.round(height / 2) + 5))
+  let blockLabel = svg.newTextEl(blockName, x, (y + Math.round(height / 2) + 5))
 
   blockLabel.appendChild(svg.newTitle(name))
 
-  blockLabel.setAttribute("x", x.toString())
   blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1"
 
   return blockLabel
