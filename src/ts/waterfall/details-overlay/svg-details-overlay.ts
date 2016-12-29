@@ -28,9 +28,7 @@ function createCloseButtonSvg(y: number): SVGGElement {
     "textAnchor": "middle"
   }))
 
-  closeBtn.appendChild(svg.newEl("title", {
-    "text": "Close Overlay"
-  }))
+  closeBtn.appendChild(svg.newTitle("Close Overlay"))
 
   return closeBtn
 }

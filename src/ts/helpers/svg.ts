@@ -44,6 +44,11 @@ export function newLine(settings: Object): SVGLineElement {
 }
 
 
+export function newTitle(text: string): SVGTitleElement {
+  return newEl("title", {text}) as SVGTitleElement
+}
+
+
 export function newTextEl(text: string, y: number, x?: number | string, css?: Object): SVGTextElement {
   css = css || {}
   let opt = {

@@ -93,9 +93,7 @@ export function createBgRect(block: TimeBlock, unit: number, diagramHeight: numb
     "class": block.cssClass || "block-other"
   })
 
-  rect.appendChild(svg.newEl("title", {
-    "text": block.name
-  })) // Add tile to wedge path
+  rect.appendChild(svg.newTitle(block.name)) // Add tile to wedge path
 
   return rect
 }

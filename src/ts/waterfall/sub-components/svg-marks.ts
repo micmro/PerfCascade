@@ -80,9 +80,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
     lineLabel.addEventListener("mouseleave", onLabelMouseLeave)
     lineLabelHolder.appendChild(lineLabel)
 
-    markHolder.appendChild(svg.newEl("title", {
-      "text": mark.name + " (" + Math.round(mark.startTime) + "ms)"
-    }))
+    markHolder.appendChild(svg.newTitle(mark.name + " (" + Math.round(mark.startTime) + "ms)"))
     markHolder.appendChild(lineHolder)
     markHolder.appendChild(lineLabelHolder)
     marksHolder.appendChild(markHolder)

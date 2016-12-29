@@ -24,9 +24,7 @@ function makeBlock(rectData: RectData, className: string) {
     "class": className
   })
   if (rectData.label) {
-    rect.appendChild(svg.newEl("title", {
-      "text": rectData.label
-    })) // Add tile to wedge path
+    rect.appendChild(svg.newTitle(rectData.label)) // Add tile to wedge path
   }
   if (rectData.showOverlay && rectData.hideOverlay) {
     rect.addEventListener("mouseenter", rectData.showOverlay(rectData))
@@ -160,9 +158,7 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
   const blockName = misc.resourceUrlFormatter(name, 125)
   let blockLabel = svg.newTextEl(blockName, (y + Math.round(height / 2) + 5))
 
-  blockLabel.appendChild(svg.newEl("title", {
-    "text": name
-  }))
+  blockLabel.appendChild(svg.newTitle(name))
 
   blockLabel.setAttribute("x", x.toString())
   blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1"
