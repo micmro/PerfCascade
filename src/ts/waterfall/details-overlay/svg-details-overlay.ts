@@ -57,14 +57,14 @@ export function createRowInfoOverlay(indexBackup: number, _barX: number,  y: num
   })
   let holder = createHolder(y, accordionHeight)
 
-  let foreignObject = svg.newEl("foreignObject", {
+  let foreignObject = svg.newForeignObject({
     "width": "100%",
     "height": accordionHeight,
     "x": "0",
     "y": y,
     "dy": "5",
     "dx": "5"
-  }) as SVGForeignObjectElement
+  })
 
 
   let closeBtn = createCloseButtonSvg(y)

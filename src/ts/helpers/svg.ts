@@ -38,6 +38,10 @@ export function newClipPath(id: string): SVGClipPathElement {
   return newEl("clipPath", {id}) as SVGClipPathElement
 }
 
+export function newForeignObject(settings: Object): SVGForeignObjectElement {
+  return newEl("foreignObject", settings) as SVGForeignObjectElement
+}
+
 export function newA(className: string): SVGAElement {
   return newEl("a", {"class": className}) as SVGAElement
 }
