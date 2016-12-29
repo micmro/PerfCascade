@@ -28,12 +28,12 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
     lineLabel.setAttribute("x", x + "%")
     lineLabel.setAttribute("stroke", "")
 
-    let line = svg.newEl("line", {
+    let line = svg.newLine({
       "x1": x + "%",
       "y1": 0,
       "x2": x + "%",
       "y2": diagramHeight
-    }) as SVGLineElement
+    })
 
     const lastMark = marks[i - 1]
     if (lastMark && mark.x - lastMark.x < 1) {
@@ -41,7 +41,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       mark.x = lastMark.x + 1
     }
     //would use polyline but can't use percentage for points
-    let lineConnection = svg.newEl("line", {
+    let lineConnection = svg.newLine({
       "x1": x + "%",
       "y1": diagramHeight,
       "x2": mark.x + "%",

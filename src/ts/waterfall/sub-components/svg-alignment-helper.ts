@@ -16,21 +16,21 @@ export interface HoverElements {
  */
 export function createAlignmentLines(diagramHeight: number): HoverElements {
   return {
-    endline: svg.newEl("line", {
+    endline: svg.newLine({
       "x1": "0",
       "y1": "0",
       "x2": "0",
       "y2": diagramHeight,
       "class": "line-end"
-    }) as SVGLineElement,
+    }),
 
-    startline: svg.newEl("line", {
+    startline: svg.newLine({
       "x1": "0",
       "y1": "0",
       "x2": "0",
       "y2": diagramHeight,
       "class": "line-start"
-    }) as SVGLineElement
+    })
   }
 }
 

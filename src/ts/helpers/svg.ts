@@ -39,6 +39,11 @@ export function newRect(settings: Object): SVGRectElement {
 }
 
 
+export function newLine(settings: Object): SVGLineElement {
+  return newEl("line", settings) as SVGLineElement
+}
+
+
 export function newTextEl(text: string, y: number, x?: number | string, css?: Object): SVGTextElement {
   css = css || {}
   let opt = {

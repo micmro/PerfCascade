@@ -33,7 +33,7 @@ let appendSecond = function (timeHolder: SVGGElement, diagramHeight: number, sec
     }
   }
 
-  const lineEl = svg.newEl("line", {
+  const lineEl = svg.newLine({
     "class": lineClass,
     "x1": secPerc * sec + "%",
     "y1": "0",
