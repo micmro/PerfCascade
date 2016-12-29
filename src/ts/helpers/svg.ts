@@ -2,7 +2,7 @@
  *  SVG Helpers
  */
 
-export function newEl(tagName: string, settings?: Object, css?: Object): SVGElement {
+function newEl(tagName: string, settings?: Object, css?: Object): SVGElement {
   let el = document.createElementNS("http://www.w3.org/2000/svg", tagName) as SVGGElement
   settings = settings || {}
   for (let attr in settings) {
