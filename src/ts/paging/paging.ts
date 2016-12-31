@@ -5,7 +5,7 @@ import * as waterfallDocsService from "../state/waterfall-docs-service"
 
 
 let selectedPageIndex = 0
-let onPageUpdateCbs: Array<OnPagingCb> = []
+let onPageUpdateCbs: OnPagingCb[] = []
 
 /**
  * Returns number of pages

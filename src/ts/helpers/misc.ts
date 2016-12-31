@@ -19,11 +19,11 @@ export function parseUrl(url: string) {
 }
 
 /**
- * @param  {Array<T>} arr - array to search
+ * @param  {T[]} arr - array to search
  * @param  {T} item - item to search for
  * @returns boolean - true if `item` is in `arr`
  */
-export function contains<T>(arr: Array<T>, item: T): boolean {
+export function contains<T>(arr: T[], item: T): boolean {
   return arr.filter((x) => x === item).length > 0
 }
 

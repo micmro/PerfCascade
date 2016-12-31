@@ -13,7 +13,7 @@ class WaterfallEntry {
   constructor(public name: string,
               public start: number,
               public end: number,
-              public segments: Array<WaterfallEntryTiming> = [],
+              public segments: WaterfallEntryTiming[] = [],
               public rawResource: Entry,
               public requestType: RequestType) {
     this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
@@ -154,9 +154,9 @@ export namespace HarTransformer {
    * @param  {Entry} entry
    * @returns Array
    */
-  function buildDetailTimingBlocks(startRelative: number, entry: Entry): Array<WaterfallEntryTiming> {
+  function buildDetailTimingBlocks(startRelative: number, entry: Entry): WaterfallEntryTiming[] {
     let t = entry.timings
-    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: Array<WaterfallEntryTiming>, key: TimingType) => {
+    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[], key: TimingType) => {
 
       const time = getTimePair(key, entry, collect, startRelative)
 
@@ -184,11 +184,11 @@ export namespace HarTransformer {
    *
    * @param  {string} key
    * @param  {Entry} entry
-   * @param  {Array<WaterfallEntry>} collect
+   * @param  {WaterfallEntry[]} collect
    * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
    * @returns {Object}
    */
-  function getTimePair(key: string, entry: Entry, collect: Array<WaterfallEntryTiming>, startRelative: number) {
+  function getTimePair(key: string, entry: Entry, collect: WaterfallEntryTiming[], startRelative: number) {
     let wptKey;
     switch (key) {
       case "wait": wptKey = "ttfb"; break

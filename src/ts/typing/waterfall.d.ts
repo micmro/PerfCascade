@@ -19,7 +19,7 @@ export interface WaterfallEntry {
   name: string,
   start: number,
   end: number,
-  segments: Array<WaterfallEntryTiming>,
+  segments: WaterfallEntryTiming[],
   rawResource: Entry,
   requestType: RequestType
 }
@@ -34,11 +34,11 @@ export interface WaterfallEntryTiming {
 export interface WaterfallData {
   title: string,
   durationMs: number,
-  blocks: Array<WaterfallEntry>,
-  marks: Array<Mark>,
-  lines: Array<WaterfallEntry>
+  blocks: WaterfallEntry[],
+  marks: Mark[],
+  lines: WaterfallEntry[]
 }
 
 export interface WaterfallDocs {
-  pages: Array<WaterfallData>
+  pages: WaterfallData[]
 }

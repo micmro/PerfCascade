@@ -9,8 +9,8 @@ export interface Har {
   version: string
   creator: Creator
   browser?: Browser
-  pages?: Array<Page>
-  entries: Array<Entry>
+  pages?: Page[]
+  entries: Entry[]
   comment?: string
   label?: string //TODO: Verify if this does exist
 }
@@ -181,11 +181,11 @@ export interface Request {
   /** Request HTTP Version. */
   httpVersion: string
   /** List of cookie objects. */
-  cookies: Array<Cookie>
+  cookies: Cookie[]
   /** List of header objects. */
-  headers: Array<Header>
+  headers: Header[]
   /** List of query parameter objects. */
-  queryString: Array<QueryString>
+  queryString: QueryString[]
   /** Posted data info. */
   postData?: PostData
   /** Total number of bytes from the start of the HTTP request message until (and including)
@@ -210,9 +210,9 @@ export interface Response {
   /** Response HTTP Version. */
   httpVersion: string
   /** List of cookie objects. */
-  cookies: Array<Cookie>
+  cookies: Cookie[]
   /** List of header objects. */
-  headers: Array<Header>
+  headers: Header[]
   /** Details about the response body. */
   content: Content
   /** Redirection target URL from the Location response header. */
@@ -286,7 +286,7 @@ export interface PostData {
    *
    * _`text` and `params` fields are mutually exclusive._
   */
-  params: Array<Param>
+  params: Param[]
   /** Plain text posted data
    *
    * _`params` and `text` fields are mutually exclusive._

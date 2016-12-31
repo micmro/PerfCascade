@@ -7,11 +7,11 @@ import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-su
 
 /**
  * Renders global markes for events like the onLoad event etc
- * @param {Array<Mark>} marks         [description]
+ * @param {Mark[]} marks         [description]
  * @param {number}      unit          horizontal unit (duration in ms of 1%)
  * @param {number}      diagramHeight Full height of SVG in px
  */
-export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: number) {
+export function createMarks(marks: Mark[], unit: number, diagramHeight: number) {
   let marksHolder = svg.newG("marker-holder", {
     "transform": "scale(1, 1)"
   })

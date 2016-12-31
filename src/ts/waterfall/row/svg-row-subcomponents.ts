@@ -85,11 +85,11 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
 /**
  * Render the block and timings for a request
  * @param  {RectData}         rectData Basic dependencys and globals
- * @param  {Array<WaterfallEntryTiming>} segments Request and Timing Data
+ * @param  {WaterfallEntryTiming[]} segments Request and Timing Data
  * @param  {number} timeTotal  - total time of the request
  * @return {SVGElement}                Renerated SVG (rect or g element)
  */
-export function createRect(rectData: RectData, segments: Array<WaterfallEntryTiming>, timeTotal: number): SVGElement {
+export function createRect(rectData: RectData, segments: WaterfallEntryTiming[], timeTotal: number): SVGElement {
   let rect = makeBlock(rectData, `time-block ${rectData.cssClass}`)
   let rectHolder = svg.newG("rect-holder")
   let firstX = rectData.x
