@@ -11,9 +11,9 @@ let ifValueDefined = (value: number, fn: (number) => any) => {
   return fn(value)
 }
 
-let formatBytes = (size?: number) => ifValueDefined(size, s => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
+let formatBytes = (size?: number) => ifValueDefined(size, (s) => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
 
-let formatTime = (size?: number) => ifValueDefined(size, s => `${s} ms`)
+let formatTime = (size?: number) => ifValueDefined(size, (s) => `${s} ms`)
 
 let formatDate = (date?: string) => {
   if (!date) {
@@ -40,12 +40,12 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
   let entry = block.rawResource as Entry
 
   let getRequestHeader = (name: string): string => {
-    let header = entry.request.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
+    let header = entry.request.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0]
     return header ? header.value : ""
   }
 
   let getResponseHeader = (name: string): string => {
-    let header = entry.response.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
+    let header = entry.response.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0]
     return header ? header.value : ""
   }
 

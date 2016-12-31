@@ -106,7 +106,7 @@ export namespace HarTransformer {
 
     let doneTime = 0;
     const blocks = data.entries
-      .filter(entry => entry.pageref === currPage.id)
+      .filter((entry) => entry.pageref === currPage.id)
       .map((entry) => {
         const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime
 
@@ -124,9 +124,9 @@ export namespace HarTransformer {
 
 
     const marks = Object.keys(pageTimings)
-      .filter(k => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
+      .filter((k) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
       .sort((a: string, b: string) => pageTimings[a] > pageTimings[b] ? 1 : -1)
-      .map(k => {
+      .map((k) => {
         const startRelative = pageTimings[k]
 
         doneTime = Math.max(doneTime, startRelative)

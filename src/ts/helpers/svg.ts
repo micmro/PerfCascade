@@ -12,7 +12,7 @@ function newEl(tagName: string, settings?: Object, css?: Object): SVGElement {
   }
   el.textContent = settings["text"] || ""
   if (css && el.style) {
-    Object.keys(css).forEach(key => {
+    Object.keys(css).forEach((key) => {
       el.style[key] = css[key]
     })
   }

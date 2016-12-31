@@ -18,5 +18,5 @@ export function subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {
 // no need for unsubscribe in the moment
 
 export function publishToOverlayChanges(change: OverlayChangeEvent) {
-  subscribers.forEach(fn => fn(change))
+  subscribers.forEach((fn) => fn(change))
 }

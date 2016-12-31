@@ -3,7 +3,7 @@ import * as misc from "./misc"
 import {WaterfallEntry} from "../typing/waterfall";
 
 export function getResponseHeader(entry: Entry, headerName: string): Header {
-  return entry.response.headers.filter(h => h.name.toLowerCase() === headerName.toLowerCase())[0]
+  return entry.response.headers.filter((h) => h.name.toLowerCase() === headerName.toLowerCase())[0]
 }
 
 export function getResponseHeaderValue(entry: Entry, headerName: string) {
