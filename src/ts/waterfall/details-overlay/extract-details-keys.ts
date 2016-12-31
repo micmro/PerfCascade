@@ -2,7 +2,7 @@ import { Entry } from "../../typing/har.d"
 import { KvTuple } from "../../typing/misc.d"
 import {WaterfallEntry} from "../../typing/waterfall";
 
-let ifValueDefined = (value: number, fn: (number) => any) => {
+let ifValueDefined = (value: number, fn: (_: number) => any) => {
   if (!isFinite(value) || value <= 0) {
     return undefined
   }
@@ -21,7 +21,7 @@ let formatDate = (date?: string) => {
   return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`
 }
 
-let asIntPartial = (val: string, ifIntFn: (number) => any) => {
+let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
   let v = parseInt(val, 10)
   return ifValueDefined(v, ifIntFn)
 }
