@@ -27,8 +27,6 @@ function getSvgHeight(marks: any[], _barsToShow: WaterfallEntry[], diagramHeight
   return Math.floor(diagramHeight + maxMarkTextLength + 35)
 }
 
-
-
 /**
  * Entry point to start rendering the full waterfall SVG
  * @param {WaterfallData} data  Object containing the setup parameter

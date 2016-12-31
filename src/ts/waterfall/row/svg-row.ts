@@ -16,8 +16,6 @@ clipPathElProto.appendChild(svg.newRect({
   "height": "100%"
 }))
 
-
-
 // Creates single reques's row
 export function createRow(index: number, rectData: RectData, block: WaterfallEntry,
                           labelXPos: number, options: ChartOptions, docIsSsl: boolean,

@@ -21,7 +21,6 @@ export function getOverlayOffset(rowIndex: number): number {
   }, 0)
 }
 
-
 /**
  * closes on overlay - rerenders others internally
  */
@@ -79,7 +78,6 @@ function realignBars(barEls: SVGGElement[]) {
     bar.style.transform = `translate(0, ${offset}px)`
   })
 }
-
 
  /**
   * removes all overlays and renders them again

@@ -4,7 +4,6 @@
 
 import * as svg from "../../helpers/svg"
 
-
 export interface HoverElements {
   endline: SVGLineElement,
   startline: SVGLineElement
@@ -33,8 +32,6 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
     })
   }
 }
-
-
 
 /**
  * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover

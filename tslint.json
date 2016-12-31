@@ -4,9 +4,8 @@
     "interface-name": false,
     "max-line-length": false,
     "max-classes-per-file": false,
-    "no-consecutive-blank-lines": false,
     "no-namespace": false,
-    
+
     // Disable this until https://github.com/palantir/tslint/commit/16e8d0 is released to avoid crash
     "object-literal-key-quotes": false,
 

@@ -3,7 +3,6 @@ import {WaterfallData} from "../typing/waterfall"
 
 import * as waterfallDocsService from "../state/waterfall-docs-service"
 
-
 let selectedPageIndex = 0
 let onPageUpdateCbs: OnPagingCb[] = []
 

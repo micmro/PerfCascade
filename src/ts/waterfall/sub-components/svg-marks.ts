@@ -4,7 +4,6 @@ import {OverlayChangeEvent} from "../../typing/open-overlay"
 import * as svg from "../../helpers/svg"
 import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
 
-
 /**
  * Renders global markes for events like the onLoad event etc
  * @param {Mark[]} marks         [description]
@@ -57,7 +56,6 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
       lineConnection.setAttribute("transform", `translate(0, ${offset})`)
     })
 
-
     let isActive = false
     let onLabelMouseEnter = () => {
       if (!isActive) {
@@ -72,7 +70,6 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
       isActive = false
       svg.removeClass(lineHolder, "active")
     }
-
 
     lineLabel.addEventListener("mouseenter", onLabelMouseEnter)
     lineLabel.addEventListener("mouseleave", onLabelMouseLeave)

@@ -8,8 +8,6 @@ import * as misc from "../../helpers/misc"
 import {WaterfallEntryTiming} from "../../typing/waterfall";
 import {timingTypeToCssClass} from "../../transformers/styling-converters";
 
-
-
 /**
  * Creates the `rect` that represent the timings in `rectData`
  * @param  {RectData} rectData - Data for block
@@ -112,7 +110,6 @@ export function createRect(rectData: RectData, segments: WaterfallEntryTiming[],
   return rectHolder
 }
 
-
 /**
  * Create a new clipper SVG Text element to label a request block to fit the left panel width
  * @param  {number}         x                horizontal position (in px)
@@ -127,7 +124,6 @@ export function createRequestLabelClipped(x: number, y: number, name: string, he
   blockLabel.style.clipPath = `url(#titleClipPath)`
   return blockLabel
 }
-
 
 /**
  * Create a new full width SVG Text element to label a request block
@@ -152,8 +148,6 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
   return labelHolder
 }
 
-
-
 // private helper
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
   const blockName = misc.resourceUrlFormatter(name, 125)
@@ -165,8 +159,6 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
 
   return blockLabel
 }
-
-
 
 /**
  * Appends the labels to `rowFixed` - TODO: see if this can be done more elegant
@@ -197,8 +189,6 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
   })
 }
 
-
-
 /**
  * Stripe for BG
  * @param  {number}      y              [description]
@@ -216,8 +206,6 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
   })
 }
 
-
-
 export function createNameRowBg(y: number, rowHeight: number, onClick: EventListener, _leftColumnWith: number): SVGGElement {
   let rowFixed = svg.newG("row row-fixed")
 
@@ -233,8 +221,6 @@ export function createNameRowBg(y: number, rowHeight: number, onClick: EventList
 
   return rowFixed
 }
-
-
 
 export function createRowBg(y: number, rowHeight: number, onClick: EventListener): SVGGElement {
   let rowFixed = svg.newG("row row-flex")

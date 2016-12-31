@@ -60,7 +60,6 @@ let appendSecond = function (timeHolder: SVGGElement, diagramHeight: number, sec
   }
 }
 
-
 /**
  * Renders the time-scale SVG elements (1sec, 2sec...)
  * @param {number} durationMs    Full duration of the waterfall
@@ -82,8 +81,6 @@ export function createTimeScale(durationMs: number, diagramHeight: number, subSe
   }
   return timeHolder
 }
-
-
 
 // TODO: Implement - data for this not parsed yet
 export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight: number): SVGRectElement {

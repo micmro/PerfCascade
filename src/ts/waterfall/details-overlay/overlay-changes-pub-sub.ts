@@ -2,14 +2,12 @@
 
 import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay.d"
 
-
 export const eventTypes = {
   "OPEN" : "open",
   "CLOSE" : "closed"
 }
 
 let subscribers: OverlayChangeSubscriber[] = []
-
 
 export function subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {
   subscribers.push(fn)

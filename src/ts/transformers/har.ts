@@ -18,9 +18,7 @@ class WaterfallEntry {
               public requestType: RequestType) {
     this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
   }
-}
-
-class WaterfallEntryTiming {
+} class WaterfallEntryTiming {
   public total: number
   constructor(public type: TimingType,
               public start: number,
@@ -121,7 +119,6 @@ export namespace HarTransformer {
           requestType
         )
       })
-
 
     const marks = Object.keys(pageTimings)
       .filter((k) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))

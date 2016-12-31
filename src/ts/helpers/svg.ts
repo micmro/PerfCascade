@@ -19,20 +19,17 @@ function newEl(tagName: string, settings?: Object, css?: Object): SVGElement {
   return el
 }
 
-
 export function newSvg(cssClass: string, settings?: Object, css?: Object): SVGSVGElement {
   settings = settings || {}
   settings["class"] = cssClass
   return newEl("svg:svg", settings, css) as SVGSVGElement
 }
 
-
 export function newG(cssClass: string, settings?: Object, css?: Object): SVGGElement {
   settings = settings || {}
   settings["class"] = cssClass
   return newEl("g", settings, css) as SVGGElement
 }
-
 
 export function newClipPath(id: string): SVGClipPathElement {
   return newEl("clipPath", {id}) as SVGClipPathElement
@@ -50,16 +47,13 @@ export function newRect(settings: Object): SVGRectElement {
   return newEl("rect", settings) as SVGRectElement
 }
 
-
 export function newLine(settings: Object): SVGLineElement {
   return newEl("line", settings) as SVGLineElement
 }
 
-
 export function newTitle(text: string): SVGTitleElement {
   return newEl("title", {text}) as SVGTitleElement
 }
-
 
 export function newTextEl(text: string, x: number|string, y: number, settings?: Object, css?: Object): SVGTextElement {
   css = css || {}
@@ -70,8 +64,6 @@ export function newTextEl(text: string, x: number|string, y: number, settings?: 
   settings["text"] = text
   return newEl("text", settings, css) as SVGTextElement
 }
-
-
 
 /** temp SVG element for size measurements  */
 let getTestSVGEl = (() => {
@@ -131,7 +123,6 @@ export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = 
   const nodeWidth = tmpTextNode.getBBox().width
   return nodeWidth
 }
-
 
 /**
  * Adds class `className` to `el`

@@ -62,7 +62,6 @@ export interface Page {
   comment?: string
 }
 
-
 /**
  * This object describes timings for various events (states) fired during the page load. All times are specified in milliseconds.
  *  If a time info is not available appropriate field is set to `-1`.
@@ -202,7 +201,6 @@ export interface Request {
   /**  A comment provided by the user or the application */
   comment?: string
 }
-
 
 /**
  * This object contains detailed info about the response.

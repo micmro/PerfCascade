@@ -3,7 +3,6 @@ import * as dom from "../../helpers/dom"
 import {createDetailsBody} from "./html-details-body"
 import {WaterfallEntry} from "../../typing/waterfall";
 
-
 function createCloseButtonSvg(y: number): SVGGElement {
   let closeBtn = svg.newA("info-overlay-close-btn")
 
@@ -27,7 +26,6 @@ function createCloseButtonSvg(y: number): SVGGElement {
 
   return closeBtn
 }
-
 
 function createHolder(y: number, accordionHeight: number) {
 
@@ -65,7 +63,6 @@ export function createRowInfoOverlay(indexBackup: number, _barX: number, y: numb
     "dy": "5",
     "dx": "5"
   })
-
 
   let closeBtn = createCloseButtonSvg(y)
   closeBtn.addEventListener("click", () => onClose(indexBackup, holder))
