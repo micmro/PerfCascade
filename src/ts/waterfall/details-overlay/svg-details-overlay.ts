@@ -31,7 +31,7 @@ function createCloseButtonSvg(y: number): SVGGElement {
 
 function createHolder(y: number, accordionHeight: number) {
 
- let innerHolder = svg.newG("info-overlay-holder", {
+  let innerHolder = svg.newG("info-overlay-holder", {
     "width": "100%"
   })
 
@@ -49,8 +49,8 @@ function createHolder(y: number, accordionHeight: number) {
   return innerHolder
 }
 
-export function createRowInfoOverlay(indexBackup: number, _barX: number,  y: number, accordionHeight: number, block: WaterfallEntry,
-  onClose: Function, _unit: number): SVGGElement {
+export function createRowInfoOverlay(indexBackup: number, _barX: number, y: number, accordionHeight: number, block: WaterfallEntry,
+                                     onClose: Function, _unit: number): SVGGElement {
   const requestID =  parseInt(block.rawResource._index + 1, 10) || indexBackup + 1
   let wrapper = svg.newG("outer-info-overlay-holder", {
     "width": "100%"

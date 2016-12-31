@@ -20,8 +20,8 @@ clipPathElProto.appendChild(svg.newRect({
 
 //Creates single reques's row
 export function createRow(index: number, rectData: RectData, block: WaterfallEntry,
-  labelXPos: number, options: ChartOptions, docIsSsl: boolean,
-  onDetailsOverlayShow: EventListener): SVGGElement {
+                          labelXPos: number, options: ChartOptions, docIsSsl: boolean,
+                          onDetailsOverlayShow: EventListener): SVGGElement {
 
   const y = rectData.y
   const rowHeight = rectData.height

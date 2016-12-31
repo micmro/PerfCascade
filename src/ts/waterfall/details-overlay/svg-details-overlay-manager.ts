@@ -44,8 +44,8 @@ export function closeOverlay(index: number, overlayHolder: SVGGElement,
 /**
  * Opens an overlay - rerenders others internaly
  */
-export function openOverlay(index: number, barX: number,  y: number, accordionHeight: number, block: WaterfallEntry,
-  overlayHolder: SVGGElement, barEls: SVGGElement[], unit: number) {
+export function openOverlay(index: number, barX: number, y: number, accordionHeight: number, block: WaterfallEntry,
+                            overlayHolder: SVGGElement, barEls: SVGGElement[], unit: number) {
 
   if (openOverlays.filter((o) => o.index === index).length > 0) {
     return
