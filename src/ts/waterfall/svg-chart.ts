@@ -92,7 +92,8 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   }
 
   if (options.showIndicatorIcons) {
-    const iconsPerBlock = barsToShow.map((block: WaterfallEntry) => indicators.getIndicatorIcons(block, docIsSsl).length)
+    const iconsPerBlock = barsToShow.map((block: WaterfallEntry) =>
+      indicators.getIndicatorIcons(block, docIsSsl).length)
     labelXPos += iconWidth * Math.max.apply(null, iconsPerBlock)
   }
 

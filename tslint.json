@@ -2,7 +2,6 @@
   "extends": "tslint:recommended",
   "rules": {
     "interface-name": false,
-    "max-line-length": false,
     "max-classes-per-file": false,
     "no-namespace": false,
 

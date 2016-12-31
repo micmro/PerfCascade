@@ -17,7 +17,8 @@ import {requestTypeToCssClass} from "../../transformers/styling-converters";
  * @param  {number} sec second of the time marker to render
  * @param  {boolean} addLabel  if true a time label is added to the marker-line
  */
-let appendSecond = (timeHolder: SVGGElement, diagramHeight: number, secsTotal: number, sec: number, addLabel: boolean = false) => {
+let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
+                    secsTotal: number, sec: number, addLabel: boolean = false) => {
   const secPerc = 100 / secsTotal
   /** just used if `addLabel` is `true` - for full seconds */
   let lineLabel

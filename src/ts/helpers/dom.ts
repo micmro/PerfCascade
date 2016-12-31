@@ -28,6 +28,7 @@ export function forEach(els: NodeListOf<Element>, fn: (el: Element, index: numbe
  * @param  {(el:Element,index:number)=>boolean} predicate
  * @returns NodeListOf
  */
-export function filter(els: NodeListOf<Element>, predicate: (el: Element, index: number) => boolean): NodeListOf<Element> {
+export function filter(els: NodeListOf<Element>,
+                       predicate: (el: Element, index: number) => boolean): NodeListOf<Element> {
   return Array.prototype.filter.call(els, predicate)
 }

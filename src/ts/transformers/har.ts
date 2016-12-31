@@ -147,14 +147,16 @@ export namespace HarTransformer {
     }
   }
   /**
-   * Create `WaterfallEntry`s to represent the subtimings of a request ("blocked", "dns", "connect", "send", "wait", "receive")
+   * Create `WaterfallEntry`s to represent the subtimings of a request
+   * ("blocked", "dns", "connect", "send", "wait", "receive")
    * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
    * @param  {Entry} entry
    * @returns Array
    */
   function buildDetailTimingBlocks(startRelative: number, entry: Entry): WaterfallEntryTiming[] {
     let t = entry.timings
-    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[], key: TimingType) => {
+    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[],
+                                                                            key: TimingType) => {
 
       const time = getTimePair(key, entry, collect, startRelative)
 
@@ -195,7 +197,8 @@ export namespace HarTransformer {
     }
     const preciseStart = parseInt(entry[`_${wptKey}_start`], 10)
     const preciseEnd = parseInt(entry[`_${wptKey}_end`], 10)
-    const start = isNaN(preciseStart) ? ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart
+    const start = isNaN(preciseStart) ?
+      ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart
     const end = isNaN(preciseEnd) ? (start + entry.timings[key]) : preciseEnd
 
     return {

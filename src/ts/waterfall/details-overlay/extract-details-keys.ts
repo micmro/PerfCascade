@@ -80,7 +80,8 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
   return {
     "general": [
       ["Request Number", `#${requestID}`],
-      ["Started", new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page request started)"],
+      ["Started", new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) +
+      " after page request started)"],
       ["Duration", formatTime(entry.time)],
       ["Error/Status Code", entry.response.status + " " + entry.response.statusText],
       ["Server IPAddress", entry.serverIPAddress],

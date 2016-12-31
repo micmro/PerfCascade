@@ -63,8 +63,9 @@ export interface Page {
 }
 
 /**
- * This object describes timings for various events (states) fired during the page load. All times are specified in milliseconds.
- *  If a time info is not available appropriate field is set to `-1`.
+ * This object describes timings for various events (states) fired during the page load.
+ * All times are specified in milliseconds.
+ * If a time info is not available appropriate field is set to `-1`.
  * http://www.softwareishard.com/blog/har-12-spec/#pageTimings
  */
 export interface PageTimings {
@@ -106,7 +107,8 @@ export interface Entry {
   /** IP address of the server that was connected (result of DNS resolution). */
   serverIPAddress?: string
   /**  Unique ID of the parent TCP/IP connection, can be the client or server port number.
-   * Note that a port number doesn't have to be unique identifier in cases where the port is shared for more connections.
+   * Note that a port number doesn't have to be unique identifier
+   * in cases where the port is shared for more connections.
    * If the port isn't available for the application, any other unique connection ID can be used instead
    * (e.g. connection index). Leave out this field if the application doesn't support this info.
    */
@@ -225,7 +227,8 @@ export interface Response {
    * the double CRLF before the body. Set to `-1` if the info is not available.
    *
    * _The size of received response-headers is computed only from headers that are really received from the server.
-   * Additional headers appended by the browser are not included in this number, but they appear in the list of header objects._
+   * Additional headers appended by the browser are not included in this number,
+   * but they appear in the list of header objects._
    */
   headersSize: number
   /** Size of the received response body in bytes. Set to zero in case of responses coming from the cache (`304`).
@@ -334,7 +337,8 @@ export interface Content {
    * The charset attribute of the MIME type is included (if available).
    */
   mimeType: string
-  /** Response body sent from the server or loaded from the browser cache. This field is populated with textual content only.
+  /** Response body sent from the server or loaded from the browser cache.
+   * This field is populated with textual content only.
    * The text field is either HTTP decoded text or a encoded (e.g. `base64`)
    * representation of the response body. Leave out this field if the information is not available.
    */
@@ -385,9 +389,13 @@ export interface CacheDetails {
  * http://www.softwareishard.com/blog/har-12-spec/#timings
  */
 export interface Timings {
-  /**  Time spent in a queue waiting for a network connection. Use `-1` if the timing does not apply to the current request. */
+  /**  Time spent in a queue waiting for a network connection.
+   * Use `-1` if the timing does not apply to the current request.
+   */
   blocked?: number
-  /**  DNS resolution time. The time required to resolve a host name. Use `-1` if the timing does not apply to the current request. */
+  /**  DNS resolution time. The time required to resolve a host name.
+   * Use `-1` if the timing does not apply to the current request.
+   */
   dns?: number
   /** Time required to create TCP connection. Use `-1` if the timing does not apply to the current request. */
   connect?: number
@@ -407,7 +415,8 @@ export interface Timings {
    */
   receive: number
   /** Time required for SSL/TLS negotiation. If this field is defined then the time is also included in the
-   * connect field (to ensure backward compatibility with HAR 1.1). Use `-1` if the timing does not apply to the current request.
+   * connect field (to ensure backward compatibility with HAR 1.1).
+   * Use `-1` if the timing does not apply to the current request.
    */
   ssl?: number
   /**  A comment provided by the user or the application */
