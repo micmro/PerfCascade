@@ -16,7 +16,6 @@
     "no-console": false,
     "no-string-literal": false,
     "semicolon": false,
-    "switch-default": false,
     "trailing-comma": false,
     "variable-name": false
   }

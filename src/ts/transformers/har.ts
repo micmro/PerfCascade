@@ -46,6 +46,7 @@ function mimeToRequestType(mimeType: string): RequestType {
     case "font": return "font"
     case "video": return "video"
     case "audio": return "audio"
+    default: break
   }
   switch (part2) {
     case "svg+xml": return "svg"
@@ -64,8 +65,8 @@ function mimeToRequestType(mimeType: string): RequestType {
     case "script":
     case "json": return "javascript"
     case "x-shockwave-flash": return "flash"
+    default: return "other"
   }
-  return "other"
 }
 
 export namespace HarTransformer {
