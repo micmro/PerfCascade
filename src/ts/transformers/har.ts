@@ -1,31 +1,41 @@
-import {
-  Entry,
-  Har
-} from "../typing/har"
+import {Entry, Har} from "../typing/har";
 import {
   Mark,
   RequestType,
   TimingType,
   WaterfallData,
-  WaterfallDocs
-} from "../typing/waterfall"
+  WaterfallDocs,
+  WaterfallEntry,
+  WaterfallEntryTiming
+} from "../typing/waterfall";
 
-class WaterfallEntry {
-  public total: number
-  constructor(public name: string,
-              public start: number,
-              public end: number,
-              public segments: WaterfallEntryTiming[] = [],
-              public rawResource: Entry,
-              public requestType: RequestType) {
-    this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
+function createWaterfallEntry(name: string,
+                              start: number,
+                              end: number,
+                              segments: WaterfallEntryTiming[] = [],
+                              rawResource: Entry,
+                              requestType: RequestType): WaterfallEntry {
+  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
+  return {
+    total,
+    name,
+    start,
+    end,
+    segments,
+    rawResource,
+    requestType
   }
-} class WaterfallEntryTiming {
-  public total: number
-  constructor(public type: TimingType,
-              public start: number,
-              public end: number) {
-    this.total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
+}
+
+function createWaterfallEntryTiming(type: TimingType,
+                                    start: number,
+                                    end: number): WaterfallEntryTiming {
+  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
+  return {
+    total,
+    type,
+    start,
+    end
   }
 }
 
@@ -114,7 +124,7 @@ export namespace HarTransformer {
         doneTime = Math.max(doneTime, startRelative + entry.time)
 
         const requestType = mimeToRequestType(entry.response.content.mimeType);
-        return new WaterfallEntry(entry.request.url,
+        return createWaterfallEntry(entry.request.url,
           startRelative,
           parseInt(entry._all_end, 10) || (startRelative + entry.time),
           buildDetailTimingBlocks(startRelative, entry),
@@ -173,11 +183,11 @@ export namespace HarTransformer {
         const sslEnd = parseInt(entry[`_ssl_end`], 10) || time.start + t.ssl
         const connectStart = (!!parseInt(entry[`_ssl_start`], 10)) ? time.start : sslEnd
         return collect
-          .concat([new WaterfallEntryTiming("ssl", sslStart, sslEnd)])
-          .concat([new WaterfallEntryTiming(key, connectStart, time.end)])
+          .concat([createWaterfallEntryTiming("ssl", sslStart, sslEnd)])
+          .concat([createWaterfallEntryTiming(key, connectStart, time.end)])
       }
 
-      return collect.concat([new WaterfallEntryTiming(key, time.start, time.end)])
+      return collect.concat([createWaterfallEntryTiming(key, time.start, time.end)])
     }, [])
   }
 
