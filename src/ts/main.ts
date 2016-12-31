@@ -1,7 +1,7 @@
 import { makeLegend } from "./legend/legend"
 import * as paging from "./paging/paging"
 import * as waterfallDocsService from "./state/waterfall-docs-service"
-import {HarTransformer} from "./transformers/har"
+import * as HarTransformer from "./transformers/har"
 import { Har } from "./typing/har"
 import { ChartOptions } from "./typing/options"
 import { WaterfallDocs } from "./typing/waterfall"
