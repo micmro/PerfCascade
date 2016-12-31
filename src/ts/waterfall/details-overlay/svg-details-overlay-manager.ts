@@ -102,7 +102,7 @@ function renderOverlays(barX: number, accordionHeight: number, overlayHolder: SV
     .forEach((overlay) => {
       let y = overlay.defaultY + currY
       let infoOverlay = createRowInfoOverlay(overlay.index, barX, y, accordionHeight, overlay.block, overlay.onClose, unit)
-      //if overlay has a preview image show it
+      // if overlay has a preview image show it
       let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
       if (previewImg && !previewImg.src) {
         previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)

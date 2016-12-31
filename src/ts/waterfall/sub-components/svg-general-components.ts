@@ -45,7 +45,7 @@ let appendSecond = function (timeHolder: SVGGElement, diagramHeight: number, sec
 
   overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
     let offset = change.combinedOverlayHeight
-    //figure out why there is an offset
+    // figure out why there is an offset
     let scale = (diagramHeight + offset) / (diagramHeight)
 
     lineEl.setAttribute("transform", `scale(1, ${scale})`)
@@ -85,7 +85,7 @@ export function createTimeScale(durationMs: number, diagramHeight: number, subSe
 
 
 
-//TODO: Implement - data for this not parsed yet
+// TODO: Implement - data for this not parsed yet
 export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight: number): SVGRectElement {
   let rect = svg.newRect({
     "width": ((block.total || 1) / unit) + "%",

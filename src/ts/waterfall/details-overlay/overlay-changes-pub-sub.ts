@@ -1,4 +1,4 @@
-//simple pub/sub for change to the overlay
+// simple pub/sub for change to the overlay
 
 import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay.d"
 
@@ -15,7 +15,7 @@ export function subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {
   subscribers.push(fn)
 }
 
-//no need for unsubscribe in the moment
+// no need for unsubscribe in the moment
 
 export function publishToOverlayChanges(change: OverlayChangeEvent) {
   subscribers.forEach(fn => fn(change))

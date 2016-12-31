@@ -26,7 +26,7 @@ function makeIcon(type: string, title: string): Icon {
  */
 export function getMimeTypeIcon(block: WaterfallEntry): Icon {
   const entry = block.rawResource
-  //highlight redirects
+  // highlight redirects
   if (!!entry.response.redirectURL) {
     const url = encodeURI(entry.response.redirectURL.split("?")[0] || "")
     return makeIcon("err3xx", `${entry.response.status} response status: Redirect to ${url}...`)

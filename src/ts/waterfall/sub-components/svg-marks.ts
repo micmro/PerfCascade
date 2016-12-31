@@ -38,7 +38,7 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
       lineLabel.setAttribute("x", lastMark.x + 1 + "%")
       mark.x = lastMark.x + 1
     }
-    //would use polyline but can't use percentage for points
+    // would use polyline but can't use percentage for points
     let lineConnection = svg.newLine({
       "x1": x + "%",
       "y1": diagramHeight,
@@ -63,7 +63,7 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
       if (!isActive) {
         isActive = true
         svg.addClass(lineHolder, "active")
-        //firefox has issues with this
+        // firefox has issues with this
         markHolder.parentNode.appendChild(markHolder)
       }
     }

@@ -1,6 +1,6 @@
 declare var zip: any
 
-//use zip
+// use zip
 zip.useWebWorkers = false
 
 /** handle client side file upload */

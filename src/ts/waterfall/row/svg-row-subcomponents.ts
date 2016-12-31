@@ -71,7 +71,7 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
   let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc
   let txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart, 2)}%`, y)
 
-  //(pessimistic) estimation of text with to avoid performance penalty of `getBBox`
+  // (pessimistic) estimation of text with to avoid performance penalty of `getBBox`
   let roughTxtWidth = totalLabel.length * 8
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
@@ -178,7 +178,7 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
   let labelFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement
   let fullLabelText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement
 
-  //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
+  // use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
   fullLabel.style.display = "none"
   fullLabel.style.visibility = "hidden"
   rowFixed.appendChild(shortLabel)
@@ -208,7 +208,7 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
  */
 export function createBgStripe(y: number, height: number, isEven: boolean): SVGRectElement {
   return svg.newRect({
-    "width": "100%", //make up for the spacing
+    "width": "100%", // make up for the spacing
     "height": height,
     "x": 0,
     "y": y,

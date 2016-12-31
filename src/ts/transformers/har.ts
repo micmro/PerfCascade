@@ -78,7 +78,7 @@ export namespace HarTransformer {
    * @returns WaterfallDocs
    */
   export function transformDoc(harData: Har): WaterfallDocs {
-    //make sure it's the *.log base node
+    // make sure it's the *.log base node
     let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
     console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length)
 
@@ -94,7 +94,7 @@ export namespace HarTransformer {
    * @returns WaterfallData
    */
   export function transformPage(harData: Har, pageIndex: number = 0): WaterfallData {
-    //make sure it's the *.log base node
+    // make sure it's the *.log base node
     let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
 
     const currentPageIndex = pageIndex
@@ -164,8 +164,8 @@ export namespace HarTransformer {
         return collect
       }
 
-      //special case for 'connect' && 'ssl' since they share time
-      //http://www.softwareishard.com/blog/har-12-spec/#timings
+      // special case for 'connect' && 'ssl' since they share time
+      // http://www.softwareishard.com/blog/har-12-spec/#timings
       if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
         const sslStart = parseInt(entry[`_ssl_start`], 10) || time.start
         const sslEnd = parseInt(entry[`_ssl_end`], 10) || time.start + t.ssl

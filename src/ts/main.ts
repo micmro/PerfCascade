@@ -21,12 +21,12 @@ const defaultOptions: Readonly<ChartOptions> = {
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {
   const options: ChartOptions = {...defaultOptions, ...chartOptions}
 
-  //setup state services
+  // setup state services
   waterfallDocsService.storeDocs(waterfallDocsData)
 
   let doc = createWaterfallSvg(paging.getSelectedPage(), options)
 
-  //page update behaviour
+  // page update behaviour
   paging.onPageUpdate((_pageIndex, pageDoc) => {
     let el = doc.parentElement
     let newDoc = createWaterfallSvg(pageDoc, options)
@@ -67,11 +67,11 @@ function fromPerfCascadeFormat(waterfallDocsData: WaterfallDocs, options: Partia
 
 let transformHarToPerfCascade = HarTransformer.transformDoc
 
-//global members that get exported via UMD
+// global members that get exported via UMD
 export { fromHar }
 export { fromPerfCascadeFormat }
 export { transformHarToPerfCascade }
 export { setSelectedPageIndex as changePage } from "./paging/paging"
 export { makeLegend }
-//export typings
+// export typings
 export * from "./typing/index.d"

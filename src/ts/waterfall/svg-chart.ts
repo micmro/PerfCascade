@@ -36,7 +36,7 @@ function getSvgHeight(marks: any[], _barsToShow: WaterfallEntry[], diagramHeight
  * @return {SVGSVGElement}            SVG Element ready to render
  */
 export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): SVGSVGElement {
-  //constants
+  // constants
 
   /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100
@@ -75,7 +75,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
     mouseListeners = alignmentHelper.makeHoverEvtListeners(hoverEl)
   }
 
-  //Start appending SVG elements to the holder element (timeLineHolder)
+  // Start appending SVG elements to the holder element (timeLineHolder)
 
   scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(data.durationMs, diagramHeight))
   scaleAndMarksHolder.appendChild(marks.createMarks(data.marks, unit, diagramHeight))
@@ -136,7 +136,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
     rowHolder.appendChild(rowItem)
   }
 
-  //Main loop to render rows with blocks
+  // Main loop to render rows with blocks
   barsToShow.forEach(renderRow)
 
   if (options.showAlignmentHelpers) {

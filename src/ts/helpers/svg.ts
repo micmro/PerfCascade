@@ -94,13 +94,13 @@ let getTestSVGEl = (() => {
       }) as SVGSVGElement
     }
 
-    //needs access to body to measure size
-    //TODO: refactor for server side use
+    // needs access to body to measure size
+    // TODO: refactor for server side use
     if (svgTestEl.parentElement === undefined ) {
       window.document.body.appendChild(svgTestEl)
     }
 
-    //debounced time-deleayed cleanup, so the element can be re-used in tight loops
+    // debounced time-deleayed cleanup, so the element can be re-used in tight loops
     clearTimeout(removeSvgTestElTimeout)
     removeSvgTestElTimeout = setTimeout(() => {
       svgTestEl.parentNode.removeChild(svgTestEl)
@@ -125,7 +125,7 @@ export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = 
     tmpTextNode = textNode.cloneNode(false) as SVGTextElement
   }
   tmp.appendChild(tmpTextNode)
-  //make sure to turn of shadow for performance
+  // make sure to turn of shadow for performance
   tmpTextNode.style.textShadow = "0"
   window.document.body.appendChild(tmp)
   const nodeWidth = tmpTextNode.getBBox().width
@@ -157,7 +157,7 @@ export function removeClass(el: SVGElement, className: string) {
   if (el.classList) {
     el.classList.remove(className)
   } else {
-    //IE doesn't support classList in SVG - also no need for dublication check i.t.m.
+    // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
     el.setAttribute("class", el.getAttribute("class").replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"))
   }
   return el

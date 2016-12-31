@@ -1,4 +1,4 @@
-//Based on the HAR 1.2 Spec
+// Based on the HAR 1.2 Spec
 // http://www.softwareishard.com/blog/har-12-spec/
 
 /**
@@ -12,7 +12,7 @@ export interface Har {
   pages?: Page[]
   entries: Entry[]
   comment?: string
-  label?: string //TODO: Verify if this does exist
+  label?: string // TODO: Verify if this does exist
 }
 
 /**
@@ -51,7 +51,7 @@ export interface Page {
   /** Date and time stamp for the beginning of the page load (ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`,
    * e.g. `2009-07-24T19:20:30.45+01:00`).
    */
-  startedDateTime: string //YYYY-MM-DDThh:mm:ss.sTZD
+  startedDateTime: string // YYYY-MM-DDThh:mm:ss.sTZD
   /** Unique identifier of a page within the `<log>` (HAR doc). Entries use it to refer the parent page. */
   id: string
   /** Page title. */
@@ -91,7 +91,7 @@ export interface Entry {
   /** Reference to the parent page. Leave out this field if the application does not support grouping by pages. */
   pageref?: string
   /** Date and time stamp of the request start (ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`). */
-  startedDateTime: string //YYYY-MM-DDThh:mm:ss.sTZD
+  startedDateTime: string // YYYY-MM-DDThh:mm:ss.sTZD
   /** Total elapsed time of the request in milliseconds.
    * This is the sum of all timings available in the timings object (i.e. not including `-1` values).
    */
@@ -115,7 +115,7 @@ export interface Entry {
   /**  A comment provided by the user or the application */
   comment?: string
 
-  //WPT Custom Fields
+  // WPT Custom Fields
   _index?: string
   _number?: string
   _ip_addr?: string
@@ -133,7 +133,7 @@ export interface Entry {
   _client_port?: string
   _jpeg_scan_count?: string
   _score_progressive_jpeg?: string
-  //Scores
+  // Scores
   _score_cache?: string
   _score_cdn?: string
   _score_gzip?: string
@@ -143,14 +143,14 @@ export interface Entry {
   _score_combine?: string
   _score_compress?: string
   _score_etags?: string
-  //possible savings
+  // possible savings
   _gzip_total?: string
   _gzip_save?: string
   _minify_total?: string
   _minify_save?: string
   _image_total?: string
   _image_save?: string
-  //Detail timings
+  // Detail timings
   _all_start?: string
   _all_end?: string
   _all_ms?: string
@@ -262,7 +262,7 @@ export interface Cookie {
   comment?: string
 }
 
-//custom helper type
+// custom helper type
 interface NameValuePair {
   name: string
   value: string

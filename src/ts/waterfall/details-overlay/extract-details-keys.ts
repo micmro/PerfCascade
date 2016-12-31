@@ -36,7 +36,7 @@ let asIntPartial = (val: string, ifIntFn: (number) => any) => {
  * @param  {WaterfallEntry} block
  */
 export function getKeys(requestID: number, block: WaterfallEntry) {
-  //TODO: dodgy casting - will not work for other adapters
+  // TODO: dodgy casting - will not work for other adapters
   let entry = block.rawResource as Entry
 
   let getRequestHeader = (name: string): string => {

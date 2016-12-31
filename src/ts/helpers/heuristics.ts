@@ -29,7 +29,7 @@ export function isInStatusCodeRange(entry: Entry, lowerBound: number, upperBound
 function isCompressible(block: WaterfallEntry): boolean {
   const entry = block.rawResource
   const minCompressionSize = 1000
-  //small responses
+  // small responses
   if (entry.response.bodySize < minCompressionSize) {
     return false
   }
@@ -55,7 +55,7 @@ function isCompressible(block: WaterfallEntry): boolean {
 
 function isCachable(block: WaterfallEntry): boolean {
   const entry = block.rawResource
-  //do not cache non-gets,204 and non 2xx status codes
+  // do not cache non-gets,204 and non 2xx status codes
   if (entry.request.method.toLocaleLowerCase() !== "get" ||
     entry.response.status === 204 ||
     !isInStatusCodeRange(entry, 200, 299)) {
