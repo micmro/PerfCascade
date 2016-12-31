@@ -140,8 +140,8 @@ export namespace HarTransformer {
 
     return {
       durationMs: doneTime,
-      blocks: blocks,
-      marks: marks,
+      blocks,
+      marks,
       lines: [],
       title: currPage.title,
     }

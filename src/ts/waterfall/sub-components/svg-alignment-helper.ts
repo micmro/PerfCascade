@@ -39,7 +39,7 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
  */
 export function makeHoverEvtListeners(hoverEl: HoverElements) {
   return {
-    onMouseEnterPartial: function () {
+    onMouseEnterPartial() {
       return function (evt: MouseEvent) {
         const targetRect = evt.target as SVGRectElement
         svg.addClass(targetRect, "active")
@@ -56,7 +56,7 @@ export function makeHoverEvtListeners(hoverEl: HoverElements) {
         svg.addClass(hoverEl.startline, "active")
       }
     },
-    onMouseLeavePartial: function () {
+    onMouseLeavePartial() {
       return function (evt: MouseEvent) {
         const targetRect = evt.target as SVGRectElement
         svg.removeClass(targetRect, "active")
