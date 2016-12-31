@@ -22,9 +22,9 @@ export function readFile(file: File, fileName: string, callback: Function) {
   let extension = fileName.match(/\.[0-9a-z]+$/i)[0]
   if ([".zhar", ".zip"].indexOf(extension) !== -1) {
     /** zhar */
-    zip.createReader(new zip.BlobReader(file), function (zipReader) {
+    zip.createReader(new zip.BlobReader(file), (zipReader) => {
       zipReader.getEntries((x) => {
-        x[0].getData(new zip.TextWriter(), function (txt) {
+        x[0].getData(new zip.TextWriter(), (txt) => {
           parseJson(txt)
           // close the zip reader
           zipReader.close()

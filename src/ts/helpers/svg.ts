@@ -71,7 +71,7 @@ let getTestSVGEl = (() => {
   let svgTestEl: SVGSVGElement
   let removeSvgTestElTimeout
 
-  return function getTestSVGElInner(): SVGSVGElement {
+  return () => {
     // lazy init svgTestEl
     if (svgTestEl === undefined) {
       svgTestEl = newEl("svg:svg", {
