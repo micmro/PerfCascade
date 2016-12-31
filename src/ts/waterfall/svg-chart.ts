@@ -1,16 +1,15 @@
-import {WaterfallData, WaterfallEntry} from "../typing/waterfall"
-import {RectData} from "../typing/rect-data"
-import {ChartOptions} from "../typing/options"
-
 import * as svg from "../helpers/svg"
-import * as generalComponents from "./sub-components/svg-general-components"
-import * as alignmentHelper from  "./sub-components/svg-alignment-helper"
-import * as marks from  "./sub-components/svg-marks"
-import * as row from "./row/svg-row"
-import * as indicators from "./row/svg-indicators"
-import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
-import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
 import {requestTypeToCssClass} from "../transformers/styling-converters";
+import {ChartOptions} from "../typing/options"
+import {RectData} from "../typing/rect-data"
+import {WaterfallData, WaterfallEntry} from "../typing/waterfall"
+import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
+import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
+import * as indicators from "./row/svg-indicators"
+import * as row from "./row/svg-row"
+import * as alignmentHelper from  "./sub-components/svg-alignment-helper"
+import * as generalComponents from "./sub-components/svg-general-components"
+import * as marks from  "./sub-components/svg-marks"
 
 /**
  * Calculate the height of the SVG chart in px

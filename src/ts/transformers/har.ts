@@ -1,11 +1,13 @@
 import {
-  Har,
-  Entry
+  Entry,
+  Har
 } from "../typing/har"
 import {
-  WaterfallDocs,
+  Mark,
+  RequestType,
+  TimingType,
   WaterfallData,
-  Mark, RequestType, TimingType
+  WaterfallDocs
 } from "../typing/waterfall"
 
 class WaterfallEntry {

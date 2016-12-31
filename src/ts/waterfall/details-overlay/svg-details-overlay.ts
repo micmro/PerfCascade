@@ -1,7 +1,7 @@
-import * as svg from "../../helpers/svg"
 import * as dom from "../../helpers/dom"
-import {createDetailsBody} from "./html-details-body"
+import * as svg from "../../helpers/svg"
 import {WaterfallEntry} from "../../typing/waterfall";
+import {createDetailsBody} from "./html-details-body"
 
 function createCloseButtonSvg(y: number): SVGGElement {
   let closeBtn = svg.newA("info-overlay-close-btn")

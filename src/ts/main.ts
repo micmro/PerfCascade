@@ -1,11 +1,11 @@
-import { Har } from "./typing/har"
-import { WaterfallDocs } from "./typing/waterfall"
-import { ChartOptions } from "./typing/options"
-import { createWaterfallSvg } from "./waterfall/svg-chart"
-import * as paging from "./paging/paging"
-import {HarTransformer} from "./transformers/har"
 import { makeLegend } from "./legend/legend"
+import * as paging from "./paging/paging"
 import * as waterfallDocsService from "./state/waterfall-docs-service"
+import {HarTransformer} from "./transformers/har"
+import { Har } from "./typing/har"
+import { ChartOptions } from "./typing/options"
+import { WaterfallDocs } from "./typing/waterfall"
+import { createWaterfallSvg } from "./waterfall/svg-chart"
 
 /** default options to use if not set in `options` parameter */
 const defaultOptions: Readonly<ChartOptions> = {

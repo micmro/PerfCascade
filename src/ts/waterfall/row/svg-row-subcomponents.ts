@@ -2,11 +2,11 @@
  * Creation of sub-components used in a ressource request row
  */
 
-import {RectData} from "../../typing/rect-data.d"
-import * as svg from "../../helpers/svg"
 import * as misc from "../../helpers/misc"
-import {WaterfallEntryTiming} from "../../typing/waterfall";
+import * as svg from "../../helpers/svg"
 import {timingTypeToCssClass} from "../../transformers/styling-converters";
+import {RectData} from "../../typing/rect-data"
+import {WaterfallEntryTiming} from "../../typing/waterfall";
 
 /**
  * Creates the `rect` that represent the timings in `rectData`

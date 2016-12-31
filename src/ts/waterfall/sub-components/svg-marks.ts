@@ -1,7 +1,6 @@
-import {Mark} from "../../typing/waterfall"
-import {OverlayChangeEvent} from "../../typing/open-overlay"
-
 import * as svg from "../../helpers/svg"
+import {OverlayChangeEvent} from "../../typing/open-overlay"
+import {Mark} from "../../typing/waterfall"
 import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
 
 /**

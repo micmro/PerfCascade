@@ -9,7 +9,6 @@
     "object-literal-key-quotes": false,
 
     "object-literal-sort-keys": false,
-    "ordered-imports": false,
     "no-console": false,
     "no-string-literal": false,
     "semicolon": false,

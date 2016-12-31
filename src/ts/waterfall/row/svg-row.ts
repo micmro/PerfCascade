@@ -1,13 +1,12 @@
-import { RectData } from "../../typing/rect-data"
-import { ChartOptions } from "../../typing/options"
-
-import * as svg from "../../helpers/svg"
+import * as heuristics from "../../helpers/heuristics"
 import * as icons from "../../helpers/icons"
 import * as misc from "../../helpers/misc"
-import * as heuristics from "../../helpers/heuristics"
-import * as rowSubComponents from "./svg-row-subcomponents"
-import * as indicators from "./svg-indicators"
+import * as svg from "../../helpers/svg"
+import { ChartOptions } from "../../typing/options"
+import { RectData } from "../../typing/rect-data"
 import {WaterfallEntry} from "../../typing/waterfall";
+import * as indicators from "./svg-indicators"
+import * as rowSubComponents from "./svg-row-subcomponents"
 
 // initial clip path
 const clipPathElProto = svg.newClipPath("titleClipPath")

@@ -2,11 +2,11 @@
  * Creation of sub-components of the waterfall chart
  */
 
-import { OverlayChangeEvent } from "../../typing/open-overlay.d"
 import * as svg from "../../helpers/svg"
-import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
-import {WaterfallEntry} from "../../typing/waterfall";
 import {requestTypeToCssClass} from "../../transformers/styling-converters";
+import { OverlayChangeEvent } from "../../typing/open-overlay"
+import {WaterfallEntry} from "../../typing/waterfall";
+import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
 
 /**
  * Renders a per-second marker line and appends it to `timeHolder`
