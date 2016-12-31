@@ -49,7 +49,8 @@ export interface Browser {
  */
 export interface Page {
   /** Date and time stamp for the beginning of the page load (ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`,
-   * e.g. `2009-07-24T19:20:30.45+01:00`). */
+   * e.g. `2009-07-24T19:20:30.45+01:00`).
+   */
   startedDateTime: string //YYYY-MM-DDThh:mm:ss.sTZD
   /** Unique identifier of a page within the `<log>` (HAR doc). Entries use it to refer the parent page. */
   id: string
@@ -66,13 +67,15 @@ export interface Page {
  * This object describes timings for various events (states) fired during the page load. All times are specified in milliseconds.
  *  If a time info is not available appropriate field is set to `-1`.
  * http://www.softwareishard.com/blog/har-12-spec/#pageTimings
-*/
+ */
 export interface PageTimings {
   /** Content of the page loaded. Number of milliseconds since page load started (`page.startedDateTime`).
-   * Use `-1` if the timing does not apply to the current request. */
+   * Use `-1` if the timing does not apply to the current request.
+   */
   onContentLoad?: number
   /** Page is loaded (`onLoad` event fired). Number of milliseconds since page load started (`page.startedDateTime`).
-   * Use `-1` if the timing does not apply to the current request. */
+   * Use `-1` if the timing does not apply to the current request.
+   */
   onLoad?: number
   /**  A comment provided by the user or the application */
   comment?: string
@@ -90,7 +93,8 @@ export interface Entry {
   /** Date and time stamp of the request start (ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`). */
   startedDateTime: string //YYYY-MM-DDThh:mm:ss.sTZD
   /** Total elapsed time of the request in milliseconds.
-   * This is the sum of all timings available in the timings object (i.e. not including `-1` values). */
+   * This is the sum of all timings available in the timings object (i.e. not including `-1` values).
+   */
   time: number
   /** Detailed info about the request. */
   request: Request
@@ -105,7 +109,8 @@ export interface Entry {
   /**  Unique ID of the parent TCP/IP connection, can be the client or server port number.
    * Note that a port number doesn't have to be unique identifier in cases where the port is shared for more connections.
    * If the port isn't available for the application, any other unique connection ID can be used instead
-   * (e.g. connection index). Leave out this field if the application doesn't support this info. */
+   * (e.g. connection index). Leave out this field if the application doesn't support this info.
+   */
   connection?: string
   /**  A comment provided by the user or the application */
   comment?: string
@@ -189,7 +194,8 @@ export interface Request {
   /** Posted data info. */
   postData?: PostData
   /** Total number of bytes from the start of the HTTP request message until (and including)
-   * the double CRLF before the body. Set to `-1` if the info is not available. */
+   * the double CRLF before the body. Set to `-1` if the info is not available.
+   */
   headersSize: number
   /** Size of the request body (POST data payload) in bytes. Set to `-1` if the info is not available. */
   bodySize: number
@@ -222,10 +228,11 @@ export interface Response {
    *
    * _The size of received response-headers is computed only from headers that are really received from the server.
    * Additional headers appended by the browser are not included in this number, but they appear in the list of header objects._
-   * */
+   */
   headersSize: number
   /** Size of the received response body in bytes. Set to zero in case of responses coming from the cache (`304`).
-   * Set to `-1` if the info is not available. */
+   * Set to `-1` if the info is not available.
+   */
   bodySize: number
   /**  A comment provided by the user or the application */
   comment?: string
@@ -285,12 +292,12 @@ export interface PostData {
   /** List of posted parameters (in case of URL encoded parameters).
    *
    * _`text` and `params` fields are mutually exclusive._
-  */
+   */
   params: Param[]
   /** Plain text posted data
    *
    * _`params` and `text` fields are mutually exclusive._
-  */
+   */
   text: string
   /**  A comment provided by the user or the application */
   comment?: string
@@ -320,20 +327,24 @@ export interface Param {
 export interface Content {
   /** Length of the returned content in bytes.
    *
-   * Should be equal to `response.bodySize` if there is no compression and bigger when the content has been compressed. */
+   * Should be equal to `response.bodySize` if there is no compression and bigger when the content has been compressed.
+   */
   size: number
   /** Number of bytes saved. Leave out this field if the information is not available. */
   compression?: number
   /** MIME type of the response text (value of the Content-Type response header).
-   * The charset attribute of the MIME type is included (if available). */
+   * The charset attribute of the MIME type is included (if available).
+   */
   mimeType: string
   /** Response body sent from the server or loaded from the browser cache. This field is populated with textual content only.
    * The text field is either HTTP decoded text or a encoded (e.g. `base64`)
-   * representation of the response body. Leave out this field if the information is not available. */
+   * representation of the response body. Leave out this field if the information is not available.
+   */
   text?: string
   /**  Encoding used for response text field e.g `base64`.
    * Leave out this field if the text field is HTTP decoded (decompressed & unchunked),
-   * than trans-coded from its original character set into UTF-8. */
+   * than trans-coded from its original character set into UTF-8.
+   */
   encoding?: string
   /**  A comment provided by the user or the application */
   comment?: string
@@ -355,11 +366,13 @@ export interface Cache {
 export interface CacheDetails {
   /** Expiration time of the cache entry.
    *
-   * _(Format not documente but assumingly ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`)_*/
+   * _(Format not documente but assumingly ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`)_
+   */
   expires?: string
   /** The last time the cache entry was opened.
    *    *
-   * _(Format not documente but assumingly ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`)_*/
+   * _(Format not documente but assumingly ISO 8601 - `YYYY-MM-DDThh:mm:ss.sTZD`)_
+   */
   lastAccess: string
   /** Etag */
   eTag: string
@@ -383,20 +396,21 @@ export interface Timings {
   /** Time required to send HTTP request to the server.
    *
    * _Not optional and must have non-negative values._
-  */
+   */
   send?: number
   /** Waiting for a response from the server.
    *
    * _Not optional and must have non-negative values._
-  */
+   */
   wait: number
   /** Time required to read entire response from the server (or cache).
    *
    * _Not optional and must have non-negative values._
-  */
+   */
   receive: number
   /** Time required for SSL/TLS negotiation. If this field is defined then the time is also included in the
-   * connect field (to ensure backward compatibility with HAR 1.1). Use `-1` if the timing does not apply to the current request. */
+   * connect field (to ensure backward compatibility with HAR 1.1). Use `-1` if the timing does not apply to the current request.
+   */
   ssl?: number
   /**  A comment provided by the user or the application */
   comment?: string

@@ -4,7 +4,6 @@
     "arrow-parens": false,
     "comment-format": false,
     "interface-name": false,
-    "jsdoc-format": false,
     "max-line-length": false,
     "max-classes-per-file": false,
     "no-consecutive-blank-lines": false,

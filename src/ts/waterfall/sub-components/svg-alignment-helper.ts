@@ -1,6 +1,6 @@
 /**
  * vertical alignment helper lines
- * */
+ */
 
 import * as svg from "../../helpers/svg"
 
