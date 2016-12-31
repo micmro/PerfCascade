@@ -4,21 +4,18 @@ declare var zip: any
 zip.useWebWorkers = false
 
 /** handle client side file upload */
-export function readFile(file: File, fileName: string, onDone: Function) {
+export function readFile(file: File, fileName: string, callback: Function) {
   if (!file) {
-    alert("Failed to load HAR file")
-    onDone()
+    return callback(new Error("Failed to load HAR file"))
   }
 
   function parseJson(rawData) {
-    let harData
     try {
-      harData = JSON.parse(rawData)
+      let harData = JSON.parse(rawData)
+      callback(null, harData.log)
     } catch (e) {
-      alert("File does not seem to be a valid HAR file")
-      return undefined
+      callback(e)
     }
-    onDone(harData.log)
   }
 
   /** start reading the file */

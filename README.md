@@ -70,10 +70,10 @@ If set a legend explaining the waterfall colours is rendered in the `legendHolde
 By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/master/src/index.html#L73-L80) you can use `perfCascadeFileReader.readFile` to read a gzip and convert it to a JSON HAR object.
 
 ```
-perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(data){
-  if(!data){
+perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(error, data){
+  if(error){
     // handle error
-    console.error("Can't read file")
+    console.error(error)
   }else{
     // handle success
     renderPerfCascadeChart(data)
