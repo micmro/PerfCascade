@@ -120,8 +120,7 @@ export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = 
   // make sure to turn of shadow for performance
   tmpTextNode.style.textShadow = "0"
   window.document.body.appendChild(tmp)
-  const nodeWidth = tmpTextNode.getBBox().width
-  return nodeWidth
+  return tmpTextNode.getBBox().width
 }
 
 /**

@@ -91,10 +91,9 @@ export function transformDoc(harData: Har): WaterfallDocs {
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
   console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length)
 
-  let waterfallDocs = {
+  return {
     pages: data.pages.map((_page, i) => this.transformPage(data, i))
-  } as WaterfallDocs
-  return waterfallDocs
+  }
 }
 /**
  * Transforms a HAR object into the format needed to render the PerfCascade
@@ -106,8 +105,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
 
-  const currentPageIndex = pageIndex
-  const currPage = data.pages[currentPageIndex]
+  const currPage = data.pages[pageIndex]
   const pageStartTime = new Date(currPage.startedDateTime).getTime()
   const pageTimings = currPage.pageTimings
 
