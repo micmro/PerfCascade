@@ -118,7 +118,7 @@ export function createRect(rectData: RectData, segments: WaterfallEntryTiming[],
  * @param  {number}         height           height of row
  * @return {SVGTextElement}                  label SVG element
  */
-export function createRequestLabelClipped(x: number, y: number, name: string, height: number, _clipPathId?: string) {
+export function createRequestLabelClipped(x: number, y: number, name: string, height: number) {
 
   let blockLabel = createRequestLabel(x, y, name, height)
   blockLabel.style.clipPath = `url(#titleClipPath)`
@@ -207,7 +207,7 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
 }
 
 export function createNameRowBg(y: number, rowHeight: number,
-                                onClick: EventListener, _leftColumnWith: number): SVGGElement {
+                                onClick: EventListener): SVGGElement {
   let rowFixed = svg.newG("row row-fixed")
 
   rowFixed.appendChild(svg.newRect({

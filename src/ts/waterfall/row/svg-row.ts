@@ -50,10 +50,10 @@ export function createRow(index: number, rectData: RectData, block: WaterfallEnt
 
   let rect = rowSubComponents.createRect(rectData, block.segments, block.total)
   let shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y,
-    requestNumber + misc.resourceUrlFormatter(block.name, 40), rowHeight, "clipPath")
+    requestNumber + misc.resourceUrlFormatter(block.name, 40), rowHeight)
   let fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, requestNumber + block.name, rowHeight)
 
-  let rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow, leftColumnWith)
+  let rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow)
   let rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow)
   let bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0))
 
