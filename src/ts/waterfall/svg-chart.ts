@@ -2,6 +2,7 @@ import * as svg from "../helpers/svg"
 import {requestTypeToCssClass} from "../transformers/styling-converters";
 import {ChartOptions} from "../typing/options"
 import {RectData} from "../typing/rect-data"
+import {Mark} from "../typing/waterfall"
 import {WaterfallData, WaterfallEntry} from "../typing/waterfall"
 import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub"
 import * as overlayManager from "./details-overlay/svg-details-overlay-manager"
@@ -13,13 +14,12 @@ import * as marks from  "./sub-components/svg-marks"
 
 /**
  * Calculate the height of the SVG chart in px
- * @param {any[]}       marks      [description]
- * @param {WaterfallEntry[]} _barsToShow [description]
+ * @param {Mark[]}       marks      [description]
  * @param  {number} diagramHeight
  * @returns Number
  */
-function getSvgHeight(marks: any[], _barsToShow: WaterfallEntry[], diagramHeight: number): number {
-  const maxMarkTextLength = marks.reduce((currMax: number, currValue: WaterfallEntry) => {
+function getSvgHeight(marks: Mark[], diagramHeight: number): number {
+  const maxMarkTextLength = marks.reduce((currMax: number, currValue: Mark) => {
     return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0, 0), true))
   }, 0)
 
@@ -44,7 +44,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   /** height of the requests part of the diagram in px */
   const diagramHeight = (barsToShow.length + 1) * options.rowHeight
   /** full height of the SVG chart in px */
-  const chartHolderHeight = getSvgHeight(data.marks, barsToShow, diagramHeight)
+  const chartHolderHeight = getSvgHeight(data.marks, diagramHeight)
 
   /** Main SVG Element that holds all data */
   let timeLineHolder = svg.newSvg("water-fall-chart", {
@@ -124,7 +124,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
     } as RectData
 
     let showDetailsOverlay = () => {
-      overlayManager.openOverlay(i, x, y + options.rowHeight, accordionHeight, block, overlayHolder, barEls, unit)
+      overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, block, overlayHolder, barEls)
     }
 
     let rowItem = row.createRow(i, rectData, block, labelXPos,
