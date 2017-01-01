@@ -1,9 +1,8 @@
 /**
  * vertical alignment helper lines
- * */
+ */
 
 import * as svg from "../../helpers/svg"
-
 
 export interface HoverElements {
   endline: SVGLineElement,
@@ -34,16 +33,14 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
   }
 }
 
-
-
 /**
  * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover
  * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
  */
 export function makeHoverEvtListeners(hoverEl: HoverElements) {
   return {
-    onMouseEnterPartial: function () {
-      return function (evt: MouseEvent) {
+    onMouseEnterPartial() {
+      return (evt: MouseEvent) => {
         const targetRect = evt.target as SVGRectElement
         svg.addClass(targetRect, "active")
 
@@ -59,8 +56,8 @@ export function makeHoverEvtListeners(hoverEl: HoverElements) {
         svg.addClass(hoverEl.startline, "active")
       }
     },
-    onMouseLeavePartial: function () {
-      return function (evt: MouseEvent) {
+    onMouseLeavePartial() {
+      return (evt: MouseEvent) => {
         const targetRect = evt.target as SVGRectElement
         svg.removeClass(targetRect, "active")
         svg.removeClass(hoverEl.endline, "active")

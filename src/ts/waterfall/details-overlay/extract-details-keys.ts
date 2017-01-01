@@ -2,18 +2,16 @@ import { Entry } from "../../typing/har.d"
 import { KvTuple } from "../../typing/misc.d"
 import {WaterfallEntry} from "../../typing/waterfall";
 
-
-
-let ifValueDefined = (value: number, fn: (number) => any) => {
+let ifValueDefined = (value: number, fn: (_: number) => any) => {
   if (!isFinite(value) || value <= 0) {
     return undefined
   }
   return fn(value)
 }
 
-let formatBytes = (size?: number) => ifValueDefined(size, s => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
+let formatBytes = (size?: number) => ifValueDefined(size, (s) => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
 
-let formatTime = (size?: number) => ifValueDefined(size, s => `${s} ms`)
+let formatTime = (size?: number) => ifValueDefined(size, (s) => `${s} ms`)
 
 let formatDate = (date?: string) => {
   if (!date) {
@@ -23,12 +21,10 @@ let formatDate = (date?: string) => {
   return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`
 }
 
-
-let asIntPartial = (val: string, ifIntFn: (number) => any) => {
+let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
   let v = parseInt(val, 10)
   return ifValueDefined(v, ifIntFn)
 }
-
 
 /**
  * Data to show in overlay tabs
@@ -36,16 +32,16 @@ let asIntPartial = (val: string, ifIntFn: (number) => any) => {
  * @param  {WaterfallEntry} block
  */
 export function getKeys(requestID: number, block: WaterfallEntry) {
-  //TODO: dodgy casting - will not work for other adapters
+  // TODO: dodgy casting - will not work for other adapters
   let entry = block.rawResource as Entry
 
   let getRequestHeader = (name: string): string => {
-    let header = entry.request.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
+    let header = entry.request.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0]
     return header ? header.value : ""
   }
 
   let getResponseHeader = (name: string): string => {
-    let header = entry.response.headers.filter(h => h.name.toLowerCase() === name.toLowerCase())[0]
+    let header = entry.response.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0]
     return header ? header.value : ""
   }
 
@@ -84,7 +80,8 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
   return {
     "general": [
       ["Request Number", `#${requestID}`],
-      ["Started", new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) + " after page request started)"],
+      ["Started", new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) +
+      " after page request started)"],
       ["Duration", formatTime(entry.time)],
       ["Error/Status Code", entry.response.status + " " + entry.response.statusText],
       ["Server IPAddress", entry.serverIPAddress],

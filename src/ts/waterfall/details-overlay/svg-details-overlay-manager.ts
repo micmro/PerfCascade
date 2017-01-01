@@ -1,7 +1,7 @@
-import {OpenOverlay, OverlayChangeEvent} from "../../typing/open-overlay.d"
-import {createRowInfoOverlay} from "./svg-details-overlay"
-import * as overlayChangesPubSub from "./overlay-changes-pub-sub"
+import {OpenOverlay, OverlayChangeEvent} from "../../typing/open-overlay"
 import {WaterfallEntry} from "../../typing/waterfall";
+import * as overlayChangesPubSub from "./overlay-changes-pub-sub"
+import {createRowInfoOverlay} from "./svg-details-overlay"
 
 /** Collection of currely open overlays */
 let openOverlays: OpenOverlay[] = []
@@ -20,7 +20,6 @@ export function getOverlayOffset(rowIndex: number): number {
     return col
   }, 0)
 }
-
 
 /**
  * closes on overlay - rerenders others internally
@@ -44,8 +43,8 @@ export function closeOverlay(index: number, overlayHolder: SVGGElement,
 /**
  * Opens an overlay - rerenders others internaly
  */
-export function openOverlay(index: number, barX: number,  y: number, accordionHeight: number, block: WaterfallEntry,
-  overlayHolder: SVGGElement, barEls: SVGGElement[], unit: number) {
+export function openOverlay(index: number, barX: number, y: number, accordionHeight: number, block: WaterfallEntry,
+                            overlayHolder: SVGGElement, barEls: SVGGElement[], unit: number) {
 
   if (openOverlays.filter((o) => o.index === index).length > 0) {
     return
@@ -80,7 +79,6 @@ function realignBars(barEls: SVGGElement[]) {
   })
 }
 
-
  /**
   * removes all overlays and renders them again
   *
@@ -101,8 +99,9 @@ function renderOverlays(barX: number, accordionHeight: number, overlayHolder: SV
     .sort((a, b) => a.index > b.index ? 1 : -1)
     .forEach((overlay) => {
       let y = overlay.defaultY + currY
-      let infoOverlay = createRowInfoOverlay(overlay.index, barX, y, accordionHeight, overlay.block, overlay.onClose, unit)
-      //if overlay has a preview image show it
+      let infoOverlay = createRowInfoOverlay(overlay.index, barX, y, accordionHeight,
+        overlay.block, overlay.onClose, unit)
+      // if overlay has a preview image show it
       let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement
       if (previewImg && !previewImg.src) {
         previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value)

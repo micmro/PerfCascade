@@ -12,6 +12,7 @@ export function makeLegend(): HTMLUListElement {
         <li class="legend-ssl" title="Time required for SSL/TLS negotiation.">SSL (TLS)</li>
         <li class="legend-send" title="Time required to send HTTP request to the server.">Send</li>
         <li class="legend-wait" title="Waiting for a response from the server.">Wait</li>
-        <li class="legend-receive" title="Time required to read entire response from the server (or cache).">Receive</li>`
+        <li class="legend-receive" 
+        title="Time required to read entire response from the server (or cache).">Receive</li>`
   return ulNode
 }

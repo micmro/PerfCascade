@@ -1,11 +1,11 @@
-import { Har } from "./typing/har"
-import { WaterfallDocs } from "./typing/waterfall"
-import { ChartOptions } from "./typing/options"
-import { createWaterfallSvg } from "./waterfall/svg-chart"
-import * as paging from "./paging/paging"
-import {HarTransformer} from "./transformers/har"
 import { makeLegend } from "./legend/legend"
+import * as paging from "./paging/paging"
 import * as waterfallDocsService from "./state/waterfall-docs-service"
+import * as HarTransformer from "./transformers/har"
+import { Har } from "./typing/har"
+import { ChartOptions } from "./typing/options"
+import { WaterfallDocs } from "./typing/waterfall"
+import { createWaterfallSvg } from "./waterfall/svg-chart"
 
 /** default options to use if not set in `options` parameter */
 const defaultOptions: Readonly<ChartOptions> = {
@@ -21,12 +21,12 @@ const defaultOptions: Readonly<ChartOptions> = {
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {
   const options: ChartOptions = {...defaultOptions, ...chartOptions}
 
-  //setup state services
+  // setup state services
   waterfallDocsService.storeDocs(waterfallDocsData)
 
   let doc = createWaterfallSvg(paging.getSelectedPage(), options)
 
-  //page update behaviour
+  // page update behaviour
   paging.onPageUpdate((_pageIndex, pageDoc) => {
     let el = doc.parentElement
     let newDoc = createWaterfallSvg(pageDoc, options)
@@ -67,11 +67,11 @@ function fromPerfCascadeFormat(waterfallDocsData: WaterfallDocs, options: Partia
 
 let transformHarToPerfCascade = HarTransformer.transformDoc
 
-//global members that get exported via UMD
+// global members that get exported via UMD
 export { fromHar }
 export { fromPerfCascadeFormat }
 export { transformHarToPerfCascade }
 export { setSelectedPageIndex as changePage } from "./paging/paging"
 export { makeLegend }
-//export typings
+// export typings
 export * from "./typing/index.d"

@@ -3,9 +3,8 @@ import {WaterfallData} from "../typing/waterfall"
 
 import * as waterfallDocsService from "../state/waterfall-docs-service"
 
-
 let selectedPageIndex = 0
-let onPageUpdateCbs: Array<OnPagingCb> = []
+let onPageUpdateCbs: OnPagingCb[] = []
 
 /**
  * Returns number of pages
@@ -46,7 +45,7 @@ export function setSelectedPageIndex(pageIndex: number) {
 
   selectedPageIndex = pageIndex
   let selectedPage = waterfallDocsService.getDocs().pages[selectedPageIndex]
-  onPageUpdateCbs.forEach(cd => {
+  onPageUpdateCbs.forEach((cd) => {
     cd(selectedPageIndex, selectedPage)
   })
 }

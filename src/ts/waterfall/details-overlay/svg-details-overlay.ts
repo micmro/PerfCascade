@@ -1,8 +1,7 @@
-import * as svg from "../../helpers/svg"
 import * as dom from "../../helpers/dom"
-import {createDetailsBody} from "./html-details-body"
+import * as svg from "../../helpers/svg"
 import {WaterfallEntry} from "../../typing/waterfall";
-
+import {createDetailsBody} from "./html-details-body"
 
 function createCloseButtonSvg(y: number): SVGGElement {
   let closeBtn = svg.newA("info-overlay-close-btn")
@@ -28,10 +27,9 @@ function createCloseButtonSvg(y: number): SVGGElement {
   return closeBtn
 }
 
-
 function createHolder(y: number, accordionHeight: number) {
 
- let innerHolder = svg.newG("info-overlay-holder", {
+  let innerHolder = svg.newG("info-overlay-holder", {
     "width": "100%"
   })
 
@@ -49,8 +47,9 @@ function createHolder(y: number, accordionHeight: number) {
   return innerHolder
 }
 
-export function createRowInfoOverlay(indexBackup: number, _barX: number,  y: number, accordionHeight: number, block: WaterfallEntry,
-  onClose: Function, _unit: number): SVGGElement {
+export function createRowInfoOverlay(indexBackup: number, _barX: number, y: number,
+                                     accordionHeight: number, block: WaterfallEntry,
+                                     onClose: Function, _unit: number): SVGGElement {
   const requestID =  parseInt(block.rawResource._index + 1, 10) || indexBackup + 1
   let wrapper = svg.newG("outer-info-overlay-holder", {
     "width": "100%"
@@ -65,7 +64,6 @@ export function createRowInfoOverlay(indexBackup: number, _barX: number,  y: num
     "dy": "5",
     "dx": "5"
   })
-
 
   let closeBtn = createCloseButtonSvg(y)
   closeBtn.addEventListener("click", () => onClose(indexBackup, holder))

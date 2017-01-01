@@ -1,6 +1,6 @@
 import { KvTuple } from "../../typing/misc"
-import { getKeys } from "./extract-details-keys"
 import {WaterfallEntry} from "../../typing/waterfall";
+import { getKeys } from "./extract-details-keys"
 
 function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
   let makeClass = (key: string) => {
@@ -11,8 +11,8 @@ function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
     return `class="${className || "no-colour"}"`
   }
   return dlKeyValues
-    .filter(tuple => (tuple[1] !== undefined && tuple[1] !== -1 && tuple[1] !== 0 && tuple[1] !== ""))
-    .map(tuple => `
+    .filter((tuple) => (tuple[1] !== undefined && tuple[1] !== -1 && tuple[1] !== 0 && tuple[1] !== ""))
+    .map((tuple) => `
       <dt ${makeClass(tuple[0])}>${tuple[0]}</dt>
       <dd>${tuple[1]}</dd>
     `).join("")
@@ -32,7 +32,8 @@ function makeImgTab(accordeonHeight: number, block: WaterfallEntry) {
   if (block.requestType !== "image") {
     return ""
   }
-  const imgTag = `<img class="preview" style="max-height:${(accordeonHeight - 100)}px" data-src="${block.rawResource.request.url}" />`
+  const imgTag = `<img class="preview" style="max-height:${(accordeonHeight - 100)}px"
+                        data-src="${block.rawResource.request.url}" />`
   return makeTab(imgTag, false)
 }
 
@@ -52,9 +53,11 @@ export function createDetailsBody(requestID: number, block: WaterfallEntry, acco
   const timingsTab = makeTab(makeDefinitionList(tabsData.timings, true))
   const requestDl = makeDefinitionList(tabsData.request)
 
-  const requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.map(h => [h.name, h.value] as KvTuple))
+  const requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.map((h) =>
+    [h.name, h.value] as KvTuple))
   const responseDl = makeDefinitionList(tabsData.response)
-  const responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.map(h => [h.name, h.value] as KvTuple))
+  const responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.map((h) =>
+    [h.name, h.value] as KvTuple))
   const imgTab = makeImgTab(accordeonHeight, block)
 
   body.innerHTML = `

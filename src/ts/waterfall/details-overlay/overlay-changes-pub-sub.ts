@@ -1,7 +1,6 @@
-//simple pub/sub for change to the overlay
+// simple pub/sub for change to the overlay
 
 import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay.d"
-
 
 export const eventTypes = {
   "OPEN" : "open",
@@ -10,13 +9,12 @@ export const eventTypes = {
 
 let subscribers: OverlayChangeSubscriber[] = []
 
-
 export function subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {
   subscribers.push(fn)
 }
 
-//no need for unsubscribe in the moment
+// no need for unsubscribe in the moment
 
 export function publishToOverlayChanges(change: OverlayChangeEvent) {
-  subscribers.forEach(fn => fn(change))
+  subscribers.forEach((fn) => fn(change))
 }

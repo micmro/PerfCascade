@@ -1,27 +1,24 @@
-import { RectData } from "../../typing/rect-data"
-import { ChartOptions } from "../../typing/options"
-
-import * as svg from "../../helpers/svg"
+import * as heuristics from "../../helpers/heuristics"
 import * as icons from "../../helpers/icons"
 import * as misc from "../../helpers/misc"
-import * as heuristics from "../../helpers/heuristics"
-import * as rowSubComponents from "./svg-row-subcomponents"
-import * as indicators from "./svg-indicators"
+import * as svg from "../../helpers/svg"
+import { ChartOptions } from "../../typing/options"
+import { RectData } from "../../typing/rect-data"
 import {WaterfallEntry} from "../../typing/waterfall";
+import * as indicators from "./svg-indicators"
+import * as rowSubComponents from "./svg-row-subcomponents"
 
-//initial clip path
+// initial clip path
 const clipPathElProto = svg.newClipPath("titleClipPath")
 clipPathElProto.appendChild(svg.newRect({
   "width": "100%",
   "height": "100%"
 }))
 
-
-
-//Creates single reques's row
+// Creates single reques's row
 export function createRow(index: number, rectData: RectData, block: WaterfallEntry,
-  labelXPos: number, options: ChartOptions, docIsSsl: boolean,
-  onDetailsOverlayShow: EventListener): SVGGElement {
+                          labelXPos: number, options: ChartOptions, docIsSsl: boolean,
+                          onDetailsOverlayShow: EventListener): SVGGElement {
 
   const y = rectData.y
   const rowHeight = rectData.height
@@ -35,7 +32,7 @@ export function createRow(index: number, rectData: RectData, block: WaterfallEnt
     rowCssClass.push("status4xx")
   } else if (block.rawResource.response.status !== 304 &&
     heuristics.isInStatusCodeRange(block.rawResource, 300, 399)) {
-    //304 == Not Modified, so not an issue
+    // 304 == Not Modified, so not an issue
     rowCssClass.push("status3xx")
   }
 
@@ -60,7 +57,7 @@ export function createRow(index: number, rectData: RectData, block: WaterfallEnt
   let rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow)
   let bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0))
 
-  //create and attach request block
+  // create and attach request block
   rowBar.appendChild(rect)
 
   let x = 3
@@ -72,7 +69,7 @@ export function createRow(index: number, rectData: RectData, block: WaterfallEnt
   }
 
   if (options.showIndicatorIcons) {
-    //Create and add warnings for potential issues
+    // Create and add warnings for potential issues
     indicators.getIndicatorIcons(block, docIsSsl).forEach((icon: indicators.Icon) => {
       rowName.appendChild(icons[icon.type](x, y + 3, icon.title))
       x += icon.width

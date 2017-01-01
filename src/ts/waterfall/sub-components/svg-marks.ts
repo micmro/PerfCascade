@@ -1,17 +1,15 @@
-import {Mark} from "../../typing/waterfall"
-import {OverlayChangeEvent} from "../../typing/open-overlay"
-
 import * as svg from "../../helpers/svg"
+import {OverlayChangeEvent} from "../../typing/open-overlay"
+import {Mark} from "../../typing/waterfall"
 import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
-
 
 /**
  * Renders global markes for events like the onLoad event etc
- * @param {Array<Mark>} marks         [description]
+ * @param {Mark[]} marks         [description]
  * @param {number}      unit          horizontal unit (duration in ms of 1%)
  * @param {number}      diagramHeight Full height of SVG in px
  */
-export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: number) {
+export function createMarks(marks: Mark[], unit: number, diagramHeight: number) {
   let marksHolder = svg.newG("marker-holder", {
     "transform": "scale(1, 1)"
   })
@@ -38,7 +36,7 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       lineLabel.setAttribute("x", lastMark.x + 1 + "%")
       mark.x = lastMark.x + 1
     }
-    //would use polyline but can't use percentage for points
+    // would use polyline but can't use percentage for points
     let lineConnection = svg.newLine({
       "x1": x + "%",
       "y1": diagramHeight,
@@ -57,13 +55,12 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       lineConnection.setAttribute("transform", `translate(0, ${offset})`)
     })
 
-
     let isActive = false
     let onLabelMouseEnter = () => {
       if (!isActive) {
         isActive = true
         svg.addClass(lineHolder, "active")
-        //firefox has issues with this
+        // firefox has issues with this
         markHolder.parentNode.appendChild(markHolder)
       }
     }
@@ -72,7 +69,6 @@ export function createMarks(marks: Array<Mark>, unit: number, diagramHeight: num
       isActive = false
       svg.removeClass(lineHolder, "active")
     }
-
 
     lineLabel.addEventListener("mouseenter", onLabelMouseEnter)
     lineLabel.addEventListener("mouseleave", onLabelMouseLeave)

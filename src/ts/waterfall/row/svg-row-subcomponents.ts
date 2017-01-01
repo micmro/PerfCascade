@@ -2,13 +2,11 @@
  * Creation of sub-components used in a ressource request row
  */
 
-import {RectData} from "../../typing/rect-data.d"
-import * as svg from "../../helpers/svg"
 import * as misc from "../../helpers/misc"
-import {WaterfallEntryTiming} from "../../typing/waterfall";
+import * as svg from "../../helpers/svg"
 import {timingTypeToCssClass} from "../../transformers/styling-converters";
-
-
+import {RectData} from "../../typing/rect-data"
+import {WaterfallEntryTiming} from "../../typing/waterfall";
 
 /**
  * Creates the `rect` that represent the timings in `rectData`
@@ -71,7 +69,7 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
   let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc
   let txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart, 2)}%`, y)
 
-  //(pessimistic) estimation of text with to avoid performance penalty of `getBBox`
+  // (pessimistic) estimation of text with to avoid performance penalty of `getBBox`
   let roughTxtWidth = totalLabel.length * 8
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
@@ -85,11 +83,11 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
 /**
  * Render the block and timings for a request
  * @param  {RectData}         rectData Basic dependencys and globals
- * @param  {Array<WaterfallEntryTiming>} segments Request and Timing Data
+ * @param  {WaterfallEntryTiming[]} segments Request and Timing Data
  * @param  {number} timeTotal  - total time of the request
  * @return {SVGElement}                Renerated SVG (rect or g element)
  */
-export function createRect(rectData: RectData, segments: Array<WaterfallEntryTiming>, timeTotal: number): SVGElement {
+export function createRect(rectData: RectData, segments: WaterfallEntryTiming[], timeTotal: number): SVGElement {
   let rect = makeBlock(rectData, `time-block ${rectData.cssClass}`)
   let rectHolder = svg.newG("rect-holder")
   let firstX = rectData.x
@@ -112,7 +110,6 @@ export function createRect(rectData: RectData, segments: Array<WaterfallEntryTim
   return rectHolder
 }
 
-
 /**
  * Create a new clipper SVG Text element to label a request block to fit the left panel width
  * @param  {number}         x                horizontal position (in px)
@@ -127,7 +124,6 @@ export function createRequestLabelClipped(x: number, y: number, name: string, he
   blockLabel.style.clipPath = `url(#titleClipPath)`
   return blockLabel
 }
-
 
 /**
  * Create a new full width SVG Text element to label a request block
@@ -152,8 +148,6 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
   return labelHolder
 }
 
-
-
 // private helper
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
   const blockName = misc.resourceUrlFormatter(name, 125)
@@ -166,8 +160,6 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
   return blockLabel
 }
 
-
-
 /**
  * Appends the labels to `rowFixed` - TODO: see if this can be done more elegant
  * @param {SVGGElement}    rowFixed   [description]
@@ -178,7 +170,7 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
   let labelFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement
   let fullLabelText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement
 
-  //use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
+  // use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
   fullLabel.style.display = "none"
   fullLabel.style.visibility = "hidden"
   rowFixed.appendChild(shortLabel)
@@ -197,8 +189,6 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
   })
 }
 
-
-
 /**
  * Stripe for BG
  * @param  {number}      y              [description]
@@ -208,7 +198,7 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
  */
 export function createBgStripe(y: number, height: number, isEven: boolean): SVGRectElement {
   return svg.newRect({
-    "width": "100%", //make up for the spacing
+    "width": "100%", // make up for the spacing
     "height": height,
     "x": 0,
     "y": y,
@@ -216,9 +206,8 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
   })
 }
 
-
-
-export function createNameRowBg(y: number, rowHeight: number, onClick: EventListener, _leftColumnWith: number): SVGGElement {
+export function createNameRowBg(y: number, rowHeight: number,
+                                onClick: EventListener, _leftColumnWith: number): SVGGElement {
   let rowFixed = svg.newG("row row-fixed")
 
   rowFixed.appendChild(svg.newRect({
@@ -233,8 +222,6 @@ export function createNameRowBg(y: number, rowHeight: number, onClick: EventList
 
   return rowFixed
 }
-
-
 
 export function createRowBg(y: number, rowHeight: number, onClick: EventListener): SVGGElement {
   let rowFixed = svg.newG("row row-flex")

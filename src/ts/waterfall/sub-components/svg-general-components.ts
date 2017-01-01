@@ -2,11 +2,11 @@
  * Creation of sub-components of the waterfall chart
  */
 
-import { OverlayChangeEvent } from "../../typing/open-overlay.d"
 import * as svg from "../../helpers/svg"
-import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
-import {WaterfallEntry} from "../../typing/waterfall";
 import {requestTypeToCssClass} from "../../transformers/styling-converters";
+import { OverlayChangeEvent } from "../../typing/open-overlay"
+import {WaterfallEntry} from "../../typing/waterfall";
+import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
 
 /**
  * Renders a per-second marker line and appends it to `timeHolder`
@@ -17,7 +17,8 @@ import {requestTypeToCssClass} from "../../transformers/styling-converters";
  * @param  {number} sec second of the time marker to render
  * @param  {boolean} addLabel  if true a time label is added to the marker-line
  */
-let appendSecond = function (timeHolder: SVGGElement, diagramHeight: number, secsTotal: number, sec: number, addLabel: boolean = false) {
+let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
+                    secsTotal: number, sec: number, addLabel: boolean = false) => {
   const secPerc = 100 / secsTotal
   /** just used if `addLabel` is `true` - for full seconds */
   let lineLabel
@@ -45,7 +46,7 @@ let appendSecond = function (timeHolder: SVGGElement, diagramHeight: number, sec
 
   overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
     let offset = change.combinedOverlayHeight
-    //figure out why there is an offset
+    // figure out why there is an offset
     let scale = (diagramHeight + offset) / (diagramHeight)
 
     lineEl.setAttribute("transform", `scale(1, ${scale})`)
@@ -59,7 +60,6 @@ let appendSecond = function (timeHolder: SVGGElement, diagramHeight: number, sec
     timeHolder.appendChild(lineLabel)
   }
 }
-
 
 /**
  * Renders the time-scale SVG elements (1sec, 2sec...)
@@ -83,9 +83,7 @@ export function createTimeScale(durationMs: number, diagramHeight: number, subSe
   return timeHolder
 }
 
-
-
-//TODO: Implement - data for this not parsed yet
+// TODO: Implement - data for this not parsed yet
 export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight: number): SVGRectElement {
   let rect = svg.newRect({
     "width": ((block.total || 1) / unit) + "%",

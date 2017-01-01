@@ -12,13 +12,12 @@ function newEl(tagName: string, settings?: Object, css?: Object): SVGElement {
   }
   el.textContent = settings["text"] || ""
   if (css && el.style) {
-    Object.keys(css).forEach(key => {
+    Object.keys(css).forEach((key) => {
       el.style[key] = css[key]
     })
   }
   return el
 }
-
 
 export function newSvg(cssClass: string, settings?: Object, css?: Object): SVGSVGElement {
   settings = settings || {}
@@ -26,13 +25,11 @@ export function newSvg(cssClass: string, settings?: Object, css?: Object): SVGSV
   return newEl("svg:svg", settings, css) as SVGSVGElement
 }
 
-
 export function newG(cssClass: string, settings?: Object, css?: Object): SVGGElement {
   settings = settings || {}
   settings["class"] = cssClass
   return newEl("g", settings, css) as SVGGElement
 }
-
 
 export function newClipPath(id: string): SVGClipPathElement {
   return newEl("clipPath", {id}) as SVGClipPathElement
@@ -50,16 +47,13 @@ export function newRect(settings: Object): SVGRectElement {
   return newEl("rect", settings) as SVGRectElement
 }
 
-
 export function newLine(settings: Object): SVGLineElement {
   return newEl("line", settings) as SVGLineElement
 }
 
-
 export function newTitle(text: string): SVGTitleElement {
   return newEl("title", {text}) as SVGTitleElement
 }
-
 
 export function newTextEl(text: string, x: number|string, y: number, settings?: Object, css?: Object): SVGTextElement {
   css = css || {}
@@ -71,15 +65,13 @@ export function newTextEl(text: string, x: number|string, y: number, settings?: 
   return newEl("text", settings, css) as SVGTextElement
 }
 
-
-
 /** temp SVG element for size measurements  */
 let getTestSVGEl = (() => {
   /** Reference to Temp SVG element for size measurements */
   let svgTestEl: SVGSVGElement
   let removeSvgTestElTimeout
 
-  return function getTestSVGElInner(): SVGSVGElement {
+  return () => {
     // lazy init svgTestEl
     if (svgTestEl === undefined) {
       svgTestEl = newEl("svg:svg", {
@@ -94,13 +86,13 @@ let getTestSVGEl = (() => {
       }) as SVGSVGElement
     }
 
-    //needs access to body to measure size
-    //TODO: refactor for server side use
+    // needs access to body to measure size
+    // TODO: refactor for server side use
     if (svgTestEl.parentElement === undefined ) {
       window.document.body.appendChild(svgTestEl)
     }
 
-    //debounced time-deleayed cleanup, so the element can be re-used in tight loops
+    // debounced time-deleayed cleanup, so the element can be re-used in tight loops
     clearTimeout(removeSvgTestElTimeout)
     removeSvgTestElTimeout = setTimeout(() => {
       svgTestEl.parentNode.removeChild(svgTestEl)
@@ -125,13 +117,12 @@ export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = 
     tmpTextNode = textNode.cloneNode(false) as SVGTextElement
   }
   tmp.appendChild(tmpTextNode)
-  //make sure to turn of shadow for performance
+  // make sure to turn of shadow for performance
   tmpTextNode.style.textShadow = "0"
   window.document.body.appendChild(tmp)
   const nodeWidth = tmpTextNode.getBBox().width
   return nodeWidth
 }
-
 
 /**
  * Adds class `className` to `el`
@@ -157,7 +148,7 @@ export function removeClass(el: SVGElement, className: string) {
   if (el.classList) {
     el.classList.remove(className)
   } else {
-    //IE doesn't support classList in SVG - also no need for dublication check i.t.m.
+    // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
     el.setAttribute("class", el.getAttribute("class").replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"))
   }
   return el
