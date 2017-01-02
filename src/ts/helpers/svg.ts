@@ -79,7 +79,7 @@ let getTestSVGEl = (() => {
         "width": "9999px"
       }, {
         "visibility": "hidden",
-        "position": "absoulte",
+        "position": "absolute",
         "top": "0px",
         "left": "0px",
         "z-index": "99999"
