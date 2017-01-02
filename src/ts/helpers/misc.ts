@@ -59,6 +59,6 @@ export function resourceUrlFormatter(url: string, maxLength: number): string {
  * @param  {number} num - number to round
  * @param  {number} decimals - decimal precision to round to
  */
-export function roundNumber(num: number, decimals: number) {
+export function roundNumber(num: number, decimals: number = 2) {
   return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals)
 }

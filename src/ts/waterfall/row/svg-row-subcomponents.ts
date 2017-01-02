@@ -16,9 +16,9 @@ import {WaterfallEntryTiming} from "../../typing/waterfall";
 function makeBlock(rectData: RectData, className: string) {
   const blockHeight = rectData.height - 1
   let rect = svg.newRect({
-    "width": misc.roundNumber(rectData.width / rectData.unit, 2) + "%",
+    "width": misc.roundNumber(rectData.width / rectData.unit) + "%",
     "height": blockHeight,
-    "x": misc.roundNumber(rectData.x / rectData.unit, 2) + "%",
+    "x": misc.roundNumber(rectData.x / rectData.unit) + "%",
     "y": rectData.y,
     "class": className
   })
@@ -67,14 +67,14 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
   const totalLabel = `${Math.round(timeTotal)} ms`
 
   let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc
-  let txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart, 2)}%`, y)
+  let txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart)}%`, y)
 
   // (pessimistic) estimation of text with to avoid performance penalty of `getBBox`
   let roughTxtWidth = totalLabel.length * 8
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
     percStart = firstX / rectData.unit - spacingPerc
-    txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart, 2)}%`, y, {}, {"textAnchor": "end"})
+    txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart)}%`, y, {}, {"textAnchor": "end"})
   }
 
   return txtEl

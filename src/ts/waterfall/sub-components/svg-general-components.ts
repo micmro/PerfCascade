@@ -2,6 +2,7 @@
  * Creation of sub-components of the waterfall chart
  */
 
+import {roundNumber} from "../../helpers/misc";
 import * as svg from "../../helpers/svg"
 import {requestTypeToCssClass} from "../../transformers/styling-converters";
 import { OverlayChangeEvent } from "../../typing/open-overlay"
@@ -27,20 +28,21 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
   if (addLabel) {
     const showTextBefore = (sec > secsTotal - 0.2)
     lineClass = "second-line"
-    let x = secPerc * sec + 0.5 + "%"
+    let x = roundNumber(secPerc * sec) + 0.5 + "%"
     let attributes = {}
     if (showTextBefore) {
-      x = secPerc * sec - 0.5 + "%"
+      x = roundNumber(secPerc * sec) - 0.5 + "%"
       attributes["text-anchor"] = "end"
     }
     lineLabel = svg.newTextEl(sec + "s", x, diagramHeight, attributes)
   }
 
+  const x = roundNumber(secPerc * sec) + "%";
   const lineEl = svg.newLine({
     "class": lineClass,
-    "x1": secPerc * sec + "%",
-    "y1": "0",
-    "x2": secPerc * sec + "%",
+    "x1": x,
+    "y1": 0,
+    "x2": x,
     "y2": diagramHeight
   })
 

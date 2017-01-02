@@ -1,3 +1,4 @@
+import {roundNumber} from "../../helpers/misc";
 import * as svg from "../../helpers/svg"
 import {OverlayChangeEvent} from "../../typing/open-overlay"
 import {Mark} from "../../typing/waterfall"
@@ -15,7 +16,7 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
   })
 
   marks.forEach((mark, i) => {
-    let x = mark.startTime / unit
+    let x = roundNumber(mark.startTime / unit)
     let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase())
     let lineHolder = svg.newG("line-holder")
     let lineLabelHolder = svg.newG("line-label-holder", {
