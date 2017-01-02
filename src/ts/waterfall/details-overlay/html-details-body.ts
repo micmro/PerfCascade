@@ -28,11 +28,11 @@ function makeTab(innerHtml: string, renderDl: boolean = true) {
   </div>`
 }
 
-function makeImgTab(accordeonHeight: number, block: WaterfallEntry) {
+function makeImgTab(accordionHeight: number, block: WaterfallEntry) {
   if (block.requestType !== "image") {
     return ""
   }
-  const imgTag = `<img class="preview" style="max-height:${(accordeonHeight - 100)}px"
+  const imgTag = `<img class="preview" style="max-height:${(accordionHeight - 100)}px"
                         data-src="${block.rawResource.request.url}" />`
   return makeTab(imgTag, false)
 }
