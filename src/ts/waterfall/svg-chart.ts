@@ -20,7 +20,8 @@ import * as marks from  "./sub-components/svg-marks"
  */
 function getSvgHeight(marks: Mark[], diagramHeight: number): number {
   const maxMarkTextLength = marks.reduce((currMax: number, currValue: Mark) => {
-    return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, 0, 0), true))
+    const attributes = {x: 0, y: 0}
+    return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, attributes), true))
   }, 0)
 
   return Math.floor(diagramHeight + maxMarkTextLength + 35)

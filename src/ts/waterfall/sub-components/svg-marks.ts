@@ -19,11 +19,9 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
     let x = roundNumber(mark.startTime / unit)
     let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase())
     let lineHolder = svg.newG("line-holder")
-    let lineLabelHolder = svg.newG("line-label-holder", {
-      "x": x + "%"
-    })
+    let lineLabelHolder = svg.newG("line-label-holder")
     mark.x = x
-    let lineLabel = svg.newTextEl(mark.name, x + "%", diagramHeight + 25)
+    let lineLabel = svg.newTextEl(mark.name, {x: x + "%", y: diagramHeight + 25})
 
     let line = svg.newLine({
       "x1": x + "%",

@@ -16,13 +16,11 @@ function createCloseButtonSvg(y: number): SVGGElement {
     "y": y
   }))
 
-  closeBtn.appendChild(svg.newTextEl("X", "100%", y, {
-    "width": 23,
-    "height": 23,
-    "dx": 7,
-    "dy": 16,
-    "fill": "#111",
-    "textAnchor": "middle"
+  closeBtn.appendChild(svg.newTextEl("X", {
+    x: "100%",
+    y,
+    dx: 7,
+    dy: 16
   }))
 
   closeBtn.appendChild(svg.newTitle("Close Overlay"))
@@ -32,9 +30,7 @@ function createCloseButtonSvg(y: number): SVGGElement {
 
 function createHolder(y: number, accordionHeight: number) {
 
-  let innerHolder = svg.newG("info-overlay-holder", {
-    "width": "100%"
-  })
+  let innerHolder = svg.newG("info-overlay-holder")
 
   let bg = svg.newRect({
     "width": "100%",
@@ -42,9 +38,8 @@ function createHolder(y: number, accordionHeight: number) {
     "x": "0",
     "y": y,
     "rx": 2,
-    "ry": 2,
-    "class": "info-overlay"
-  })
+    "ry": 2
+  }, "info-overlay")
 
   innerHolder.appendChild(bg)
   return innerHolder
@@ -54,18 +49,14 @@ export function createRowInfoOverlay(indexBackup: number, y: number,
                                      accordionHeight: number, block: WaterfallEntry,
                                      onClose: Function): SVGGElement {
   const requestID =  parseInt(block.rawResource._index + 1, 10) || indexBackup + 1
-  let wrapper = svg.newG("outer-info-overlay-holder", {
-    "width": "100%"
-  })
+  let wrapper = svg.newG("outer-info-overlay-holder")
   let holder = createHolder(y, accordionHeight)
 
   let foreignObject = svg.newForeignObject({
     "width": "100%",
     "height": accordionHeight,
     "x": "0",
-    "y": y,
-    "dy": "5",
-    "dx": "5"
+    "y": y
   })
 
   let closeBtn = createCloseButtonSvg(y)

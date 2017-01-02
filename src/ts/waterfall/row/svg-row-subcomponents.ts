@@ -19,9 +19,8 @@ function makeBlock(rectData: RectData, className: string) {
     "width": misc.roundNumber(rectData.width / rectData.unit) + "%",
     "height": blockHeight,
     "x": misc.roundNumber(rectData.x / rectData.unit) + "%",
-    "y": rectData.y,
-    "class": className
-  })
+    "y": rectData.y
+  }, className)
   if (rectData.label) {
     rect.appendChild(svg.newTitle(rectData.label)) // Add tile to wedge path
   }
@@ -67,14 +66,14 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
   const totalLabel = `${Math.round(timeTotal)} ms`
 
   let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc
-  let txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart)}%`, y)
+  let txtEl = svg.newTextEl(totalLabel, {x: `${misc.roundNumber(percStart)}%`, y})
 
   // (pessimistic) estimation of text with to avoid performance penalty of `getBBox`
   let roughTxtWidth = totalLabel.length * 8
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
     percStart = firstX / rectData.unit - spacingPerc
-    txtEl = svg.newTextEl(totalLabel, `${misc.roundNumber(percStart)}%`, y, {}, {"textAnchor": "end"})
+    txtEl = svg.newTextEl(totalLabel, {x: `${misc.roundNumber(percStart)}%`, y}, {"textAnchor": "end"})
   }
 
   return txtEl
@@ -136,14 +135,13 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
   let blockLabel = createRequestLabel(x, y, name, height)
   let labelHolder = svg.newG("full-label")
   labelHolder.appendChild(svg.newRect({
-    "class": "label-full-bg",
     "x": x - 3,
     "y": y + 3,
     "width": svg.getNodeTextWidth(blockLabel),
     "height": height - 4,
     "rx": 5,
     "ry": 5
-  }))
+  }, "label-full-bg"))
   labelHolder.appendChild(blockLabel)
   return labelHolder
 }
@@ -151,7 +149,8 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
 // private helper
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
   const blockName = misc.resourceUrlFormatter(name, 125)
-  let blockLabel = svg.newTextEl(blockName, x, (y + Math.round(height / 2) + 5))
+  y = y + Math.round(height / 2) + 5
+  let blockLabel = svg.newTextEl(blockName, {x, y})
 
   blockLabel.appendChild(svg.newTitle(name))
 
@@ -197,13 +196,13 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
  * @return {SVGRectElement}                [description]
  */
 export function createBgStripe(y: number, height: number, isEven: boolean): SVGRectElement {
+  const className = isEven ? "even" : "odd";
   return svg.newRect({
     "width": "100%", // make up for the spacing
     "height": height,
     "x": 0,
-    "y": y,
-    "class": isEven ? "even" : "odd"
-  })
+    "y": y
+  }, className)
 }
 
 export function createNameRowBg(y: number, rowHeight: number,
@@ -214,9 +213,11 @@ export function createNameRowBg(y: number, rowHeight: number,
     "width": "100%",
     "height": rowHeight,
     "x": "0",
-    "y": y,
-    "opacity": "0"
-  }))
+    "y": y
+    }, "",
+    {
+      "opacity": 0
+    }))
 
   rowFixed.addEventListener("click", onClick)
 
@@ -227,12 +228,14 @@ export function createRowBg(y: number, rowHeight: number, onClick: EventListener
   let rowFixed = svg.newG("row row-flex")
 
   rowFixed.appendChild(svg.newRect({
-    "width": "100%",
-    "height": rowHeight,
-    "x": "0",
-    "y": y,
-    "opacity": "0"
-  }))
+      "width": "100%",
+      "height": rowHeight,
+      "x": "0",
+      "y": y
+    }, "",
+    {
+      "opacity": 0
+    }))
 
   rowFixed.addEventListener("click", onClick)
 

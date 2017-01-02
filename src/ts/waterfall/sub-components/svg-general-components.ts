@@ -29,22 +29,21 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
     const showTextBefore = (sec > secsTotal - 0.2)
     lineClass = "second-line"
     let x = roundNumber(secPerc * sec) + 0.5 + "%"
-    let attributes = {}
+    let css = {}
     if (showTextBefore) {
       x = roundNumber(secPerc * sec) - 0.5 + "%"
-      attributes["text-anchor"] = "end"
+      css["text-anchor"] = "end"
     }
-    lineLabel = svg.newTextEl(sec + "s", x, diagramHeight, attributes)
+    lineLabel = svg.newTextEl(sec + "s", {x, y: diagramHeight}, css)
   }
 
   const x = roundNumber(secPerc * sec) + "%";
   const lineEl = svg.newLine({
-    "class": lineClass,
     "x1": x,
     "y1": 0,
     "x2": x,
     "y2": diagramHeight
-  })
+  }, lineClass)
 
   overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
     let offset = change.combinedOverlayHeight
@@ -91,9 +90,8 @@ export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight:
     "width": ((block.total || 1) / unit) + "%",
     "height": diagramHeight,
     "x": ((block.start || 0.001) / unit) + "%",
-    "y": 0,
-    "class": requestTypeToCssClass(block.requestType)
-  })
+    "y": 0
+  }, requestTypeToCssClass(block.requestType))
 
   rect.appendChild(svg.newTitle(block.name)) // Add tile to wedge path
 

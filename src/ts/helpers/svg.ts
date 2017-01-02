@@ -2,66 +2,99 @@
  *  SVG Helpers
  */
 
-export type DomAttributeMap = {[key: string]: string|number}
-export type CssStyleMap = {[key: string]: string|number}
+type StringToStringOrNumberMap = {[key: string]: string|number}
+export type DomAttributeMap = StringToStringOrNumberMap
+export type CssStyleMap = StringToStringOrNumberMap
 
-function newEl(tagName: string, settings: DomAttributeMap = {}, css: CssStyleMap = {}): SVGElement {
-  let el = document.createElementNS("http://www.w3.org/2000/svg", tagName) as SVGGElement
-  for (let attr in settings) {
-    if (attr !== "text") {
-      el.setAttributeNS(null, attr, String(settings[attr]))
-    }
+function entries(obj: StringToStringOrNumberMap): Array<[string, string]> {
+  const entries: Array<[string, string]> = []
+  for (let k of Object.keys(obj)) {
+    entries.push([k, String((obj[k]))]);
   }
-  el.textContent = String(settings["text"] || "")
-  if (css && el.style) {
-    Object.keys(css).forEach((key) => {
-      el.style[key] = css[key]
-    })
-  }
-  return el
+  return entries
 }
 
-export function newSvg(cssClass: string, attributes: DomAttributeMap = {}, css: CssStyleMap = {}): SVGSVGElement {
-  attributes["class"] = cssClass
-  return newEl("svg:svg", attributes, css) as SVGSVGElement
+function safeSetAttribute(el: SVGElement, key: string, s: string) {
+  if (!(key in el)) {
+    console.warn(new Error(`Trying to set non-existing attribute ${key} = ${s} on a <${el.tagName.toLowerCase()}>.`))
+  }
+  el.setAttributeNS(null, key, s)
 }
 
-export function newG(cssClass: string, attributes: DomAttributeMap = {}, css: CssStyleMap = {}): SVGGElement {
-  attributes["class"] = cssClass
-  return newEl("g", attributes, css) as SVGGElement
+interface StylableSVGElement extends SVGElement, SVGStylable {
+}
+
+function safeSetStyle(el: StylableSVGElement, key: string, s: string) {
+  if (key in el.style) {
+    el.style[key] = s
+  } else {
+    console.warn(new Error(`Trying to set non-existing style ${key} = ${s} on a <${el.tagName.toLowerCase()}>.`))
+  }
+}
+
+interface SvgElementOptions {
+  attributes?: DomAttributeMap,
+  css?: CssStyleMap,
+  text?: string,
+  className?: string
+}
+
+function newElement<T extends StylableSVGElement>(tagName: string,
+                                                  {
+                                                    attributes = {},
+                                                    css = {},
+                                                    text = "",
+                                                    className = ""
+                                                  }: SvgElementOptions = {}): T {
+  const element = document.createElementNS("http://www.w3.org/2000/svg", tagName) as T
+  if (className) {
+    addClass(element, className)
+  }
+  if (text) {
+    element.textContent = text
+  }
+  entries(css).forEach(([key, value]) => safeSetStyle(element, key, value))
+  entries(attributes).forEach(([key, value]) => safeSetAttribute(element, key, value))
+
+  return element
+}
+
+export function newSvg(className: string, attributes: DomAttributeMap, css: CssStyleMap = {}): SVGSVGElement {
+  return newElement<SVGSVGElement>("svg:svg", {className, attributes, css})
+}
+
+export function newG(className: string, attributes: DomAttributeMap = {}, css: CssStyleMap = {}): SVGGElement {
+  return newElement<SVGGElement>("g", {className, attributes, css})
 }
 
 export function newClipPath(id: string): SVGClipPathElement {
-  return newEl("clipPath", {id}) as SVGClipPathElement
+  const attributes = {id}
+  return newElement<SVGClipPathElement>("clipPath", {attributes})
 }
 
 export function newForeignObject(attributes: DomAttributeMap): SVGForeignObjectElement {
-  return newEl("foreignObject", attributes) as SVGForeignObjectElement
+  return newElement<SVGForeignObjectElement>("foreignObject", {attributes})
 }
 
 export function newA(className: string): SVGAElement {
-  return newEl("a", {"class": className}) as SVGAElement
+  return newElement<SVGAElement>("a", {className})
 }
 
-export function newRect(attributes: DomAttributeMap): SVGRectElement {
-  return newEl("rect", attributes) as SVGRectElement
+export function newRect(attributes: DomAttributeMap, className: string = "", css: CssStyleMap = {}): SVGRectElement {
+  return newElement<SVGRectElement>("rect", {attributes, className, css})
 }
 
-export function newLine(attributes: DomAttributeMap): SVGLineElement {
-  return newEl("line", attributes) as SVGLineElement
+export function newLine(attributes: DomAttributeMap, className: string = ""): SVGLineElement {
+  return newElement<SVGLineElement>("line", {className, attributes})
 }
 
 export function newTitle(text: string): SVGTitleElement {
-  return newEl("title", {text}) as SVGTitleElement
+  return newElement<SVGTitleElement>("title", {text})
 }
 
-export function newTextEl(text: string, x: number|string, y: number, attributes: DomAttributeMap = {},
+export function newTextEl(text: string, attributes: DomAttributeMap = {},
                           css: CssStyleMap = {}): SVGTextElement {
-  attributes["fill"] = "#111"
-  attributes["x"] = x.toString()
-  attributes["y"] = y.toString()
-  attributes["text"] = text
-  return newEl("text", attributes, css) as SVGTextElement
+  return newElement<SVGTextElement>("text", {text, attributes, css})
 }
 
 /** temp SVG element for size measurements  */
@@ -73,16 +106,18 @@ let getTestSVGEl = (() => {
   return () => {
     // lazy init svgTestEl
     if (svgTestEl === undefined) {
-      svgTestEl = newEl("svg:svg", {
+      const attributes = {
         "className": "water-fall-chart temp",
         "width": "9999px"
-      }, {
+      }
+      const css = {
         "visibility": "hidden",
         "position": "absolute",
         "top": "0px",
         "left": "0px",
         "z-index": "99999"
-      }) as SVGSVGElement
+      }
+      svgTestEl = newSvg("water-fall-chart temp", attributes, css)
     }
 
     // needs access to body to measure size
