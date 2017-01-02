@@ -129,8 +129,9 @@ export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = 
  * @param  {string} className
  */
 export function addClass(el: SVGElement, className: string) {
-  if (el.classList) {
-    el.classList.add(className)
+  const classList = el.classList;
+  if (classList) {
+    className.split(" ").forEach((c) => classList.add(c))
   } else {
     // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
     el.setAttribute("class", el.getAttribute("class") + " " + className)
@@ -144,8 +145,9 @@ export function addClass(el: SVGElement, className: string) {
  * @param  {string} className
  */
 export function removeClass(el: SVGElement, className: string) {
-  if (el.classList) {
-    el.classList.remove(className)
+  const classList = el.classList;
+  if (classList) {
+    classList.remove(className)
   } else {
     // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
     el.setAttribute("class", el.getAttribute("class").replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"))
