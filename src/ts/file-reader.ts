@@ -1,4 +1,4 @@
-declare var zip: any
+declare const zip: any
 
 // use zip
 zip.useWebWorkers = false
