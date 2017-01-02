@@ -21,7 +21,7 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .water-fall-chart .line-end.active,
 .water-fall-chart .line-start.active {display: block;}
 
-.water-fall-chart .mark-holder text {-webkit-writing-mode: tb; writing-mode:vertical-lr; writing-mode: tb;}
+.water-fall-chart .mark-holder text {writing-mode:vertical-lr;}
 
 .left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9}
 
