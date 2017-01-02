@@ -2,7 +2,7 @@
  *  SVG Helpers
  */
 
-type StringToStringOrNumberMap = {[key: string]: string|number}
+export type StringToStringOrNumberMap = {[key: string]: string|number}
 export type DomAttributeMap = StringToStringOrNumberMap
 export type CssStyleMap = StringToStringOrNumberMap
 
