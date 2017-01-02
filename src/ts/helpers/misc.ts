@@ -6,7 +6,7 @@
  * Parses URL into its components
  * @param  {string} url
  */
-export function parseUrl(url: string) {
+function parseUrl(url: string) {
   let pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?")
   let matches = url.match(pattern)
   return {
