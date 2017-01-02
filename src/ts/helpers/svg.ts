@@ -2,15 +2,17 @@
  *  SVG Helpers
  */
 
-function newEl(tagName: string, settings?: Object, css?: Object): SVGElement {
+export type DomAttributeMap = {[key: string]: string|number}
+export type CssStyleMap = {[key: string]: string|number}
+
+function newEl(tagName: string, settings: DomAttributeMap = {}, css: CssStyleMap = {}): SVGElement {
   let el = document.createElementNS("http://www.w3.org/2000/svg", tagName) as SVGGElement
-  settings = settings || {}
   for (let attr in settings) {
     if (attr !== "text") {
-      el.setAttributeNS(null, attr, settings[attr])
+      el.setAttributeNS(null, attr, String(settings[attr]))
     }
   }
-  el.textContent = settings["text"] || ""
+  el.textContent = String(settings["text"] || "")
   if (css && el.style) {
     Object.keys(css).forEach((key) => {
       el.style[key] = css[key]
@@ -19,50 +21,47 @@ function newEl(tagName: string, settings?: Object, css?: Object): SVGElement {
   return el
 }
 
-export function newSvg(cssClass: string, settings?: Object, css?: Object): SVGSVGElement {
-  settings = settings || {}
-  settings["class"] = cssClass
-  return newEl("svg:svg", settings, css) as SVGSVGElement
+export function newSvg(cssClass: string, attributes: DomAttributeMap = {}, css: CssStyleMap = {}): SVGSVGElement {
+  attributes["class"] = cssClass
+  return newEl("svg:svg", attributes, css) as SVGSVGElement
 }
 
-export function newG(cssClass: string, settings?: Object, css?: Object): SVGGElement {
-  settings = settings || {}
-  settings["class"] = cssClass
-  return newEl("g", settings, css) as SVGGElement
+export function newG(cssClass: string, attributes: DomAttributeMap = {}, css: CssStyleMap = {}): SVGGElement {
+  attributes["class"] = cssClass
+  return newEl("g", attributes, css) as SVGGElement
 }
 
 export function newClipPath(id: string): SVGClipPathElement {
   return newEl("clipPath", {id}) as SVGClipPathElement
 }
 
-export function newForeignObject(settings: Object): SVGForeignObjectElement {
-  return newEl("foreignObject", settings) as SVGForeignObjectElement
+export function newForeignObject(attributes: DomAttributeMap): SVGForeignObjectElement {
+  return newEl("foreignObject", attributes) as SVGForeignObjectElement
 }
 
 export function newA(className: string): SVGAElement {
   return newEl("a", {"class": className}) as SVGAElement
 }
 
-export function newRect(settings: Object): SVGRectElement {
-  return newEl("rect", settings) as SVGRectElement
+export function newRect(attributes: DomAttributeMap): SVGRectElement {
+  return newEl("rect", attributes) as SVGRectElement
 }
 
-export function newLine(settings: Object): SVGLineElement {
-  return newEl("line", settings) as SVGLineElement
+export function newLine(attributes: DomAttributeMap): SVGLineElement {
+  return newEl("line", attributes) as SVGLineElement
 }
 
 export function newTitle(text: string): SVGTitleElement {
   return newEl("title", {text}) as SVGTitleElement
 }
 
-export function newTextEl(text: string, x: number|string, y: number, settings?: Object, css?: Object): SVGTextElement {
-  css = css || {}
-  settings = settings || {}
-  settings["fill"] = "#111"
-  settings["x"] = x.toString()
-  settings["y"] = y.toString()
-  settings["text"] = text
-  return newEl("text", settings, css) as SVGTextElement
+export function newTextEl(text: string, x: number|string, y: number, attributes: DomAttributeMap = {},
+                          css: CssStyleMap = {}): SVGTextElement {
+  attributes["fill"] = "#111"
+  attributes["x"] = x.toString()
+  attributes["y"] = y.toString()
+  attributes["text"] = text
+  return newEl("text", attributes, css) as SVGTextElement
 }
 
 /** temp SVG element for size measurements  */
