@@ -24,7 +24,7 @@ function parseUrl(url: string) {
  * @returns boolean - true if `item` is in `arr`
  */
 export function contains<T>(arr: T[], item: T): boolean {
-  return arr.filter((x) => x === item).length > 0
+  return arr.some((x) => x === item)
 }
 
 /**
