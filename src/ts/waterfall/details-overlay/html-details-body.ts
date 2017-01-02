@@ -96,9 +96,7 @@ export function createDetailsBody(requestID: number, block: WaterfallEntry, acco
       </div>
       ${timingsTab}
       <div class="tab">
-        <code>
-          <pre>${JSON.stringify(block.rawResource, null, 2)}</pre>
-        </code>
+        <pre><code>${JSON.stringify(block.rawResource, null, 2)}</code></pre>
       </div>
       ${imgTab}
     </div>
