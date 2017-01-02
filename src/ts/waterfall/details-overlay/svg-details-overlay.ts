@@ -1,7 +1,10 @@
-import * as dom from "../../helpers/dom"
 import * as svg from "../../helpers/svg"
 import {WaterfallEntry} from "../../typing/waterfall";
 import {createDetailsBody} from "./html-details-body"
+
+export function forEach(els: NodeListOf<Element>, fn: (el: Element, index: number) => any) {
+  Array.prototype.forEach.call(els, fn)
+}
 
 function createCloseButtonSvg(y: number): SVGGElement {
   let closeBtn = svg.newA("info-overlay-close-btn")
@@ -73,13 +76,13 @@ export function createRowInfoOverlay(indexBackup: number, y: number,
   let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>
 
   let setTabStatus = (index) => {
-    dom.forEach(tabs, (tab: HTMLDivElement, j) => {
+    forEach(tabs, (tab: HTMLDivElement, j) => {
       tab.style.display = (index === j) ? "block" : "none"
       buttons.item(j).classList.toggle("active", (index === j))
     })
   }
 
-  dom.forEach(buttons, (btn, i) => {
+  forEach(buttons, (btn, i) => {
     btn.addEventListener("click", () => { setTabStatus(i) })
   })
 
