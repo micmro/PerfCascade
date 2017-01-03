@@ -15,7 +15,7 @@ const defaultOptions: Readonly<ChartOptions> = {
   showIndicatorIcons: true,
   leftColumnWith: 25,
   pageSelector: undefined,
-  legendHolder: undefined
+  legendHolder: undefined,
 };
 
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {

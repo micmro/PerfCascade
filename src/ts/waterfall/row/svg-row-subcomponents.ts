@@ -19,7 +19,7 @@ function makeBlock(rectData: RectData, className: string) {
     "width": misc.roundNumber(rectData.width / rectData.unit) + "%",
     "height": blockHeight,
     "x": misc.roundNumber(rectData.x / rectData.unit) + "%",
-    "y": rectData.y
+    "y": rectData.y,
   }, className);
   if (rectData.label) {
     rect.appendChild(svg.newTitle(rectData.label)); // Add tile to wedge path
@@ -49,7 +49,7 @@ function segmentToRectData(segment: WaterfallEntryTiming, rectData: RectData): R
     + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
     "unit": rectData.unit,
     "showOverlay": rectData.showOverlay,
-    "hideOverlay": rectData.hideOverlay
+    "hideOverlay": rectData.hideOverlay,
   } as RectData;
 }
 
@@ -140,7 +140,7 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
     "width": svg.getNodeTextWidth(blockLabel),
     "height": height - 4,
     "rx": 5,
-    "ry": 5
+    "ry": 5,
   }, "label-full-bg"));
   labelHolder.appendChild(blockLabel);
   return labelHolder;
@@ -201,7 +201,7 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
     "width": "100%", // make up for the spacing
     "height": height,
     "x": 0,
-    "y": y
+    "y": y,
   }, className);
 }
 
@@ -213,10 +213,10 @@ export function createNameRowBg(y: number, rowHeight: number,
     "width": "100%",
     "height": rowHeight,
     "x": "0",
-    "y": y
+    "y": y,
     }, "",
     {
-      "opacity": 0
+      "opacity": 0,
     }));
 
   rowFixed.addEventListener("click", onClick);
@@ -231,10 +231,10 @@ export function createRowBg(y: number, rowHeight: number, onClick: EventListener
       "width": "100%",
       "height": rowHeight,
       "x": "0",
-      "y": y
+      "y": y,
     }, "",
     {
-      "opacity": 0
+      "opacity": 0,
     }));
 
   rowFixed.addEventListener("click", onClick);

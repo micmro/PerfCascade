@@ -6,7 +6,7 @@ import {
   WaterfallData,
   WaterfallDocs,
   WaterfallEntry,
-  WaterfallEntryTiming
+  WaterfallEntryTiming,
 } from "../typing/waterfall";
 
 function createWaterfallEntry(name: string,
@@ -23,7 +23,7 @@ function createWaterfallEntry(name: string,
     end,
     segments,
     rawResource,
-    requestType
+    requestType,
   };
 }
 
@@ -35,7 +35,7 @@ function createWaterfallEntryTiming(type: TimingType,
     total,
     type,
     start,
-    end
+    end,
   };
 }
 
@@ -92,7 +92,7 @@ export function transformDoc(harData: Har): WaterfallDocs {
   console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length);
 
   return {
-    pages: data.pages.map((_page, i) => this.transformPage(data, i))
+    pages: data.pages.map((_page, i) => this.transformPage(data, i)),
   };
 }
 /**
@@ -125,7 +125,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
         parseInt(entry._all_end, 10) || (startRelative + entry.time),
         buildDetailTimingBlocks(startRelative, entry),
         entry,
-        requestType
+        requestType,
       );
     });
 
@@ -139,7 +139,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
 
       return {
         "name": `${k.replace(/^[_]/, "")} (${startRelative}ms)`,
-        "startTime": startRelative
+        "startTime": startRelative,
       } as Mark;
     });
 
@@ -211,6 +211,6 @@ function getTimePair(key: string, entry: Entry, collect: WaterfallEntryTiming[],
 
   return {
     "start": start,
-    "end": end
+    "end": end,
   };
 }

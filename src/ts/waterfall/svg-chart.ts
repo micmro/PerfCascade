@@ -49,7 +49,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
 
   /** Main SVG Element that holds all data */
   let timeLineHolder = svg.newSvg("water-fall-chart", {
-    "height": chartHolderHeight
+    "height": chartHolderHeight,
   });
 
   /** Holder of request-details overlay */
@@ -57,7 +57,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   /** Holder for scale, event and marks */
   let scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
     "x": `${options.leftColumnWith}%`,
-    "width": `${100 - options.leftColumnWith}%`
+    "width": `${100 - options.leftColumnWith}%`,
   });
   /** Holds all rows */
   let rowHolder = svg.newG("rows-holder");
@@ -121,7 +121,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
       "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
       "unit": unit,
       "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
-      "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined
+      "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
     } as RectData;
 
     let showDetailsOverlay = () => {

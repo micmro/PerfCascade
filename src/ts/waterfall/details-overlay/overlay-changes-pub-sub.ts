@@ -4,7 +4,7 @@ import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-ove
 
 export const eventTypes = {
   "OPEN" : "open",
-  "CLOSE" : "closed"
+  "CLOSE" : "closed",
 };
 
 let subscribers: OverlayChangeSubscriber[] = [];

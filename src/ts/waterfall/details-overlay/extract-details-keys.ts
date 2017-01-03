@@ -168,6 +168,6 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
       ["Timing-Allow-Origin", getResponseHeader("Timing-Allow-Origin")],
       ["Redirect URL", entry.response.redirectURL],
       ["Comment", entry.response.comment],
-    ] as KvTuple[]
+    ] as KvTuple[],
   };
 }

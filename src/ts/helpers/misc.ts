@@ -14,7 +14,7 @@ function parseUrl(url: string) {
     authority: matches[4],
     path: matches[5],
     query: matches[7],
-    fragment: matches[9]
+    fragment: matches[9],
   };
 }
 

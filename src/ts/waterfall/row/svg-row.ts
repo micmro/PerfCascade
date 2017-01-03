@@ -12,7 +12,7 @@ import * as rowSubComponents from "./svg-row-subcomponents";
 const clipPathElProto = svg.newClipPath("titleClipPath");
 clipPathElProto.appendChild(svg.newRect({
   "width": "100%",
-  "height": "100%"
+  "height": "100%",
 }));
 
 // Create row for a single request
@@ -39,11 +39,11 @@ export function createRow(index: number, rectData: RectData, block: WaterfallEnt
   let rowItem = svg.newG(rowCssClass.join(" "));
   let leftFixedHolder = svg.newSvg("left-fixed-holder", {
     "x": "0",
-    "width": `${leftColumnWith}%`
+    "width": `${leftColumnWith}%`,
   });
   let flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
     "x": `${leftColumnWith}%`,
-    "width": `${100 - leftColumnWith}%`
+    "width": `${100 - leftColumnWith}%`,
   });
 
   let requestNumber = `${index + 1}. `;

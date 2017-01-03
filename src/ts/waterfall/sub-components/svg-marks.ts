@@ -12,7 +12,7 @@ import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-su
  */
 export function createMarks(marks: Mark[], unit: number, diagramHeight: number) {
   let marksHolder = svg.newG("marker-holder", {
-    "transform": "scale(1, 1)"
+    "transform": "scale(1, 1)",
   });
 
   marks.forEach((mark, i) => {
@@ -27,7 +27,7 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
       "x1": x + "%",
       "y1": 0,
       "x2": x + "%",
-      "y2": diagramHeight
+      "y2": diagramHeight,
     });
 
     const lastMark = marks[i - 1];
@@ -40,7 +40,7 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
       "x1": x + "%",
       "y1": diagramHeight,
       "x2": mark.x + "%",
-      "y2": diagramHeight + 23
+      "y2": diagramHeight + 23,
     });
     lineHolder.appendChild(line);
     lineHolder.appendChild(lineConnection);

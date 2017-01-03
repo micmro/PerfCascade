@@ -42,7 +42,7 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
     "x1": x,
     "y1": 0,
     "x2": x,
-    "y2": diagramHeight
+    "y2": diagramHeight,
   }, lineClass);
 
   overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
@@ -90,7 +90,7 @@ export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight:
     "width": ((block.total || 1) / unit) + "%",
     "height": diagramHeight,
     "x": ((block.start || 0.001) / unit) + "%",
-    "y": 0
+    "y": 0,
   }, requestTypeToCssClass(block.requestType));
 
   rect.appendChild(svg.newTitle(block.name)); // Add tile to wedge path

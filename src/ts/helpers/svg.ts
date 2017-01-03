@@ -44,7 +44,7 @@ function newElement<T extends StylableSVGElement>(tagName: string,
                                                     attributes = {},
                                                     css = {},
                                                     text = "",
-                                                    className = ""
+                                                    className = "",
                                                   }: SvgElementOptions = {}): T {
   const element = document.createElementNS("http://www.w3.org/2000/svg", tagName) as T;
   if (className) {
@@ -108,14 +108,14 @@ let getTestSVGEl = (() => {
     if (svgTestEl === undefined) {
       const attributes = {
         "className": "water-fall-chart temp",
-        "width": "9999px"
+        "width": "9999px",
       };
       const css = {
         "visibility": "hidden",
         "position": "absolute",
         "top": "0px",
         "left": "0px",
-        "z-index": "99999"
+        "z-index": "99999",
       };
       svgTestEl = newSvg("water-fall-chart temp", attributes, css);
     }
