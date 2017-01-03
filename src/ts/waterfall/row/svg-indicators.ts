@@ -48,9 +48,7 @@ export function getMimeTypeIcon(block: WaterfallEntry): Icon {
   const entry = block.rawResource;
   let output = [];
 
-  if (!docIsSsl && heuristics.isSecure(block)) {
-    output.push(makeIcon("lock", "Secure Connection"));
-  } else if (docIsSsl && !heuristics.isSecure(block)) {
+  if (docIsSsl && !heuristics.isSecure(block)) {
     output.push(makeIcon("noTls", "Insecure Connection"));
   }
 
