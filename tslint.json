@@ -9,7 +9,6 @@
     "object-literal-sort-keys": false,
     "no-console": false,
     "no-string-literal": false,
-    "semicolon": false,
     "trailing-comma": false,
 
     // allow-leading-underscore since _ is used to silence warnings about unused function parameters.

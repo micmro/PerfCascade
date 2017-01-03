@@ -2,10 +2,10 @@
  * Creation of sub-components used in a ressource request row
  */
 
-import * as misc from "../../helpers/misc"
-import * as svg from "../../helpers/svg"
+import * as misc from "../../helpers/misc";
+import * as svg from "../../helpers/svg";
 import {timingTypeToCssClass} from "../../transformers/styling-converters";
-import {RectData} from "../../typing/rect-data"
+import {RectData} from "../../typing/rect-data";
 import {WaterfallEntryTiming} from "../../typing/waterfall";
 
 /**
@@ -14,22 +14,22 @@ import {WaterfallEntryTiming} from "../../typing/waterfall";
  * @param  {string} className - className for block `rect`
  */
 function makeBlock(rectData: RectData, className: string) {
-  const blockHeight = rectData.height - 1
+  const blockHeight = rectData.height - 1;
   let rect = svg.newRect({
     "width": misc.roundNumber(rectData.width / rectData.unit) + "%",
     "height": blockHeight,
     "x": misc.roundNumber(rectData.x / rectData.unit) + "%",
     "y": rectData.y
-  }, className)
+  }, className);
   if (rectData.label) {
-    rect.appendChild(svg.newTitle(rectData.label)) // Add tile to wedge path
+    rect.appendChild(svg.newTitle(rectData.label)); // Add tile to wedge path
   }
   if (rectData.showOverlay && rectData.hideOverlay) {
-    rect.addEventListener("mouseenter", rectData.showOverlay(rectData))
-    rect.addEventListener("mouseleave", rectData.hideOverlay(rectData))
+    rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
+    rect.addEventListener("mouseleave", rectData.hideOverlay(rectData));
   }
 
-  return rect
+  return rect;
 }
 
 /**
@@ -50,7 +50,7 @@ function segmentToRectData(segment: WaterfallEntryTiming, rectData: RectData): R
     "unit": rectData.unit,
     "showOverlay": rectData.showOverlay,
     "hideOverlay": rectData.hideOverlay
-  } as RectData
+  } as RectData;
 }
 
 /**
@@ -60,23 +60,23 @@ function segmentToRectData(segment: WaterfallEntryTiming, rectData: RectData): R
  * @returns SVGTextElement
  */
 function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number): SVGTextElement {
-  const minWidth = 500 // minimum supported diagram width that should show the timing label uncropped
-  const spacingPerc = (5 / minWidth * 100)
-  const y = rectData.y + rectData.height / 1.5
-  const totalLabel = `${Math.round(timeTotal)} ms`
+  const minWidth = 500; // minimum supported diagram width that should show the timing label uncropped
+  const spacingPerc = (5 / minWidth * 100);
+  const y = rectData.y + rectData.height / 1.5;
+  const totalLabel = `${Math.round(timeTotal)} ms`;
 
-  let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc
-  let txtEl = svg.newTextEl(totalLabel, {x: `${misc.roundNumber(percStart)}%`, y})
+  let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc;
+  let txtEl = svg.newTextEl(totalLabel, {x: `${misc.roundNumber(percStart)}%`, y});
 
   // (pessimistic) estimation of text with to avoid performance penalty of `getBBox`
-  let roughTxtWidth = totalLabel.length * 8
+  let roughTxtWidth = totalLabel.length * 8;
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
-    percStart = firstX / rectData.unit - spacingPerc
-    txtEl = svg.newTextEl(totalLabel, {x: `${misc.roundNumber(percStart)}%`, y}, {"textAnchor": "end"})
+    percStart = firstX / rectData.unit - spacingPerc;
+    txtEl = svg.newTextEl(totalLabel, {x: `${misc.roundNumber(percStart)}%`, y}, {"textAnchor": "end"});
   }
 
-  return txtEl
+  return txtEl;
 }
 
 /**
@@ -87,26 +87,26 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
  * @return {SVGElement}                Renerated SVG (rect or g element)
  */
 export function createRect(rectData: RectData, segments: WaterfallEntryTiming[], timeTotal: number): SVGElement {
-  let rect = makeBlock(rectData, `time-block ${rectData.cssClass}`)
-  let rectHolder = svg.newG("rect-holder")
-  let firstX = rectData.x
+  let rect = makeBlock(rectData, `time-block ${rectData.cssClass}`);
+  let rectHolder = svg.newG("rect-holder");
+  let firstX = rectData.x;
 
-  rectHolder.appendChild(rect)
+  rectHolder.appendChild(rect);
 
   if (segments && segments.length > 0) {
     segments.forEach((segment) => {
       if (segment.total > 0 && typeof segment.start === "number") {
-        let childRectData = segmentToRectData(segment, rectData)
-        let childRect = makeBlock(childRectData, `segment ${childRectData.cssClass}`)
-        firstX = Math.min(firstX, childRectData.x)
-        rectHolder.appendChild(childRect)
+        let childRectData = segmentToRectData(segment, rectData);
+        let childRect = makeBlock(childRectData, `segment ${childRectData.cssClass}`);
+        firstX = Math.min(firstX, childRectData.x);
+        rectHolder.appendChild(childRect);
       }
-    })
+    });
 
-    rectHolder.appendChild(createTimingLabel(rectData, timeTotal, firstX))
+    rectHolder.appendChild(createTimingLabel(rectData, timeTotal, firstX));
   }
 
-  return rectHolder
+  return rectHolder;
 }
 
 /**
@@ -119,9 +119,9 @@ export function createRect(rectData: RectData, segments: WaterfallEntryTiming[],
  */
 export function createRequestLabelClipped(x: number, y: number, name: string, height: number) {
 
-  let blockLabel = createRequestLabel(x, y, name, height)
-  blockLabel.style.clipPath = `url(#titleClipPath)`
-  return blockLabel
+  let blockLabel = createRequestLabel(x, y, name, height);
+  blockLabel.style.clipPath = `url(#titleClipPath)`;
+  return blockLabel;
 }
 
 /**
@@ -132,8 +132,8 @@ export function createRequestLabelClipped(x: number, y: number, name: string, he
  * @param  {number}         height           height of row
  */
 export function createRequestLabelFull(x: number, y: number, name: string, height: number) {
-  let blockLabel = createRequestLabel(x, y, name, height)
-  let labelHolder = svg.newG("full-label")
+  let blockLabel = createRequestLabel(x, y, name, height);
+  let labelHolder = svg.newG("full-label");
   labelHolder.appendChild(svg.newRect({
     "x": x - 3,
     "y": y + 3,
@@ -141,22 +141,22 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
     "height": height - 4,
     "rx": 5,
     "ry": 5
-  }, "label-full-bg"))
-  labelHolder.appendChild(blockLabel)
-  return labelHolder
+  }, "label-full-bg"));
+  labelHolder.appendChild(blockLabel);
+  return labelHolder;
 }
 
 // private helper
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
-  const blockName = misc.resourceUrlFormatter(name, 125)
-  y = y + Math.round(height / 2) + 5
-  let blockLabel = svg.newTextEl(blockName, {x, y})
+  const blockName = misc.resourceUrlFormatter(name, 125);
+  y = y + Math.round(height / 2) + 5;
+  let blockLabel = svg.newTextEl(blockName, {x, y});
 
-  blockLabel.appendChild(svg.newTitle(name))
+  blockLabel.appendChild(svg.newTitle(name));
 
-  blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1"
+  blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1";
 
-  return blockLabel
+  return blockLabel;
 }
 
 /**
@@ -166,26 +166,26 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
  * @param {SVGGElement}    fullLabel  [description]
  */
 export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextElement, fullLabel: SVGGElement) {
-  let labelFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement
-  let fullLabelText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement
+  let labelFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement;
+  let fullLabelText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement;
 
   // use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
-  fullLabel.style.display = "none"
-  fullLabel.style.visibility = "hidden"
-  rowFixed.appendChild(shortLabel)
-  rowFixed.appendChild(fullLabel)
+  fullLabel.style.display = "none";
+  fullLabel.style.visibility = "hidden";
+  rowFixed.appendChild(shortLabel);
+  rowFixed.appendChild(fullLabel);
 
   rowFixed.addEventListener("mouseenter", () => {
-    fullLabel.style.display = "block"
-    shortLabel.style.display = "none"
-    fullLabel.style.visibility = "visible"
-    labelFullBg.style.width = (fullLabelText.clientWidth + 10).toString()
-  })
+    fullLabel.style.display = "block";
+    shortLabel.style.display = "none";
+    fullLabel.style.visibility = "visible";
+    labelFullBg.style.width = (fullLabelText.clientWidth + 10).toString();
+  });
   rowFixed.addEventListener("mouseleave", () => {
-    shortLabel.style.display = "block"
-    fullLabel.style.display = "none"
-    fullLabel.style.visibility = "hidden"
-  })
+    shortLabel.style.display = "block";
+    fullLabel.style.display = "none";
+    fullLabel.style.visibility = "hidden";
+  });
 }
 
 /**
@@ -202,12 +202,12 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
     "height": height,
     "x": 0,
     "y": y
-  }, className)
+  }, className);
 }
 
 export function createNameRowBg(y: number, rowHeight: number,
                                 onClick: EventListener): SVGGElement {
-  let rowFixed = svg.newG("row row-fixed")
+  let rowFixed = svg.newG("row row-fixed");
 
   rowFixed.appendChild(svg.newRect({
     "width": "100%",
@@ -217,15 +217,15 @@ export function createNameRowBg(y: number, rowHeight: number,
     }, "",
     {
       "opacity": 0
-    }))
+    }));
 
-  rowFixed.addEventListener("click", onClick)
+  rowFixed.addEventListener("click", onClick);
 
-  return rowFixed
+  return rowFixed;
 }
 
 export function createRowBg(y: number, rowHeight: number, onClick: EventListener): SVGGElement {
-  let rowFixed = svg.newG("row row-flex")
+  let rowFixed = svg.newG("row row-flex");
 
   rowFixed.appendChild(svg.newRect({
       "width": "100%",
@@ -235,9 +235,9 @@ export function createRowBg(y: number, rowHeight: number, onClick: EventListener
     }, "",
     {
       "opacity": 0
-    }))
+    }));
 
-  rowFixed.addEventListener("click", onClick)
+  rowFixed.addEventListener("click", onClick);
 
-  return rowFixed
+  return rowFixed;
 }

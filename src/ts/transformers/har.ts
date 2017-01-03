@@ -15,7 +15,7 @@ function createWaterfallEntry(name: string,
                               segments: WaterfallEntryTiming[] = [],
                               rawResource: Entry,
                               requestType: RequestType): WaterfallEntry {
-  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
+  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   return {
     total,
     name,
@@ -24,19 +24,19 @@ function createWaterfallEntry(name: string,
     segments,
     rawResource,
     requestType
-  }
+  };
 }
 
 function createWaterfallEntryTiming(type: TimingType,
                                     start: number,
                                     end: number): WaterfallEntryTiming {
-  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start)
+  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   return {
     total,
     type,
     start,
     end
-  }
+  };
 }
 
 /**
@@ -45,39 +45,39 @@ function createWaterfallEntryTiming(type: TimingType,
  */
 function mimeToRequestType(mimeType: string): RequestType {
   if (mimeType === undefined) {
-    return "other"
+    return "other";
   }
-  let types = mimeType.split("/")
-  let part2 = types[1]
+  let types = mimeType.split("/");
+  let part2 = types[1];
   // take care of text/css; charset=UTF-8 etc
   if (part2 !== undefined) {
-    part2 = part2.indexOf(";") > -1 ? part2.split(";")[0] : part2
+    part2 = part2.indexOf(";") > -1 ? part2.split(";")[0] : part2;
   }
   switch (types[0]) {
-    case "image": return "image"
-    case "font": return "font"
-    case "video": return "video"
-    case "audio": return "audio"
-    default: break
+    case "image": return "image";
+    case "font": return "font";
+    case "video": return "video";
+    case "audio": return "audio";
+    default: break;
   }
   switch (part2) {
-    case "svg+xml": return "svg"
+    case "svg+xml": return "svg";
     case "xml":
-    case "html": return "html"
-    case "plain": return "plain"
-    case "css": return "css"
+    case "html": return "html";
+    case "plain": return "plain";
+    case "css": return "css";
     case "vnd.ms-fontobject":
     case "font-woff":
     case "font-woff2":
     case "x-font-truetype":
     case "x-font-opentype":
-    case "x-font-woff": return "font"
+    case "x-font-woff": return "font";
     case "javascript":
     case "x-javascript":
     case "script":
-    case "json": return "javascript"
-    case "x-shockwave-flash": return "flash"
-    default: return "other"
+    case "json": return "javascript";
+    case "x-shockwave-flash": return "flash";
+    default: return "other";
   }
 }
 
@@ -88,12 +88,12 @@ function mimeToRequestType(mimeType: string): RequestType {
  */
 export function transformDoc(harData: Har): WaterfallDocs {
   // make sure it's the *.log base node
-  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
-  console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length)
+  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
+  console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length);
 
   return {
     pages: data.pages.map((_page, i) => this.transformPage(data, i))
-  }
+  };
 }
 /**
  * Transforms a HAR object into the format needed to render the PerfCascade
@@ -103,21 +103,21 @@ export function transformDoc(harData: Har): WaterfallDocs {
  */
 export function transformPage(harData: Har, pageIndex: number = 0): WaterfallData {
   // make sure it's the *.log base node
-  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har
+  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
 
-  const currPage = data.pages[pageIndex]
-  const pageStartTime = new Date(currPage.startedDateTime).getTime()
-  const pageTimings = currPage.pageTimings
+  const currPage = data.pages[pageIndex];
+  const pageStartTime = new Date(currPage.startedDateTime).getTime();
+  const pageTimings = currPage.pageTimings;
 
-  console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length)
+  console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
 
   let doneTime = 0;
   const blocks = data.entries
     .filter((entry) => entry.pageref === currPage.id)
     .map((entry) => {
-      const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime
+      const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
 
-      doneTime = Math.max(doneTime, startRelative + entry.time)
+      doneTime = Math.max(doneTime, startRelative + entry.time);
 
       const requestType = mimeToRequestType(entry.response.content.mimeType);
       return createWaterfallEntry(entry.request.url,
@@ -126,25 +126,25 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
         buildDetailTimingBlocks(startRelative, entry),
         entry,
         requestType
-      )
-    })
+      );
+    });
 
   const marks = Object.keys(pageTimings)
     .filter((k) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
     .sort((a: string, b: string) => pageTimings[a] > pageTimings[b] ? 1 : -1)
     .map((k) => {
-      const startRelative = pageTimings[k]
+      const startRelative = pageTimings[k];
 
-      doneTime = Math.max(doneTime, startRelative)
+      doneTime = Math.max(doneTime, startRelative);
 
       return {
         "name": `${k.replace(/^[_]/, "")} (${startRelative}ms)`,
         "startTime": startRelative
-      } as Mark
-    })
+      } as Mark;
+    });
 
   // Add 100ms margin to make room for labels
-  doneTime += 100
+  doneTime += 100;
 
   return {
     durationMs: doneTime,
@@ -152,7 +152,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
     marks,
     lines: [],
     title: currPage.title,
-  }
+  };
 }
 /**
  * Create `WaterfallEntry`s to represent the subtimings of a request
@@ -162,29 +162,29 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
  * @returns Array
  */
 function buildDetailTimingBlocks(startRelative: number, entry: Entry): WaterfallEntryTiming[] {
-  let t = entry.timings
+  let t = entry.timings;
   return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[],
                                                                           key: TimingType) => {
 
-    const time = getTimePair(key, entry, collect, startRelative)
+    const time = getTimePair(key, entry, collect, startRelative);
 
     if (time.end && time.start >= time.end) {
-      return collect
+      return collect;
     }
 
     // special case for 'connect' && 'ssl' since they share time
     // http://www.softwareishard.com/blog/har-12-spec/#timings
     if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
-      const sslStart = parseInt(entry[`_ssl_start`], 10) || time.start
-      const sslEnd = parseInt(entry[`_ssl_end`], 10) || time.start + t.ssl
-      const connectStart = (!!parseInt(entry[`_ssl_start`], 10)) ? time.start : sslEnd
+      const sslStart = parseInt(entry[`_ssl_start`], 10) || time.start;
+      const sslEnd = parseInt(entry[`_ssl_end`], 10) || time.start + t.ssl;
+      const connectStart = (!!parseInt(entry[`_ssl_start`], 10)) ? time.start : sslEnd;
       return collect
         .concat([createWaterfallEntryTiming("ssl", sslStart, sslEnd)])
-        .concat([createWaterfallEntryTiming(key, connectStart, time.end)])
+        .concat([createWaterfallEntryTiming(key, connectStart, time.end)]);
     }
 
-    return collect.concat([createWaterfallEntryTiming(key, time.start, time.end)])
-  }, [])
+    return collect.concat([createWaterfallEntryTiming(key, time.start, time.end)]);
+  }, []);
 }
 
 /**
@@ -199,18 +199,18 @@ function buildDetailTimingBlocks(startRelative: number, entry: Entry): Waterfall
 function getTimePair(key: string, entry: Entry, collect: WaterfallEntryTiming[], startRelative: number) {
   let wptKey;
   switch (key) {
-      case "wait": wptKey = "ttfb"; break
-      case "receive": wptKey = "download"; break
-      default: wptKey = key
+      case "wait": wptKey = "ttfb"; break;
+      case "receive": wptKey = "download"; break;
+      default: wptKey = key;
   }
-  const preciseStart = parseInt(entry[`_${wptKey}_start`], 10)
-  const preciseEnd = parseInt(entry[`_${wptKey}_end`], 10)
+  const preciseStart = parseInt(entry[`_${wptKey}_start`], 10);
+  const preciseEnd = parseInt(entry[`_${wptKey}_end`], 10);
   const start = isNaN(preciseStart) ?
-    ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart
-  const end = isNaN(preciseEnd) ? (start + entry.timings[key]) : preciseEnd
+    ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart;
+  const end = isNaN(preciseEnd) ? (start + entry.timings[key]) : preciseEnd;
 
   return {
     "start": start,
     "end": end
-  }
+  };
 }

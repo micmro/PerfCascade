@@ -2,8 +2,8 @@
  * Creates the html for diagrams legend
  */
 export function makeLegend(): HTMLUListElement {
-  let ulNode = document.createElement("ul") as HTMLUListElement
-  ulNode.className = "resource-legend"
+  let ulNode = document.createElement("ul") as HTMLUListElement;
+  ulNode.className = "resource-legend";
 
   ulNode.innerHTML = `
         <li class="legend-blocked" title="Time spent in a queue waiting for a network connection.">Blocked</li>
@@ -13,6 +13,6 @@ export function makeLegend(): HTMLUListElement {
         <li class="legend-send" title="Time required to send HTTP request to the server.">Send</li>
         <li class="legend-wait" title="Waiting for a response from the server.">Wait</li>
         <li class="legend-receive" 
-        title="Time required to read entire response from the server (or cache).">Receive</li>`
-  return ulNode
+        title="Time required to read entire response from the server (or cache).">Receive</li>`;
+  return ulNode;
 }

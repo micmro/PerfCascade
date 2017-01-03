@@ -1,17 +1,17 @@
-import {OnPagingCb} from "../typing/paging"
-import {WaterfallData} from "../typing/waterfall"
+import {OnPagingCb} from "../typing/paging";
+import {WaterfallData} from "../typing/waterfall";
 
-import * as waterfallDocsService from "../state/waterfall-docs-service"
+import * as waterfallDocsService from "../state/waterfall-docs-service";
 
-let selectedPageIndex = 0
-let onPageUpdateCbs: OnPagingCb[] = []
+let selectedPageIndex = 0;
+let onPageUpdateCbs: OnPagingCb[] = [];
 
 /**
  * Returns number of pages
  * @returns number - number of pages in current doc
  */
 export function getPageCount(): number {
-  return waterfallDocsService.getDocs().pages.length
+  return waterfallDocsService.getDocs().pages.length;
 }
 
 /**
@@ -19,7 +19,7 @@ export function getPageCount(): number {
  * @returns WaterfallData - currently selected page
  */
 export function getSelectedPage(): WaterfallData {
-  return waterfallDocsService.getDocs().pages[selectedPageIndex]
+  return waterfallDocsService.getDocs().pages[selectedPageIndex];
 }
 
 /**
@@ -27,7 +27,7 @@ export function getSelectedPage(): WaterfallData {
  * @returns number - index of current page (0 based)
  */
 export function getSelectedPageIndex(): number {
-  return selectedPageIndex
+  return selectedPageIndex;
 }
 
 /**
@@ -37,17 +37,17 @@ export function getSelectedPageIndex(): number {
  */
 export function setSelectedPageIndex(pageIndex: number) {
   if (selectedPageIndex === pageIndex) {
-    return
+    return;
   }
   if (pageIndex < 0 || pageIndex >=  getPageCount()) {
-    throw new Error("Page does not exist - Invalid pageIndex selected")
+    throw new Error("Page does not exist - Invalid pageIndex selected");
   }
 
-  selectedPageIndex = pageIndex
-  let selectedPage = waterfallDocsService.getDocs().pages[selectedPageIndex]
+  selectedPageIndex = pageIndex;
+  let selectedPage = waterfallDocsService.getDocs().pages[selectedPageIndex];
   onPageUpdateCbs.forEach((cd) => {
-    cd(selectedPageIndex, selectedPage)
-  })
+    cd(selectedPageIndex, selectedPage);
+  });
 }
 
 /**
@@ -57,9 +57,9 @@ export function setSelectedPageIndex(pageIndex: number) {
  */
 export function onPageUpdate(cb: OnPagingCb): number {
   if (getPageCount() > 1) {
-    return onPageUpdateCbs.push(cb)
+    return onPageUpdateCbs.push(cb);
   }
-  return undefined
+  return undefined;
 }
 
 /**
@@ -68,16 +68,16 @@ export function onPageUpdate(cb: OnPagingCb): number {
  */
 export function initPagingSelectBox(selectbox: HTMLSelectElement) {
   if (getPageCount() <= 1) {
-    return
+    return;
   }
   waterfallDocsService.getDocs().pages.forEach((p, i) => {
-    let option = new Option(p.title, i.toString(), i === selectedPageIndex)
-    selectbox.add(option)
-  })
+    let option = new Option(p.title, i.toString(), i === selectedPageIndex);
+    selectbox.add(option);
+  });
 
-  selectbox.style.display = "block"
+  selectbox.style.display = "block";
   selectbox.addEventListener("change", (evt) => {
-    let val = parseInt((evt.target as HTMLOptionElement).value, 10)
-    setSelectedPageIndex(val)
-  })
+    let val = parseInt((evt.target as HTMLOptionElement).value, 10);
+    setSelectedPageIndex(val);
+  });
 }

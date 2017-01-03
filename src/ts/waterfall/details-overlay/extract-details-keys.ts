@@ -1,30 +1,30 @@
-import { Entry } from "../../typing/har.d"
-import { KvTuple } from "../../typing/misc.d"
+import { Entry } from "../../typing/har.d";
+import { KvTuple } from "../../typing/misc.d";
 import {WaterfallEntry} from "../../typing/waterfall";
 
 let ifValueDefined = (value: number, fn: (_: number) => any) => {
   if (!isFinite(value) || value <= 0) {
-    return undefined
+    return undefined;
   }
-  return fn(value)
-}
+  return fn(value);
+};
 
-let formatBytes = (size?: number) => ifValueDefined(size, (s) => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`)
+let formatBytes = (size?: number) => ifValueDefined(size, (s) => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`);
 
-let formatTime = (size?: number) => ifValueDefined(size, (s) => `${s} ms`)
+let formatTime = (size?: number) => ifValueDefined(size, (s) => `${s} ms`);
 
 let formatDate = (date?: string) => {
   if (!date) {
-    return ""
+    return "";
   }
-  let dateToFormat = new Date(date)
-  return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`
-}
+  let dateToFormat = new Date(date);
+  return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`;
+};
 
 let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
-  let v = parseInt(val, 10)
-  return ifValueDefined(v, ifIntFn)
-}
+  let v = parseInt(val, 10);
+  return ifValueDefined(v, ifIntFn);
+};
 
 /**
  * Data to show in overlay tabs
@@ -33,49 +33,49 @@ let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
  */
 export function getKeys(requestID: number, block: WaterfallEntry) {
   // TODO: dodgy casting - will not work for other adapters
-  let entry = block.rawResource as Entry
+  let entry = block.rawResource as Entry;
 
   let getRequestHeader = (name: string): string => {
-    let header = entry.request.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0]
-    return header ? header.value : ""
-  }
+    let header = entry.request.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0];
+    return header ? header.value : "";
+  };
 
   let getResponseHeader = (name: string): string => {
-    let header = entry.response.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0]
-    return header ? header.value : ""
-  }
+    let header = entry.response.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0];
+    return header ? header.value : "";
+  };
 
   let getContentType = () => {
-    let respContentType = getResponseHeader("Content-Type")
+    let respContentType = getResponseHeader("Content-Type");
     if (entry._contentType && entry._contentType !== respContentType) {
-      return respContentType + " | " + entry._contentType
+      return respContentType + " | " + entry._contentType;
     }
-    return respContentType
-  }
+    return respContentType;
+  };
 
   /** get experimental feature (usually WebPageTest) */
   let getExp = (name: string): string => {
-    return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || ""
-  }
+    return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || "";
+  };
 
   let getHarTiming = (name: string): string => {
     if (entry.timings[name] && entry.timings[name] > 0) {
-      return entry.timings[name] + " ms"
+      return entry.timings[name] + " ms";
     }
-    return ""
-  }
+    return "";
+  };
 
   /** get experimental feature and ensure it's not a sting of `0` or `` */
   let getExpNotNull = (name: string): string => {
-    let resp = getExp(name)
-    return resp !== "0" ? resp : ""
-  }
+    let resp = getExp(name);
+    return resp !== "0" ? resp : "";
+  };
 
   /** get experimental feature and format it as byte */
   let getExpAsByte = (name: string): string => {
-    let resp = parseInt(getExp(name), 10)
-    return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp)
-  }
+    let resp = parseInt(getExp(name), 10);
+    return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
+  };
 
   return {
     "general": [
@@ -169,5 +169,5 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
       ["Redirect URL", entry.response.redirectURL],
       ["Comment", entry.response.comment],
     ] as KvTuple[]
-  }
+  };
 }

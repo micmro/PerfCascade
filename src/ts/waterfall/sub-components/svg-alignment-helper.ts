@@ -2,11 +2,11 @@
  * vertical alignment helper lines
  */
 
-import * as svg from "../../helpers/svg"
+import * as svg from "../../helpers/svg";
 
 export interface HoverElements {
-  endline: SVGLineElement,
-  startline: SVGLineElement
+  endline: SVGLineElement;
+  startline: SVGLineElement;
 }
 
 /**
@@ -28,7 +28,7 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
       "x2": "0",
       "y2": diagramHeight
     }, "line-start")
-  }
+  };
 }
 
 /**
@@ -39,28 +39,28 @@ export function makeHoverEvtListeners(hoverEl: HoverElements) {
   return {
     onMouseEnterPartial() {
       return (evt: MouseEvent) => {
-        const targetRect = evt.target as SVGRectElement
-        svg.addClass(targetRect, "active")
+        const targetRect = evt.target as SVGRectElement;
+        svg.addClass(targetRect, "active");
 
         const xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
-          targetRect.width.baseVal.valueInSpecifiedUnits + "%"
-        const xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%"
+          targetRect.width.baseVal.valueInSpecifiedUnits + "%";
+        const xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
 
-        hoverEl.endline.x1.baseVal.valueAsString = xPosEnd
-        hoverEl.endline.x2.baseVal.valueAsString = xPosEnd
-        hoverEl.startline.x1.baseVal.valueAsString = xPosStart
-        hoverEl.startline.x2.baseVal.valueAsString = xPosStart
-        svg.addClass(hoverEl.endline, "active")
-        svg.addClass(hoverEl.startline, "active")
-      }
+        hoverEl.endline.x1.baseVal.valueAsString = xPosEnd;
+        hoverEl.endline.x2.baseVal.valueAsString = xPosEnd;
+        hoverEl.startline.x1.baseVal.valueAsString = xPosStart;
+        hoverEl.startline.x2.baseVal.valueAsString = xPosStart;
+        svg.addClass(hoverEl.endline, "active");
+        svg.addClass(hoverEl.startline, "active");
+      };
     },
     onMouseLeavePartial() {
       return (evt: MouseEvent) => {
-        const targetRect = evt.target as SVGRectElement
-        svg.removeClass(targetRect, "active")
-        svg.removeClass(hoverEl.endline, "active")
-        svg.removeClass(hoverEl.startline, "active")
-      }
+        const targetRect = evt.target as SVGRectElement;
+        svg.removeClass(targetRect, "active");
+        svg.removeClass(hoverEl.endline, "active");
+        svg.removeClass(hoverEl.startline, "active");
+      };
     }
-  }
+  };
 }

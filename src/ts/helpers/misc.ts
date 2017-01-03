@@ -7,15 +7,15 @@
  * @param  {string} url
  */
 function parseUrl(url: string) {
-  let pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?")
-  let matches = url.match(pattern)
+  let pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
+  let matches = url.match(pattern);
   return {
     scheme: matches[2],
     authority: matches[4],
     path: matches[5],
     query: matches[7],
     fragment: matches[9]
-  }
+  };
 }
 
 /**
@@ -24,7 +24,7 @@ function parseUrl(url: string) {
  * @returns boolean - true if `item` is in `arr`
  */
 export function contains<T>(arr: T[], item: T): boolean {
-  return arr.some((x) => x === item)
+  return arr.some((x) => x === item);
 }
 
 /**
@@ -35,23 +35,23 @@ export function contains<T>(arr: T[], item: T): boolean {
  */
 export function resourceUrlFormatter(url: string, maxLength: number): string {
   if (url.length < maxLength) {
-    return url.replace(/https?:\/\//, "")
+    return url.replace(/https?:\/\//, "");
   }
 
-  let matches = parseUrl(url)
+  let matches = parseUrl(url);
 
   if ((matches.authority + matches.path).length < maxLength) {
-    return matches.authority + matches.path
+    return matches.authority + matches.path;
   }
 
-  const maxAuthLength = Math.floor(maxLength / 2) - 3
-  const maxPathLength = Math.floor(maxLength / 2) - 5
+  const maxAuthLength = Math.floor(maxLength / 2) - 3;
+  const maxPathLength = Math.floor(maxLength / 2) - 5;
   // maybe we could fine tune these numbers
-  let p = matches.path.split("/")
+  let p = matches.path.split("/");
   if (matches.authority.length > maxAuthLength) {
-    return matches.authority.substr(0, maxAuthLength) + "..." + p[p.length - 1].substr(-maxPathLength)
+    return matches.authority.substr(0, maxAuthLength) + "..." + p[p.length - 1].substr(-maxPathLength);
   }
-  return matches.authority + "..." + p[p.length - 1].substr(-maxPathLength)
+  return matches.authority + "..." + p[p.length - 1].substr(-maxPathLength);
 }
 
 /**
@@ -60,5 +60,5 @@ export function resourceUrlFormatter(url: string, maxLength: number): string {
  * @param  {number} decimals - decimal precision to round to
  */
 export function roundNumber(num: number, decimals: number = 2) {
-  return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals)
+  return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }

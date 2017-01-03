@@ -1,64 +1,64 @@
-import { KvTuple } from "../../typing/misc"
+import { KvTuple } from "../../typing/misc";
 import {WaterfallEntry} from "../../typing/waterfall";
-import { getKeys } from "./extract-details-keys"
+import { getKeys } from "./extract-details-keys";
 
 function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
   let makeClass = (key: string) => {
     if (!addClass) {
-      return ""
+      return "";
     }
-    let className = key.toLowerCase().replace(/[^a-z-]/g, "")
-    return `class="${className || "no-colour"}"`
-  }
+    let className = key.toLowerCase().replace(/[^a-z-]/g, "");
+    return `class="${className || "no-colour"}"`;
+  };
   return dlKeyValues
     .filter((tuple) => (tuple[1] !== undefined && tuple[1] !== -1 && tuple[1] !== 0 && tuple[1] !== ""))
     .map((tuple) => `
       <dt ${makeClass(tuple[0])}>${tuple[0]}</dt>
       <dd>${tuple[1]}</dd>
-    `).join("")
+    `).join("");
 }
 
 function makeTab(innerHtml: string, renderDl: boolean = true) {
   if (innerHtml.trim() === "") {
-    return ""
+    return "";
   }
-  let inner = renderDl ? `<dl>${innerHtml}</dl>` : innerHtml
+  let inner = renderDl ? `<dl>${innerHtml}</dl>` : innerHtml;
   return `<div class="tab">
     ${inner}
-  </div>`
+  </div>`;
 }
 
 function makeImgTab(accordionHeight: number, block: WaterfallEntry) {
   if (block.requestType !== "image") {
-    return ""
+    return "";
   }
   const imgTag = `<img class="preview" style="max-height:${(accordionHeight - 100)}px"
-                        data-src="${block.rawResource.request.url}" />`
-  return makeTab(imgTag, false)
+                        data-src="${block.rawResource.request.url}" />`;
+  return makeTab(imgTag, false);
 }
 
 function makeTabBtn(name: string, tab: string) {
-  return !!tab ? `<li><button class="tab-button">${name}</button></li>` : ""
+  return !!tab ? `<li><button class="tab-button">${name}</button></li>` : "";
 }
 
 export function createDetailsBody(requestID: number, block: WaterfallEntry, accordeonHeight: number) {
 
-  let html = document.createElement("html") as HTMLHtmlElement
-  let body = document.createElement("body")
-  body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml")
-  html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/")
+  let html = document.createElement("html") as HTMLHtmlElement;
+  let body = document.createElement("body");
+  body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+  html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
 
-  const tabsData = getKeys(requestID, block)
-  const generalTab = makeTab(makeDefinitionList(tabsData.general))
-  const timingsTab = makeTab(makeDefinitionList(tabsData.timings, true))
-  const requestDl = makeDefinitionList(tabsData.request)
+  const tabsData = getKeys(requestID, block);
+  const generalTab = makeTab(makeDefinitionList(tabsData.general));
+  const timingsTab = makeTab(makeDefinitionList(tabsData.timings, true));
+  const requestDl = makeDefinitionList(tabsData.request);
 
   const requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.map((h) =>
-    [h.name, h.value] as KvTuple))
-  const responseDl = makeDefinitionList(tabsData.response)
+    [h.name, h.value] as KvTuple));
+  const responseDl = makeDefinitionList(tabsData.response);
   const responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.map((h) =>
-    [h.name, h.value] as KvTuple))
-  const imgTab = makeImgTab(accordeonHeight, block)
+    [h.name, h.value] as KvTuple));
+  const imgTab = makeImgTab(accordeonHeight, block);
 
   body.innerHTML = `
     <div class="wrapper">
@@ -100,8 +100,8 @@ export function createDetailsBody(requestID: number, block: WaterfallEntry, acco
       </div>
       ${imgTab}
     </div>
-    `
+    `;
 
-  html.appendChild(body)
-  return html
+  html.appendChild(body);
+  return html;
 }

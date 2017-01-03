@@ -1,45 +1,45 @@
 import {Entry} from "./har";
 
-export type TimingType = "blocked" | "dns" | "connect" | "send" | "wait" | "receive" | "ssl"
+export type TimingType = "blocked" | "dns" | "connect" | "send" | "wait" | "receive" | "ssl";
 export type RequestType = "other" | "image" | "video" | "audio" | "font" | "svg" |  "html" |
-  "plain" | "css" | "javascript" | "flash"
+  "plain" | "css" | "javascript" | "flash";
 
 interface UserTiming {
-  duration?: number
-  name: string
-  startTime: number
+  duration?: number;
+  name: string;
+  startTime: number;
 }
 
 export interface Mark extends UserTiming {
   /** custom data to store x position */
-  x?: number
+  x?: number;
 }
 
 export interface WaterfallEntry {
-  total: number
-  name: string,
-  start: number,
-  end: number,
-  segments: WaterfallEntryTiming[],
-  rawResource: Entry,
-  requestType: RequestType
+  total: number;
+  name: string;
+  start: number;
+  end: number;
+  segments: WaterfallEntryTiming[];
+  rawResource: Entry;
+  requestType: RequestType;
 }
 
 export interface WaterfallEntryTiming {
-  total: number
-  type: TimingType,
-  start: number,
-  end: number
+  total: number;
+  type: TimingType;
+  start: number;
+  end: number;
 }
 
 export interface WaterfallData {
-  title: string,
-  durationMs: number,
-  blocks: WaterfallEntry[],
-  marks: Mark[],
-  lines: WaterfallEntry[]
+  title: string;
+  durationMs: number;
+  blocks: WaterfallEntry[];
+  marks: Mark[];
+  lines: WaterfallEntry[];
 }
 
 export interface WaterfallDocs {
-  pages: WaterfallData[]
+  pages: WaterfallData[];
 }

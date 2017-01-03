@@ -5,7 +5,7 @@ import {RequestType, TimingType} from "../typing/waterfall";
  * @param {RequestType} requestType
  */
 export function requestTypeToCssClass(requestType: RequestType) {
-  return "block-" + requestType
+  return "block-" + requestType;
 }
 
 /**
@@ -13,5 +13,5 @@ export function requestTypeToCssClass(requestType: RequestType) {
  * @param {TimingType} timingType
  */
 export function timingTypeToCssClass(timingType: TimingType) {
-  return "block-" + timingType
+  return "block-" + timingType;
 }

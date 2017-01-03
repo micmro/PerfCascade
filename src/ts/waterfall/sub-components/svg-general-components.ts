@@ -3,11 +3,11 @@
  */
 
 import {roundNumber} from "../../helpers/misc";
-import * as svg from "../../helpers/svg"
+import * as svg from "../../helpers/svg";
 import {requestTypeToCssClass} from "../../transformers/styling-converters";
-import { OverlayChangeEvent } from "../../typing/open-overlay"
+import { OverlayChangeEvent } from "../../typing/open-overlay";
 import {WaterfallEntry} from "../../typing/waterfall";
-import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub"
+import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub";
 
 /**
  * Renders a per-second marker line and appends it to `timeHolder`
@@ -20,21 +20,21 @@ import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-su
  */
 let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
                     secsTotal: number, sec: number, addLabel: boolean = false) => {
-  const secPerc = 100 / secsTotal
+  const secPerc = 100 / secsTotal;
   /** just used if `addLabel` is `true` - for full seconds */
-  let lineLabel
-  let lineClass = "sub-second-line"
+  let lineLabel;
+  let lineClass = "sub-second-line";
 
   if (addLabel) {
-    const showTextBefore = (sec > secsTotal - 0.2)
-    lineClass = "second-line"
-    let x = roundNumber(secPerc * sec) + 0.5 + "%"
-    let css = {}
+    const showTextBefore = (sec > secsTotal - 0.2);
+    lineClass = "second-line";
+    let x = roundNumber(secPerc * sec) + 0.5 + "%";
+    let css = {};
     if (showTextBefore) {
-      x = roundNumber(secPerc * sec) - 0.5 + "%"
-      css["text-anchor"] = "end"
+      x = roundNumber(secPerc * sec) - 0.5 + "%";
+      css["text-anchor"] = "end";
     }
-    lineLabel = svg.newTextEl(sec + "s", {x, y: diagramHeight}, css)
+    lineLabel = svg.newTextEl(sec + "s", {x, y: diagramHeight}, css);
   }
 
   const x = roundNumber(secPerc * sec) + "%";
@@ -43,24 +43,24 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
     "y1": 0,
     "x2": x,
     "y2": diagramHeight
-  }, lineClass)
+  }, lineClass);
 
   overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
-    let offset = change.combinedOverlayHeight
+    let offset = change.combinedOverlayHeight;
     // figure out why there is an offset
-    let scale = (diagramHeight + offset) / (diagramHeight)
+    let scale = (diagramHeight + offset) / (diagramHeight);
 
-    lineEl.setAttribute("transform", `scale(1, ${scale})`)
+    lineEl.setAttribute("transform", `scale(1, ${scale})`);
     if (addLabel) {
-      lineLabel.setAttribute("transform", `translate(0, ${offset})`)
+      lineLabel.setAttribute("transform", `translate(0, ${offset})`);
     }
-  })
+  });
 
-  timeHolder.appendChild(lineEl)
+  timeHolder.appendChild(lineEl);
   if (addLabel) {
-    timeHolder.appendChild(lineLabel)
+    timeHolder.appendChild(lineLabel);
   }
-}
+};
 
 /**
  * Renders the time-scale SVG elements (1sec, 2sec...)
@@ -69,19 +69,19 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
  * @param {number} subSecondStepMs  Distant (time in ms) between sub-second time-scales
  */
 export function createTimeScale(durationMs: number, diagramHeight: number, subSecondStepMs = 200): SVGGElement {
-  let timeHolder = svg.newG("time-scale full-width")
+  let timeHolder = svg.newG("time-scale full-width");
   /** steps between each second marker */
-  const subSecondSteps = 1000 / subSecondStepMs
-  const secs = durationMs / 1000
-  const steps = durationMs / subSecondStepMs
+  const subSecondSteps = 1000 / subSecondStepMs;
+  const secs = durationMs / 1000;
+  const steps = durationMs / subSecondStepMs;
 
   for (let i = 0; i <= steps; i++) {
-    const isFullSec = i % subSecondSteps === 0
-    const secValue = i / subSecondSteps
+    const isFullSec = i % subSecondSteps === 0;
+    const secValue = i / subSecondSteps;
 
-    appendSecond(timeHolder, diagramHeight, secs, secValue, isFullSec)
+    appendSecond(timeHolder, diagramHeight, secs, secValue, isFullSec);
   }
-  return timeHolder
+  return timeHolder;
 }
 
 // TODO: Implement - data for this not parsed yet
@@ -91,9 +91,9 @@ export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight:
     "height": diagramHeight,
     "x": ((block.start || 0.001) / unit) + "%",
     "y": 0
-  }, requestTypeToCssClass(block.requestType))
+  }, requestTypeToCssClass(block.requestType));
 
-  rect.appendChild(svg.newTitle(block.name)) // Add tile to wedge path
+  rect.appendChild(svg.newTitle(block.name)); // Add tile to wedge path
 
-  return rect
+  return rect;
 }

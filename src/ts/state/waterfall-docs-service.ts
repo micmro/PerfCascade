@@ -1,18 +1,18 @@
-import {WaterfallDocs} from "../typing/waterfall"
+import {WaterfallDocs} from "../typing/waterfall";
 
 /*
 * Central service to store HAR data
 * and make it accessible everywhere by importing this module
 */
 
-let docs: WaterfallDocs
+let docs: WaterfallDocs;
 
 /**
  * Store Waterfall-Docs data centrally for Multi-page HARs
  * @param  {WaterfallDocs} waterfallDocs
  */
 export function storeDocs(waterfallDocs: WaterfallDocs) {
-  docs = waterfallDocs
+  docs = waterfallDocs;
 }
 
 /**
@@ -20,5 +20,5 @@ export function storeDocs(waterfallDocs: WaterfallDocs) {
  * @returns WaterfallDocs
  */
 export function getDocs(): WaterfallDocs {
-  return docs
+  return docs;
 }

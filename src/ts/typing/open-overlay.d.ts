@@ -1,21 +1,21 @@
 import {WaterfallEntry} from "./waterfall";
 
 export interface OpenOverlay {
-  index: number
-  defaultY: number
-  block: WaterfallEntry
-  onClose: Function
+  index: number;
+  defaultY: number;
+  block: WaterfallEntry;
+  onClose: Function;
    /* instance  info **/
-  actualY?: number
-  height?: number
+  actualY?: number;
+  height?: number;
 }
 
 export interface OverlayChangeEvent {
-  type: string
-  openOverlays: OpenOverlay[]
-  combinedOverlayHeight: number
+  type: string;
+  openOverlays: OpenOverlay[];
+  combinedOverlayHeight: number;
 }
 
 export interface OverlayChangeSubscriber {
-  (change: OverlayChangeEvent): void
+  (change: OverlayChangeEvent): void;
 }
