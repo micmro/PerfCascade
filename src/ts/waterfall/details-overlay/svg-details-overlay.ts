@@ -10,17 +10,17 @@ function createCloseButtonSvg(y: number): SVGGElement {
   let closeBtn = svg.newA("info-overlay-close-btn");
 
   closeBtn.appendChild(svg.newRect({
-    "width": 23,
     "height": 23,
+    "width": 23,
     "x": "100%",
     "y": y,
   }));
 
   closeBtn.appendChild(svg.newTextEl("X", {
-    x: "100%",
-    y,
     dx: 7,
     dy: 16,
+    x: "100%",
+    y,
   }));
 
   closeBtn.appendChild(svg.newTitle("Close Overlay"));
@@ -33,12 +33,12 @@ function createHolder(y: number, accordionHeight: number) {
   let innerHolder = svg.newG("info-overlay-holder");
 
   let bg = svg.newRect({
-    "width": "100%",
     "height": accordionHeight,
-    "x": "0",
-    "y": y,
     "rx": 2,
     "ry": 2,
+    "width": "100%",
+    "x": "0",
+    "y": y,
   }, "info-overlay");
 
   innerHolder.appendChild(bg);
@@ -53,8 +53,8 @@ export function createRowInfoOverlay(indexBackup: number, y: number,
   let holder = createHolder(y, accordionHeight);
 
   let foreignObject = svg.newForeignObject({
-    "width": "100%",
     "height": accordionHeight,
+    "width": "100%",
     "x": "0",
     "y": y,
   });

@@ -25,8 +25,8 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
 
     let line = svg.newLine({
       "x1": x + "%",
-      "y1": 0,
       "x2": x + "%",
+      "y1": 0,
       "y2": diagramHeight,
     });
 
@@ -38,8 +38,8 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
     // would use polyline but can't use percentage for points
     let lineConnection = svg.newLine({
       "x1": x + "%",
-      "y1": diagramHeight,
       "x2": mark.x + "%",
+      "y1": diagramHeight,
       "y2": diagramHeight + 23,
     });
     lineHolder.appendChild(line);

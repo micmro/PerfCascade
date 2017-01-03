@@ -17,15 +17,15 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
   return {
     endline: svg.newLine({
       "x1": "0",
-      "y1": "0",
       "x2": "0",
+      "y1": "0",
       "y2": diagramHeight,
     }, "line-end"),
 
     startline: svg.newLine({
       "x1": "0",
-      "y1": "0",
       "x2": "0",
+      "y1": "0",
       "y2": diagramHeight,
     }, "line-start"),
   };

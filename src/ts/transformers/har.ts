@@ -210,7 +210,7 @@ function getTimePair(key: string, entry: Entry, collect: WaterfallEntryTiming[],
   const end = isNaN(preciseEnd) ? (start + entry.timings[key]) : preciseEnd;
 
   return {
-    "start": start,
     "end": end,
+    "start": start,
   };
 }

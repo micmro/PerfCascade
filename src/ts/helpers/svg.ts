@@ -111,10 +111,10 @@ let getTestSVGEl = (() => {
         "width": "9999px",
       };
       const css = {
-        "visibility": "hidden",
+        "left": "0px",
         "position": "absolute",
         "top": "0px",
-        "left": "0px",
+        "visibility": "hidden",
         "z-index": "99999",
       };
       svgTestEl = newSvg("water-fall-chart temp", attributes, css);

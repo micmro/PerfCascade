@@ -3,8 +3,8 @@
 import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay";
 
 export const eventTypes = {
-  "OPEN" : "open",
   "CLOSE" : "closed",
+  "OPEN" : "open",
 };
 
 let subscribers: OverlayChangeSubscriber[] = [];

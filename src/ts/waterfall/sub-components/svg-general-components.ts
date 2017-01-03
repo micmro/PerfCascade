@@ -40,8 +40,8 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
   const x = roundNumber(secPerc * sec) + "%";
   const lineEl = svg.newLine({
     "x1": x,
-    "y1": 0,
     "x2": x,
+    "y1": 0,
     "y2": diagramHeight,
   }, lineClass);
 
@@ -87,8 +87,8 @@ export function createTimeScale(durationMs: number, diagramHeight: number, subSe
 // TODO: Implement - data for this not parsed yet
 export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight: number): SVGRectElement {
   let rect = svg.newRect({
-    "width": ((block.total || 1) / unit) + "%",
     "height": diagramHeight,
+    "width": ((block.total || 1) / unit) + "%",
     "x": ((block.start || 0.001) / unit) + "%",
     "y": 0,
   }, requestTypeToCssClass(block.requestType));

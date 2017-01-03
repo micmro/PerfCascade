@@ -11,8 +11,8 @@ import * as rowSubComponents from "./svg-row-subcomponents";
 // initial clip path
 const clipPathElProto = svg.newClipPath("titleClipPath");
 clipPathElProto.appendChild(svg.newRect({
-  "width": "100%",
   "height": "100%",
+  "width": "100%",
 }));
 
 // Create row for a single request
@@ -38,12 +38,12 @@ export function createRow(index: number, rectData: RectData, block: WaterfallEnt
 
   let rowItem = svg.newG(rowCssClass.join(" "));
   let leftFixedHolder = svg.newSvg("left-fixed-holder", {
-    "x": "0",
     "width": `${leftColumnWith}%`,
+    "x": "0",
   });
   let flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
-    "x": `${leftColumnWith}%`,
     "width": `${100 - leftColumnWith}%`,
+    "x": `${leftColumnWith}%`,
   });
 
   let requestNumber = `${index + 1}. `;

@@ -56,8 +56,8 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   let overlayHolder = svg.newG("overlays");
   /** Holder for scale, event and marks */
   let scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
-    "x": `${options.leftColumnWith}%`,
     "width": `${100 - options.leftColumnWith}%`,
+    "x": `${options.leftColumnWith}%`,
   });
   /** Holds all rows */
   let rowHolder = svg.newG("rows-holder");
@@ -113,15 +113,15 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
     const x = (block.start || 0.001);
     const accordionHeight = 450;
     const rectData = {
-      "width": blockWidth,
+      "cssClass": requestTypeToCssClass(block.requestType),
       "height": options.rowHeight,
+      "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
+      "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+      "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
+      "unit": unit,
+      "width": blockWidth,
       "x": x,
       "y": y,
-      "cssClass": requestTypeToCssClass(block.requestType),
-      "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
-      "unit": unit,
-      "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
-      "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
     } as RectData;
 
     let showDetailsOverlay = () => {

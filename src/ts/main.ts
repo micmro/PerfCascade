@@ -9,13 +9,13 @@ import { createWaterfallSvg } from "./waterfall/svg-chart";
 
 /** default options to use if not set in `options` parameter */
 const defaultOptions: Readonly<ChartOptions> = {
+  leftColumnWith: 25,
+  legendHolder: undefined,
+  pageSelector: undefined,
   rowHeight: 23,
   showAlignmentHelpers: true,
-  showMimeTypeIcon: true,
   showIndicatorIcons: true,
-  leftColumnWith: 25,
-  pageSelector: undefined,
-  legendHolder: undefined,
+  showMimeTypeIcon: true,
 };
 
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {

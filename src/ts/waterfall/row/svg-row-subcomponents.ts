@@ -16,8 +16,8 @@ import {WaterfallEntryTiming} from "../../typing/waterfall";
 function makeBlock(rectData: RectData, className: string) {
   const blockHeight = rectData.height - 1;
   let rect = svg.newRect({
-    "width": misc.roundNumber(rectData.width / rectData.unit) + "%",
     "height": blockHeight,
+    "width": misc.roundNumber(rectData.width / rectData.unit) + "%",
     "x": misc.roundNumber(rectData.x / rectData.unit) + "%",
     "y": rectData.y,
   }, className);
@@ -40,16 +40,16 @@ function makeBlock(rectData: RectData, className: string) {
  */
 function segmentToRectData(segment: WaterfallEntryTiming, rectData: RectData): RectData {
   return {
-    "width": segment.total,
-    "height": (rectData.height - 6),
-    "x": segment.start || 0.001,
-    "y": rectData.y,
     "cssClass": timingTypeToCssClass(segment.type),
+    "height": (rectData.height - 6),
+    "hideOverlay": rectData.hideOverlay,
     "label": segment.type + " (" + Math.round(segment.start) + "ms - "
     + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
-    "unit": rectData.unit,
     "showOverlay": rectData.showOverlay,
-    "hideOverlay": rectData.hideOverlay,
+    "unit": rectData.unit,
+    "width": segment.total,
+    "x": segment.start || 0.001,
+    "y": rectData.y,
   } as RectData;
 }
 
@@ -135,12 +135,12 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
   let blockLabel = createRequestLabel(x, y, name, height);
   let labelHolder = svg.newG("full-label");
   labelHolder.appendChild(svg.newRect({
-    "x": x - 3,
-    "y": y + 3,
-    "width": svg.getNodeTextWidth(blockLabel),
     "height": height - 4,
     "rx": 5,
     "ry": 5,
+    "width": svg.getNodeTextWidth(blockLabel),
+    "x": x - 3,
+    "y": y + 3,
   }, "label-full-bg"));
   labelHolder.appendChild(blockLabel);
   return labelHolder;
@@ -198,8 +198,8 @@ export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextEl
 export function createBgStripe(y: number, height: number, isEven: boolean): SVGRectElement {
   const className = isEven ? "even" : "odd";
   return svg.newRect({
-    "width": "100%", // make up for the spacing
     "height": height,
+    "width": "100%", // make up for the spacing
     "x": 0,
     "y": y,
   }, className);
@@ -210,10 +210,10 @@ export function createNameRowBg(y: number, rowHeight: number,
   let rowFixed = svg.newG("row row-fixed");
 
   rowFixed.appendChild(svg.newRect({
-    "width": "100%",
-    "height": rowHeight,
-    "x": "0",
-    "y": y,
+      "height": rowHeight,
+      "width": "100%",
+      "x": "0",
+      "y": y,
     }, "",
     {
       "opacity": 0,
@@ -228,8 +228,8 @@ export function createRowBg(y: number, rowHeight: number, onClick: EventListener
   let rowFixed = svg.newG("row row-flex");
 
   rowFixed.appendChild(svg.newRect({
-      "width": "100%",
       "height": rowHeight,
+      "width": "100%",
       "x": "0",
       "y": y,
     }, "",

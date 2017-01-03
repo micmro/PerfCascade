@@ -33,9 +33,9 @@ export function closeOverlay(index: number, overlayHolder: SVGGElement,
 
   renderOverlays(accordionHeight, overlayHolder);
   overlayChangesPubSub.publishToOverlayChanges({
-    "type" : overlayChangesPubSub.eventTypes.CLOSE,
-    "openOverlays": openOverlays,
     "combinedOverlayHeight": getCombinedOverlayHeight(),
+    "openOverlays": openOverlays,
+    "type" : overlayChangesPubSub.eventTypes.CLOSE,
   } as OverlayChangeEvent);
   realignBars(barEls);
 }
@@ -51,9 +51,9 @@ export function openOverlay(index: number, y: number, accordionHeight: number, b
   }
 
   openOverlays.push({
-    "index": index,
-    "defaultY": y,
     "block": block,
+    "defaultY": y,
+    "index": index,
     "onClose": () => {
       this.closeOverlay(index, overlayHolder, accordionHeight, barEls);
     },
@@ -61,9 +61,9 @@ export function openOverlay(index: number, y: number, accordionHeight: number, b
 
   renderOverlays(accordionHeight, overlayHolder);
   overlayChangesPubSub.publishToOverlayChanges({
-    "type" : overlayChangesPubSub.eventTypes.OPEN,
-    "openOverlays": openOverlays,
     "combinedOverlayHeight": getCombinedOverlayHeight(),
+    "openOverlays": openOverlays,
+    "type" : overlayChangesPubSub.eventTypes.OPEN,
   } as OverlayChangeEvent);
   realignBars(barEls);
 }

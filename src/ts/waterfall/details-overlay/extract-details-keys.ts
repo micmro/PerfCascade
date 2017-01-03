@@ -107,16 +107,6 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
       ["Image Total", getExpAsByte("image_total")],
       ["Image Save", getExpAsByte("image_save")],
     ] as KvTuple[],
-    "timings": [
-      ["Total", `${block.total} ms`],
-      ["Blocked", getHarTiming("blocked")],
-      ["DNS", getHarTiming("dns")],
-      ["Connect", getHarTiming("connect")],
-      ["SSL (TLS)", getHarTiming("ssl")],
-      ["Send", getHarTiming("send")],
-      ["Wait", getHarTiming("wait")],
-      ["Receive", getHarTiming("receive")],
-    ] as KvTuple[],
     "request": [
       ["Method", entry.request.method],
       ["HTTP Version", entry.request.httpVersion],
@@ -168,6 +158,16 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
       ["Timing-Allow-Origin", getResponseHeader("Timing-Allow-Origin")],
       ["Redirect URL", entry.response.redirectURL],
       ["Comment", entry.response.comment],
+    ] as KvTuple[],
+    "timings": [
+      ["Total", `${block.total} ms`],
+      ["Blocked", getHarTiming("blocked")],
+      ["DNS", getHarTiming("dns")],
+      ["Connect", getHarTiming("connect")],
+      ["SSL (TLS)", getHarTiming("ssl")],
+      ["Send", getHarTiming("send")],
+      ["Wait", getHarTiming("wait")],
+      ["Receive", getHarTiming("receive")],
     ] as KvTuple[],
   };
 }
