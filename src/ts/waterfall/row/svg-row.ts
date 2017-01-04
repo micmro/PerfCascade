@@ -16,7 +16,7 @@ clipPathElProto.appendChild(svg.newRect({
 }));
 
 // Create row for a single request
-export function createRow(index: number, rectData: RectData, block: WaterfallEntry,
+export function createRow(index: number, rectData: RectData, entry: WaterfallEntry,
                           labelXPos: number, options: ChartOptions, docIsSsl: boolean,
                           onDetailsOverlayShow: EventListener): SVGGElement {
 
@@ -25,13 +25,13 @@ export function createRow(index: number, rectData: RectData, block: WaterfallEnt
   const leftColumnWith = options.leftColumnWith;
 
   let rowCssClass = ["row-item"];
-  if (heuristics.isInStatusCodeRange(block.rawResource, 500, 599)) {
+  if (heuristics.isInStatusCodeRange(entry.rawResource, 500, 599)) {
     rowCssClass.push("status5xx");
   }
-  if (heuristics.isInStatusCodeRange(block.rawResource, 400, 499)) {
+  if (heuristics.isInStatusCodeRange(entry.rawResource, 400, 499)) {
     rowCssClass.push("status4xx");
-  } else if (block.rawResource.response.status !== 304 &&
-    heuristics.isInStatusCodeRange(block.rawResource, 300, 399)) {
+  } else if (entry.rawResource.response.status !== 304 &&
+    heuristics.isInStatusCodeRange(entry.rawResource, 300, 399)) {
     // 304 == Not Modified, so not an issue
     rowCssClass.push("status3xx");
   }
@@ -48,10 +48,10 @@ export function createRow(index: number, rectData: RectData, block: WaterfallEnt
 
   let requestNumber = `${index + 1}. `;
 
-  let rect = rowSubComponents.createRect(rectData, block.segments, block.total);
+  let rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
   let shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y,
-    requestNumber + misc.resourceUrlFormatter(block.name, 40), rowHeight);
-  let fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, requestNumber + block.name, rowHeight);
+    requestNumber + misc.resourceUrlFormatter(entry.name, 40), rowHeight);
+  let fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, requestNumber + entry.name, rowHeight);
 
   let rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow);
   let rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow);
@@ -63,14 +63,14 @@ export function createRow(index: number, rectData: RectData, block: WaterfallEnt
   let x = 3;
 
   if (options.showMimeTypeIcon) {
-    const icon = indicators.getMimeTypeIcon(block);
+    const icon = indicators.getMimeTypeIcon(entry);
     rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
     x += icon.width;
   }
 
   if (options.showIndicatorIcons) {
     // Create and add warnings for potential issues
-    indicators.getIndicatorIcons(block, docIsSsl).forEach((icon: indicators.Icon) => {
+    indicators.getIndicatorIcons(entry, docIsSsl).forEach((icon: indicators.Icon) => {
       rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
       x += icon.width;
     });

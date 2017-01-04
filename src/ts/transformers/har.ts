@@ -112,7 +112,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
 
   let doneTime = 0;
-  const blocks = data.entries
+  const entries = data.entries
     .filter((entry) => entry.pageref === currPage.id)
     .map((entry) => {
       const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
@@ -148,7 +148,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
 
   return {
     durationMs: doneTime,
-    blocks,
+    entries,
     marks,
     lines: [],
     title: currPage.title,
@@ -158,15 +158,15 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
  * Create `WaterfallEntry`s to represent the subtimings of a request
  * ("blocked", "dns", "connect", "send", "wait", "receive")
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
- * @param  {Entry} entry
+ * @param  {Entry} harEntry
  * @returns Array
  */
-function buildDetailTimingBlocks(startRelative: number, entry: Entry): WaterfallEntryTiming[] {
-  let t = entry.timings;
+function buildDetailTimingBlocks(startRelative: number, harEntry: Entry): WaterfallEntryTiming[] {
+  let t = harEntry.timings;
   return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[],
                                                                           key: TimingType) => {
 
-    const time = getTimePair(key, entry, collect, startRelative);
+    const time = getTimePair(key, harEntry, collect, startRelative);
 
     if (time.end && time.start >= time.end) {
       return collect;
@@ -175,9 +175,9 @@ function buildDetailTimingBlocks(startRelative: number, entry: Entry): Waterfall
     // special case for 'connect' && 'ssl' since they share time
     // http://www.softwareishard.com/blog/har-12-spec/#timings
     if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
-      const sslStart = parseInt(entry[`_ssl_start`], 10) || time.start;
-      const sslEnd = parseInt(entry[`_ssl_end`], 10) || time.start + t.ssl;
-      const connectStart = (!!parseInt(entry[`_ssl_start`], 10)) ? time.start : sslEnd;
+      const sslStart = parseInt(harEntry[`_ssl_start`], 10) || time.start;
+      const sslEnd = parseInt(harEntry[`_ssl_end`], 10) || time.start + t.ssl;
+      const connectStart = (!!parseInt(harEntry[`_ssl_start`], 10)) ? time.start : sslEnd;
       return collect
         .concat([createWaterfallEntryTiming("ssl", sslStart, sslEnd)])
         .concat([createWaterfallEntryTiming(key, connectStart, time.end)]);
@@ -191,23 +191,23 @@ function buildDetailTimingBlocks(startRelative: number, entry: Entry): Waterfall
  * Returns Object containing start and end time of `collect`
  *
  * @param  {string} key
- * @param  {Entry} entry
+ * @param  {Entry} harEntry
  * @param  {WaterfallEntry[]} collect
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @returns {Object}
  */
-function getTimePair(key: string, entry: Entry, collect: WaterfallEntryTiming[], startRelative: number) {
+function getTimePair(key: string, harEntry: Entry, collect: WaterfallEntryTiming[], startRelative: number) {
   let wptKey;
   switch (key) {
       case "wait": wptKey = "ttfb"; break;
       case "receive": wptKey = "download"; break;
       default: wptKey = key;
   }
-  const preciseStart = parseInt(entry[`_${wptKey}_start`], 10);
-  const preciseEnd = parseInt(entry[`_${wptKey}_end`], 10);
+  const preciseStart = parseInt(harEntry[`_${wptKey}_start`], 10);
+  const preciseEnd = parseInt(harEntry[`_${wptKey}_end`], 10);
   const start = isNaN(preciseStart) ?
     ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart;
-  const end = isNaN(preciseEnd) ? (start + entry.timings[key]) : preciseEnd;
+  const end = isNaN(preciseEnd) ? (start + harEntry.timings[key]) : preciseEnd;
 
   return {
     "end": end,

@@ -46,9 +46,9 @@ function createHolder(y: number, accordionHeight: number) {
 }
 
 export function createRowInfoOverlay(indexBackup: number, y: number,
-                                     accordionHeight: number, block: WaterfallEntry,
+                                     accordionHeight: number, entry: WaterfallEntry,
                                      onClose: Function): SVGGElement {
-  const requestID =  parseInt(block.rawResource._index + 1, 10) || indexBackup + 1;
+  const requestID =  parseInt(entry.rawResource._index + 1, 10) || indexBackup + 1;
   let wrapper = svg.newG("outer-info-overlay-holder");
   let holder = createHolder(y, accordionHeight);
 
@@ -62,7 +62,7 @@ export function createRowInfoOverlay(indexBackup: number, y: number,
   let closeBtn = createCloseButtonSvg(y);
   closeBtn.addEventListener("click", () => onClose(indexBackup, holder));
 
-  let body = createDetailsBody(requestID, block, accordionHeight);
+  let body = createDetailsBody(requestID, entry, accordionHeight);
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
   let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
 

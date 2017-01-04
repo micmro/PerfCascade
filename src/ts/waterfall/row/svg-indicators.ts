@@ -21,46 +21,46 @@ function makeIcon(type: string, title: string): Icon {
 
 /**
  * Scan the request for errors or potential issues and highlight them
- * @param  {WaterfallEntry} block
+ * @param  {WaterfallEntry} entry
  * @returns {Icon}
  */
-export function getMimeTypeIcon(block: WaterfallEntry): Icon {
-  const entry = block.rawResource;
+export function getMimeTypeIcon(entry: WaterfallEntry): Icon {
+  const harEntry = entry.rawResource;
   // highlight redirects
-  if (!!entry.response.redirectURL) {
-    const url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
-    return makeIcon("err3xx", `${entry.response.status} response status: Redirect to ${url}...`);
-  } else if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
-    return makeIcon("err4xx", `${entry.response.status} response status: ${entry.response.statusText}`);
-  } else if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
-    return makeIcon("err5xx", `${entry.response.status} response status: ${entry.response.statusText}`);
+  if (!!harEntry.response.redirectURL) {
+    const url = encodeURI(harEntry.response.redirectURL.split("?")[0] || "");
+    return makeIcon("err3xx", `${harEntry.response.status} response status: Redirect to ${url}...`);
+  } else if (heuristics.isInStatusCodeRange(harEntry, 400, 499)) {
+    return makeIcon("err4xx", `${harEntry.response.status} response status: ${harEntry.response.statusText}`);
+  } else if (heuristics.isInStatusCodeRange(harEntry, 500, 599)) {
+    return makeIcon("err5xx", `${harEntry.response.status} response status: ${harEntry.response.statusText}`);
   } else {
-    return makeIcon(block.requestType, block.requestType);
+    return makeIcon(entry.requestType, entry.requestType);
   }
 }
   /**
    * Scan the request for errors or portential issues and highlight them
-   * @param  {WaterfallEntry} block
+   * @param  {WaterfallEntry} entry
    * @param  {boolean} docIsSsl
    * @returns {Icon[]}
    */
-  export function getIndicatorIcons(block: WaterfallEntry, docIsSsl: boolean): Icon[] {
-  const entry = block.rawResource;
+  export function getIndicatorIcons(entry: WaterfallEntry, docIsSsl: boolean): Icon[] {
+  const harEntry = entry.rawResource;
   let output = [];
 
-  if (docIsSsl && !heuristics.isSecure(block)) {
+  if (docIsSsl && !heuristics.isSecure(entry)) {
     output.push(makeIcon("noTls", "Insecure Connection"));
   }
 
-  if (heuristics.hasCacheIssue(block)) {
+  if (heuristics.hasCacheIssue(entry)) {
     output.push(makeIcon("noCache", "Response not cached"));
   }
 
-  if (heuristics.hasCompressionIssue(block)) {
+  if (heuristics.hasCompressionIssue(entry)) {
     output.push(makeIcon("noGzip", "no gzip"));
   }
 
-  if (!entry.response.content.mimeType && heuristics.isInStatusCodeRange(entry, 200, 299)) {
+  if (!harEntry.response.content.mimeType && heuristics.isInStatusCodeRange(harEntry, 200, 299)) {
     output.push(makeIcon("warning", "No MIME Type defined"));
   }
 

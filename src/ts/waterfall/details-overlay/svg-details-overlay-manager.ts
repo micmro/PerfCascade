@@ -43,7 +43,7 @@ export function closeOverlay(index: number, overlayHolder: SVGGElement,
 /**
  * Opens an overlay - rerenders others internaly
  */
-export function openOverlay(index: number, y: number, accordionHeight: number, block: WaterfallEntry,
+export function openOverlay(index: number, y: number, accordionHeight: number, entry: WaterfallEntry,
                             overlayHolder: SVGGElement, barEls: SVGGElement[]) {
 
   if (openOverlays.filter((o) => o.index === index).length > 0) {
@@ -51,8 +51,8 @@ export function openOverlay(index: number, y: number, accordionHeight: number, b
   }
 
   openOverlays.push({
-    "block": block,
     "defaultY": y,
+    "entry": entry,
     "index": index,
     "onClose": () => {
       this.closeOverlay(index, overlayHolder, accordionHeight, barEls);
@@ -98,7 +98,7 @@ function renderOverlays(accordionHeight: number, overlayHolder: SVGGElement) {
     .forEach((overlay) => {
       let y = overlay.defaultY + currY;
       let infoOverlay = createRowInfoOverlay(overlay.index, y, accordionHeight,
-        overlay.block, overlay.onClose);
+        overlay.entry, overlay.onClose);
       // if overlay has a preview image show it
       let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement;
       if (previewImg && !previewImg.src) {

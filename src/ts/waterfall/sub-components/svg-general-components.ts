@@ -85,15 +85,15 @@ export function createTimeScale(durationMs: number, diagramHeight: number, subSe
 }
 
 // TODO: Implement - data for this not parsed yet
-export function createBgRect(block: WaterfallEntry, unit: number, diagramHeight: number): SVGRectElement {
+export function createBgRect(entry: WaterfallEntry, unit: number, diagramHeight: number): SVGRectElement {
   let rect = svg.newRect({
     "height": diagramHeight,
-    "width": ((block.total || 1) / unit) + "%",
-    "x": ((block.start || 0.001) / unit) + "%",
+    "width": ((entry.total || 1) / unit) + "%",
+    "x": ((entry.start || 0.001) / unit) + "%",
     "y": 0,
-  }, requestTypeToCssClass(block.requestType));
+  }, requestTypeToCssClass(entry.requestType));
 
-  rect.appendChild(svg.newTitle(block.name)); // Add tile to wedge path
+  rect.appendChild(svg.newTitle(entry.name)); // Add tile to wedge path
 
   return rect;
 }

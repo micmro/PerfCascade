@@ -26,18 +26,18 @@ export function isInStatusCodeRange(entry: Entry, lowerBound: number, upperBound
   return entry.response.status >= lowerBound && entry.response.status <= upperBound;
 }
 
-function isCompressible(block: WaterfallEntry): boolean {
-  const entry = block.rawResource;
+function isCompressible(entry: WaterfallEntry): boolean {
+  const harEntry = entry.rawResource;
   const minCompressionSize = 1000;
   // small responses
-  if (entry.response.bodySize < minCompressionSize) {
+  if (harEntry.response.bodySize < minCompressionSize) {
     return false;
   }
 
-  if (misc.contains(["html", "css", "javascript", "svg", "plain"], block.requestType)) {
+  if (misc.contains(["html", "css", "javascript", "svg", "plain"], entry.requestType)) {
     return true;
   }
-  const mime = entry.response.content.mimeType;
+  const mime = harEntry.response.content.mimeType;
   const compressableMimes = ["application/vnd.ms-fontobject",
     "application/x-font-opentype",
     "application/x-font-truetype",
@@ -53,34 +53,34 @@ function isCompressible(block: WaterfallEntry): boolean {
   return false;
 }
 
-function isCachable(block: WaterfallEntry): boolean {
-  const entry = block.rawResource;
+function isCachable(entry: WaterfallEntry): boolean {
+  const harEntry = entry.rawResource;
   // do not cache non-gets,204 and non 2xx status codes
-  if (entry.request.method.toLocaleLowerCase() !== "get" ||
-    entry.response.status === 204 ||
-    !isInStatusCodeRange(entry, 200, 299)) {
+  if (harEntry.request.method.toLocaleLowerCase() !== "get" ||
+    harEntry.response.status === 204 ||
+    !isInStatusCodeRange(harEntry, 200, 299)) {
     return false;
   }
 
-  if (getResponseHeader(entry, "Cache-Control") === undefined
-    && getResponseHeader(entry, "Expires") === undefined) {
+  if (getResponseHeader(harEntry, "Cache-Control") === undefined
+    && getResponseHeader(harEntry, "Expires") === undefined) {
     return true;
   }
-  if (getResponseHeaderValue(entry, "Cache-Control").indexOf("no-cache") > -1
-    || getResponseHeaderValue(entry, "Pragma") === "no-cache") {
+  if (getResponseHeaderValue(harEntry, "Cache-Control").indexOf("no-cache") > -1
+    || getResponseHeaderValue(harEntry, "Pragma") === "no-cache") {
     return true;
   }
   return false;
 }
 
-export function hasCacheIssue(block: WaterfallEntry) {
-  return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCachable(block));
+export function hasCacheIssue(entry: WaterfallEntry) {
+  return (getResponseHeader(entry.rawResource, "Content-Encoding") === undefined && isCachable(entry));
 }
 
-export function hasCompressionIssue(block: WaterfallEntry) {
-  return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCompressible(block));
+export function hasCompressionIssue(entry: WaterfallEntry) {
+  return (getResponseHeader(entry.rawResource, "Content-Encoding") === undefined && isCompressible(entry));
 }
 
-export function isSecure(block: WaterfallEntry) {
-  return block.name.indexOf("https://") === 0;
+export function isSecure(entry: WaterfallEntry) {
+  return entry.name.indexOf("https://") === 0;
 }

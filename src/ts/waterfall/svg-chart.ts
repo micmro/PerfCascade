@@ -38,12 +38,12 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
 
   /** horizontal unit (duration in ms of 1%) */
   const unit: number = data.durationMs / 100;
-  const barsToShow = data.blocks
-    .filter((block) => (typeof block.start === "number" && typeof block.total === "number"))
+  const entriesToShow = data.entries
+    .filter((entry) => (typeof entry.start === "number" && typeof entry.total === "number"))
     .sort((a, b) => (a.start || 0) - (b.start || 0));
-  const docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
+  const docIsSsl = (data.entries[0].name.indexOf("https://") === 0);
   /** height of the requests part of the diagram in px */
-  const diagramHeight = (barsToShow.length + 1) * options.rowHeight;
+  const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
   /** full height of the SVG chart in px */
   const chartHolderHeight = getSvgHeight(data.marks, diagramHeight);
 
@@ -78,22 +78,22 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(data.durationMs, diagramHeight));
   scaleAndMarksHolder.appendChild(marks.createMarks(data.marks, unit, diagramHeight));
 
-  data.lines.forEach((block) => {
-    timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight));
+  data.lines.forEach((entry) => {
+    timeLineHolder.appendChild(generalComponents.createBgRect(entry, unit, diagramHeight));
   });
 
   let labelXPos = 5;
 
   // This assumes all icons (mime and indicators) have the same width
-  const iconWidth = indicators.getMimeTypeIcon(barsToShow[0]).width;
+  const iconWidth = indicators.getMimeTypeIcon(entriesToShow[0]).width;
 
   if (options.showMimeTypeIcon) {
     labelXPos += iconWidth;
   }
 
   if (options.showIndicatorIcons) {
-    const iconsPerBlock = barsToShow.map((block: WaterfallEntry) =>
-      indicators.getIndicatorIcons(block, docIsSsl).length);
+    const iconsPerBlock = entriesToShow.map((entry: WaterfallEntry) =>
+      indicators.getIndicatorIcons(entry, docIsSsl).length);
     labelXPos += iconWidth * Math.max.apply(null, iconsPerBlock);
   }
 
@@ -107,28 +107,28 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   });
 
   /** Renders single row and hooks up behaviour */
-  function renderRow(block: WaterfallEntry, i: number) {
-    const blockWidth = block.total || 1;
+  function renderRow(entry: WaterfallEntry, i: number) {
+    const entryWidth = entry.total || 1;
     const y = options.rowHeight * i;
-    const x = (block.start || 0.001);
+    const x = (entry.start || 0.001);
     const accordionHeight = 450;
     const rectData = {
-      "cssClass": requestTypeToCssClass(block.requestType),
+      "cssClass": requestTypeToCssClass(entry.requestType),
       "height": options.rowHeight,
       "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-      "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+      "label": entry.name + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
       "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
       "unit": unit,
-      "width": blockWidth,
+      "width": entryWidth,
       "x": x,
       "y": y,
     } as RectData;
 
     let showDetailsOverlay = () => {
-      overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, block, overlayHolder, barEls);
+      overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, entry, overlayHolder, barEls);
     };
 
-    let rowItem = row.createRow(i, rectData, block, labelXPos,
+    let rowItem = row.createRow(i, rectData, entry, labelXPos,
       options, docIsSsl, showDetailsOverlay);
 
     barEls.push(rowItem);
@@ -136,7 +136,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   }
 
   // Main loop to render rows with blocks
-  barsToShow.forEach(renderRow);
+  entriesToShow.forEach(renderRow);
 
   if (options.showAlignmentHelpers) {
     scaleAndMarksHolder.appendChild(hoverOverlayHolder);

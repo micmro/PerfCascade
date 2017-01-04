@@ -35,7 +35,7 @@ export interface WaterfallEntryTiming {
 export interface WaterfallData {
   title: string;
   durationMs: number;
-  blocks: WaterfallEntry[];
+  entries: WaterfallEntry[];
   marks: Mark[];
   lines: WaterfallEntry[];
 }

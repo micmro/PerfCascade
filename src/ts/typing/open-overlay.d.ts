@@ -3,7 +3,7 @@ import {WaterfallEntry} from "./waterfall";
 export interface OpenOverlay {
   index: number;
   defaultY: number;
-  block: WaterfallEntry;
+  entry: WaterfallEntry;
   onClose: Function;
    /* instance  info **/
   actualY?: number;

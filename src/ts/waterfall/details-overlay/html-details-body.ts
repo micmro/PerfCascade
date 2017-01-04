@@ -28,12 +28,12 @@ function makeTab(innerHtml: string, renderDl: boolean = true) {
   </div>`;
 }
 
-function makeImgTab(accordionHeight: number, block: WaterfallEntry) {
-  if (block.requestType !== "image") {
+function makeImgTab(accordionHeight: number, entry: WaterfallEntry) {
+  if (entry.requestType !== "image") {
     return "";
   }
   const imgTag = `<img class="preview" style="max-height:${(accordionHeight - 100)}px"
-                        data-src="${block.rawResource.request.url}" />`;
+                        data-src="${entry.rawResource.request.url}" />`;
   return makeTab(imgTag, false);
 }
 
@@ -41,29 +41,29 @@ function makeTabBtn(name: string, tab: string) {
   return !!tab ? `<li><button class="tab-button">${name}</button></li>` : "";
 }
 
-export function createDetailsBody(requestID: number, block: WaterfallEntry, accordeonHeight: number) {
+export function createDetailsBody(requestID: number, entry: WaterfallEntry, accordeonHeight: number) {
 
   let html = document.createElement("html") as HTMLHtmlElement;
   let body = document.createElement("body");
   body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
   html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
 
-  const tabsData = getKeys(requestID, block);
+  const tabsData = getKeys(requestID, entry);
   const generalTab = makeTab(makeDefinitionList(tabsData.general));
   const timingsTab = makeTab(makeDefinitionList(tabsData.timings, true));
   const requestDl = makeDefinitionList(tabsData.request);
 
-  const requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.map((h) =>
+  const requestHeadersDl = makeDefinitionList(entry.rawResource.request.headers.map((h) =>
     [h.name, h.value] as KvTuple));
   const responseDl = makeDefinitionList(tabsData.response);
-  const responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.map((h) =>
+  const responseHeadersDl = makeDefinitionList(entry.rawResource.response.headers.map((h) =>
     [h.name, h.value] as KvTuple));
-  const imgTab = makeImgTab(accordeonHeight, block);
+  const imgTab = makeImgTab(accordeonHeight, entry);
 
   body.innerHTML = `
     <div class="wrapper">
-      <header class="type-${block.requestType}">
-        <h3><strong>#${requestID}</strong> ${block.name}</h3>
+      <header class="type-${entry.requestType}">
+        <h3><strong>#${requestID}</strong> ${entry.name}</h3>
         <nav class="tab-nav">
         <ul>
           ${makeTabBtn("General", generalTab)}
@@ -96,7 +96,7 @@ export function createDetailsBody(requestID: number, block: WaterfallEntry, acco
       </div>
       ${timingsTab}
       <div class="tab">
-        <pre><code>${JSON.stringify(block.rawResource, null, 2)}</code></pre>
+        <pre><code>${JSON.stringify(entry.rawResource, null, 2)}</code></pre>
       </div>
       ${imgTab}
     </div>

@@ -1,4 +1,3 @@
-import { Entry } from "../../typing/har.d";
 import { KvTuple } from "../../typing/misc.d";
 import {WaterfallEntry} from "../../typing/waterfall";
 
@@ -29,38 +28,37 @@ let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
 /**
  * Data to show in overlay tabs
  * @param  {number} requestID - request number
- * @param  {WaterfallEntry} block
+ * @param  {WaterfallEntry} entry
  */
-export function getKeys(requestID: number, block: WaterfallEntry) {
-  // TODO: dodgy casting - will not work for other adapters
-  let entry = block.rawResource as Entry;
+export function getKeys(requestID: number, entry: WaterfallEntry) {
+  let harEntry = entry.rawResource;
 
   let getRequestHeader = (name: string): string => {
-    let header = entry.request.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0];
+    let header = harEntry.request.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0];
     return header ? header.value : "";
   };
 
   let getResponseHeader = (name: string): string => {
-    let header = entry.response.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0];
+    let header = harEntry.response.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0];
     return header ? header.value : "";
   };
 
   let getContentType = () => {
     let respContentType = getResponseHeader("Content-Type");
-    if (entry._contentType && entry._contentType !== respContentType) {
-      return respContentType + " | " + entry._contentType;
+    if (harEntry._contentType && harEntry._contentType !== respContentType) {
+      return respContentType + " | " + harEntry._contentType;
     }
     return respContentType;
   };
 
   /** get experimental feature (usually WebPageTest) */
   let getExp = (name: string): string => {
-    return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || "";
+    return harEntry[name] || harEntry["_" + name] || harEntry.request[name] || harEntry.request["_" + name] || "";
   };
 
   let getHarTiming = (name: string): string => {
-    if (entry.timings[name] && entry.timings[name] > 0) {
-      return entry.timings[name] + " ms";
+    if (harEntry.timings[name] && harEntry.timings[name] > 0) {
+      return harEntry.timings[name] + " ms";
     }
     return "";
   };
@@ -80,12 +78,12 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
   return {
     "general": [
       ["Request Number", `#${requestID}`],
-      ["Started", new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) +
+      ["Started", new Date(harEntry.startedDateTime).toLocaleString() + " (" + formatTime(entry.start) +
       " after page request started)"],
-      ["Duration", formatTime(entry.time)],
-      ["Error/Status Code", entry.response.status + " " + entry.response.statusText],
-      ["Server IPAddress", entry.serverIPAddress],
-      ["Connection", entry.connection],
+      ["Duration", formatTime(harEntry.time)],
+      ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
+      ["Server IPAddress", harEntry.serverIPAddress],
+      ["Connection", harEntry.connection],
       ["Browser Priority", getExp("priority") || getExp("initialPriority")],
       ["Was pushed", getExp("was_pushed")],
       ["Initiator (Loaded by)", getExp("initiator")],
@@ -108,12 +106,12 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
       ["Image Save", getExpAsByte("image_save")],
     ] as KvTuple[],
     "request": [
-      ["Method", entry.request.method],
-      ["HTTP Version", entry.request.httpVersion],
+      ["Method", harEntry.request.method],
+      ["HTTP Version", harEntry.request.httpVersion],
       ["Bytes Out (uploaded)", getExpAsByte("bytesOut")],
-      ["Headers Size", formatBytes(entry.request.headersSize)],
-      ["Body Size", formatBytes(entry.request.bodySize)],
-      ["Comment", entry.request.comment],
+      ["Headers Size", formatBytes(harEntry.request.headersSize)],
+      ["Body Size", formatBytes(harEntry.request.bodySize)],
+      ["Comment", harEntry.request.comment],
       ["User-Agent", getRequestHeader("User-Agent")],
       ["Host", getRequestHeader("Host")],
       ["Connection", getRequestHeader("Connection")],
@@ -124,15 +122,15 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
       ["If-Modified-Since", getRequestHeader("If-Modified-Since")],
       ["If-Range", getRequestHeader("If-Range")],
       ["If-Unmodified-Since", getRequestHeader("If-Unmodified-Since")],
-      ["Querystring parameters count", entry.request.queryString.length],
-      ["Cookies count", entry.request.cookies.length],
+      ["Querystring parameters count", harEntry.request.queryString.length],
+      ["Cookies count", harEntry.request.cookies.length],
     ] as KvTuple[],
     "response": [
-      ["Status", entry.response.status + " " + entry.response.statusText],
-      ["HTTP Version", entry.response.httpVersion],
+      ["Status", harEntry.response.status + " " + harEntry.response.statusText],
+      ["HTTP Version", harEntry.response.httpVersion],
       ["Bytes In (downloaded)", getExpAsByte("bytesIn")],
-      ["Header Size", formatBytes(entry.response.headersSize)],
-      ["Body Size", formatBytes(entry.response.bodySize)],
+      ["Header Size", formatBytes(harEntry.response.headersSize)],
+      ["Body Size", formatBytes(harEntry.response.bodySize)],
       ["Content-Type", getContentType()],
       ["Cache-Control", getResponseHeader("Cache-Control")],
       ["Content-Encoding", getResponseHeader("Content-Encoding")],
@@ -140,9 +138,9 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
       ["Last-Modified", formatDate(getResponseHeader("Last-Modified"))],
       ["Pragma", getResponseHeader("Pragma")],
       ["Content-Length", asIntPartial(getResponseHeader("Content-Length"), formatBytes)],
-      ["Content Size", (getResponseHeader("Content-Length") !== entry.response.content.size.toString() ?
-        formatBytes(entry.response.content.size) : "")],
-      ["Content Compression", formatBytes(entry.response.content.compression)],
+      ["Content Size", (getResponseHeader("Content-Length") !== harEntry.response.content.size.toString() ?
+        formatBytes(harEntry.response.content.size) : "")],
+      ["Content Compression", formatBytes(harEntry.response.content.compression)],
       ["Connection", getResponseHeader("Connection")],
       ["ETag", getResponseHeader("ETag")],
       ["Accept-Patch", getResponseHeader("Accept-Patch")],
@@ -156,11 +154,11 @@ export function getKeys(requestID: number, block: WaterfallEntry) {
       ["Upgrade", getResponseHeader("Upgrade")],
       ["Vary", getResponseHeader("Vary")],
       ["Timing-Allow-Origin", getResponseHeader("Timing-Allow-Origin")],
-      ["Redirect URL", entry.response.redirectURL],
-      ["Comment", entry.response.comment],
+      ["Redirect URL", harEntry.response.redirectURL],
+      ["Comment", harEntry.response.comment],
     ] as KvTuple[],
     "timings": [
-      ["Total", `${block.total} ms`],
+      ["Total", `${entry.total} ms`],
       ["Blocked", getHarTiming("blocked")],
       ["DNS", getHarTiming("dns")],
       ["Connect", getHarTiming("connect")],
