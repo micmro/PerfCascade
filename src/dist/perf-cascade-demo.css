@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.15 (22/12/2016) */
+/*! github.com/micmro/PerfCascade Version:0.2.16 (04/01/2017) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -493,7 +493,7 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 .water-fall-chart .line-end.active,
 .water-fall-chart .line-start.active {display: block;}
 
-.water-fall-chart .mark-holder text {-webkit-writing-mode: tb; writing-mode:vertical-lr; writing-mode: tb;}
+.water-fall-chart .mark-holder text {writing-mode:vertical-lr;}
 
 .left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9}
 
