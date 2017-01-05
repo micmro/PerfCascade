@@ -3,11 +3,7 @@
  */
 
 import * as svg from "../../helpers/svg";
-
-export interface HoverElements {
-  endline: SVGLineElement;
-  startline: SVGLineElement;
-}
+import {HoverElements, HoverEvtListeners} from "../../typing/svg-alignment-helpers.d";
 
 /**
  * Creates verticale alignment bars
@@ -35,7 +31,7 @@ export function createAlignmentLines(diagramHeight: number): HoverElements {
  * Partially appliable Eventlisteners for verticale alignment bars to be shown on hover
  * @param {HoverElements} hoverEl  verticale alignment bars SVG Elements
  */
-export function makeHoverEvtListeners(hoverEl: HoverElements) {
+export function makeHoverEvtListeners(hoverEl: HoverElements): HoverEvtListeners {
   return {
     onMouseEnterPartial() {
       return (evt: MouseEvent) => {

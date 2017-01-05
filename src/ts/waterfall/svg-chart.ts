@@ -2,6 +2,7 @@ import * as svg from "../helpers/svg";
 import {requestTypeToCssClass} from "../transformers/styling-converters";
 import {ChartOptions} from "../typing/options";
 import {RectData} from "../typing/rect-data";
+import {HoverEvtListeners} from "../typing/svg-alignment-helpers";
 import {Mark} from "../typing/waterfall";
 import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
 import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub";
@@ -63,8 +64,8 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   let rowHolder = svg.newG("rows-holder");
 
   /** Holder for on-hover vertical comparison bars */
-  let hoverOverlayHolder;
-  let mouseListeners;
+  let hoverOverlayHolder: SVGGElement;
+  let mouseListeners: HoverEvtListeners;
   if (options.showAlignmentHelpers) {
     hoverOverlayHolder = svg.newG("hover-overlays");
     let hoverEl = alignmentHelper.createAlignmentLines(diagramHeight);

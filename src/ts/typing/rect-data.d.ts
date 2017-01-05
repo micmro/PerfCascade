@@ -10,7 +10,7 @@ export interface RectData {
   label?: string;
   unit: number;
   /** @type {Function} Partially applicable function (to capture row data) that return an event listener */
-  showOverlay?: Function;
+  showOverlay?: (rectData: RectData) => EventListener;
   /** @type {Function} Partially applicable function (to capture row data) that return an event listener */
-  hideOverlay?: Function;
+  hideOverlay?: (rectData: RectData) => EventListener;
 }
