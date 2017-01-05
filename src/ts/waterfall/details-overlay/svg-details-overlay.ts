@@ -1,4 +1,5 @@
 import * as svg from "../../helpers/svg";
+import {OnCloseFn} from "../../typing/open-overlay";
 import {WaterfallEntry} from "../../typing/waterfall";
 import {createDetailsBody} from "./html-details-body";
 
@@ -47,7 +48,7 @@ function createHolder(y: number, accordionHeight: number) {
 
 export function createRowInfoOverlay(indexBackup: number, y: number,
                                      accordionHeight: number, entry: WaterfallEntry,
-                                     onClose: Function): SVGGElement {
+                                     onClose: OnCloseFn): SVGGElement {
   const requestID =  parseInt(entry.rawResource._index + 1, 10) || indexBackup + 1;
   let wrapper = svg.newG("outer-info-overlay-holder");
   let holder = createHolder(y, accordionHeight);

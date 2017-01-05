@@ -1,10 +1,12 @@
 import {WaterfallEntry} from "./waterfall";
 
+export type OnCloseFn = (indexBackup: number, holder: SVGElement) => void;
+
 export interface OpenOverlay {
   index: number;
   defaultY: number;
   entry: WaterfallEntry;
-  onClose: Function;
+  onClose: OnCloseFn;
    /* instance  info **/
   actualY?: number;
   height?: number;
