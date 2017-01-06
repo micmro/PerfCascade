@@ -110,6 +110,21 @@ export function createRect(rectData: RectData, segments: WaterfallEntryTiming[],
 }
 
 /**
+ * Create a SVG text element for the request number label, right aligned within the specified width.
+ * @param {number} x horizontal position (in px).
+ * @param {number} y vertical position of related request block (in px).
+ * @param {string} requestNumber the request number string
+ * @param {number} height height of row
+ * @param {number} width width of the space within the right align the label.
+ * @returns {SVGTextElement}
+ */
+export function createRequestNumberLabel(x: number, y: number, requestNumber: string, height: number, width: number) {
+  y += Math.round(height / 2) + 5;
+  x += width;
+  return svg.newTextEl(requestNumber, {x, y}, {"text-anchor": "end"});
+}
+
+/**
  * Create a new clipper SVG Text element to label a request block to fit the left panel width
  * @param  {number}         x                horizontal position (in px)
  * @param  {number}         y                vertical position of related request block (in px)
@@ -162,16 +177,19 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
 /**
  * Appends the labels to `rowFixed` - TODO: see if this can be done more elegant
  * @param {SVGGElement}    rowFixed   [description]
+ * @param {SVGTextElement} requestNumberLabel a label placed in front of every shortLabel
  * @param {SVGTextElement} shortLabel [description]
  * @param {SVGGElement}    fullLabel  [description]
  */
-export function appendRequestLabels(rowFixed: SVGGElement, shortLabel: SVGTextElement, fullLabel: SVGGElement) {
+export function appendRequestLabels(rowFixed: SVGGElement, requestNumberLabel: SVGTextElement,
+                                    shortLabel: SVGTextElement, fullLabel: SVGGElement) {
   let labelFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement;
   let fullLabelText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement;
 
   // use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
   fullLabel.style.display = "none";
   fullLabel.style.visibility = "hidden";
+  rowFixed.appendChild(requestNumberLabel);
   rowFixed.appendChild(shortLabel);
   rowFixed.appendChild(fullLabel);
 

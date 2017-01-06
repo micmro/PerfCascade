@@ -16,6 +16,21 @@ import * as generalComponents from "./sub-components/svg-general-components";
 import * as marks from  "./sub-components/svg-marks";
 
 /**
+ * Get a string that's as wide, or wider than any number from 0-n.
+ * @param n
+ * @returns {string}
+ */
+function getWidestDigitString(n: number): string {
+  const numDigits = Math.floor((Math.log(n) / Math.LN10)) + 1;
+  let s = "";
+  for (let i = 0; i < numDigits; i++) {
+    // No number should take more horizonal space than 0 to write.
+    s += "0";
+  }
+  return s;
+}
+
+/**
  * Calculate the height of the SVG chart in px
  * @param {Mark[]}       marks      [description]
  * @param  {number} diagramHeight
@@ -110,26 +125,32 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
     timeLineHolder.appendChild(generalComponents.createBgRect(context, entry));
   });
 
-  let labelXPos = 5;
-
   // This assumes all icons (mime and indicators) have the same width
-  const iconWidth = indicators.getMimeTypeIcon(entriesToShow[0]).width;
+  const perIconWidth = indicators.getMimeTypeIcon(entriesToShow[0]).width;
+
+  let maxIcons = 0;
 
   if (options.showMimeTypeIcon) {
-    labelXPos += iconWidth;
+    maxIcons += 1;
   }
 
   if (options.showIndicatorIcons) {
     const iconsPerBlock = entriesToShow.map((entry: WaterfallEntry) =>
       indicators.getIndicatorIcons(entry, context.docIsSsl).length);
-    labelXPos += iconWidth * Math.max.apply(null, iconsPerBlock);
+    maxIcons += Math.max.apply(null, iconsPerBlock);
   }
+
+  const maxIconsWidth = maxIcons * perIconWidth;
+
+  const widestRequestNumber = getWidestDigitString(entriesToShow.length);
+  const maxNumberWidth = svg.getNodeTextWidth(svg.newTextEl(`${widestRequestNumber}`), true);
 
   let barEls: SVGGElement[] = [];
 
   function getChartHeight(): string {
     return (chartHolderHeight + context.overlayManager.getCombinedOverlayHeight()).toString() + "px";
   }
+
   context.pubSub.subscribeToOverlayChanges(() => {
     timeLineHolder.style.height = getChartHeight();
   });
@@ -156,7 +177,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
       context.overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
     };
 
-    let rowItem = row.createRow(context, i, rectData, entry, labelXPos, showDetailsOverlay);
+    let rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);
 
     barEls.push(rowItem);
     rowHolder.appendChild(rowItem);
