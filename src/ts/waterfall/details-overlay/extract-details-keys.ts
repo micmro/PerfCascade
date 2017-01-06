@@ -1,5 +1,4 @@
 import {getHeader} from "../../helpers/har";
-import { KvTuple } from "../../typing/misc";
 import {WaterfallEntry} from "../../typing/waterfall";
 
 let ifValueDefined = (value: number, fn: (_: number) => any) => {
@@ -25,6 +24,9 @@ let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
   let v = parseInt(val, 10);
   return ifValueDefined(v, ifIntFn);
 };
+
+/** Key/Value pair in array `["key", "value"]` */
+export type KvTuple = [string, string|number];
 
 /**
  * Data to show in overlay tabs
