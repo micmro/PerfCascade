@@ -1,5 +1,5 @@
 import {getHeader} from "../../helpers/har";
-import {Header} from "../../typing/har";
+import {Entry, Header} from "../../typing/har";
 import {WaterfallEntry} from "../../typing/waterfall";
 
 let ifValueDefined = (value: number, fn: (_: number) => any) => {
@@ -25,6 +25,68 @@ let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
   let v = parseInt(val, 10);
   return ifValueDefined(v, ifIntFn);
 };
+
+/** get experimental feature (usually WebPageTest) */
+let getExp = (harEntry: Entry, name: string): string => {
+  return harEntry[name] || harEntry["_" + name] || harEntry.request[name] || harEntry.request["_" + name] || "";
+};
+
+/** get experimental feature and ensure it's not a sting of `0` or `` */
+let getExpNotNull = (harEntry: Entry, name: string): string => {
+  let resp = getExp(harEntry, name);
+  return resp !== "0" ? resp : "";
+};
+
+/** get experimental feature and format it as byte */
+let getExpAsByte = (harEntry: Entry, name: string): string => {
+  let resp = parseInt(getExp(harEntry, name), 10);
+  return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
+};
+
+function parseResponseDetails(harEntry: Entry): KvTuple[] {
+  const response = harEntry.response;
+  const content = response.content;
+
+  const header = (name: string) => getHeader(response.headers, name);
+
+  let contentType = header("Content-Type");
+  if (harEntry._contentType && harEntry._contentType !== contentType) {
+    contentType = contentType + " | " + harEntry._contentType;
+  }
+
+  return [
+    ["Status", response.status + " " + response.statusText],
+    ["HTTP Version", response.httpVersion],
+    ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
+    ["Header Size", formatBytes(response.headersSize)],
+    ["Body Size", formatBytes(response.bodySize)],
+    ["Content-Type", contentType],
+    ["Cache-Control", header("Cache-Control")],
+    ["Content-Encoding", header("Content-Encoding")],
+    ["Expires", formatDate(header("Expires"))],
+    ["Last-Modified", formatDate(header("Last-Modified"))],
+    ["Pragma", header("Pragma")],
+    ["Content-Length", asIntPartial(header("Content-Length"), formatBytes)],
+    ["Content Size", (header("Content-Length") !== content.size.toString() ?
+      formatBytes(content.size) : "")],
+    ["Content Compression", formatBytes(content.compression)],
+    ["Connection", header("Connection")],
+    ["ETag", header("ETag")],
+    ["Accept-Patch", header("Accept-Patch")],
+    ["Age", header("Age")],
+    ["Allow", header("Allow")],
+    ["Content-Disposition", header("Content-Disposition")],
+    ["Location", header("Location")],
+    ["Strict-Transport-Security", header("Strict-Transport-Security")],
+    ["Trailer (for chunked transfer coding)", header("Trailer")],
+    ["Transfer-Encoding", header("Transfer-Encoding")],
+    ["Upgrade", header("Upgrade")],
+    ["Vary", header("Vary")],
+    ["Timing-Allow-Origin", header("Timing-Allow-Origin")],
+    ["Redirect URL", response.redirectURL],
+    ["Comment", response.comment],
+  ];
+}
 
 function parseTimings(entry: WaterfallEntry): KvTuple[] {
   const timings = entry.rawResource.timings;
@@ -55,31 +117,6 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
   const requestHeaders = harEntry.request.headers;
   const responseHeaders = harEntry.response.headers;
 
-  let getContentType = () => {
-    let respContentType = getHeader(responseHeaders, "Content-Type");
-    if (harEntry._contentType && harEntry._contentType !== respContentType) {
-      return respContentType + " | " + harEntry._contentType;
-    }
-    return respContentType;
-  };
-
-  /** get experimental feature (usually WebPageTest) */
-  let getExp = (name: string): string => {
-    return harEntry[name] || harEntry["_" + name] || harEntry.request[name] || harEntry.request["_" + name] || "";
-  };
-
-  /** get experimental feature and ensure it's not a sting of `0` or `` */
-  let getExpNotNull = (name: string): string => {
-    let resp = getExp(name);
-    return resp !== "0" ? resp : "";
-  };
-
-  /** get experimental feature and format it as byte */
-  let getExpAsByte = (name: string): string => {
-    let resp = parseInt(getExp(name), 10);
-    return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
-  };
-
   let headerToKvTuple = (header: Header): KvTuple => [header.name, header.value];
 
   return {
@@ -91,31 +128,31 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
       ["Server IPAddress", harEntry.serverIPAddress],
       ["Connection", harEntry.connection],
-      ["Browser Priority", getExp("priority") || getExp("initialPriority")],
-      ["Was pushed", getExp("was_pushed")],
-      ["Initiator (Loaded by)", getExp("initiator")],
-      ["Initiator Line", getExp("initiator_line")],
+      ["Browser Priority", getExp(harEntry, "priority") || getExp(harEntry, "initialPriority")],
+      ["Was pushed", getExp(harEntry, "was_pushed")],
+      ["Initiator (Loaded by)", getExp(harEntry, "initiator")],
+      ["Initiator Line", getExp(harEntry, "initiator_line")],
       ["Host", getHeader(requestHeaders, "Host")],
-      ["IP", getExp("ip_addr")],
-      ["Client Port", getExpNotNull("client_port")],
-      ["Expires", getExp("expires")],
-      ["Cache Time", getExp("cache_time")],
-      ["CDN Provider", getExp("cdn_provider")],
-      ["ObjectSize", getExp("objectSize")],
-      ["Bytes In (downloaded)", getExpAsByte("bytesIn")],
-      ["Bytes Out (uploaded)", getExpAsByte("bytesOut")],
-      ["JPEG Scan Count", getExpNotNull("jpeg_scan_count")],
-      ["Gzip Total", getExpAsByte("gzip_total")],
-      ["Gzip Save", getExpAsByte("gzip_save")],
-      ["Minify Total", getExpAsByte("minify_total")],
-      ["Minify Save", getExpAsByte("minify_save")],
-      ["Image Total", getExpAsByte("image_total")],
-      ["Image Save", getExpAsByte("image_save")],
+      ["IP", getExp(harEntry, "ip_addr")],
+      ["Client Port", getExpNotNull(harEntry, "client_port")],
+      ["Expires", getExp(harEntry, "expires")],
+      ["Cache Time", getExp(harEntry, "cache_time")],
+      ["CDN Provider", getExp(harEntry, "cdn_provider")],
+      ["ObjectSize", getExp(harEntry, "objectSize")],
+      ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
+      ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
+      ["JPEG Scan Count", getExpNotNull(harEntry, "jpeg_scan_count")],
+      ["Gzip Total", getExpAsByte(harEntry, "gzip_total")],
+      ["Gzip Save", getExpAsByte(harEntry, "gzip_save")],
+      ["Minify Total", getExpAsByte(harEntry, "minify_total")],
+      ["Minify Save", getExpAsByte(harEntry, "minify_save")],
+      ["Image Total", getExpAsByte(harEntry, "image_total")],
+      ["Image Save", getExpAsByte(harEntry, "image_save")],
     ] as KvTuple[],
     "request": [
       ["Method", harEntry.request.method],
       ["HTTP Version", harEntry.request.httpVersion],
-      ["Bytes Out (uploaded)", getExpAsByte("bytesOut")],
+      ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
       ["Headers Size", formatBytes(harEntry.request.headersSize)],
       ["Body Size", formatBytes(harEntry.request.bodySize)],
       ["Comment", harEntry.request.comment],
@@ -133,38 +170,7 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Cookies count", harEntry.request.cookies.length],
     ] as KvTuple[],
     "requestHeaders": requestHeaders.map(headerToKvTuple),
-    "response": [
-      ["Status", harEntry.response.status + " " + harEntry.response.statusText],
-      ["HTTP Version", harEntry.response.httpVersion],
-      ["Bytes In (downloaded)", getExpAsByte("bytesIn")],
-      ["Header Size", formatBytes(harEntry.response.headersSize)],
-      ["Body Size", formatBytes(harEntry.response.bodySize)],
-      ["Content-Type", getContentType()],
-      ["Cache-Control", getHeader(responseHeaders, "Cache-Control")],
-      ["Content-Encoding", getHeader(responseHeaders, "Content-Encoding")],
-      ["Expires", formatDate(getHeader(responseHeaders, "Expires"))],
-      ["Last-Modified", formatDate(getHeader(responseHeaders, "Last-Modified"))],
-      ["Pragma", getHeader(responseHeaders, "Pragma")],
-      ["Content-Length", asIntPartial(getHeader(responseHeaders, "Content-Length"), formatBytes)],
-      ["Content Size", (getHeader(responseHeaders, "Content-Length") !== harEntry.response.content.size.toString() ?
-        formatBytes(harEntry.response.content.size) : "")],
-      ["Content Compression", formatBytes(harEntry.response.content.compression)],
-      ["Connection", getHeader(responseHeaders, "Connection")],
-      ["ETag", getHeader(responseHeaders, "ETag")],
-      ["Accept-Patch", getHeader(responseHeaders, "Accept-Patch")],
-      ["Age", getHeader(responseHeaders, "Age")],
-      ["Allow", getHeader(responseHeaders, "Allow")],
-      ["Content-Disposition", getHeader(responseHeaders, "Content-Disposition")],
-      ["Location", getHeader(responseHeaders, "Location")],
-      ["Strict-Transport-Security", getHeader(responseHeaders, "Strict-Transport-Security")],
-      ["Trailer (for chunked transfer coding)", getHeader(responseHeaders, "Trailer")],
-      ["Transfer-Encoding", getHeader(responseHeaders, "Transfer-Encoding")],
-      ["Upgrade", getHeader(responseHeaders, "Upgrade")],
-      ["Vary", getHeader(responseHeaders, "Vary")],
-      ["Timing-Allow-Origin", getHeader(responseHeaders, "Timing-Allow-Origin")],
-      ["Redirect URL", harEntry.response.redirectURL],
-      ["Comment", harEntry.response.comment],
-    ] as KvTuple[],
+    "response": parseResponseDetails(harEntry),
     "responseHeaders": responseHeaders.map(headerToKvTuple),
     "timings": parseTimings(entry),
   };
