@@ -57,11 +57,9 @@ export function createDetailsBody(requestID: number, entry: WaterfallEntry, acco
   const timingsTab = makeTab(makeDefinitionList(tabsData.timings, true));
   const requestDl = makeDefinitionList(tabsData.request);
 
-  const requestHeadersDl = makeDefinitionList(entry.rawResource.request.headers.map((h) =>
-    [h.name, h.value] as KvTuple));
+  const requestHeadersDl = makeDefinitionList(tabsData.requestHeaders);
   const responseDl = makeDefinitionList(tabsData.response);
-  const responseHeadersDl = makeDefinitionList(entry.rawResource.response.headers.map((h) =>
-    [h.name, h.value] as KvTuple));
+  const responseHeadersDl = makeDefinitionList(tabsData.responseHeaders);
   const imgTab = makeImgTab(accordeonHeight, entry);
 
   body.innerHTML = `

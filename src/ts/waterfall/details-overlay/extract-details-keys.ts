@@ -1,4 +1,5 @@
 import {getHeader} from "../../helpers/har";
+import {Header} from "../../typing/har";
 import {WaterfallEntry} from "../../typing/waterfall";
 
 let ifValueDefined = (value: number, fn: (_: number) => any) => {
@@ -70,6 +71,8 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
     return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
   };
 
+  let headerToKvTuple = (header: Header): KvTuple => [header.name, header.value];
+
   return {
     "general": [
       ["Request Number", `#${requestID}`],
@@ -120,6 +123,7 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Querystring parameters count", harEntry.request.queryString.length],
       ["Cookies count", harEntry.request.cookies.length],
     ] as KvTuple[],
+    "requestHeaders": requestHeaders.map(headerToKvTuple),
     "response": [
       ["Status", harEntry.response.status + " " + harEntry.response.statusText],
       ["HTTP Version", harEntry.response.httpVersion],
@@ -152,6 +156,7 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Redirect URL", harEntry.response.redirectURL],
       ["Comment", harEntry.response.comment],
     ] as KvTuple[],
+    "responseHeaders": responseHeaders.map(headerToKvTuple),
     "timings": [
       ["Total", `${entry.total} ms`],
       ["Blocked", getHarTiming("blocked")],
