@@ -10,8 +10,13 @@ function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
     let className = key.toLowerCase().replace(/[^a-z-]/g, "");
     return `class="${className || "no-colour"}"`;
   };
+  const isValidTuple = (tuple: KvTuple): boolean => {
+    const value = tuple[1];
+    return (typeof value === "string" && value.length > 0) ||
+      (typeof value === "number" && !(value === 0 || value === -1));
+  };
   return dlKeyValues
-    .filter((tuple) => (tuple[1] !== undefined && tuple[1] !== -1 && tuple[1] !== 0 && tuple[1] !== ""))
+    .filter(isValidTuple)
     .map((tuple) => `
       <dt ${makeClass(tuple[0])}>${tuple[0]}</dt>
       <dd>${tuple[1]}</dd>
