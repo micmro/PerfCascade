@@ -26,6 +26,22 @@ let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
   return ifValueDefined(v, ifIntFn);
 };
 
+function parseTimings(entry: WaterfallEntry): KvTuple[] {
+  const timings = entry.rawResource.timings;
+
+  // FIXME should only filter -1 values here, 0 is a valid timing.
+  return [
+    ["Total", `${entry.total} ms`],
+    ["Blocked", formatTime(timings["blocked"])],
+    ["DNS", formatTime(timings["dns"])],
+    ["Connect", formatTime(timings["connect"])],
+    ["SSL (TLS)", formatTime(timings["ssl"])],
+    ["Send", formatTime(timings["send"])],
+    ["Wait", formatTime(timings["wait"])],
+    ["Receive", formatTime(timings["receive"])],
+  ];
+}
+
 /** Key/Value pair in array `["key", "value"]` */
 export type KvTuple = [string, string|number];
 
@@ -50,13 +66,6 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
   /** get experimental feature (usually WebPageTest) */
   let getExp = (name: string): string => {
     return harEntry[name] || harEntry["_" + name] || harEntry.request[name] || harEntry.request["_" + name] || "";
-  };
-
-  let getHarTiming = (name: string): string => {
-    if (harEntry.timings[name] && harEntry.timings[name] > 0) {
-      return harEntry.timings[name] + " ms";
-    }
-    return "";
   };
 
   /** get experimental feature and ensure it's not a sting of `0` or `` */
@@ -157,15 +166,6 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Comment", harEntry.response.comment],
     ] as KvTuple[],
     "responseHeaders": responseHeaders.map(headerToKvTuple),
-    "timings": [
-      ["Total", `${entry.total} ms`],
-      ["Blocked", getHarTiming("blocked")],
-      ["DNS", getHarTiming("dns")],
-      ["Connect", getHarTiming("connect")],
-      ["SSL (TLS)", getHarTiming("ssl")],
-      ["Send", getHarTiming("send")],
-      ["Wait", getHarTiming("wait")],
-      ["Receive", getHarTiming("receive")],
-    ] as KvTuple[],
+    "timings": parseTimings(entry),
   };
 }
