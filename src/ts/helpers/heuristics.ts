@@ -1,19 +1,7 @@
-import {Entry, Header} from "../typing/har";
+import {Entry} from "../typing/har";
 import {WaterfallEntry} from "../typing/waterfall";
+import {getHeader, hasHeader} from "./har";
 import * as misc from "./misc";
-
-function getResponseHeader(entry: Entry, headerName: string): Header {
-  return entry.response.headers.filter((h) => h.name.toLowerCase() === headerName.toLowerCase())[0];
-}
-
-function getResponseHeaderValue(entry: Entry, headerName: string) {
-  let header = getResponseHeader(entry, headerName);
-  if (header !== undefined) {
-    return header.value;
-  } else {
-    return "";
-  }
-}
 
 /**
  *
@@ -55,6 +43,8 @@ function isCompressible(entry: WaterfallEntry): boolean {
 
 function isCachable(entry: WaterfallEntry): boolean {
   const harEntry = entry.rawResource;
+  const headers = harEntry.response.headers;
+
   // do not cache non-gets,204 and non 2xx status codes
   if (harEntry.request.method.toLocaleLowerCase() !== "get" ||
     harEntry.response.status === 204 ||
@@ -62,23 +52,23 @@ function isCachable(entry: WaterfallEntry): boolean {
     return false;
   }
 
-  if (getResponseHeader(harEntry, "Cache-Control") === undefined
-    && getResponseHeader(harEntry, "Expires") === undefined) {
+  if (!(hasHeader(headers, "Cache-Control") || hasHeader(headers, "Expires"))) {
     return true;
   }
-  if (getResponseHeaderValue(harEntry, "Cache-Control").indexOf("no-cache") > -1
-    || getResponseHeaderValue(harEntry, "Pragma") === "no-cache") {
-    return true;
-  }
-  return false;
+  return getHeader(headers, "Cache-Control").indexOf("no-cache") > -1
+    || getHeader(headers, "Pragma") === "no-cache";
 }
 
 export function hasCacheIssue(entry: WaterfallEntry) {
-  return (getResponseHeader(entry.rawResource, "Content-Encoding") === undefined && isCachable(entry));
+  const harEntry = entry.rawResource;
+  const headers = harEntry.response.headers;
+  return (!hasHeader(headers, "Content-Encoding") && isCachable(entry));
 }
 
 export function hasCompressionIssue(entry: WaterfallEntry) {
-  return (getResponseHeader(entry.rawResource, "Content-Encoding") === undefined && isCompressible(entry));
+  const harEntry = entry.rawResource;
+  const headers = harEntry.response.headers;
+  return (!hasHeader(headers, "Content-Encoding") && isCompressible(entry));
 }
 
 export function isSecure(entry: WaterfallEntry) {

@@ -1,4 +1,5 @@
-import { KvTuple } from "../../typing/misc.d";
+import {getHeader} from "../../helpers/har";
+import { KvTuple } from "../../typing/misc";
 import {WaterfallEntry} from "../../typing/waterfall";
 
 let ifValueDefined = (value: number, fn: (_: number) => any) => {
@@ -31,20 +32,12 @@ let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
  * @param  {WaterfallEntry} entry
  */
 export function getKeys(requestID: number, entry: WaterfallEntry) {
-  let harEntry = entry.rawResource;
-
-  let getRequestHeader = (name: string): string => {
-    let header = harEntry.request.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0];
-    return header ? header.value : "";
-  };
-
-  let getResponseHeader = (name: string): string => {
-    let header = harEntry.response.headers.filter((h) => h.name.toLowerCase() === name.toLowerCase())[0];
-    return header ? header.value : "";
-  };
+  const harEntry = entry.rawResource;
+  const requestHeaders = harEntry.request.headers;
+  const responseHeaders = harEntry.response.headers;
 
   let getContentType = () => {
-    let respContentType = getResponseHeader("Content-Type");
+    let respContentType = getHeader(responseHeaders, "Content-Type");
     if (harEntry._contentType && harEntry._contentType !== respContentType) {
       return respContentType + " | " + harEntry._contentType;
     }
@@ -88,7 +81,7 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Was pushed", getExp("was_pushed")],
       ["Initiator (Loaded by)", getExp("initiator")],
       ["Initiator Line", getExp("initiator_line")],
-      ["Host", getRequestHeader("Host")],
+      ["Host", getHeader(requestHeaders, "Host")],
       ["IP", getExp("ip_addr")],
       ["Client Port", getExpNotNull("client_port")],
       ["Expires", getExp("expires")],
@@ -112,16 +105,16 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Headers Size", formatBytes(harEntry.request.headersSize)],
       ["Body Size", formatBytes(harEntry.request.bodySize)],
       ["Comment", harEntry.request.comment],
-      ["User-Agent", getRequestHeader("User-Agent")],
-      ["Host", getRequestHeader("Host")],
-      ["Connection", getRequestHeader("Connection")],
-      ["Accept", getRequestHeader("Accept")],
-      ["Accept-Encoding", getRequestHeader("Accept-Encoding")],
-      ["Expect", getRequestHeader("Expect")],
-      ["Forwarded", getRequestHeader("Forwarded")],
-      ["If-Modified-Since", getRequestHeader("If-Modified-Since")],
-      ["If-Range", getRequestHeader("If-Range")],
-      ["If-Unmodified-Since", getRequestHeader("If-Unmodified-Since")],
+      ["User-Agent", getHeader(requestHeaders, "User-Agent")],
+      ["Host", getHeader(requestHeaders, "Host")],
+      ["Connection", getHeader(requestHeaders, "Connection")],
+      ["Accept", getHeader(requestHeaders, "Accept")],
+      ["Accept-Encoding", getHeader(requestHeaders, "Accept-Encoding")],
+      ["Expect", getHeader(requestHeaders, "Expect")],
+      ["Forwarded", getHeader(requestHeaders, "Forwarded")],
+      ["If-Modified-Since", getHeader(requestHeaders, "If-Modified-Since")],
+      ["If-Range", getHeader(requestHeaders, "If-Range")],
+      ["If-Unmodified-Since", getHeader(requestHeaders, "If-Unmodified-Since")],
       ["Querystring parameters count", harEntry.request.queryString.length],
       ["Cookies count", harEntry.request.cookies.length],
     ] as KvTuple[],
@@ -132,28 +125,28 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Header Size", formatBytes(harEntry.response.headersSize)],
       ["Body Size", formatBytes(harEntry.response.bodySize)],
       ["Content-Type", getContentType()],
-      ["Cache-Control", getResponseHeader("Cache-Control")],
-      ["Content-Encoding", getResponseHeader("Content-Encoding")],
-      ["Expires", formatDate(getResponseHeader("Expires"))],
-      ["Last-Modified", formatDate(getResponseHeader("Last-Modified"))],
-      ["Pragma", getResponseHeader("Pragma")],
-      ["Content-Length", asIntPartial(getResponseHeader("Content-Length"), formatBytes)],
-      ["Content Size", (getResponseHeader("Content-Length") !== harEntry.response.content.size.toString() ?
+      ["Cache-Control", getHeader(responseHeaders, "Cache-Control")],
+      ["Content-Encoding", getHeader(responseHeaders, "Content-Encoding")],
+      ["Expires", formatDate(getHeader(responseHeaders, "Expires"))],
+      ["Last-Modified", formatDate(getHeader(responseHeaders, "Last-Modified"))],
+      ["Pragma", getHeader(responseHeaders, "Pragma")],
+      ["Content-Length", asIntPartial(getHeader(responseHeaders, "Content-Length"), formatBytes)],
+      ["Content Size", (getHeader(responseHeaders, "Content-Length") !== harEntry.response.content.size.toString() ?
         formatBytes(harEntry.response.content.size) : "")],
       ["Content Compression", formatBytes(harEntry.response.content.compression)],
-      ["Connection", getResponseHeader("Connection")],
-      ["ETag", getResponseHeader("ETag")],
-      ["Accept-Patch", getResponseHeader("Accept-Patch")],
-      ["Age", getResponseHeader("Age")],
-      ["Allow", getResponseHeader("Allow")],
-      ["Content-Disposition", getResponseHeader("Content-Disposition")],
-      ["Location", getResponseHeader("Location")],
-      ["Strict-Transport-Security", getResponseHeader("Strict-Transport-Security")],
-      ["Trailer (for chunked transfer coding)", getResponseHeader("Trailer")],
-      ["Transfer-Encoding", getResponseHeader("Transfer-Encoding")],
-      ["Upgrade", getResponseHeader("Upgrade")],
-      ["Vary", getResponseHeader("Vary")],
-      ["Timing-Allow-Origin", getResponseHeader("Timing-Allow-Origin")],
+      ["Connection", getHeader(responseHeaders, "Connection")],
+      ["ETag", getHeader(responseHeaders, "ETag")],
+      ["Accept-Patch", getHeader(responseHeaders, "Accept-Patch")],
+      ["Age", getHeader(responseHeaders, "Age")],
+      ["Allow", getHeader(responseHeaders, "Allow")],
+      ["Content-Disposition", getHeader(responseHeaders, "Content-Disposition")],
+      ["Location", getHeader(responseHeaders, "Location")],
+      ["Strict-Transport-Security", getHeader(responseHeaders, "Strict-Transport-Security")],
+      ["Trailer (for chunked transfer coding)", getHeader(responseHeaders, "Trailer")],
+      ["Transfer-Encoding", getHeader(responseHeaders, "Transfer-Encoding")],
+      ["Upgrade", getHeader(responseHeaders, "Upgrade")],
+      ["Vary", getHeader(responseHeaders, "Vary")],
+      ["Timing-Allow-Origin", getHeader(responseHeaders, "Timing-Allow-Origin")],
       ["Redirect URL", harEntry.response.redirectURL],
       ["Comment", harEntry.response.comment],
     ] as KvTuple[],
