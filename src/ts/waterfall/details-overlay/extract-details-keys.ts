@@ -43,6 +43,40 @@ let getExpAsByte = (harEntry: Entry, name: string): string => {
   return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
 };
 
+function parseGeneralDetails(entry: WaterfallEntry, requestID: number): KvTuple[] {
+  const harEntry = entry.rawResource;
+
+  return [
+    ["Request Number", `#${requestID}`],
+    ["Started", new Date(harEntry.startedDateTime).toLocaleString() + " (" + formatTime(entry.start) +
+    " after page request started)"],
+    ["Duration", formatTime(harEntry.time)],
+    ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
+    ["Server IPAddress", harEntry.serverIPAddress],
+    ["Connection", harEntry.connection],
+    ["Browser Priority", getExp(harEntry, "priority") || getExp(harEntry, "initialPriority")],
+    ["Was pushed", getExp(harEntry, "was_pushed")],
+    ["Initiator (Loaded by)", getExp(harEntry, "initiator")],
+    ["Initiator Line", getExp(harEntry, "initiator_line")],
+    ["Host", getHeader(harEntry.request.headers, "Host")],
+    ["IP", getExp(harEntry, "ip_addr")],
+    ["Client Port", getExpNotNull(harEntry, "client_port")],
+    ["Expires", getExp(harEntry, "expires")],
+    ["Cache Time", getExp(harEntry, "cache_time")],
+    ["CDN Provider", getExp(harEntry, "cdn_provider")],
+    ["ObjectSize", getExp(harEntry, "objectSize")],
+    ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
+    ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
+    ["JPEG Scan Count", getExpNotNull(harEntry, "jpeg_scan_count")],
+    ["Gzip Total", getExpAsByte(harEntry, "gzip_total")],
+    ["Gzip Save", getExpAsByte(harEntry, "gzip_save")],
+    ["Minify Total", getExpAsByte(harEntry, "minify_total")],
+    ["Minify Save", getExpAsByte(harEntry, "minify_save")],
+    ["Image Total", getExpAsByte(harEntry, "image_total")],
+    ["Image Save", getExpAsByte(harEntry, "image_save")],
+  ];
+}
+
 function parseRequestDetails(harEntry: Entry): KvTuple[] {
   const request = harEntry.request;
 
@@ -147,35 +181,7 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
   let headerToKvTuple = (header: Header): KvTuple => [header.name, header.value];
 
   return {
-    "general": [
-      ["Request Number", `#${requestID}`],
-      ["Started", new Date(harEntry.startedDateTime).toLocaleString() + " (" + formatTime(entry.start) +
-      " after page request started)"],
-      ["Duration", formatTime(harEntry.time)],
-      ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
-      ["Server IPAddress", harEntry.serverIPAddress],
-      ["Connection", harEntry.connection],
-      ["Browser Priority", getExp(harEntry, "priority") || getExp(harEntry, "initialPriority")],
-      ["Was pushed", getExp(harEntry, "was_pushed")],
-      ["Initiator (Loaded by)", getExp(harEntry, "initiator")],
-      ["Initiator Line", getExp(harEntry, "initiator_line")],
-      ["Host", getHeader(requestHeaders, "Host")],
-      ["IP", getExp(harEntry, "ip_addr")],
-      ["Client Port", getExpNotNull(harEntry, "client_port")],
-      ["Expires", getExp(harEntry, "expires")],
-      ["Cache Time", getExp(harEntry, "cache_time")],
-      ["CDN Provider", getExp(harEntry, "cdn_provider")],
-      ["ObjectSize", getExp(harEntry, "objectSize")],
-      ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
-      ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
-      ["JPEG Scan Count", getExpNotNull(harEntry, "jpeg_scan_count")],
-      ["Gzip Total", getExpAsByte(harEntry, "gzip_total")],
-      ["Gzip Save", getExpAsByte(harEntry, "gzip_save")],
-      ["Minify Total", getExpAsByte(harEntry, "minify_total")],
-      ["Minify Save", getExpAsByte(harEntry, "minify_save")],
-      ["Image Total", getExpAsByte(harEntry, "image_total")],
-      ["Image Save", getExpAsByte(harEntry, "image_save")],
-    ] as KvTuple[],
+    "general": parseGeneralDetails(entry, requestID),
     "request": parseRequestDetails(harEntry),
     "requestHeaders": requestHeaders.map(headerToKvTuple),
     "response": parseResponseDetails(harEntry),
