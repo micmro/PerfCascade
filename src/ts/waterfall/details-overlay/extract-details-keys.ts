@@ -43,6 +43,33 @@ let getExpAsByte = (harEntry: Entry, name: string): string => {
   return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
 };
 
+function parseRequestDetails(harEntry: Entry): KvTuple[] {
+  const request = harEntry.request;
+
+  const header = (name: string) => getHeader(request.headers, name);
+
+  return [
+    ["Method", request.method],
+    ["HTTP Version", request.httpVersion],
+    ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
+    ["Headers Size", formatBytes(request.headersSize)],
+    ["Body Size", formatBytes(request.bodySize)],
+    ["Comment", request.comment],
+    ["User-Agent", header("User-Agent")],
+    ["Host", header("Host")],
+    ["Connection", header("Connection")],
+    ["Accept", header("Accept")],
+    ["Accept-Encoding", header("Accept-Encoding")],
+    ["Expect", header("Expect")],
+    ["Forwarded", header("Forwarded")],
+    ["If-Modified-Since", header("If-Modified-Since")],
+    ["If-Range", header("If-Range")],
+    ["If-Unmodified-Since", header("If-Unmodified-Since")],
+    ["Querystring parameters count", request.queryString.length],
+    ["Cookies count", request.cookies.length],
+  ];
+}
+
 function parseResponseDetails(harEntry: Entry): KvTuple[] {
   const response = harEntry.response;
   const content = response.content;
@@ -149,26 +176,7 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Image Total", getExpAsByte(harEntry, "image_total")],
       ["Image Save", getExpAsByte(harEntry, "image_save")],
     ] as KvTuple[],
-    "request": [
-      ["Method", harEntry.request.method],
-      ["HTTP Version", harEntry.request.httpVersion],
-      ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
-      ["Headers Size", formatBytes(harEntry.request.headersSize)],
-      ["Body Size", formatBytes(harEntry.request.bodySize)],
-      ["Comment", harEntry.request.comment],
-      ["User-Agent", getHeader(requestHeaders, "User-Agent")],
-      ["Host", getHeader(requestHeaders, "Host")],
-      ["Connection", getHeader(requestHeaders, "Connection")],
-      ["Accept", getHeader(requestHeaders, "Accept")],
-      ["Accept-Encoding", getHeader(requestHeaders, "Accept-Encoding")],
-      ["Expect", getHeader(requestHeaders, "Expect")],
-      ["Forwarded", getHeader(requestHeaders, "Forwarded")],
-      ["If-Modified-Since", getHeader(requestHeaders, "If-Modified-Since")],
-      ["If-Range", getHeader(requestHeaders, "If-Range")],
-      ["If-Unmodified-Since", getHeader(requestHeaders, "If-Unmodified-Since")],
-      ["Querystring parameters count", harEntry.request.queryString.length],
-      ["Cookies count", harEntry.request.cookies.length],
-    ] as KvTuple[],
+    "request": parseRequestDetails(harEntry),
     "requestHeaders": requestHeaders.map(headerToKvTuple),
     "response": parseResponseDetails(harEntry),
     "responseHeaders": responseHeaders.map(headerToKvTuple),
