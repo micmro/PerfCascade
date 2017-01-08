@@ -1,4 +1,5 @@
 import * as svg from "../helpers/svg";
+import {baseCssClassName} from "../state/global-static-settings";
 import {requestTypeToCssClass} from "../transformers/styling-converters";
 import {ChartOptions} from "../typing/options";
 import {RectData} from "../typing/rect-data";
@@ -47,14 +48,18 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
   /** full height of the SVG chart in px */
   const chartHolderHeight = getSvgHeight(data.marks, diagramHeight);
+  /** random generated `id` used to identify overlay updates */
+  const overlayId = "overlay-" + (Math.random() * 100000000).toFixed(0);
 
   /** Main SVG Element that holds all data */
-  let timeLineHolder = svg.newSvg("water-fall-chart", {
+  let timeLineHolder = svg.newSvg(baseCssClassName, {
     "height": chartHolderHeight,
   });
 
   /** Holder of request-details overlay */
-  let overlayHolder = svg.newG("overlays");
+  let overlayHolder = svg.newG("overlays", {
+    "id": overlayId,
+  });
   /** Holder for scale, event and marks */
   let scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
     "width": `${100 - options.leftColumnWith}%`,
@@ -100,11 +105,14 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
 
   let barEls: SVGGElement[] = [];
 
-  function getChartHeight(): string {
-    return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px";
+  function getChartHeight(overlayHolderId: string): string {
+    return (chartHolderHeight + overlayManager.getCombinedOverlayHeight(overlayHolderId)).toString() + "px";
   }
-  overlayChangesPubSub.subscribeToOverlayChanges(() => {
-    timeLineHolder.style.height = getChartHeight();
+  overlayChangesPubSub.subscribeToOverlayChanges((e) => {
+    if (e.overlayHolderId !== overlayId) {
+      return;
+    }
+    timeLineHolder.style.height = getChartHeight(e.overlayHolderId);
   });
 
   /** Renders single row and hooks up behaviour */

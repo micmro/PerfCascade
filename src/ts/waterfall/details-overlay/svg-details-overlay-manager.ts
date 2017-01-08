@@ -4,16 +4,16 @@ import * as overlayChangesPubSub from "./overlay-changes-pub-sub";
 import {createRowInfoOverlay} from "./svg-details-overlay";
 
 /** Collection of currely open overlays */
-let openOverlays: OpenOverlay[] = [];
+let openOverlays: {[overlayId: string]: OpenOverlay[]} = {};
 
 /** all open overlays height combined */
-export function getCombinedOverlayHeight() {
-  return openOverlays.reduce((pre, curr) => pre + curr.height, 0);
+export function getCombinedOverlayHeight(overlayHolderId: string) {
+  return openOverlays[overlayHolderId].reduce((pre, curr) => pre + curr.height, 0);
 }
 
 /** y offset to it's default y position */
-export function getOverlayOffset(rowIndex: number): number {
-  return openOverlays.reduce((col, overlay) => {
+function getOverlayOffset(overlayHolderId: string, rowIndex: number): number {
+  return openOverlays[overlayHolderId].reduce((col, overlay) => {
     if (overlay.index < rowIndex) {
       return col + overlay.height;
     }
@@ -27,17 +27,19 @@ export function getOverlayOffset(rowIndex: number): number {
 export function closeOverlay(index: number, overlayHolder: SVGGElement,
                              accordionHeight: number, barEls: SVGGElement[]) {
 
-  openOverlays.splice(openOverlays.reduce((prev: number, curr, i) => {
+  const overlayHolderId = overlayHolder.id;
+  openOverlays[overlayHolderId].splice(openOverlays[overlayHolderId].reduce((prev: number, curr, i) => {
     return (curr.index === index) ? i : prev;
   }, -1), 1);
 
   renderOverlays(accordionHeight, overlayHolder);
   overlayChangesPubSub.publishToOverlayChanges({
-    "combinedOverlayHeight": getCombinedOverlayHeight(),
-    "openOverlays": openOverlays,
+    "combinedOverlayHeight": getCombinedOverlayHeight(overlayHolderId),
+    "openOverlays": openOverlays[overlayHolderId],
+    "overlayHolderId": overlayHolderId,
     "type" : overlayChangesPubSub.eventTypes.CLOSE,
-  } as OverlayChangeEvent);
-  realignBars(barEls);
+  } as OverlayChangeEvent, overlayHolder);
+  realignBars(overlayHolderId, barEls);
 }
 
 /**
@@ -46,11 +48,14 @@ export function closeOverlay(index: number, overlayHolder: SVGGElement,
 export function openOverlay(index: number, y: number, accordionHeight: number, entry: WaterfallEntry,
                             overlayHolder: SVGGElement, barEls: SVGGElement[]) {
 
-  if (openOverlays.filter((o) => o.index === index).length > 0) {
+  const overlayHolderId = overlayHolder.id;
+  if (openOverlays[overlayHolderId] && openOverlays[overlayHolderId].filter((o) => o.index === index).length > 0) {
     return;
+  } else if (openOverlays[overlayHolderId] === undefined) {
+    openOverlays[overlayHolderId] = [];
   }
 
-  openOverlays.push({
+  openOverlays[overlayHolderId].push({
     "defaultY": y,
     "entry": entry,
     "index": index,
@@ -61,20 +66,21 @@ export function openOverlay(index: number, y: number, accordionHeight: number, e
 
   renderOverlays(accordionHeight, overlayHolder);
   overlayChangesPubSub.publishToOverlayChanges({
-    "combinedOverlayHeight": getCombinedOverlayHeight(),
-    "openOverlays": openOverlays,
+    "combinedOverlayHeight": getCombinedOverlayHeight(overlayHolderId),
+    "openOverlays": openOverlays[overlayHolderId],
+    "overlayHolderId": overlayHolderId,
     "type" : overlayChangesPubSub.eventTypes.OPEN,
-  } as OverlayChangeEvent);
-  realignBars(barEls);
+  } as OverlayChangeEvent, overlayHolder);
+  realignBars(overlayHolderId, barEls);
 }
 
 /**
  * sets the offset for request-bars
  * @param  {SVGGElement[]} barEls
  */
-function realignBars(barEls: SVGGElement[]) {
+function realignBars(overlayHolderId: string, barEls: SVGGElement[]) {
   barEls.forEach((bar, j) => {
-    let offset = getOverlayOffset(j);
+    let offset = getOverlayOffset(overlayHolderId, j);
     bar.style.transform = `translate(0, ${offset}px)`;
   });
 }
@@ -88,12 +94,13 @@ function realignBars(barEls: SVGGElement[]) {
   * @param  {SVGGElement} overlayHolder
   */
 function renderOverlays(accordionHeight: number, overlayHolder: SVGGElement) {
+  const overlayHolderId = overlayHolder.id;
   while (overlayHolder.firstChild ) {
     overlayHolder.removeChild(overlayHolder.firstChild);
   }
 
   let currY = 0;
-  openOverlays
+  openOverlays[overlayHolderId]
     .sort((a, b) => a.index > b.index ? 1 : -1)
     .forEach((overlay) => {
       let y = overlay.defaultY + currY;

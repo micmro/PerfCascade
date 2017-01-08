@@ -2,6 +2,8 @@
  *  SVG Helpers
  */
 
+import {baseCssClassName} from "../state/global-static-settings";
+
 export type StringToStringOrNumberMap = {[key: string]: string|number};
 export type DomAttributeMap = StringToStringOrNumberMap;
 export type CssStyleMap = StringToStringOrNumberMap;
@@ -188,4 +190,33 @@ export function removeClass(el: SVGElement, className: string) {
       .replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"));
   }
   return el;
+}
+
+/**
+ * Recursivly finds the the base SVG Dom element of `el`
+ * @param  {Element} el - DOM element used as base for traversal
+ * @returns SVGSVGElement
+ */
+export function getBaseEl(el: Element): SVGSVGElement {
+  if (!el) {
+    throw Error("Could not find base element");
+  }
+  if (el.classList.contains(baseCssClassName)) {
+    return el as SVGSVGElement;
+  }
+  return getBaseEl(el.parentElement) as SVGSVGElement;
+}
+
+/**
+ * Finds out if `el` is part of the same chart as overlay el with `overlayHolderId`
+ * @param  {Element} el - DOM element used as base for traversal
+ * @param {string} overlayHolderId - id of holder element to match
+ * @returns Boolean
+ */
+export function isSameChart(el: Element, overlayHolderId: string): Boolean {
+  let overlay = getBaseEl(el).getElementsByClassName("overlays")[0] as SVGGElement;
+  if (!overlay || overlay.id !== overlayHolderId) {
+    return false;
+  }
+  return true;
 }

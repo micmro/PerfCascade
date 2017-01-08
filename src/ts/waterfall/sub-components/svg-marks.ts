@@ -46,6 +46,9 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
     lineHolder.appendChild(lineConnection);
 
     overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
+      if (!svg.isSameChart(lineHolder, change.overlayHolderId)) {
+        return;
+      }
       let offset = change.combinedOverlayHeight;
       let scale = (diagramHeight + offset) / (diagramHeight);
 

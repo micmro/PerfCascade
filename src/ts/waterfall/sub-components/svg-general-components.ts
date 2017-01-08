@@ -46,6 +46,9 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
   }, lineClass);
 
   overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
+    if (!svg.isSameChart(timeHolder, change.overlayHolderId)) {
+      return;
+    }
     let offset = change.combinedOverlayHeight;
     // figure out why there is an offset
     let scale = (diagramHeight + offset) / (diagramHeight);
