@@ -80,7 +80,7 @@ function parseGeneralDetails(entry: WaterfallEntry, requestID: number): KvTuple[
 function parseRequestDetails(harEntry: Entry): KvTuple[] {
   const request = harEntry.request;
 
-  const header = (name: string) => getHeader(request.headers, name);
+  const stringHeader = (name: string): KvTuple => [name, getHeader(request.headers, name)];
 
   return [
     ["Method", request.method],
@@ -89,16 +89,16 @@ function parseRequestDetails(harEntry: Entry): KvTuple[] {
     ["Headers Size", formatBytes(request.headersSize)],
     ["Body Size", formatBytes(request.bodySize)],
     ["Comment", request.comment],
-    ["User-Agent", header("User-Agent")],
-    ["Host", header("Host")],
-    ["Connection", header("Connection")],
-    ["Accept", header("Accept")],
-    ["Accept-Encoding", header("Accept-Encoding")],
-    ["Expect", header("Expect")],
-    ["Forwarded", header("Forwarded")],
-    ["If-Modified-Since", header("If-Modified-Since")],
-    ["If-Range", header("If-Range")],
-    ["If-Unmodified-Since", header("If-Unmodified-Since")],
+    stringHeader("User-Agent"),
+    stringHeader("Host"),
+    stringHeader("Connection"),
+    stringHeader("Accept"),
+    stringHeader("Accept-Encoding"),
+    stringHeader("Expect"),
+    stringHeader("Forwarded"),
+    stringHeader("If-Modified-Since"),
+    stringHeader("If-Range"),
+    stringHeader("If-Unmodified-Since"),
     ["Querystring parameters count", request.queryString.length],
     ["Cookies count", request.cookies.length],
   ];
@@ -107,10 +107,14 @@ function parseRequestDetails(harEntry: Entry): KvTuple[] {
 function parseResponseDetails(harEntry: Entry): KvTuple[] {
   const response = harEntry.response;
   const content = response.content;
+  const headers = response.headers;
 
-  const header = (name: string) => getHeader(response.headers, name);
+  const stringHeader = (title: string, name: string = title): KvTuple => [title, getHeader(headers, name)];
+  const dateHeader = (name: string): KvTuple => [name, formatDate(getHeader(headers, name))];
 
-  let contentType = header("Content-Type");
+  const contentLength = getHeader(headers, "Content-Length");
+
+  let contentType = getHeader(headers, "Content-Type");
   if (harEntry._contentType && harEntry._contentType !== contentType) {
     contentType = contentType + " | " + harEntry._contentType;
   }
@@ -122,28 +126,27 @@ function parseResponseDetails(harEntry: Entry): KvTuple[] {
     ["Header Size", formatBytes(response.headersSize)],
     ["Body Size", formatBytes(response.bodySize)],
     ["Content-Type", contentType],
-    ["Cache-Control", header("Cache-Control")],
-    ["Content-Encoding", header("Content-Encoding")],
-    ["Expires", formatDate(header("Expires"))],
-    ["Last-Modified", formatDate(header("Last-Modified"))],
-    ["Pragma", header("Pragma")],
-    ["Content-Length", asIntPartial(header("Content-Length"), formatBytes)],
-    ["Content Size", (header("Content-Length") !== content.size.toString() ?
-      formatBytes(content.size) : "")],
+    stringHeader("Cache-Control"),
+    stringHeader("Content-Encoding"),
+    dateHeader("Expires"),
+    dateHeader("Last-Modified"),
+    stringHeader("Pragma"),
+    ["Content-Length", asIntPartial(contentLength, formatBytes)],
+    ["Content Size", (contentLength !== content.size.toString() ? formatBytes(content.size) : "")],
     ["Content Compression", formatBytes(content.compression)],
-    ["Connection", header("Connection")],
-    ["ETag", header("ETag")],
-    ["Accept-Patch", header("Accept-Patch")],
-    ["Age", header("Age")],
-    ["Allow", header("Allow")],
-    ["Content-Disposition", header("Content-Disposition")],
-    ["Location", header("Location")],
-    ["Strict-Transport-Security", header("Strict-Transport-Security")],
-    ["Trailer (for chunked transfer coding)", header("Trailer")],
-    ["Transfer-Encoding", header("Transfer-Encoding")],
-    ["Upgrade", header("Upgrade")],
-    ["Vary", header("Vary")],
-    ["Timing-Allow-Origin", header("Timing-Allow-Origin")],
+    stringHeader("Connection"),
+    stringHeader("ETag"),
+    stringHeader("Accept-Patch"),
+    stringHeader("Age"),
+    stringHeader("Allow"),
+    stringHeader("Content-Disposition"),
+    stringHeader("Location"),
+    stringHeader("Strict-Transport-Security"),
+    stringHeader("Trailer (for chunked transfer coding)", "Trailer"),
+    stringHeader("Transfer-Encoding"),
+    stringHeader("Upgrade"),
+    stringHeader("Vary"),
+    stringHeader("Timing-Allow-Origin"),
     ["Redirect URL", response.redirectURL],
     ["Comment", response.comment],
   ];
