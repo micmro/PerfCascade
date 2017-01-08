@@ -2,11 +2,11 @@
  * Creation of sub-components of the waterfall chart
  */
 
-import {roundNumber} from "../../helpers/misc";
+import { roundNumber } from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
-import {requestTypeToCssClass} from "../../transformers/styling-converters";
+import { requestTypeToCssClass } from "../../transformers/styling-converters";
 import { OverlayChangeEvent } from "../../typing/open-overlay";
-import {WaterfallEntry} from "../../typing/waterfall";
+import { WaterfallEntry } from "../../typing/waterfall";
 import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub";
 
 /**
@@ -19,7 +19,7 @@ import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-su
  * @param  {boolean} addLabel  if true a time label is added to the marker-line
  */
 let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
-                    secsTotal: number, sec: number, addLabel: boolean = false) => {
+  secsTotal: number, sec: number, addLabel: boolean = false) => {
   const secPerc = 100 / secsTotal;
   /** just used if `addLabel` is `true` - for full seconds */
   let lineLabel;
@@ -34,7 +34,7 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
       x = roundNumber(secPerc * sec) - 0.5 + "%";
       css["text-anchor"] = "end";
     }
-    lineLabel = svg.newTextEl(sec + "s", {x, y: diagramHeight}, css);
+    lineLabel = svg.newTextEl(sec + "s", { x, y: diagramHeight }, css);
   }
 
   const x = roundNumber(secPerc * sec) + "%";
