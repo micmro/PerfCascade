@@ -2,7 +2,7 @@
  * Creates the html for diagrams legend
  */
 export function makeLegend(): HTMLUListElement {
-  let ulNode = document.createElement("ul") as HTMLUListElement;
+  let ulNode = document.createElement("ul");
   ulNode.className = "resource-legend";
 
   ulNode.innerHTML = `
