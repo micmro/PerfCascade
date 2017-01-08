@@ -97,7 +97,7 @@ export function getKeys(requestID: number, entry: WaterfallEntry) {
       ["Bytes Out (uploaded)", getExpAsByte("bytesOut")],
       ["JPEG Scan Count", getExpNotNull("jpeg_scan_count")],
       ["Gzip Total", getExpAsByte("gzip_total")],
-      ["Gzip Save", getExpAsByte("gzip_safe")],
+      ["Gzip Save", getExpAsByte("gzip_save")],
       ["Minify Total", getExpAsByte("minify_total")],
       ["Minify Save", getExpAsByte("minify_save")],
       ["Image Total", getExpAsByte("image_total")],
