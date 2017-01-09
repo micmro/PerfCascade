@@ -13,7 +13,7 @@ export interface OpenOverlay {
 }
 
 export interface OverlayChangeEvent {
-  type: EventTypes;
+  type: EventType;
   /** list of currenly open overlays */
   openOverlays: OpenOverlay[];
   combinedOverlayHeight: number;
@@ -28,4 +28,4 @@ export interface OverlayChangeEvent {
  */
 export type OverlayChangeSubscriber = (change: OverlayChangeEvent, chartBaseEl: SVGSVGElement) => void;
 
-export type EventTypes = "closed" | "open";
+export type EventType = "closed" | "open";

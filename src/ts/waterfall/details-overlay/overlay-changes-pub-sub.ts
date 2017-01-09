@@ -3,11 +3,6 @@
 import {getBaseEl} from "../../helpers/svg";
 import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay";
 
-export const eventTypes = {
-  "CLOSE" : "closed",
-  "OPEN" : "open",
-};
-
 let subscribers: OverlayChangeSubscriber[] = [];
 
 export function subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {

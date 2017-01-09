@@ -37,7 +37,7 @@ export function closeOverlay(index: number, overlayHolder: SVGGElement,
     "combinedOverlayHeight": getCombinedOverlayHeight(overlayHolderId),
     "openOverlays": openOverlays[overlayHolderId],
     "overlayHolderId": overlayHolderId,
-    "type" : overlayChangesPubSub.eventTypes.CLOSE,
+    "type" : "closed",
   } as OverlayChangeEvent, overlayHolder);
   realignBars(overlayHolderId, barEls);
 }
@@ -69,7 +69,7 @@ export function openOverlay(index: number, y: number, accordionHeight: number, e
     "combinedOverlayHeight": getCombinedOverlayHeight(overlayHolderId),
     "openOverlays": openOverlays[overlayHolderId],
     "overlayHolderId": overlayHolderId,
-    "type" : overlayChangesPubSub.eventTypes.OPEN,
+    "type" : "open",
   } as OverlayChangeEvent, overlayHolder);
   realignBars(overlayHolderId, barEls);
 }
