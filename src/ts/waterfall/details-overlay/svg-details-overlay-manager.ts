@@ -49,10 +49,11 @@ export function openOverlay(index: number, y: number, accordionHeight: number, e
                             overlayHolder: SVGGElement, barEls: SVGGElement[]) {
 
   const overlayHolderId = overlayHolder.id;
-  if (openOverlays[overlayHolderId] && openOverlays[overlayHolderId].filter((o) => o.index === index).length > 0) {
-    return;
-  } else if (openOverlays[overlayHolderId] === undefined) {
+  if (openOverlays[overlayHolderId] === undefined) {
     openOverlays[overlayHolderId] = [];
+  }
+  if (openOverlays[overlayHolderId].some((o) => o.index === index)) {
+    return;
   }
 
   openOverlays[overlayHolderId].push({
