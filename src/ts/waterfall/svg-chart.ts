@@ -1,5 +1,4 @@
 import * as svg from "../helpers/svg";
-import {baseCssClassName} from "../state/global-static-settings";
 import {requestTypeToCssClass} from "../transformers/styling-converters";
 import {Context} from "../typing/context";
 import {ChartOptions} from "../typing/options";
@@ -78,7 +77,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   const chartHolderHeight = getSvgHeight(data.marks, context.diagramHeight);
 
   /** Main SVG Element that holds all data */
-  let timeLineHolder = svg.newSvg(baseCssClassName, {
+  let timeLineHolder = svg.newSvg("water-fall-chart", {
     "height": chartHolderHeight,
   });
 
