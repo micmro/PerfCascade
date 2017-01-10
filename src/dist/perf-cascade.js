@@ -1,20 +1,26 @@
-/*! github.com/micmro/PerfCascade Version:0.2.16 (04/01/2017) */
+/*! github.com/micmro/PerfCascade Version:0.2.17 (11/01/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+function matchHeaderFilter(lowercaseName) {
+    return function (header) { return header.name.toLowerCase() === lowercaseName; };
+}
+function hasHeader(headers, headerName) {
+    var headerFilter = matchHeaderFilter(headerName.toLowerCase());
+    return headers.some(headerFilter);
+}
+exports.hasHeader = hasHeader;
+function getHeader(headers, headerName) {
+    var headerFilter = matchHeaderFilter(headerName.toLowerCase());
+    var firstMatch = headers.filter(headerFilter).pop();
+    return firstMatch ? firstMatch.value : undefined;
+}
+exports.getHeader = getHeader;
+
+},{}],2:[function(require,module,exports){
+"use strict";
+var har_1 = require("./har");
 var misc = require("./misc");
-function getResponseHeader(entry, headerName) {
-    return entry.response.headers.filter(function (h) { return h.name.toLowerCase() === headerName.toLowerCase(); })[0];
-}
-function getResponseHeaderValue(entry, headerName) {
-    var header = getResponseHeader(entry, headerName);
-    if (header !== undefined) {
-        return header.value;
-    }
-    else {
-        return "";
-    }
-}
 /**
  *
  * Checks if `entry.response.status` code is `>= lowerBound` and `<= upperBound`
@@ -26,17 +32,17 @@ function isInStatusCodeRange(entry, lowerBound, upperBound) {
     return entry.response.status >= lowerBound && entry.response.status <= upperBound;
 }
 exports.isInStatusCodeRange = isInStatusCodeRange;
-function isCompressible(block) {
-    var entry = block.rawResource;
+function isCompressible(entry) {
+    var harEntry = entry.rawResource;
     var minCompressionSize = 1000;
     // small responses
-    if (entry.response.bodySize < minCompressionSize) {
+    if (harEntry.response.bodySize < minCompressionSize) {
         return false;
     }
-    if (misc.contains(["html", "css", "javascript", "svg", "plain"], block.requestType)) {
+    if (misc.contains(["html", "css", "javascript", "svg", "plain"], entry.requestType)) {
         return true;
     }
-    var mime = entry.response.content.mimeType;
+    var mime = harEntry.response.content.mimeType;
     var compressableMimes = ["application/vnd.ms-fontobject",
         "application/x-font-opentype",
         "application/x-font-truetype",
@@ -51,38 +57,39 @@ function isCompressible(block) {
     }
     return false;
 }
-function isCachable(block) {
-    var entry = block.rawResource;
+function isCachable(entry) {
+    var harEntry = entry.rawResource;
+    var headers = harEntry.response.headers;
     // do not cache non-gets,204 and non 2xx status codes
-    if (entry.request.method.toLocaleLowerCase() !== "get" ||
-        entry.response.status === 204 ||
-        !isInStatusCodeRange(entry, 200, 299)) {
+    if (harEntry.request.method.toLocaleLowerCase() !== "get" ||
+        harEntry.response.status === 204 ||
+        !isInStatusCodeRange(harEntry, 200, 299)) {
         return false;
     }
-    if (getResponseHeader(entry, "Cache-Control") === undefined
-        && getResponseHeader(entry, "Expires") === undefined) {
+    if (!(har_1.hasHeader(headers, "Cache-Control") || har_1.hasHeader(headers, "Expires"))) {
         return true;
     }
-    if (getResponseHeaderValue(entry, "Cache-Control").indexOf("no-cache") > -1
-        || getResponseHeaderValue(entry, "Pragma") === "no-cache") {
-        return true;
-    }
-    return false;
+    return har_1.getHeader(headers, "Cache-Control").indexOf("no-cache") > -1
+        || har_1.getHeader(headers, "Pragma") === "no-cache";
 }
-function hasCacheIssue(block) {
-    return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCachable(block));
+function hasCacheIssue(entry) {
+    var harEntry = entry.rawResource;
+    var headers = harEntry.response.headers;
+    return (!har_1.hasHeader(headers, "Content-Encoding") && isCachable(entry));
 }
 exports.hasCacheIssue = hasCacheIssue;
-function hasCompressionIssue(block) {
-    return (getResponseHeader(block.rawResource, "Content-Encoding") === undefined && isCompressible(block));
+function hasCompressionIssue(entry) {
+    var harEntry = entry.rawResource;
+    var headers = harEntry.response.headers;
+    return (!har_1.hasHeader(headers, "Content-Encoding") && isCompressible(entry));
 }
 exports.hasCompressionIssue = hasCompressionIssue;
-function isSecure(block) {
-    return block.name.indexOf("https://") === 0;
+function isSecure(entry) {
+    return entry.name.indexOf("https://") === 0;
 }
 exports.isSecure = isSecure;
 
-},{"./misc":3}],2:[function(require,module,exports){
+},{"./har":1,"./misc":4}],3:[function(require,module,exports){
 /**
  *  SVG Icons
  */
@@ -178,7 +185,7 @@ function audio(x, y, title, scale) {
 }
 exports.audio = audio;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /**
  *  Misc Helpers
  */
@@ -242,7 +249,7 @@ function roundNumber(num, decimals) {
 }
 exports.roundNumber = roundNumber;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /**
  *  SVG Helpers
  */
@@ -426,7 +433,7 @@ function removeClass(el, className) {
 }
 exports.removeClass = removeClass;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 /**
  * Creates the html for diagrams legend
@@ -439,7 +446,7 @@ function makeLegend() {
 }
 exports.makeLegend = makeLegend;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 var __assign = (this && this.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -514,7 +521,7 @@ exports.transformHarToPerfCascade = transformHarToPerfCascade;
 var paging_1 = require("./paging/paging");
 exports.changePage = paging_1.setSelectedPageIndex;
 
-},{"./legend/legend":5,"./paging/paging":7,"./state/waterfall-docs-service":8,"./transformers/har":9,"./waterfall/svg-chart":22}],7:[function(require,module,exports){
+},{"./legend/legend":6,"./paging/paging":8,"./state/waterfall-docs-service":9,"./transformers/har":10,"./waterfall/svg-chart":23}],8:[function(require,module,exports){
 "use strict";
 var waterfallDocsService = require("../state/waterfall-docs-service");
 var selectedPageIndex = 0;
@@ -594,7 +601,7 @@ function initPagingSelectBox(selectbox) {
 }
 exports.initPagingSelectBox = initPagingSelectBox;
 
-},{"../state/waterfall-docs-service":8}],8:[function(require,module,exports){
+},{"../state/waterfall-docs-service":9}],9:[function(require,module,exports){
 "use strict";
 /*
 * Central service to store HAR data
@@ -618,7 +625,7 @@ function getDocs() {
 }
 exports.getDocs = getDocs;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 function createWaterfallEntry(name, start, end, segments, rawResource, requestType) {
     if (segments === void 0) { segments = []; }
@@ -713,7 +720,7 @@ function transformPage(harData, pageIndex) {
     var pageTimings = currPage.pageTimings;
     console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
     var doneTime = 0;
-    var blocks = data.entries
+    var entries = data.entries
         .filter(function (entry) { return entry.pageref === currPage.id; })
         .map(function (entry) {
         var startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
@@ -736,7 +743,7 @@ function transformPage(harData, pageIndex) {
     doneTime += 100;
     return {
         durationMs: doneTime,
-        blocks: blocks,
+        entries: entries,
         marks: marks,
         lines: [],
         title: currPage.title,
@@ -747,22 +754,22 @@ exports.transformPage = transformPage;
  * Create `WaterfallEntry`s to represent the subtimings of a request
  * ("blocked", "dns", "connect", "send", "wait", "receive")
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
- * @param  {Entry} entry
+ * @param  {Entry} harEntry
  * @returns Array
  */
-function buildDetailTimingBlocks(startRelative, entry) {
-    var t = entry.timings;
+function buildDetailTimingBlocks(startRelative, harEntry) {
+    var t = harEntry.timings;
     return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce(function (collect, key) {
-        var time = getTimePair(key, entry, collect, startRelative);
+        var time = getTimePair(key, harEntry, collect, startRelative);
         if (time.end && time.start >= time.end) {
             return collect;
         }
         // special case for 'connect' && 'ssl' since they share time
         // http://www.softwareishard.com/blog/har-12-spec/#timings
         if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
-            var sslStart = parseInt(entry["_ssl_start"], 10) || time.start;
-            var sslEnd = parseInt(entry["_ssl_end"], 10) || time.start + t.ssl;
-            var connectStart = (!!parseInt(entry["_ssl_start"], 10)) ? time.start : sslEnd;
+            var sslStart = parseInt(harEntry["_ssl_start"], 10) || time.start;
+            var sslEnd = parseInt(harEntry["_ssl_end"], 10) || time.start + t.ssl;
+            var connectStart = (!!parseInt(harEntry["_ssl_start"], 10)) ? time.start : sslEnd;
             return collect
                 .concat([createWaterfallEntryTiming("ssl", sslStart, sslEnd)])
                 .concat([createWaterfallEntryTiming(key, connectStart, time.end)]);
@@ -774,12 +781,12 @@ function buildDetailTimingBlocks(startRelative, entry) {
  * Returns Object containing start and end time of `collect`
  *
  * @param  {string} key
- * @param  {Entry} entry
+ * @param  {Entry} harEntry
  * @param  {WaterfallEntry[]} collect
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @returns {Object}
  */
-function getTimePair(key, entry, collect, startRelative) {
+function getTimePair(key, harEntry, collect, startRelative) {
     var wptKey;
     switch (key) {
         case "wait":
@@ -790,18 +797,18 @@ function getTimePair(key, entry, collect, startRelative) {
             break;
         default: wptKey = key;
     }
-    var preciseStart = parseInt(entry["_" + wptKey + "_start"], 10);
-    var preciseEnd = parseInt(entry["_" + wptKey + "_end"], 10);
+    var preciseStart = parseInt(harEntry["_" + wptKey + "_start"], 10);
+    var preciseEnd = parseInt(harEntry["_" + wptKey + "_end"], 10);
     var start = isNaN(preciseStart) ?
         ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart;
-    var end = isNaN(preciseEnd) ? (start + entry.timings[key]) : preciseEnd;
+    var end = isNaN(preciseEnd) ? (start + harEntry.timings[key]) : preciseEnd;
     return {
         "end": end,
         "start": start,
     };
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 /**
  * Convert a RequestType into a CSS class
@@ -820,8 +827,9 @@ function timingTypeToCssClass(timingType) {
 }
 exports.timingTypeToCssClass = timingTypeToCssClass;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
+var har_1 = require("../../helpers/har");
 var ifValueDefined = function (value, fn) {
     if (!isFinite(value) || value <= 0) {
         return undefined;
@@ -841,146 +849,158 @@ var asIntPartial = function (val, ifIntFn) {
     var v = parseInt(val, 10);
     return ifValueDefined(v, ifIntFn);
 };
+/** get experimental feature (usually WebPageTest) */
+var getExp = function (harEntry, name) {
+    return harEntry[name] || harEntry["_" + name] || harEntry.request[name] || harEntry.request["_" + name] || "";
+};
+/** get experimental feature and ensure it's not a sting of `0` or `` */
+var getExpNotNull = function (harEntry, name) {
+    var resp = getExp(harEntry, name);
+    return resp !== "0" ? resp : "";
+};
+/** get experimental feature and format it as byte */
+var getExpAsByte = function (harEntry, name) {
+    var resp = parseInt(getExp(harEntry, name), 10);
+    return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
+};
+function parseGeneralDetails(entry, requestID) {
+    var harEntry = entry.rawResource;
+    return [
+        ["Request Number", "#" + requestID],
+        ["Started", new Date(harEntry.startedDateTime).toLocaleString() + " (" + formatTime(entry.start) +
+                " after page request started)"],
+        ["Duration", formatTime(harEntry.time)],
+        ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
+        ["Server IPAddress", harEntry.serverIPAddress],
+        ["Connection", harEntry.connection],
+        ["Browser Priority", getExp(harEntry, "priority") || getExp(harEntry, "initialPriority")],
+        ["Was pushed", getExp(harEntry, "was_pushed")],
+        ["Initiator (Loaded by)", getExp(harEntry, "initiator")],
+        ["Initiator Line", getExp(harEntry, "initiator_line")],
+        ["Host", har_1.getHeader(harEntry.request.headers, "Host")],
+        ["IP", getExp(harEntry, "ip_addr")],
+        ["Client Port", getExpNotNull(harEntry, "client_port")],
+        ["Expires", getExp(harEntry, "expires")],
+        ["Cache Time", getExp(harEntry, "cache_time")],
+        ["CDN Provider", getExp(harEntry, "cdn_provider")],
+        ["ObjectSize", getExp(harEntry, "objectSize")],
+        ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
+        ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
+        ["JPEG Scan Count", getExpNotNull(harEntry, "jpeg_scan_count")],
+        ["Gzip Total", getExpAsByte(harEntry, "gzip_total")],
+        ["Gzip Save", getExpAsByte(harEntry, "gzip_save")],
+        ["Minify Total", getExpAsByte(harEntry, "minify_total")],
+        ["Minify Save", getExpAsByte(harEntry, "minify_save")],
+        ["Image Total", getExpAsByte(harEntry, "image_total")],
+        ["Image Save", getExpAsByte(harEntry, "image_save")],
+    ];
+}
+function parseRequestDetails(harEntry) {
+    var request = harEntry.request;
+    var stringHeader = function (name) { return [name, har_1.getHeader(request.headers, name)]; };
+    return [
+        ["Method", request.method],
+        ["HTTP Version", request.httpVersion],
+        ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
+        ["Headers Size", formatBytes(request.headersSize)],
+        ["Body Size", formatBytes(request.bodySize)],
+        ["Comment", request.comment],
+        stringHeader("User-Agent"),
+        stringHeader("Host"),
+        stringHeader("Connection"),
+        stringHeader("Accept"),
+        stringHeader("Accept-Encoding"),
+        stringHeader("Expect"),
+        stringHeader("Forwarded"),
+        stringHeader("If-Modified-Since"),
+        stringHeader("If-Range"),
+        stringHeader("If-Unmodified-Since"),
+        ["Querystring parameters count", request.queryString.length],
+        ["Cookies count", request.cookies.length],
+    ];
+}
+function parseResponseDetails(harEntry) {
+    var response = harEntry.response;
+    var content = response.content;
+    var headers = response.headers;
+    var stringHeader = function (title, name) {
+        if (name === void 0) { name = title; }
+        return [title, har_1.getHeader(headers, name)];
+    };
+    var dateHeader = function (name) { return [name, formatDate(har_1.getHeader(headers, name))]; };
+    var contentLength = har_1.getHeader(headers, "Content-Length");
+    var contentType = har_1.getHeader(headers, "Content-Type");
+    if (harEntry._contentType && harEntry._contentType !== contentType) {
+        contentType = contentType + " | " + harEntry._contentType;
+    }
+    return [
+        ["Status", response.status + " " + response.statusText],
+        ["HTTP Version", response.httpVersion],
+        ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
+        ["Header Size", formatBytes(response.headersSize)],
+        ["Body Size", formatBytes(response.bodySize)],
+        ["Content-Type", contentType],
+        stringHeader("Cache-Control"),
+        stringHeader("Content-Encoding"),
+        dateHeader("Expires"),
+        dateHeader("Last-Modified"),
+        stringHeader("Pragma"),
+        ["Content-Length", asIntPartial(contentLength, formatBytes)],
+        ["Content Size", (contentLength !== content.size.toString() ? formatBytes(content.size) : "")],
+        ["Content Compression", formatBytes(content.compression)],
+        stringHeader("Connection"),
+        stringHeader("ETag"),
+        stringHeader("Accept-Patch"),
+        stringHeader("Age"),
+        stringHeader("Allow"),
+        stringHeader("Content-Disposition"),
+        stringHeader("Location"),
+        stringHeader("Strict-Transport-Security"),
+        stringHeader("Trailer (for chunked transfer coding)", "Trailer"),
+        stringHeader("Transfer-Encoding"),
+        stringHeader("Upgrade"),
+        stringHeader("Vary"),
+        stringHeader("Timing-Allow-Origin"),
+        ["Redirect URL", response.redirectURL],
+        ["Comment", response.comment],
+    ];
+}
+function parseTimings(entry) {
+    var timings = entry.rawResource.timings;
+    // FIXME should only filter -1 values here, 0 is a valid timing.
+    return [
+        ["Total", entry.total + " ms"],
+        ["Blocked", formatTime(timings["blocked"])],
+        ["DNS", formatTime(timings["dns"])],
+        ["Connect", formatTime(timings["connect"])],
+        ["SSL (TLS)", formatTime(timings["ssl"])],
+        ["Send", formatTime(timings["send"])],
+        ["Wait", formatTime(timings["wait"])],
+        ["Receive", formatTime(timings["receive"])],
+    ];
+}
 /**
  * Data to show in overlay tabs
  * @param  {number} requestID - request number
- * @param  {WaterfallEntry} block
+ * @param  {WaterfallEntry} entry
  */
-function getKeys(requestID, block) {
-    // TODO: dodgy casting - will not work for other adapters
-    var entry = block.rawResource;
-    var getRequestHeader = function (name) {
-        var header = entry.request.headers.filter(function (h) { return h.name.toLowerCase() === name.toLowerCase(); })[0];
-        return header ? header.value : "";
-    };
-    var getResponseHeader = function (name) {
-        var header = entry.response.headers.filter(function (h) { return h.name.toLowerCase() === name.toLowerCase(); })[0];
-        return header ? header.value : "";
-    };
-    var getContentType = function () {
-        var respContentType = getResponseHeader("Content-Type");
-        if (entry._contentType && entry._contentType !== respContentType) {
-            return respContentType + " | " + entry._contentType;
-        }
-        return respContentType;
-    };
-    /** get experimental feature (usually WebPageTest) */
-    var getExp = function (name) {
-        return entry[name] || entry["_" + name] || entry.request[name] || entry.request["_" + name] || "";
-    };
-    var getHarTiming = function (name) {
-        if (entry.timings[name] && entry.timings[name] > 0) {
-            return entry.timings[name] + " ms";
-        }
-        return "";
-    };
-    /** get experimental feature and ensure it's not a sting of `0` or `` */
-    var getExpNotNull = function (name) {
-        var resp = getExp(name);
-        return resp !== "0" ? resp : "";
-    };
-    /** get experimental feature and format it as byte */
-    var getExpAsByte = function (name) {
-        var resp = parseInt(getExp(name), 10);
-        return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
-    };
+function getKeys(requestID, entry) {
+    var harEntry = entry.rawResource;
+    var requestHeaders = harEntry.request.headers;
+    var responseHeaders = harEntry.response.headers;
+    var headerToKvTuple = function (header) { return [header.name, header.value]; };
     return {
-        "general": [
-            ["Request Number", "#" + requestID],
-            ["Started", new Date(entry.startedDateTime).toLocaleString() + " (" + formatTime(block.start) +
-                    " after page request started)"],
-            ["Duration", formatTime(entry.time)],
-            ["Error/Status Code", entry.response.status + " " + entry.response.statusText],
-            ["Server IPAddress", entry.serverIPAddress],
-            ["Connection", entry.connection],
-            ["Browser Priority", getExp("priority") || getExp("initialPriority")],
-            ["Was pushed", getExp("was_pushed")],
-            ["Initiator (Loaded by)", getExp("initiator")],
-            ["Initiator Line", getExp("initiator_line")],
-            ["Host", getRequestHeader("Host")],
-            ["IP", getExp("ip_addr")],
-            ["Client Port", getExpNotNull("client_port")],
-            ["Expires", getExp("expires")],
-            ["Cache Time", getExp("cache_time")],
-            ["CDN Provider", getExp("cdn_provider")],
-            ["ObjectSize", getExp("objectSize")],
-            ["Bytes In (downloaded)", getExpAsByte("bytesIn")],
-            ["Bytes Out (uploaded)", getExpAsByte("bytesOut")],
-            ["JPEG Scan Count", getExpNotNull("jpeg_scan_count")],
-            ["Gzip Total", getExpAsByte("gzip_total")],
-            ["Gzip Save", getExpAsByte("gzip_safe")],
-            ["Minify Total", getExpAsByte("minify_total")],
-            ["Minify Save", getExpAsByte("minify_save")],
-            ["Image Total", getExpAsByte("image_total")],
-            ["Image Save", getExpAsByte("image_save")],
-        ],
-        "request": [
-            ["Method", entry.request.method],
-            ["HTTP Version", entry.request.httpVersion],
-            ["Bytes Out (uploaded)", getExpAsByte("bytesOut")],
-            ["Headers Size", formatBytes(entry.request.headersSize)],
-            ["Body Size", formatBytes(entry.request.bodySize)],
-            ["Comment", entry.request.comment],
-            ["User-Agent", getRequestHeader("User-Agent")],
-            ["Host", getRequestHeader("Host")],
-            ["Connection", getRequestHeader("Connection")],
-            ["Accept", getRequestHeader("Accept")],
-            ["Accept-Encoding", getRequestHeader("Accept-Encoding")],
-            ["Expect", getRequestHeader("Expect")],
-            ["Forwarded", getRequestHeader("Forwarded")],
-            ["If-Modified-Since", getRequestHeader("If-Modified-Since")],
-            ["If-Range", getRequestHeader("If-Range")],
-            ["If-Unmodified-Since", getRequestHeader("If-Unmodified-Since")],
-            ["Querystring parameters count", entry.request.queryString.length],
-            ["Cookies count", entry.request.cookies.length],
-        ],
-        "response": [
-            ["Status", entry.response.status + " " + entry.response.statusText],
-            ["HTTP Version", entry.response.httpVersion],
-            ["Bytes In (downloaded)", getExpAsByte("bytesIn")],
-            ["Header Size", formatBytes(entry.response.headersSize)],
-            ["Body Size", formatBytes(entry.response.bodySize)],
-            ["Content-Type", getContentType()],
-            ["Cache-Control", getResponseHeader("Cache-Control")],
-            ["Content-Encoding", getResponseHeader("Content-Encoding")],
-            ["Expires", formatDate(getResponseHeader("Expires"))],
-            ["Last-Modified", formatDate(getResponseHeader("Last-Modified"))],
-            ["Pragma", getResponseHeader("Pragma")],
-            ["Content-Length", asIntPartial(getResponseHeader("Content-Length"), formatBytes)],
-            ["Content Size", (getResponseHeader("Content-Length") !== entry.response.content.size.toString() ?
-                    formatBytes(entry.response.content.size) : "")],
-            ["Content Compression", formatBytes(entry.response.content.compression)],
-            ["Connection", getResponseHeader("Connection")],
-            ["ETag", getResponseHeader("ETag")],
-            ["Accept-Patch", getResponseHeader("Accept-Patch")],
-            ["Age", getResponseHeader("Age")],
-            ["Allow", getResponseHeader("Allow")],
-            ["Content-Disposition", getResponseHeader("Content-Disposition")],
-            ["Location", getResponseHeader("Location")],
-            ["Strict-Transport-Security", getResponseHeader("Strict-Transport-Security")],
-            ["Trailer (for chunked transfer coding)", getResponseHeader("Trailer")],
-            ["Transfer-Encoding", getResponseHeader("Transfer-Encoding")],
-            ["Upgrade", getResponseHeader("Upgrade")],
-            ["Vary", getResponseHeader("Vary")],
-            ["Timing-Allow-Origin", getResponseHeader("Timing-Allow-Origin")],
-            ["Redirect URL", entry.response.redirectURL],
-            ["Comment", entry.response.comment],
-        ],
-        "timings": [
-            ["Total", block.total + " ms"],
-            ["Blocked", getHarTiming("blocked")],
-            ["DNS", getHarTiming("dns")],
-            ["Connect", getHarTiming("connect")],
-            ["SSL (TLS)", getHarTiming("ssl")],
-            ["Send", getHarTiming("send")],
-            ["Wait", getHarTiming("wait")],
-            ["Receive", getHarTiming("receive")],
-        ],
+        "general": parseGeneralDetails(entry, requestID),
+        "request": parseRequestDetails(harEntry),
+        "requestHeaders": requestHeaders.map(headerToKvTuple),
+        "response": parseResponseDetails(harEntry),
+        "responseHeaders": responseHeaders.map(headerToKvTuple),
+        "timings": parseTimings(entry),
     };
 }
 exports.getKeys = getKeys;
 
-},{}],12:[function(require,module,exports){
+},{"../../helpers/har":1}],13:[function(require,module,exports){
 "use strict";
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues, addClass) {
@@ -992,8 +1012,13 @@ function makeDefinitionList(dlKeyValues, addClass) {
         var className = key.toLowerCase().replace(/[^a-z-]/g, "");
         return "class=\"" + (className || "no-colour") + "\"";
     };
+    var isValidTuple = function (tuple) {
+        var value = tuple[1];
+        return (typeof value === "string" && value.length > 0) ||
+            (typeof value === "number" && !(value === 0 || value === -1));
+    };
     return dlKeyValues
-        .filter(function (tuple) { return (tuple[1] !== undefined && tuple[1] !== -1 && tuple[1] !== 0 && tuple[1] !== ""); })
+        .filter(isValidTuple)
         .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + tuple[0] + "</dt>\n      <dd>" + tuple[1] + "</dd>\n    "; }).join("");
 }
 function makeTab(innerHtml, renderDl) {
@@ -1004,162 +1029,168 @@ function makeTab(innerHtml, renderDl) {
     var inner = renderDl ? "<dl>" + innerHtml + "</dl>" : innerHtml;
     return "<div class=\"tab\">\n    " + inner + "\n  </div>";
 }
-function makeImgTab(accordionHeight, block) {
-    if (block.requestType !== "image") {
+function makeImgTab(accordionHeight, entry) {
+    if (entry.requestType !== "image") {
         return "";
     }
-    var imgTag = "<img class=\"preview\" style=\"max-height:" + (accordionHeight - 100) + "px\"\n                        data-src=\"" + block.rawResource.request.url + "\" />";
+    var imgTag = "<img class=\"preview\" style=\"max-height:" + (accordionHeight - 100) + "px\"\n                        data-src=\"" + entry.rawResource.request.url + "\" />";
     return makeTab(imgTag, false);
 }
 function makeTabBtn(name, tab) {
     return !!tab ? "<li><button class=\"tab-button\">" + name + "</button></li>" : "";
 }
-function createDetailsBody(requestID, block, accordeonHeight) {
+function createDetailsBody(requestID, entry, accordeonHeight) {
     var html = document.createElement("html");
     var body = document.createElement("body");
     body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
-    var tabsData = extract_details_keys_1.getKeys(requestID, block);
+    var tabsData = extract_details_keys_1.getKeys(requestID, entry);
     var generalTab = makeTab(makeDefinitionList(tabsData.general));
     var timingsTab = makeTab(makeDefinitionList(tabsData.timings, true));
     var requestDl = makeDefinitionList(tabsData.request);
-    var requestHeadersDl = makeDefinitionList(block.rawResource.request.headers.map(function (h) {
-        return [h.name, h.value];
-    }));
+    var requestHeadersDl = makeDefinitionList(tabsData.requestHeaders);
     var responseDl = makeDefinitionList(tabsData.response);
-    var responseHeadersDl = makeDefinitionList(block.rawResource.response.headers.map(function (h) {
-        return [h.name, h.value];
-    }));
-    var imgTab = makeImgTab(accordeonHeight, block);
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + block.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> " + block.name + "</h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n          " + makeTabBtn("Preview", imgTab) + "\n        </ul>\n        </nav>\n      </header>\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <pre><code>" + JSON.stringify(block.rawResource, null, 2) + "</code></pre>\n      </div>\n      " + imgTab + "\n    </div>\n    ";
+    var responseHeadersDl = makeDefinitionList(tabsData.responseHeaders);
+    var imgTab = makeImgTab(accordeonHeight, entry);
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> " + entry.name + "</h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n          " + makeTabBtn("Preview", imgTab) + "\n        </ul>\n        </nav>\n      </header>\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <pre><code>" + JSON.stringify(entry.rawResource, null, 2) + "</code></pre>\n      </div>\n      " + imgTab + "\n    </div>\n    ";
     html.appendChild(body);
     return html;
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":11}],13:[function(require,module,exports){
-// simple pub/sub for change to the overlay
+},{"./extract-details-keys":12}],14:[function(require,module,exports){
 "use strict";
-exports.eventTypes = {
-    "CLOSE": "closed",
-    "OPEN": "open",
-};
-var subscribers = [];
-function subscribeToOverlayChanges(fn) {
-    subscribers.push(fn);
-}
-exports.subscribeToOverlayChanges = subscribeToOverlayChanges;
-// no need for unsubscribe in the moment
-function publishToOverlayChanges(change) {
-    subscribers.forEach(function (fn) { return fn(change); });
-}
-exports.publishToOverlayChanges = publishToOverlayChanges;
+var PubSub = (function () {
+    function PubSub() {
+        this.subscribers = [];
+    }
+    PubSub.prototype.subscribeToOverlayChanges = function (fn) {
+        this.subscribers.push(fn);
+    };
+    PubSub.prototype.publishToOverlayChanges = function (change) {
+        this.subscribers.forEach(function (fn) { return fn(change); });
+    };
+    return PubSub;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = PubSub;
+;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
-var overlayChangesPubSub = require("./overlay-changes-pub-sub");
 var svg_details_overlay_1 = require("./svg-details-overlay");
-/** Collection of currely open overlays */
-var openOverlays = [];
-/** all open overlays height combined */
-function getCombinedOverlayHeight() {
-    return openOverlays.reduce(function (pre, curr) { return pre + curr.height; }, 0);
-}
-exports.getCombinedOverlayHeight = getCombinedOverlayHeight;
-/** y offset to it's default y position */
-function getOverlayOffset(rowIndex) {
-    return openOverlays.reduce(function (col, overlay) {
-        if (overlay.index < rowIndex) {
-            return col + overlay.height;
-        }
-        return col;
-    }, 0);
-}
-exports.getOverlayOffset = getOverlayOffset;
-/**
- * closes on overlay - rerenders others internally
- */
-function closeOverlay(index, overlayHolder, accordionHeight, barEls) {
-    openOverlays.splice(openOverlays.reduce(function (prev, curr, i) {
-        return (curr.index === index) ? i : prev;
-    }, -1), 1);
-    renderOverlays(accordionHeight, overlayHolder);
-    overlayChangesPubSub.publishToOverlayChanges({
-        "combinedOverlayHeight": getCombinedOverlayHeight(),
-        "openOverlays": openOverlays,
-        "type": overlayChangesPubSub.eventTypes.CLOSE,
-    });
-    realignBars(barEls);
-}
-exports.closeOverlay = closeOverlay;
-/**
- * Opens an overlay - rerenders others internaly
- */
-function openOverlay(index, y, accordionHeight, block, overlayHolder, barEls) {
-    var _this = this;
-    if (openOverlays.filter(function (o) { return o.index === index; }).length > 0) {
-        return;
+/** Overlay (popup) instance manager */
+var OverlayManager = (function () {
+    // TODO: move `overlayHolder` to constructor
+    function OverlayManager(context, overlayHolder) {
+        this.context = context;
+        this.overlayHolder = overlayHolder;
+        /** Collection of currely open overlays */
+        this.openOverlays = [];
     }
-    openOverlays.push({
-        "block": block,
-        "defaultY": y,
-        "index": index,
-        "onClose": function () {
-            _this.closeOverlay(index, overlayHolder, accordionHeight, barEls);
-        },
-    });
-    renderOverlays(accordionHeight, overlayHolder);
-    overlayChangesPubSub.publishToOverlayChanges({
-        "combinedOverlayHeight": getCombinedOverlayHeight(),
-        "openOverlays": openOverlays,
-        "type": overlayChangesPubSub.eventTypes.OPEN,
-    });
-    realignBars(barEls);
-}
-exports.openOverlay = openOverlay;
-/**
- * sets the offset for request-bars
- * @param  {SVGGElement[]} barEls
- */
-function realignBars(barEls) {
-    barEls.forEach(function (bar, j) {
-        var offset = getOverlayOffset(j);
-        bar.style.transform = "translate(0, " + offset + "px)";
-    });
-}
-/**
- * removes all overlays and renders them again
- *
- * @summary this is to re-set the "y" position since there is a bug in chrome with
- * tranform of an SVG and positioning/scoll of a foreignObjects
- * @param  {number} accordionHeight
- * @param  {SVGGElement} overlayHolder
- */
-function renderOverlays(accordionHeight, overlayHolder) {
-    while (overlayHolder.firstChild) {
-        overlayHolder.removeChild(overlayHolder.firstChild);
-    }
-    var currY = 0;
-    openOverlays
-        .sort(function (a, b) { return a.index > b.index ? 1 : -1; })
-        .forEach(function (overlay) {
-        var y = overlay.defaultY + currY;
-        var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(overlay.index, y, accordionHeight, overlay.block, overlay.onClose);
-        // if overlay has a preview image show it
-        var previewImg = infoOverlay.querySelector("img.preview");
-        if (previewImg && !previewImg.src) {
-            previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
+    /** all open overlays height combined */
+    OverlayManager.prototype.getCombinedOverlayHeight = function () {
+        return this.openOverlays.reduce(function (pre, curr) { return pre + curr.height; }, 0);
+    };
+    /**
+     * Opens an overlay - rerenders others internaly
+     */
+    OverlayManager.prototype.openOverlay = function (index, y, accordionHeight, entry, barEls) {
+        if (this.openOverlays.some(function (o) { return o.index === index; })) {
+            return;
         }
-        overlayHolder.appendChild(infoOverlay);
-        var currHeight = infoOverlay.getBoundingClientRect().height;
-        currY += currHeight;
-        overlay.actualY = y;
-        overlay.height = currHeight;
-        return overlay;
-    });
-}
+        var self = this;
+        this.openOverlays.push({
+            "defaultY": y,
+            "entry": entry,
+            "index": index,
+            "onClose": function () {
+                self.closeOverlay(index, accordionHeight, barEls);
+            },
+        });
+        this.renderOverlays(accordionHeight);
+        this.context.pubSub.publishToOverlayChanges({
+            "combinedOverlayHeight": self.getCombinedOverlayHeight(),
+            "openOverlays": self.openOverlays,
+            "type": "open",
+        });
+        this.realignBars(barEls);
+    };
+    /**
+     * closes on overlay - rerenders others internally
+     */
+    OverlayManager.prototype.closeOverlay = function (index, accordionHeight, barEls) {
+        var self = this;
+        this.openOverlays.splice(this.openOverlays.reduce(function (prev, curr, i) {
+            return (curr.index === index) ? i : prev;
+        }, -1), 1);
+        this.renderOverlays(accordionHeight);
+        this.context.pubSub.publishToOverlayChanges({
+            "combinedOverlayHeight": self.getCombinedOverlayHeight(),
+            "openOverlays": self.openOverlays,
+            "type": "closed",
+        });
+        this.realignBars(barEls);
+    };
+    /**
+     * sets the offset for request-bars
+     * @param  {SVGGElement[]} barEls
+     */
+    OverlayManager.prototype.realignBars = function (barEls) {
+        var _this = this;
+        barEls.forEach(function (bar, j) {
+            var offset = _this.getOverlayOffset(j);
+            bar.style.transform = "translate(0, " + offset + "px)";
+        });
+    };
+    /** y offset to it's default y position */
+    OverlayManager.prototype.getOverlayOffset = function (rowIndex) {
+        return this.openOverlays.reduce(function (col, overlay) {
+            if (overlay.index < rowIndex) {
+                return col + overlay.height;
+            }
+            return col;
+        }, 0);
+    };
+    /**
+     * removes all overlays and renders them again
+     *
+     * @summary this is to re-set the "y" position since there is a bug in chrome with
+     * tranform of an SVG and positioning/scoll of a foreignObjects
+     * @param  {number} accordionHeight
+     * @param  {SVGGElement} overlayHolder
+     */
+    OverlayManager.prototype.renderOverlays = function (accordionHeight) {
+        var _this = this;
+        while (this.overlayHolder.firstChild) {
+            this.overlayHolder.removeChild(this.overlayHolder.firstChild);
+        }
+        var currY = 0;
+        this.openOverlays
+            .sort(function (a, b) { return a.index > b.index ? 1 : -1; })
+            .forEach(function (overlay) {
+            var y = overlay.defaultY + currY;
+            var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(overlay.index, y, accordionHeight, overlay.entry, overlay.onClose);
+            // if overlay has a preview image show it
+            var previewImg = infoOverlay.querySelector("img.preview");
+            if (previewImg && !previewImg.src) {
+                previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
+            }
+            _this.overlayHolder.appendChild(infoOverlay);
+            var currHeight = infoOverlay.getBoundingClientRect().height;
+            currY += currHeight;
+            overlay.actualY = y;
+            overlay.height = currHeight;
+            return overlay;
+        });
+    };
+    return OverlayManager;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = OverlayManager;
+;
 
-},{"./overlay-changes-pub-sub":13,"./svg-details-overlay":15}],15:[function(require,module,exports){
+},{"./svg-details-overlay":16}],16:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var html_details_body_1 = require("./html-details-body");
@@ -1197,8 +1228,8 @@ function createHolder(y, accordionHeight) {
     innerHolder.appendChild(bg);
     return innerHolder;
 }
-function createRowInfoOverlay(indexBackup, y, accordionHeight, block, onClose) {
-    var requestID = parseInt(block.rawResource._index + 1, 10) || indexBackup + 1;
+function createRowInfoOverlay(indexBackup, y, accordionHeight, entry, onClose) {
+    var requestID = parseInt(entry.rawResource._index + 1, 10) || indexBackup + 1;
     var wrapper = svg.newG("outer-info-overlay-holder");
     var holder = createHolder(y, accordionHeight);
     var foreignObject = svg.newForeignObject({
@@ -1209,7 +1240,7 @@ function createRowInfoOverlay(indexBackup, y, accordionHeight, block, onClose) {
     });
     var closeBtn = createCloseButtonSvg(y);
     closeBtn.addEventListener("click", function () { return onClose(indexBackup, holder); });
-    var body = html_details_body_1.createDetailsBody(requestID, block, accordionHeight);
+    var body = html_details_body_1.createDetailsBody(requestID, entry, accordionHeight);
     var buttons = body.getElementsByClassName("tab-button");
     var tabs = body.getElementsByClassName("tab");
     var setTabStatus = function (index) {
@@ -1230,7 +1261,7 @@ function createRowInfoOverlay(indexBackup, y, accordionHeight, block, onClose) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/svg":4,"./html-details-body":12}],16:[function(require,module,exports){
+},{"../../helpers/svg":5,"./html-details-body":13}],17:[function(require,module,exports){
 /**
  * Creation of sub-components used in a resource request row
  */
@@ -1242,53 +1273,53 @@ function makeIcon(type, title) {
 }
 /**
  * Scan the request for errors or potential issues and highlight them
- * @param  {WaterfallEntry} block
+ * @param  {WaterfallEntry} entry
  * @returns {Icon}
  */
-function getMimeTypeIcon(block) {
-    var entry = block.rawResource;
+function getMimeTypeIcon(entry) {
+    var harEntry = entry.rawResource;
     // highlight redirects
-    if (!!entry.response.redirectURL) {
-        var url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
-        return makeIcon("err3xx", entry.response.status + " response status: Redirect to " + url + "...");
+    if (!!harEntry.response.redirectURL) {
+        var url = encodeURI(harEntry.response.redirectURL.split("?")[0] || "");
+        return makeIcon("err3xx", harEntry.response.status + " response status: Redirect to " + url + "...");
     }
-    else if (heuristics.isInStatusCodeRange(entry, 400, 499)) {
-        return makeIcon("err4xx", entry.response.status + " response status: " + entry.response.statusText);
+    else if (heuristics.isInStatusCodeRange(harEntry, 400, 499)) {
+        return makeIcon("err4xx", harEntry.response.status + " response status: " + harEntry.response.statusText);
     }
-    else if (heuristics.isInStatusCodeRange(entry, 500, 599)) {
-        return makeIcon("err5xx", entry.response.status + " response status: " + entry.response.statusText);
+    else if (heuristics.isInStatusCodeRange(harEntry, 500, 599)) {
+        return makeIcon("err5xx", harEntry.response.status + " response status: " + harEntry.response.statusText);
     }
     else {
-        return makeIcon(block.requestType, block.requestType);
+        return makeIcon(entry.requestType, entry.requestType);
     }
 }
 exports.getMimeTypeIcon = getMimeTypeIcon;
 /**
  * Scan the request for errors or portential issues and highlight them
- * @param  {WaterfallEntry} block
+ * @param  {WaterfallEntry} entry
  * @param  {boolean} docIsSsl
  * @returns {Icon[]}
  */
-function getIndicatorIcons(block, docIsSsl) {
-    var entry = block.rawResource;
+function getIndicatorIcons(entry, docIsSsl) {
+    var harEntry = entry.rawResource;
     var output = [];
-    if (docIsSsl && !heuristics.isSecure(block)) {
+    if (docIsSsl && !heuristics.isSecure(entry)) {
         output.push(makeIcon("noTls", "Insecure Connection"));
     }
-    if (heuristics.hasCacheIssue(block)) {
+    if (heuristics.hasCacheIssue(entry)) {
         output.push(makeIcon("noCache", "Response not cached"));
     }
-    if (heuristics.hasCompressionIssue(block)) {
+    if (heuristics.hasCompressionIssue(entry)) {
         output.push(makeIcon("noGzip", "no gzip"));
     }
-    if (!entry.response.content.mimeType && heuristics.isInStatusCodeRange(entry, 200, 299)) {
+    if (!harEntry.response.content.mimeType && heuristics.isInStatusCodeRange(harEntry, 200, 299)) {
         output.push(makeIcon("warning", "No MIME Type defined"));
     }
     return output;
 }
 exports.getIndicatorIcons = getIndicatorIcons;
 
-},{"../../helpers/heuristics":1}],17:[function(require,module,exports){
+},{"../../helpers/heuristics":2}],18:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1503,7 +1534,7 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":3,"../../helpers/svg":4,"../../transformers/styling-converters":10}],18:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":5,"../../transformers/styling-converters":11}],19:[function(require,module,exports){
 "use strict";
 var heuristics = require("../../helpers/heuristics");
 var icons = require("../../helpers/icons");
@@ -1518,19 +1549,19 @@ clipPathElProto.appendChild(svg.newRect({
     "width": "100%",
 }));
 // Create row for a single request
-function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetailsOverlayShow) {
+function createRow(context, index, rectData, entry, labelXPos, onDetailsOverlayShow) {
     var y = rectData.y;
     var rowHeight = rectData.height;
-    var leftColumnWith = options.leftColumnWith;
+    var leftColumnWith = context.options.leftColumnWith;
     var rowCssClass = ["row-item"];
-    if (heuristics.isInStatusCodeRange(block.rawResource, 500, 599)) {
+    if (heuristics.isInStatusCodeRange(entry.rawResource, 500, 599)) {
         rowCssClass.push("status5xx");
     }
-    if (heuristics.isInStatusCodeRange(block.rawResource, 400, 499)) {
+    if (heuristics.isInStatusCodeRange(entry.rawResource, 400, 499)) {
         rowCssClass.push("status4xx");
     }
-    else if (block.rawResource.response.status !== 304 &&
-        heuristics.isInStatusCodeRange(block.rawResource, 300, 399)) {
+    else if (entry.rawResource.response.status !== 304 &&
+        heuristics.isInStatusCodeRange(entry.rawResource, 300, 399)) {
         // 304 == Not Modified, so not an issue
         rowCssClass.push("status3xx");
     }
@@ -1544,23 +1575,23 @@ function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetai
         "x": leftColumnWith + "%",
     });
     var requestNumber = index + 1 + ". ";
-    var rect = rowSubComponents.createRect(rectData, block.segments, block.total);
-    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, requestNumber + misc.resourceUrlFormatter(block.name, 40), rowHeight);
-    var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, requestNumber + block.name, rowHeight);
+    var rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
+    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, requestNumber + misc.resourceUrlFormatter(entry.name, 40), rowHeight);
+    var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, requestNumber + entry.name, rowHeight);
     var rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow);
     var rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow);
     var bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
     // create and attach request block
     rowBar.appendChild(rect);
     var x = 3;
-    if (options.showMimeTypeIcon) {
-        var icon = indicators.getMimeTypeIcon(block);
+    if (context.options.showMimeTypeIcon) {
+        var icon = indicators.getMimeTypeIcon(entry);
         rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
         x += icon.width;
     }
-    if (options.showIndicatorIcons) {
+    if (context.options.showIndicatorIcons) {
         // Create and add warnings for potential issues
-        indicators.getIndicatorIcons(block, docIsSsl).forEach(function (icon) {
+        indicators.getIndicatorIcons(entry, context.docIsSsl).forEach(function (icon) {
             rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
             x += icon.width;
         });
@@ -1576,7 +1607,7 @@ function createRow(index, rectData, block, labelXPos, options, docIsSsl, onDetai
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":1,"../../helpers/icons":2,"../../helpers/misc":3,"../../helpers/svg":4,"./svg-indicators":16,"./svg-row-subcomponents":17}],19:[function(require,module,exports){
+},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":17,"./svg-row-subcomponents":18}],20:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  */
@@ -1636,7 +1667,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/svg":4}],20:[function(require,module,exports){
+},{"../../helpers/svg":5}],21:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1644,18 +1675,18 @@ exports.makeHoverEvtListeners = makeHoverEvtListeners;
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
 var styling_converters_1 = require("../../transformers/styling-converters");
-var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
 /**
  * Renders a per-second marker line and appends it to `timeHolder`
  *
+ * @param  {Context} context  Execution context object
  * @param  {SVGGElement} timeHolder element that the second marker is appended to
- * @param  {number} diagramHeight  Full height of SVG in px
  * @param  {number} secsTotal  total number of seconds in the timeline
  * @param  {number} sec second of the time marker to render
  * @param  {boolean} addLabel  if true a time label is added to the marker-line
  */
-var appendSecond = function (timeHolder, diagramHeight, secsTotal, sec, addLabel) {
+var appendSecond = function (context, timeHolder, secsTotal, sec, addLabel) {
     if (addLabel === void 0) { addLabel = false; }
+    var diagramHeight = context.diagramHeight;
     var secPerc = 100 / secsTotal;
     /** just used if `addLabel` is `true` - for full seconds */
     var lineLabel;
@@ -1678,7 +1709,7 @@ var appendSecond = function (timeHolder, diagramHeight, secsTotal, sec, addLabel
         "y1": 0,
         "y2": diagramHeight,
     }, lineClass);
-    overlayChangesPubSub.subscribeToOverlayChanges(function (change) {
+    context.pubSub.subscribeToOverlayChanges(function (change) {
         var offset = change.combinedOverlayHeight;
         // figure out why there is an offset
         var scale = (diagramHeight + offset) / (diagramHeight);
@@ -1694,11 +1725,11 @@ var appendSecond = function (timeHolder, diagramHeight, secsTotal, sec, addLabel
 };
 /**
  * Renders the time-scale SVG elements (1sec, 2sec...)
+ * @param  {Context} context  Execution context object
  * @param {number} durationMs    Full duration of the waterfall
- * @param {number} diagramHeight Full height of SVG in px
  * @param {number} subSecondStepMs  Distant (time in ms) between sub-second time-scales
  */
-function createTimeScale(durationMs, diagramHeight, subSecondStepMs) {
+function createTimeScale(context, durationMs, subSecondStepMs) {
     if (subSecondStepMs === void 0) { subSecondStepMs = 200; }
     var timeHolder = svg.newG("time-scale full-width");
     /** steps between each second marker */
@@ -1708,41 +1739,40 @@ function createTimeScale(durationMs, diagramHeight, subSecondStepMs) {
     for (var i = 0; i <= steps; i++) {
         var isFullSec = i % subSecondSteps === 0;
         var secValue = i / subSecondSteps;
-        appendSecond(timeHolder, diagramHeight, secs, secValue, isFullSec);
+        appendSecond(context, timeHolder, secs, secValue, isFullSec);
     }
     return timeHolder;
 }
 exports.createTimeScale = createTimeScale;
 // TODO: Implement - data for this not parsed yet
-function createBgRect(block, unit, diagramHeight) {
+function createBgRect(context, entry) {
     var rect = svg.newRect({
-        "height": diagramHeight,
-        "width": ((block.total || 1) / unit) + "%",
-        "x": ((block.start || 0.001) / unit) + "%",
+        "height": context.diagramHeight,
+        "width": ((entry.total || 1) / context.unit) + "%",
+        "x": ((entry.start || 0.001) / context.unit) + "%",
         "y": 0,
-    }, styling_converters_1.requestTypeToCssClass(block.requestType));
-    rect.appendChild(svg.newTitle(block.name)); // Add tile to wedge path
+    }, styling_converters_1.requestTypeToCssClass(entry.requestType));
+    rect.appendChild(svg.newTitle(entry.name)); // Add tile to wedge path
     return rect;
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/misc":3,"../../helpers/svg":4,"../../transformers/styling-converters":10,"../details-overlay/overlay-changes-pub-sub":13}],21:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":5,"../../transformers/styling-converters":11}],22:[function(require,module,exports){
 "use strict";
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
-var overlayChangesPubSub = require("../details-overlay/overlay-changes-pub-sub");
 /**
  * Renders global marks for events like the onLoad event etc
+ * @param  {Context} context  Execution context object
  * @param {Mark[]} marks         [description]
- * @param {number}      unit          horizontal unit (duration in ms of 1%)
- * @param {number}      diagramHeight Full height of SVG in px
  */
-function createMarks(marks, unit, diagramHeight) {
+function createMarks(context, marks) {
+    var diagramHeight = context.diagramHeight;
     var marksHolder = svg.newG("marker-holder", {
         "transform": "scale(1, 1)",
     });
     marks.forEach(function (mark, i) {
-        var x = misc_1.roundNumber(mark.startTime / unit);
+        var x = misc_1.roundNumber(mark.startTime / context.unit);
         var markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase());
         var lineHolder = svg.newG("line-holder");
         var lineLabelHolder = svg.newG("line-label-holder");
@@ -1768,7 +1798,7 @@ function createMarks(marks, unit, diagramHeight) {
         });
         lineHolder.appendChild(line);
         lineHolder.appendChild(lineConnection);
-        overlayChangesPubSub.subscribeToOverlayChanges(function (change) {
+        context.pubSub.subscribeToOverlayChanges(function (change) {
             var offset = change.combinedOverlayHeight;
             var scale = (diagramHeight + offset) / (diagramHeight);
             line.setAttribute("transform", "scale(1, " + scale + ")");
@@ -1800,12 +1830,12 @@ function createMarks(marks, unit, diagramHeight) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/misc":3,"../../helpers/svg":4,"../details-overlay/overlay-changes-pub-sub":13}],22:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":5}],23:[function(require,module,exports){
 "use strict";
 var svg = require("../helpers/svg");
 var styling_converters_1 = require("../transformers/styling-converters");
-var overlayChangesPubSub = require("./details-overlay/overlay-changes-pub-sub");
-var overlayManager = require("./details-overlay/svg-details-overlay-manager");
+var overlay_changes_pub_sub_1 = require("./details-overlay/overlay-changes-pub-sub");
+var svg_details_overlay_manager_1 = require("./details-overlay/svg-details-overlay-manager");
 var indicators = require("./row/svg-indicators");
 var row = require("./row/svg-row");
 var alignmentHelper = require("./sub-components/svg-alignment-helper");
@@ -1825,29 +1855,48 @@ function getSvgHeight(marks, diagramHeight) {
     return Math.floor(diagramHeight + maxMarkTextLength + 35);
 }
 /**
+ * Intitializes the context object
+ * @param {WaterfallData} data - Object containing the setup parameter
+ * @param {ChartOptions} options - Chart config/customization options
+ * @param {WaterfallEntry[]} entriesToShow - Filtered array of entries that will be rendered
+ * @return {Context} Context object
+ */
+function createContext(data, options, entriesToShow, overlayHolder) {
+    var unit = data.durationMs / 100;
+    var diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
+    var docIsSsl = (data.entries[0].name.indexOf("https://") === 0);
+    var context = {
+        diagramHeight: diagramHeight,
+        overlayManager: undefined,
+        pubSub: new overlay_changes_pub_sub_1.default(),
+        unit: unit,
+        options: options,
+        docIsSsl: docIsSsl,
+    };
+    // `overlayManager` needs the `context` reference, so it's attached later
+    context.overlayManager = new svg_details_overlay_manager_1.default(context, overlayHolder);
+    return context;
+}
+/**
  * Entry point to start rendering the full waterfall SVG
- * @param {WaterfallData} data  Object containing the setup parameter
- * @param {ChartOptions} options
- * @return {SVGSVGElement}            SVG Element ready to render
+ * @param {WaterfallData} data - Object containing the setup parameter
+ * @param {ChartOptions} options - Chart config/customization options
+ * @return {SVGSVGElement} - SVG Element ready to render
  */
 function createWaterfallSvg(data, options) {
     // constants
-    /** horizontal unit (duration in ms of 1%) */
-    var unit = data.durationMs / 100;
-    var barsToShow = data.blocks
-        .filter(function (block) { return (typeof block.start === "number" && typeof block.total === "number"); })
+    var entriesToShow = data.entries
+        .filter(function (entry) { return (typeof entry.start === "number" && typeof entry.total === "number"); })
         .sort(function (a, b) { return (a.start || 0) - (b.start || 0); });
-    var docIsSsl = (data.blocks[0].name.indexOf("https://") === 0);
-    /** height of the requests part of the diagram in px */
-    var diagramHeight = (barsToShow.length + 1) * options.rowHeight;
+    /** Holder of request-details overlay */
+    var overlayHolder = svg.newG("overlays");
+    var context = createContext(data, options, entriesToShow, overlayHolder);
     /** full height of the SVG chart in px */
-    var chartHolderHeight = getSvgHeight(data.marks, diagramHeight);
+    var chartHolderHeight = getSvgHeight(data.marks, context.diagramHeight);
     /** Main SVG Element that holds all data */
     var timeLineHolder = svg.newSvg("water-fall-chart", {
         "height": chartHolderHeight,
     });
-    /** Holder of request-details overlay */
-    var overlayHolder = svg.newG("overlays");
     /** Holder for scale, event and marks */
     var scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
         "width": 100 - options.leftColumnWith + "%",
@@ -1860,62 +1909,62 @@ function createWaterfallSvg(data, options) {
     var mouseListeners;
     if (options.showAlignmentHelpers) {
         hoverOverlayHolder = svg.newG("hover-overlays");
-        var hoverEl = alignmentHelper.createAlignmentLines(diagramHeight);
+        var hoverEl = alignmentHelper.createAlignmentLines(context.diagramHeight);
         hoverOverlayHolder.appendChild(hoverEl.startline);
         hoverOverlayHolder.appendChild(hoverEl.endline);
         mouseListeners = alignmentHelper.makeHoverEvtListeners(hoverEl);
     }
     // Start appending SVG elements to the holder element (timeLineHolder)
-    scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(data.durationMs, diagramHeight));
-    scaleAndMarksHolder.appendChild(marks.createMarks(data.marks, unit, diagramHeight));
-    data.lines.forEach(function (block) {
-        timeLineHolder.appendChild(generalComponents.createBgRect(block, unit, diagramHeight));
+    scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(context, data.durationMs));
+    scaleAndMarksHolder.appendChild(marks.createMarks(context, data.marks));
+    data.lines.forEach(function (entry) {
+        timeLineHolder.appendChild(generalComponents.createBgRect(context, entry));
     });
     var labelXPos = 5;
     // This assumes all icons (mime and indicators) have the same width
-    var iconWidth = indicators.getMimeTypeIcon(barsToShow[0]).width;
+    var iconWidth = indicators.getMimeTypeIcon(entriesToShow[0]).width;
     if (options.showMimeTypeIcon) {
         labelXPos += iconWidth;
     }
     if (options.showIndicatorIcons) {
-        var iconsPerBlock = barsToShow.map(function (block) {
-            return indicators.getIndicatorIcons(block, docIsSsl).length;
+        var iconsPerBlock = entriesToShow.map(function (entry) {
+            return indicators.getIndicatorIcons(entry, context.docIsSsl).length;
         });
         labelXPos += iconWidth * Math.max.apply(null, iconsPerBlock);
     }
     var barEls = [];
     function getChartHeight() {
-        return (chartHolderHeight + overlayManager.getCombinedOverlayHeight()).toString() + "px";
+        return (chartHolderHeight + context.overlayManager.getCombinedOverlayHeight()).toString() + "px";
     }
-    overlayChangesPubSub.subscribeToOverlayChanges(function () {
+    context.pubSub.subscribeToOverlayChanges(function () {
         timeLineHolder.style.height = getChartHeight();
     });
     /** Renders single row and hooks up behaviour */
-    function renderRow(block, i) {
-        var blockWidth = block.total || 1;
+    function renderRow(entry, i) {
+        var entryWidth = entry.total || 1;
         var y = options.rowHeight * i;
-        var x = (block.start || 0.001);
+        var x = (entry.start || 0.001);
         var accordionHeight = 450;
         var rectData = {
-            "cssClass": styling_converters_1.requestTypeToCssClass(block.requestType),
+            "cssClass": styling_converters_1.requestTypeToCssClass(entry.requestType),
             "height": options.rowHeight,
             "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-            "label": block.name + " (" + block.start + "ms - " + block.end + "ms | total: " + block.total + "ms)",
+            "label": entry.name + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
             "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
-            "unit": unit,
-            "width": blockWidth,
+            "unit": context.unit,
+            "width": entryWidth,
             "x": x,
             "y": y,
         };
         var showDetailsOverlay = function () {
-            overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, block, overlayHolder, barEls);
+            context.overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
         };
-        var rowItem = row.createRow(i, rectData, block, labelXPos, options, docIsSsl, showDetailsOverlay);
+        var rowItem = row.createRow(context, i, rectData, entry, labelXPos, showDetailsOverlay);
         barEls.push(rowItem);
         rowHolder.appendChild(rowItem);
     }
     // Main loop to render rows with blocks
-    barsToShow.forEach(renderRow);
+    entriesToShow.forEach(renderRow);
     if (options.showAlignmentHelpers) {
         scaleAndMarksHolder.appendChild(hoverOverlayHolder);
     }
@@ -1926,5 +1975,5 @@ function createWaterfallSvg(data, options) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":4,"../transformers/styling-converters":10,"./details-overlay/overlay-changes-pub-sub":13,"./details-overlay/svg-details-overlay-manager":14,"./row/svg-indicators":16,"./row/svg-row":18,"./sub-components/svg-alignment-helper":19,"./sub-components/svg-general-components":20,"./sub-components/svg-marks":21}]},{},[6])(6)
+},{"../helpers/svg":5,"../transformers/styling-converters":11,"./details-overlay/overlay-changes-pub-sub":14,"./details-overlay/svg-details-overlay-manager":15,"./row/svg-indicators":17,"./row/svg-row":19,"./sub-components/svg-alignment-helper":20,"./sub-components/svg-general-components":21,"./sub-components/svg-marks":22}]},{},[7])(7)
 });
