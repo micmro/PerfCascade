@@ -1,5 +1,5 @@
 import {Entry} from "../typing/har";
-import {WaterfallEntry} from "../typing/waterfall";
+import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
 import {getHeader, hasHeader} from "./har";
 import * as misc from "./misc";
 
@@ -73,4 +73,14 @@ export function hasCompressionIssue(entry: WaterfallEntry) {
 
 export function isSecure(entry: WaterfallEntry) {
   return entry.name.indexOf("https://") === 0;
+}
+
+/**
+ * Check if the document (disregarding any initial http->https redirects) is loaded over a secure connection.
+ * @param data the waterfall data.
+ * @returns {boolean}
+ */
+export function documentIsSecure(data: WaterfallData) {
+  const rootDocument = data.entries.filter((e) => !e.rawResource.response.redirectURL)[0];
+  return isSecure(rootDocument);
 }
