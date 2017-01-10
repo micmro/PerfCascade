@@ -1,20 +1,15 @@
 // simple pub/sub for change to the overlay
+import {PubSubClass} from "../../typing/context.d";
+import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay.d";
 
-import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay";
+export default class PubSub implements PubSubClass {
+  private subscribers: OverlayChangeSubscriber[] = [];
 
-export const eventTypes = {
-  "CLOSE" : "closed",
-  "OPEN" : "open",
+  public subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {
+    this.subscribers.push(fn);
+  }
+
+  public publishToOverlayChanges(change: OverlayChangeEvent) {
+    this.subscribers.forEach((fn) => fn(change));
+  }
 };
-
-let subscribers: OverlayChangeSubscriber[] = [];
-
-export function subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {
-  subscribers.push(fn);
-}
-
-// no need for unsubscribe in the moment
-
-export function publishToOverlayChanges(change: OverlayChangeEvent) {
-  subscribers.forEach((fn) => fn(change));
-}

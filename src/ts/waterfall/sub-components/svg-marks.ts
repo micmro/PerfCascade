@@ -1,22 +1,22 @@
 import {roundNumber} from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
+import {Context} from "../../typing/context";
 import {OverlayChangeEvent} from "../../typing/open-overlay";
 import {Mark} from "../../typing/waterfall";
-import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub";
 
 /**
  * Renders global marks for events like the onLoad event etc
+ * @param  {Context} context  Execution context object
  * @param {Mark[]} marks         [description]
- * @param {number}      unit          horizontal unit (duration in ms of 1%)
- * @param {number}      diagramHeight Full height of SVG in px
  */
-export function createMarks(marks: Mark[], unit: number, diagramHeight: number) {
+export function createMarks(context: Context, marks: Mark[]) {
+  const diagramHeight = context.diagramHeight;
   let marksHolder = svg.newG("marker-holder", {
     "transform": "scale(1, 1)",
   });
 
   marks.forEach((mark, i) => {
-    let x = roundNumber(mark.startTime / unit);
+    let x = roundNumber(mark.startTime / context.unit);
     let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase());
     let lineHolder = svg.newG("line-holder");
     let lineLabelHolder = svg.newG("line-label-holder");
@@ -45,7 +45,7 @@ export function createMarks(marks: Mark[], unit: number, diagramHeight: number) 
     lineHolder.appendChild(line);
     lineHolder.appendChild(lineConnection);
 
-    overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
+    context.pubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
       let offset = change.combinedOverlayHeight;
       let scale = (diagramHeight + offset) / (diagramHeight);
 

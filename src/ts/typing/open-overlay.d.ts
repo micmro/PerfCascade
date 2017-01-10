@@ -13,11 +13,16 @@ export interface OpenOverlay {
 }
 
 export interface OverlayChangeEvent {
-  type: string;
+  type: EventType;
+  /** list of currenly open overlays */
   openOverlays: OpenOverlay[];
   combinedOverlayHeight: number;
 }
 
-export interface OverlayChangeSubscriber {
-  (change: OverlayChangeEvent): void;
-}
+/**
+ * @param  {OverlayChangeEvent} change - overlay change event
+ * @returns void
+ */
+export type OverlayChangeSubscriber = (change: OverlayChangeEvent) => void;
+
+export type EventType = "closed" | "open";
