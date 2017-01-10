@@ -1,3 +1,4 @@
+import {documentIsSecure} from "../helpers/heuristics";
 import * as svg from "../helpers/svg";
 import {requestTypeToCssClass} from "../transformers/styling-converters";
 import {Context} from "../typing/context";
@@ -40,7 +41,7 @@ function createContext(data: WaterfallData, options: ChartOptions,
                        entriesToShow: WaterfallEntry[], overlayHolder: SVGGElement): Context {
   const unit = data.durationMs / 100;
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
-  const docIsSsl = (data.entries[0].name.indexOf("https://") === 0);
+  const docIsSsl = documentIsSecure(data);
 
   let context = {
     diagramHeight,
