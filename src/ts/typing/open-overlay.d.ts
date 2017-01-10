@@ -17,15 +17,12 @@ export interface OverlayChangeEvent {
   /** list of currenly open overlays */
   openOverlays: OpenOverlay[];
   combinedOverlayHeight: number;
-  /** unique id to identify of the overlay holder to identify the chart */
-  overlayHolderId: string;
 }
 
 /**
  * @param  {OverlayChangeEvent} change - overlay change event
- * @param  {SVGSVGElement} chartBaseEl - base chart element of the chart instance that has triggered the update
  * @returns void
  */
-export type OverlayChangeSubscriber = (change: OverlayChangeEvent, chartBaseEl: SVGSVGElement) => void;
+export type OverlayChangeSubscriber = (change: OverlayChangeEvent) => void;
 
 export type EventType = "closed" | "open";

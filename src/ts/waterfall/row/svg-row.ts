@@ -2,7 +2,7 @@ import * as heuristics from "../../helpers/heuristics";
 import * as icons from "../../helpers/icons";
 import * as misc from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
-import { ChartOptions } from "../../typing/options";
+import { Context } from "../../typing/context";
 import { RectData } from "../../typing/rect-data";
 import {WaterfallEntry} from "../../typing/waterfall";
 import * as indicators from "./svg-indicators";
@@ -16,13 +16,12 @@ clipPathElProto.appendChild(svg.newRect({
 }));
 
 // Create row for a single request
-export function createRow(index: number, rectData: RectData, entry: WaterfallEntry,
-                          labelXPos: number, options: ChartOptions, docIsSsl: boolean,
-                          onDetailsOverlayShow: EventListener): SVGGElement {
+export function createRow(context: Context, index: number, rectData: RectData, entry: WaterfallEntry,
+                          labelXPos: number, onDetailsOverlayShow: EventListener): SVGGElement {
 
   const y = rectData.y;
   const rowHeight = rectData.height;
-  const leftColumnWith = options.leftColumnWith;
+  const leftColumnWith = context.options.leftColumnWith;
 
   let rowCssClass = ["row-item"];
   if (heuristics.isInStatusCodeRange(entry.rawResource, 500, 599)) {
@@ -62,15 +61,15 @@ export function createRow(index: number, rectData: RectData, entry: WaterfallEnt
 
   let x = 3;
 
-  if (options.showMimeTypeIcon) {
+  if (context.options.showMimeTypeIcon) {
     const icon = indicators.getMimeTypeIcon(entry);
     rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
     x += icon.width;
   }
 
-  if (options.showIndicatorIcons) {
+  if (context.options.showIndicatorIcons) {
     // Create and add warnings for potential issues
-    indicators.getIndicatorIcons(entry, docIsSsl).forEach((icon: indicators.Icon) => {
+    indicators.getIndicatorIcons(entry, context.docIsSsl).forEach((icon: indicators.Icon) => {
       rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
       x += icon.width;
     });

@@ -1,17 +1,15 @@
 // simple pub/sub for change to the overlay
+import {PubSubClass} from "../../typing/context.d";
+import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay.d";
 
-import {getBaseEl} from "../../helpers/svg";
-import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay";
+export default class PubSub implements PubSubClass {
+  private subscribers: OverlayChangeSubscriber[] = [];
 
-let subscribers: OverlayChangeSubscriber[] = [];
+  public subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {
+    this.subscribers.push(fn);
+  }
 
-export function subscribeToOverlayChanges(fn: OverlayChangeSubscriber) {
-  subscribers.push(fn);
-}
-
-// no need for unsubscribe in the moment
-
-export function publishToOverlayChanges(change: OverlayChangeEvent, overlayHolder: SVGGElement) {
-  let eventChartBaseEl = getBaseEl(overlayHolder);
-  subscribers.forEach((fn) => fn(change, eventChartBaseEl));
+  public publishToOverlayChanges(change: OverlayChangeEvent) {
+    this.subscribers.forEach((fn) => fn(change));
+  }
 };

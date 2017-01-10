@@ -5,21 +5,23 @@
 import { roundNumber } from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
 import { requestTypeToCssClass } from "../../transformers/styling-converters";
+import { Context } from "../../typing/context";
 import { OverlayChangeEvent } from "../../typing/open-overlay";
 import { WaterfallEntry } from "../../typing/waterfall";
-import * as overlayChangesPubSub from "../details-overlay/overlay-changes-pub-sub";
 
 /**
  * Renders a per-second marker line and appends it to `timeHolder`
  *
+ * @param  {Context} context  Execution context object
  * @param  {SVGGElement} timeHolder element that the second marker is appended to
- * @param  {number} diagramHeight  Full height of SVG in px
  * @param  {number} secsTotal  total number of seconds in the timeline
  * @param  {number} sec second of the time marker to render
  * @param  {boolean} addLabel  if true a time label is added to the marker-line
  */
-let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
-  secsTotal: number, sec: number, addLabel: boolean = false) => {
+let appendSecond = (context: Context, timeHolder: SVGGElement,
+                    secsTotal: number, sec: number, addLabel: boolean = false) => {
+
+  const diagramHeight = context.diagramHeight;
   const secPerc = 100 / secsTotal;
   /** just used if `addLabel` is `true` - for full seconds */
   let lineLabel;
@@ -45,10 +47,7 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
     "y2": diagramHeight,
   }, lineClass);
 
-  overlayChangesPubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
-    if (!svg.isSameChart(timeHolder, change.overlayHolderId)) {
-      return;
-    }
+  context.pubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
     let offset = change.combinedOverlayHeight;
     // figure out why there is an offset
     let scale = (diagramHeight + offset) / (diagramHeight);
@@ -67,11 +66,11 @@ let appendSecond = (timeHolder: SVGGElement, diagramHeight: number,
 
 /**
  * Renders the time-scale SVG elements (1sec, 2sec...)
+ * @param  {Context} context  Execution context object
  * @param {number} durationMs    Full duration of the waterfall
- * @param {number} diagramHeight Full height of SVG in px
  * @param {number} subSecondStepMs  Distant (time in ms) between sub-second time-scales
  */
-export function createTimeScale(durationMs: number, diagramHeight: number, subSecondStepMs = 200): SVGGElement {
+export function createTimeScale(context: Context, durationMs: number, subSecondStepMs = 200): SVGGElement {
   let timeHolder = svg.newG("time-scale full-width");
   /** steps between each second marker */
   const subSecondSteps = 1000 / subSecondStepMs;
@@ -82,17 +81,17 @@ export function createTimeScale(durationMs: number, diagramHeight: number, subSe
     const isFullSec = i % subSecondSteps === 0;
     const secValue = i / subSecondSteps;
 
-    appendSecond(timeHolder, diagramHeight, secs, secValue, isFullSec);
+    appendSecond(context, timeHolder, secs, secValue, isFullSec);
   }
   return timeHolder;
 }
 
 // TODO: Implement - data for this not parsed yet
-export function createBgRect(entry: WaterfallEntry, unit: number, diagramHeight: number): SVGRectElement {
+export function createBgRect(context: Context, entry: WaterfallEntry): SVGRectElement {
   let rect = svg.newRect({
-    "height": diagramHeight,
-    "width": ((entry.total || 1) / unit) + "%",
-    "x": ((entry.start || 0.001) / unit) + "%",
+    "height": context.diagramHeight,
+    "width": ((entry.total || 1) / context.unit) + "%",
+    "x": ((entry.start || 0.001) / context.unit) + "%",
     "y": 0,
   }, requestTypeToCssClass(entry.requestType));
 

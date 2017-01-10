@@ -1,13 +1,14 @@
 import * as svg from "../helpers/svg";
 import {baseCssClassName} from "../state/global-static-settings";
 import {requestTypeToCssClass} from "../transformers/styling-converters";
+import {Context} from "../typing/context";
 import {ChartOptions} from "../typing/options";
 import {RectData} from "../typing/rect-data";
 import {HoverEvtListeners} from "../typing/svg-alignment-helpers";
 import {Mark} from "../typing/waterfall";
 import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
-import * as overlayChangesPubSub from "./details-overlay/overlay-changes-pub-sub";
-import * as overlayManager from "./details-overlay/svg-details-overlay-manager";
+import PubSub from "./details-overlay/overlay-changes-pub-sub";
+import OverlayManager from "./details-overlay/svg-details-overlay-manager";
 import * as indicators from "./row/svg-indicators";
 import * as row from "./row/svg-row";
 import * as alignmentHelper from  "./sub-components/svg-alignment-helper";
@@ -30,36 +31,57 @@ function getSvgHeight(marks: Mark[], diagramHeight: number): number {
 }
 
 /**
+ * Intitializes the context object
+ * @param {WaterfallData} data - Object containing the setup parameter
+ * @param {ChartOptions} options - Chart config/customization options
+ * @param {WaterfallEntry[]} entriesToShow - Filtered array of entries that will be rendered
+ * @return {Context} Context object
+ */
+function createContext(data: WaterfallData, options: ChartOptions,
+                       entriesToShow: WaterfallEntry[], overlayHolder: SVGGElement): Context {
+  const unit = data.durationMs / 100;
+  const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
+  const docIsSsl = (data.entries[0].name.indexOf("https://") === 0);
+
+  let context = {
+    diagramHeight,
+    overlayManager: undefined,
+    pubSub : new PubSub(),
+    unit,
+    options,
+    docIsSsl,
+  };
+  // `overlayManager` needs the `context` reference, so it's attached later
+  context.overlayManager = new OverlayManager(context, overlayHolder);
+
+  return context;
+}
+
+/**
  * Entry point to start rendering the full waterfall SVG
- * @param {WaterfallData} data  Object containing the setup parameter
- * @param {ChartOptions} options
- * @return {SVGSVGElement}            SVG Element ready to render
+ * @param {WaterfallData} data - Object containing the setup parameter
+ * @param {ChartOptions} options - Chart config/customization options
+ * @return {SVGSVGElement} - SVG Element ready to render
  */
 export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): SVGSVGElement {
   // constants
-
-  /** horizontal unit (duration in ms of 1%) */
-  const unit: number = data.durationMs / 100;
   const entriesToShow = data.entries
     .filter((entry) => (typeof entry.start === "number" && typeof entry.total === "number"))
     .sort((a, b) => (a.start || 0) - (b.start || 0));
-  const docIsSsl = (data.entries[0].name.indexOf("https://") === 0);
-  /** height of the requests part of the diagram in px */
-  const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
+
+  /** Holder of request-details overlay */
+  let overlayHolder = svg.newG("overlays");
+
+  const context = createContext(data, options, entriesToShow, overlayHolder);
+
   /** full height of the SVG chart in px */
-  const chartHolderHeight = getSvgHeight(data.marks, diagramHeight);
-  /** random generated `id` used to identify overlay updates */
-  const overlayId = "overlay-" + (Math.random() * 100000000).toFixed(0);
+  const chartHolderHeight = getSvgHeight(data.marks, context.diagramHeight);
 
   /** Main SVG Element that holds all data */
   let timeLineHolder = svg.newSvg(baseCssClassName, {
     "height": chartHolderHeight,
   });
 
-  /** Holder of request-details overlay */
-  let overlayHolder = svg.newG("overlays", {
-    "id": overlayId,
-  });
   /** Holder for scale, event and marks */
   let scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
     "width": `${100 - options.leftColumnWith}%`,
@@ -73,7 +95,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   let mouseListeners: HoverEvtListeners;
   if (options.showAlignmentHelpers) {
     hoverOverlayHolder = svg.newG("hover-overlays");
-    let hoverEl = alignmentHelper.createAlignmentLines(diagramHeight);
+    let hoverEl = alignmentHelper.createAlignmentLines(context.diagramHeight);
     hoverOverlayHolder.appendChild(hoverEl.startline);
     hoverOverlayHolder.appendChild(hoverEl.endline);
     mouseListeners = alignmentHelper.makeHoverEvtListeners(hoverEl);
@@ -81,11 +103,11 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
 
   // Start appending SVG elements to the holder element (timeLineHolder)
 
-  scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(data.durationMs, diagramHeight));
-  scaleAndMarksHolder.appendChild(marks.createMarks(data.marks, unit, diagramHeight));
+  scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(context, data.durationMs));
+  scaleAndMarksHolder.appendChild(marks.createMarks(context, data.marks));
 
   data.lines.forEach((entry) => {
-    timeLineHolder.appendChild(generalComponents.createBgRect(entry, unit, diagramHeight));
+    timeLineHolder.appendChild(generalComponents.createBgRect(context, entry));
   });
 
   let labelXPos = 5;
@@ -99,20 +121,17 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
 
   if (options.showIndicatorIcons) {
     const iconsPerBlock = entriesToShow.map((entry: WaterfallEntry) =>
-      indicators.getIndicatorIcons(entry, docIsSsl).length);
+      indicators.getIndicatorIcons(entry, context.docIsSsl).length);
     labelXPos += iconWidth * Math.max.apply(null, iconsPerBlock);
   }
 
   let barEls: SVGGElement[] = [];
 
-  function getChartHeight(overlayHolderId: string): string {
-    return (chartHolderHeight + overlayManager.getCombinedOverlayHeight(overlayHolderId)).toString() + "px";
+  function getChartHeight(): string {
+    return (chartHolderHeight + context.overlayManager.getCombinedOverlayHeight()).toString() + "px";
   }
-  overlayChangesPubSub.subscribeToOverlayChanges((e) => {
-    if (e.overlayHolderId !== overlayId) {
-      return;
-    }
-    timeLineHolder.style.height = getChartHeight(e.overlayHolderId);
+  context.pubSub.subscribeToOverlayChanges(() => {
+    timeLineHolder.style.height = getChartHeight();
   });
 
   /** Renders single row and hooks up behaviour */
@@ -127,18 +146,17 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
       "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
       "label": entry.name + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
       "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
-      "unit": unit,
+      "unit": context.unit,
       "width": entryWidth,
       "x": x,
       "y": y,
     } as RectData;
 
     let showDetailsOverlay = () => {
-      overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, entry, overlayHolder, barEls);
+      context.overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
     };
 
-    let rowItem = row.createRow(i, rectData, entry, labelXPos,
-      options, docIsSsl, showDetailsOverlay);
+    let rowItem = row.createRow(context, i, rectData, entry, labelXPos, showDetailsOverlay);
 
     barEls.push(rowItem);
     rowHolder.appendChild(rowItem);
