@@ -1,7 +1,7 @@
 
 * {box-sizing: border-box;}
 
-#output {margin: 2em 0; font-size: 12px; line-height: 1em;}
+.output {margin: 2em 0; font-size: 12px; line-height: 1em;}
 
 .water-fall-holder {fill:#ccc;}
 
