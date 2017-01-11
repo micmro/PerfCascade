@@ -20,8 +20,7 @@ const defaultOptions: Readonly<ChartOptions> = {
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {
   const options: ChartOptions = {...defaultOptions, ...chartOptions};
 
-  // setup state services
-  // waterfallDocsService.storeDocs(waterfallDocsData);
+  // setup paging helper
   let paging = new Paging(waterfallDocsData);
 
   let doc = createWaterfallSvg(paging.getSelectedPage(), options);
