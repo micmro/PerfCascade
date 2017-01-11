@@ -54,7 +54,8 @@ function parseGeneralDetails(entry: WaterfallEntry, requestID: number): KvTuple[
     ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
     ["Server IPAddress", harEntry.serverIPAddress],
     ["Connection", harEntry.connection],
-    ["Browser Priority", getExp(harEntry, "priority") || getExp(harEntry, "newPriority") || getExp(harEntry, "initialPriority")],
+    ["Browser Priority", getExp(harEntry, "priority") || getExp(harEntry, "newPriority") ||
+    getExp(harEntry, "initialPriority")],
     ["Was pushed", getExp(harEntry, "was_pushed")],
     ["Initiator (Loaded by)", getExp(harEntry, "initiator")],
     ["Initiator Line", getExp(harEntry, "initiator_line")],
