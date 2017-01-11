@@ -1,84 +1,90 @@
 import {OnPagingCb} from "../typing/paging";
-import {WaterfallData} from "../typing/waterfall";
+import {WaterfallData, WaterfallDocs} from "../typing/waterfall";
 
-import * as waterfallDocsService from "../state/waterfall-docs-service";
+/** Class to keep track of run of a multi-run har is beeing shown  */
+export default class Paging {
+  private selectedPageIndex = 0;
+  private onPageUpdateCbs: OnPagingCb[] = [];
 
-let selectedPageIndex = 0;
-let onPageUpdateCbs: OnPagingCb[] = [];
+  constructor(private doc: WaterfallDocs) {
 
-/**
- * Returns number of pages
- * @returns number - number of pages in current doc
- */
-export function getPageCount(): number {
-  return waterfallDocsService.getDocs().pages.length;
-}
-
-/**
- * Returns selected pages
- * @returns WaterfallData - currently selected page
- */
-export function getSelectedPage(): WaterfallData {
-  return waterfallDocsService.getDocs().pages[selectedPageIndex];
-}
-
-/**
- * Returns index of currently selected page
- * @returns number - index of current page (0 based)
- */
-export function getSelectedPageIndex(): number {
-  return selectedPageIndex;
-}
-
-/**
- * Update which pageIndex is currently update.
- * Published `onPageUpdate`
- * @param  {number} pageIndex
- */
-export function setSelectedPageIndex(pageIndex: number) {
-  if (selectedPageIndex === pageIndex) {
-    return;
-  }
-  if (pageIndex < 0 || pageIndex >=  getPageCount()) {
-    throw new Error("Page does not exist - Invalid pageIndex selected");
   }
 
-  selectedPageIndex = pageIndex;
-  let selectedPage = waterfallDocsService.getDocs().pages[selectedPageIndex];
-  onPageUpdateCbs.forEach((cd) => {
-    cd(selectedPageIndex, selectedPage);
-  });
-}
-
-/**
- * Register subscriber callbacks to be called when the pageindex updates
- * @param  {OnPagingCb} cb
- * @returns number - index of the callback
- */
-export function onPageUpdate(cb: OnPagingCb): number {
-  if (getPageCount() > 1) {
-    return onPageUpdateCbs.push(cb);
+  /**
+   * Returns number of pages
+   * @returns number - number of pages in current doc
+   */
+  public getPageCount(): number {
+    return this.doc.pages.length;
   }
-  return undefined;
-}
 
-/**
- * hooks up select box with paging options
- * @param  {HTMLSelectElement} selectbox
- */
-export function initPagingSelectBox(selectbox: HTMLSelectElement) {
-  if (getPageCount() <= 1) {
-    selectbox.style.display = "none";
-    return;
+  /**
+   * Returns selected pages
+   * @returns WaterfallData - currently selected page
+   */
+  public getSelectedPage(): WaterfallData {
+    return this.doc.pages[this.selectedPageIndex];
   }
-  waterfallDocsService.getDocs().pages.forEach((p, i) => {
-    let option = new Option(p.title, i.toString(), i === selectedPageIndex);
-    selectbox.add(option);
-  });
 
-  selectbox.style.display = "block";
-  selectbox.addEventListener("change", (evt) => {
-    let val = parseInt((evt.target as HTMLOptionElement).value, 10);
-    setSelectedPageIndex(val);
-  });
+  /**
+   * Returns index of currently selected page
+   * @returns number - index of current page (0 based)
+   */
+  public getSelectedPageIndex(): number {
+    return this.selectedPageIndex;
+  }
+
+  /**
+   * Update which pageIndex is currently update.
+   * Published `onPageUpdate`
+   * @param  {number} pageIndex
+   */
+  public setSelectedPageIndex(pageIndex: number) {
+    if (this.selectedPageIndex === pageIndex) {
+      return;
+    }
+    if (pageIndex < 0 || pageIndex >=  this.getPageCount()) {
+      throw new Error("Page does not exist - Invalid pageIndex selected");
+    }
+
+    this.selectedPageIndex = pageIndex;
+    let selectedPage = this.doc.pages[this.selectedPageIndex];
+    this.onPageUpdateCbs.forEach((cd) => {
+      cd(this.selectedPageIndex, selectedPage);
+    });
+  }
+
+  /**
+   * Register subscriber callbacks to be called when the pageindex updates
+   * @param  {OnPagingCb} cb
+   * @returns number - index of the callback
+   */
+  public onPageUpdate(cb: OnPagingCb): number {
+    if (this.getPageCount() > 1) {
+      return this.onPageUpdateCbs.push(cb);
+    }
+    return undefined;
+  }
+
+  /**
+   * hooks up select box with paging options
+   * @param  {HTMLSelectElement} selectbox
+   */
+  public initPagingSelectBox(selectbox: HTMLSelectElement) {
+    const self = this;
+    if (this.getPageCount() <= 1) {
+      selectbox.style.display = "none";
+      return;
+    }
+    this.doc.pages.forEach((p, i) => {
+      let option = new Option(p.title, i.toString(), i === this.selectedPageIndex);
+      selectbox.add(option);
+    });
+
+    selectbox.style.display = "block";
+    selectbox.addEventListener("change", (evt) => {
+      let val = parseInt((evt.target as HTMLOptionElement).value, 10);
+      self.setSelectedPageIndex(val);
+    });
+  }
 }
