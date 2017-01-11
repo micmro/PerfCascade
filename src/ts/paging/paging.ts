@@ -68,6 +68,7 @@ export function onPageUpdate(cb: OnPagingCb): number {
  */
 export function initPagingSelectBox(selectbox: HTMLSelectElement) {
   if (getPageCount() <= 1) {
+    selectbox.style.display = "none";
     return;
   }
   waterfallDocsService.getDocs().pages.forEach((p, i) => {
