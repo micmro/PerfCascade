@@ -54,14 +54,18 @@ function mimeToRequestType(mimeType: string): RequestType {
     part2 = part2.indexOf(";") > -1 ? part2.split(";")[0] : part2;
   }
   switch (types[0]) {
-    case "image": return "image";
+    case "image": {
+      if (part2 === "svg+xml") {
+        return "svg";
+      }
+      return "image";
+    }
     case "font": return "font";
     case "video": return "video";
     case "audio": return "audio";
     default: break;
   }
   switch (part2) {
-    case "svg+xml": return "svg";
     case "xml":
     case "html": return "html";
     case "plain": return "plain";
