@@ -1,5 +1,5 @@
 # PerfCascade
-Extensible waterfall-viewer that works with HAR and other formats (in the future).
+Extensible waterfall-viewer that works with [HAR](http://www.softwareishard.com/blog/har-12-spec/) and other formats (in the future).
 
 [![Build status][travis-image]][travis-url]
 
@@ -88,7 +88,7 @@ perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(error, d
 
 See `package.json` for other useful tasks like linting etc.
 
-## Specs and ressources
+## Specs and resources
 
 - [W3C HAR Spec](https://w3c.github.io/web-performance/specs/HAR/Overview.html)
 - [HAR 1.2 Spec](http://www.softwareishard.com/blog/har-12-spec)
