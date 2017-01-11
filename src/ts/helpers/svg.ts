@@ -159,10 +159,10 @@ export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = 
 
 /**
  * Adds class `className` to `el`
- * @param  {SVGElement} el
+ * @param  {SVGElement|HTMLElement} el
  * @param  {string} className
  */
-export function addClass(el: SVGElement, className: string) {
+export function addClass<T extends SVGElement | HTMLElement>(el: T, className: string): T {
   const classList = el.classList;
   if (classList) {
     className.split(" ").forEach((c) => classList.add(c));
@@ -175,10 +175,10 @@ export function addClass(el: SVGElement, className: string) {
 
 /**
  * Removes class `className` from `el`
- * @param  {SVGElement} el
+ * @param  {SVGElement|HTMLElement} el
  * @param  {string} className
  */
-export function removeClass(el: SVGElement, className: string) {
+export function removeClass<T extends SVGElement | HTMLElement>(el: T, className: string): T {
   const classList = el.classList;
   if (classList) {
     classList.remove(className);
@@ -186,6 +186,17 @@ export function removeClass(el: SVGElement, className: string) {
     // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
     el.setAttribute("class", el.getAttribute("class")
       .replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"));
+  }
+  return el;
+}
+
+/**
+ * Removes all child DOM nodes from `el`
+ * @param  {SVGElement|HTMLElement} el
+ */
+export function removeChildren<T extends SVGElement | HTMLElement>(el: T): T {
+  while (el.hasChildNodes()) {
+    el.removeChild(el.lastChild);
   }
   return el;
 }
