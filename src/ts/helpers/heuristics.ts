@@ -41,28 +41,26 @@ function isCompressible(entry: WaterfallEntry): boolean {
   return false;
 }
 
-function isCachable(entry: WaterfallEntry): boolean {
+/**
+ * Checks if response could be cacheable, but isn't due to lack of cache header.
+ * Explicitly marking a response as non-cacheable is not considered a caching issue.
+ * @param {WaterfallEntry} entry -  the waterfall entry.
+ * @returns {boolean}
+ */
+export function hasCacheIssue(entry: WaterfallEntry) {
   const harEntry = entry.rawResource;
-  const headers = harEntry.response.headers;
-
-  // do not cache non-gets,204 and non 2xx status codes
-  if (harEntry.request.method.toLocaleLowerCase() !== "get" ||
-    harEntry.response.status === 204 ||
-    !isInStatusCodeRange(harEntry, 200, 299)) {
+  if (harEntry.request.method.toLowerCase() !== "get") {
+    return false;
+  }
+  if (harEntry.response.status === 204 || !isInStatusCodeRange(harEntry, 200, 299)) {
     return false;
   }
 
-  if (!(hasHeader(headers, "Cache-Control") || hasHeader(headers, "Expires"))) {
-    return true;
-  }
-  return getHeader(headers, "Cache-Control").indexOf("no-cache") > -1
-    || getHeader(headers, "Pragma") === "no-cache";
-}
-
-export function hasCacheIssue(entry: WaterfallEntry) {
-  const harEntry = entry.rawResource;
   const headers = harEntry.response.headers;
-  return (!hasHeader(headers, "Content-Encoding") && isCachable(entry));
+  if (/no-cache/.test(getHeader(headers, "Cache-Control"))) {
+    return false;
+  }
+  return !(hasHeader(headers, "Cache-Control") || hasHeader(headers, "Expires"));
 }
 
 export function hasCompressionIssue(entry: WaterfallEntry) {
