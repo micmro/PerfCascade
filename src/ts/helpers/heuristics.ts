@@ -77,7 +77,7 @@ export function isSecure(entry: WaterfallEntry) {
 
 /**
  * Check if the document (disregarding any initial http->https redirects) is loaded over a secure connection.
- * @param data the waterfall data.
+ * @param {WaterfallData} data -  the waterfall data.
  * @returns {boolean}
  */
 export function documentIsSecure(data: WaterfallData) {
