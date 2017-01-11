@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.17 (11/01/2017) */
+/*! github.com/micmro/PerfCascade Version:0.2.18 (12/01/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -88,6 +88,16 @@ function isSecure(entry) {
     return entry.name.indexOf("https://") === 0;
 }
 exports.isSecure = isSecure;
+/**
+ * Check if the document (disregarding any initial http->https redirects) is loaded over a secure connection.
+ * @param {WaterfallData} data -  the waterfall data.
+ * @returns {boolean}
+ */
+function documentIsSecure(data) {
+    var rootDocument = data.entries.filter(function (e) { return !e.rawResource.response.redirectURL; })[0];
+    return isSecure(rootDocument);
+}
+exports.documentIsSecure = documentIsSecure;
 
 },{"./har":1,"./misc":4}],3:[function(require,module,exports){
 /**
@@ -149,6 +159,11 @@ function image(x, y, title, scale) {
     return toSvg(x, y, title, "icon-image", scale, "<path d=\"M 6,6 Q 6,6.75 5.475,7.275 4.95,7.8 4.2,7.8 3.45,7.8\n    2.925,7.275 2.4,6.75 2.4,6 2.4,5.25 2.925,4.725 3.45,4.2 4.2,4.2 4.95,4.2 5.475,4.725 6,5.25 6,6 Z m 9.6,3.6 0,4.2\n    -13.2,0 0,-1.8 3,-3 1.5,1.5 4.8,-4.8 z M 16.5,3 1.5,3 Q 1.378125,3 1.289063,3.089 1.200003,3.178 1.200003,3.2999 l\n    0,11.4 q 0,0.1219 0.08906,0.2109 0.08906,0.089 0.210937,0.089 l 15,0 q 0.121875,0 0.210938,-0.089 0.08906,-0.089\n    0.08906,-0.2109 l 0,-11.4 q 0,-0.1219 -0.08906,-0.2109 Q 16.621878,3 16.5,3 Z m 1.5,0.3 0,11.4 q \n    0,0.6188 -0.440625,1.0594 Q 17.11875,16.2 16.5,16.2 l -15,0 Q 0.88125,16.2 0.440625,15.7594 0,15.3188 0,14.7 L 0,3.3\n    Q 0,2.6813 0.440625,2.2406 0.88125,1.8 1.5,1.8 l 15,0 q 0.61875,0 1.059375,0.4406 Q 18,2.6813 18,3.3 Z\" />");
 }
 exports.image = image;
+function svg(x, y, title, scale) {
+    if (scale === void 0) { scale = 1; }
+    return image(x, y, title, scale);
+}
+exports.svg = svg;
 function html(x, y, title, scale) {
     if (scale === void 0) { scale = 1; }
     return toSvg(x, y, title, "icon-html", scale, "<path d=\"m 5.62623,13.310467 -0.491804,0.4919 q -0.09836,0.098\n    -0.226229,0.098 -0.127869,0 -0.22623,-0.098 L 0.098361,9.218667 Q 0,9.120367 0,8.992467 q 0,-0.1279 0.09836,-0.2262\n    l 4.583606,-4.5836 q 0.09836,-0.098 0.22623,-0.098 0.127869,0 0.226229,0.098 l 0.491804,0.4918 q 0.09836,0.098\n    0.09836,0.2262 0,0.1279 -0.09836,0.2262 l -3.865574,3.8656 3.865574,3.8656 q 0.09836,0.098 0.09836,0.2262 0,0.1279\n    -0.09836,0.2262 z m 5.813114,-10.495 -3.668852,12.6983 q -0.03934,0.1279 -0.152459,0.1918 -0.113115,0.064\n    -0.231148,0.025 l -0.609836,-0.1672 q -0.127869,-0.039 -0.191803,-0.1525 -0.06393,-0.1131 -0.02459,-0.2409 l\n    3.668852,-12.6984 q 0.03934,-0.1279 0.152459,-0.1918 0.113115,-0.064 0.231148,-0.025 l 0.609836,0.1672 q\n    0.127869,0.039 0.191803,0.1525 0.06393,0.1131 0.02459,0.241 z m 6.462295,6.4032 -4.583606,4.5837 q -0.09836,0.098\n    -0.22623,0.098 -0.127869,0 -0.226229,-0.098 l -0.491804,-0.4919 q -0.09836,-0.098 -0.09836,-0.2262 0,-0.1278\n    0.09836,-0.2262 l 3.865574,-3.8656 -3.865574,-3.8656 q -0.09836,-0.098 -0.09836,-0.2262 0,-0.1279 0.09836,-0.2262 l\n    0.491804,-0.4918 q 0.09836,-0.098 0.226229,-0.098 0.127869,0 0.22623,0.098 l 4.583606,4.5836 Q 18,8.864567\n    18,8.992467 q 0,0.1279 -0.09836,0.2262 z\" />");
@@ -399,7 +414,7 @@ function getNodeTextWidth(textNode, skipClone) {
 exports.getNodeTextWidth = getNodeTextWidth;
 /**
  * Adds class `className` to `el`
- * @param  {SVGElement} el
+ * @param  {SVGElement|HTMLElement} el
  * @param  {string} className
  */
 function addClass(el, className) {
@@ -416,7 +431,7 @@ function addClass(el, className) {
 exports.addClass = addClass;
 /**
  * Removes class `className` from `el`
- * @param  {SVGElement} el
+ * @param  {SVGElement|HTMLElement} el
  * @param  {string} className
  */
 function removeClass(el, className) {
@@ -432,6 +447,17 @@ function removeClass(el, className) {
     return el;
 }
 exports.removeClass = removeClass;
+/**
+ * Removes all child DOM nodes from `el`
+ * @param  {SVGElement|HTMLElement} el
+ */
+function removeChildren(el) {
+    while (el.hasChildNodes()) {
+        el.removeChild(el.lastChild);
+    }
+    return el;
+}
+exports.removeChildren = removeChildren;
 
 },{}],6:[function(require,module,exports){
 "use strict";
@@ -458,8 +484,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 };
 var legend_1 = require("./legend/legend");
 exports.makeLegend = legend_1.makeLegend;
-var paging = require("./paging/paging");
-var waterfallDocsService = require("./state/waterfall-docs-service");
+var paging_1 = require("./paging/paging");
 var HarTransformer = require("./transformers/har");
 var svg_chart_1 = require("./waterfall/svg-chart");
 /** default options to use if not set in `options` parameter */
@@ -475,8 +500,8 @@ var defaultOptions = {
 function PerfCascade(waterfallDocsData, chartOptions) {
     if (chartOptions === void 0) { chartOptions = {}; }
     var options = __assign({}, defaultOptions, chartOptions);
-    // setup state services
-    waterfallDocsService.storeDocs(waterfallDocsData);
+    // setup paging helper
+    var paging = new paging_1.default(waterfallDocsData);
     var doc = svg_chart_1.createWaterfallSvg(paging.getSelectedPage(), options);
     // page update behaviour
     paging.onPageUpdate(function (_pageIndex, pageDoc) {
@@ -518,114 +543,97 @@ function fromPerfCascadeFormat(waterfallDocsData, options) {
 exports.fromPerfCascadeFormat = fromPerfCascadeFormat;
 var transformHarToPerfCascade = HarTransformer.transformDoc;
 exports.transformHarToPerfCascade = transformHarToPerfCascade;
-var paging_1 = require("./paging/paging");
-exports.changePage = paging_1.setSelectedPageIndex;
 
-},{"./legend/legend":6,"./paging/paging":8,"./state/waterfall-docs-service":9,"./transformers/har":10,"./waterfall/svg-chart":23}],8:[function(require,module,exports){
+},{"./legend/legend":6,"./paging/paging":8,"./transformers/har":9,"./waterfall/svg-chart":22}],8:[function(require,module,exports){
 "use strict";
-var waterfallDocsService = require("../state/waterfall-docs-service");
-var selectedPageIndex = 0;
-var onPageUpdateCbs = [];
-/**
- * Returns number of pages
- * @returns number - number of pages in current doc
- */
-function getPageCount() {
-    return waterfallDocsService.getDocs().pages.length;
-}
-exports.getPageCount = getPageCount;
-/**
- * Returns selected pages
- * @returns WaterfallData - currently selected page
- */
-function getSelectedPage() {
-    return waterfallDocsService.getDocs().pages[selectedPageIndex];
-}
-exports.getSelectedPage = getSelectedPage;
-/**
- * Returns index of currently selected page
- * @returns number - index of current page (0 based)
- */
-function getSelectedPageIndex() {
-    return selectedPageIndex;
-}
-exports.getSelectedPageIndex = getSelectedPageIndex;
-/**
- * Update which pageIndex is currently update.
- * Published `onPageUpdate`
- * @param  {number} pageIndex
- */
-function setSelectedPageIndex(pageIndex) {
-    if (selectedPageIndex === pageIndex) {
-        return;
+var svg = require("../helpers/svg");
+/** Class to keep track of run of a multi-run har is beeing shown  */
+var Paging = (function () {
+    function Paging(doc) {
+        this.doc = doc;
+        this.selectedPageIndex = 0;
+        this.onPageUpdateCbs = [];
     }
-    if (pageIndex < 0 || pageIndex >= getPageCount()) {
-        throw new Error("Page does not exist - Invalid pageIndex selected");
-    }
-    selectedPageIndex = pageIndex;
-    var selectedPage = waterfallDocsService.getDocs().pages[selectedPageIndex];
-    onPageUpdateCbs.forEach(function (cd) {
-        cd(selectedPageIndex, selectedPage);
-    });
-}
-exports.setSelectedPageIndex = setSelectedPageIndex;
-/**
- * Register subscriber callbacks to be called when the pageindex updates
- * @param  {OnPagingCb} cb
- * @returns number - index of the callback
- */
-function onPageUpdate(cb) {
-    if (getPageCount() > 1) {
-        return onPageUpdateCbs.push(cb);
-    }
-    return undefined;
-}
-exports.onPageUpdate = onPageUpdate;
-/**
- * hooks up select box with paging options
- * @param  {HTMLSelectElement} selectbox
- */
-function initPagingSelectBox(selectbox) {
-    if (getPageCount() <= 1) {
-        return;
-    }
-    waterfallDocsService.getDocs().pages.forEach(function (p, i) {
-        var option = new Option(p.title, i.toString(), i === selectedPageIndex);
-        selectbox.add(option);
-    });
-    selectbox.style.display = "block";
-    selectbox.addEventListener("change", function (evt) {
-        var val = parseInt(evt.target.value, 10);
-        setSelectedPageIndex(val);
-    });
-}
-exports.initPagingSelectBox = initPagingSelectBox;
+    /**
+     * Returns number of pages
+     * @returns number - number of pages in current doc
+     */
+    Paging.prototype.getPageCount = function () {
+        return this.doc.pages.length;
+    };
+    /**
+     * Returns selected pages
+     * @returns WaterfallData - currently selected page
+     */
+    Paging.prototype.getSelectedPage = function () {
+        return this.doc.pages[this.selectedPageIndex];
+    };
+    /**
+     * Returns index of currently selected page
+     * @returns number - index of current page (0 based)
+     */
+    Paging.prototype.getSelectedPageIndex = function () {
+        return this.selectedPageIndex;
+    };
+    /**
+     * Update which pageIndex is currently update.
+     * Published `onPageUpdate`
+     * @param  {number} pageIndex
+     */
+    Paging.prototype.setSelectedPageIndex = function (pageIndex) {
+        var _this = this;
+        if (this.selectedPageIndex === pageIndex) {
+            return;
+        }
+        if (pageIndex < 0 || pageIndex >= this.getPageCount()) {
+            throw new Error("Page does not exist - Invalid pageIndex selected");
+        }
+        this.selectedPageIndex = pageIndex;
+        var selectedPage = this.doc.pages[this.selectedPageIndex];
+        this.onPageUpdateCbs.forEach(function (cb) {
+            cb(_this.selectedPageIndex, selectedPage);
+        });
+    };
+    /**
+     * Register subscriber callbacks to be called when the pageindex updates
+     * @param  {OnPagingCb} cb
+     * @returns number - index of the callback
+     */
+    Paging.prototype.onPageUpdate = function (cb) {
+        if (this.getPageCount() > 1) {
+            return this.onPageUpdateCbs.push(cb);
+        }
+        return undefined;
+    };
+    /**
+     * hooks up select box with paging options
+     * @param  {HTMLSelectElement} selectbox
+     */
+    Paging.prototype.initPagingSelectBox = function (selectbox) {
+        var _this = this;
+        var self = this;
+        if (this.getPageCount() <= 1) {
+            selectbox.style.display = "none";
+            return;
+        }
+        // remove all existing options, like placeholders
+        svg.removeChildren(selectbox);
+        this.doc.pages.forEach(function (p, i) {
+            var option = new Option(p.title, i.toString(), i === _this.selectedPageIndex);
+            selectbox.add(option);
+        });
+        selectbox.style.display = "block";
+        selectbox.addEventListener("change", function (evt) {
+            var val = parseInt(evt.target.value, 10);
+            self.setSelectedPageIndex(val);
+        });
+    };
+    return Paging;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = Paging;
 
-},{"../state/waterfall-docs-service":9}],9:[function(require,module,exports){
-"use strict";
-/*
-* Central service to store HAR data
-* and make it accessible everywhere by importing this module
-*/
-var docs;
-/**
- * Store Waterfall-Docs data centrally for Multi-page HARs
- * @param  {WaterfallDocs} waterfallDocs
- */
-function storeDocs(waterfallDocs) {
-    docs = waterfallDocs;
-}
-exports.storeDocs = storeDocs;
-/**
- * Get stored Waterfall-Docs
- * @returns WaterfallDocs
- */
-function getDocs() {
-    return docs;
-}
-exports.getDocs = getDocs;
-
-},{}],10:[function(require,module,exports){
+},{"../helpers/svg":5}],9:[function(require,module,exports){
 "use strict";
 function createWaterfallEntry(name, start, end, segments, rawResource, requestType) {
     if (segments === void 0) { segments = []; }
@@ -664,14 +672,18 @@ function mimeToRequestType(mimeType) {
         part2 = part2.indexOf(";") > -1 ? part2.split(";")[0] : part2;
     }
     switch (types[0]) {
-        case "image": return "image";
+        case "image": {
+            if (part2 === "svg+xml") {
+                return "svg";
+            }
+            return "image";
+        }
         case "font": return "font";
         case "video": return "video";
         case "audio": return "audio";
         default: break;
     }
     switch (part2) {
-        case "svg+xml": return "svg";
         case "xml":
         case "html": return "html";
         case "plain": return "plain";
@@ -808,7 +820,7 @@ function getTimePair(key, harEntry, collect, startRelative) {
     };
 }
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 /**
  * Convert a RequestType into a CSS class
@@ -827,7 +839,7 @@ function timingTypeToCssClass(timingType) {
 }
 exports.timingTypeToCssClass = timingTypeToCssClass;
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 var har_1 = require("../../helpers/har");
 var ifValueDefined = function (value, fn) {
@@ -873,7 +885,8 @@ function parseGeneralDetails(entry, requestID) {
         ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
         ["Server IPAddress", harEntry.serverIPAddress],
         ["Connection", harEntry.connection],
-        ["Browser Priority", getExp(harEntry, "priority") || getExp(harEntry, "initialPriority")],
+        ["Browser Priority", getExp(harEntry, "priority") || getExp(harEntry, "newPriority") ||
+                getExp(harEntry, "initialPriority")],
         ["Was pushed", getExp(harEntry, "was_pushed")],
         ["Initiator (Loaded by)", getExp(harEntry, "initiator")],
         ["Initiator Line", getExp(harEntry, "initiator_line")],
@@ -1000,7 +1013,7 @@ function getKeys(requestID, entry) {
 }
 exports.getKeys = getKeys;
 
-},{"../../helpers/har":1}],13:[function(require,module,exports){
+},{"../../helpers/har":1}],12:[function(require,module,exports){
 "use strict";
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues, addClass) {
@@ -1058,7 +1071,7 @@ function createDetailsBody(requestID, entry, accordeonHeight) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":12}],14:[function(require,module,exports){
+},{"./extract-details-keys":11}],13:[function(require,module,exports){
 "use strict";
 var PubSub = (function () {
     function PubSub() {
@@ -1076,8 +1089,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = PubSub;
 ;
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
+var svg = require("../../helpers/svg");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 /** Overlay (popup) instance manager */
 var OverlayManager = (function () {
@@ -1162,9 +1176,7 @@ var OverlayManager = (function () {
      */
     OverlayManager.prototype.renderOverlays = function (accordionHeight) {
         var _this = this;
-        while (this.overlayHolder.firstChild) {
-            this.overlayHolder.removeChild(this.overlayHolder.firstChild);
-        }
+        svg.removeChildren(this.overlayHolder);
         var currY = 0;
         this.openOverlays
             .sort(function (a, b) { return a.index > b.index ? 1 : -1; })
@@ -1190,7 +1202,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = OverlayManager;
 ;
 
-},{"./svg-details-overlay":16}],16:[function(require,module,exports){
+},{"../../helpers/svg":5,"./svg-details-overlay":15}],15:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var html_details_body_1 = require("./html-details-body");
@@ -1261,7 +1273,7 @@ function createRowInfoOverlay(indexBackup, y, accordionHeight, entry, onClose) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/svg":5,"./html-details-body":13}],17:[function(require,module,exports){
+},{"../../helpers/svg":5,"./html-details-body":12}],16:[function(require,module,exports){
 /**
  * Creation of sub-components used in a resource request row
  */
@@ -1319,7 +1331,7 @@ function getIndicatorIcons(entry, docIsSsl) {
 }
 exports.getIndicatorIcons = getIndicatorIcons;
 
-},{"../../helpers/heuristics":2}],18:[function(require,module,exports){
+},{"../../helpers/heuristics":2}],17:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1534,7 +1546,7 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":4,"../../helpers/svg":5,"../../transformers/styling-converters":11}],19:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":5,"../../transformers/styling-converters":10}],18:[function(require,module,exports){
 "use strict";
 var heuristics = require("../../helpers/heuristics");
 var icons = require("../../helpers/icons");
@@ -1607,7 +1619,7 @@ function createRow(context, index, rectData, entry, labelXPos, onDetailsOverlayS
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":17,"./svg-row-subcomponents":18}],20:[function(require,module,exports){
+},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":16,"./svg-row-subcomponents":17}],19:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  */
@@ -1667,7 +1679,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/svg":5}],21:[function(require,module,exports){
+},{"../../helpers/svg":5}],20:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1757,7 +1769,7 @@ function createBgRect(context, entry) {
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/misc":4,"../../helpers/svg":5,"../../transformers/styling-converters":11}],22:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":5,"../../transformers/styling-converters":10}],21:[function(require,module,exports){
 "use strict";
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
@@ -1830,8 +1842,9 @@ function createMarks(context, marks) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/misc":4,"../../helpers/svg":5}],23:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":5}],22:[function(require,module,exports){
 "use strict";
+var heuristics_1 = require("../helpers/heuristics");
 var svg = require("../helpers/svg");
 var styling_converters_1 = require("../transformers/styling-converters");
 var overlay_changes_pub_sub_1 = require("./details-overlay/overlay-changes-pub-sub");
@@ -1864,7 +1877,7 @@ function getSvgHeight(marks, diagramHeight) {
 function createContext(data, options, entriesToShow, overlayHolder) {
     var unit = data.durationMs / 100;
     var diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
-    var docIsSsl = (data.entries[0].name.indexOf("https://") === 0);
+    var docIsSsl = heuristics_1.documentIsSecure(data);
     var context = {
         diagramHeight: diagramHeight,
         overlayManager: undefined,
@@ -1975,5 +1988,5 @@ function createWaterfallSvg(data, options) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":5,"../transformers/styling-converters":11,"./details-overlay/overlay-changes-pub-sub":14,"./details-overlay/svg-details-overlay-manager":15,"./row/svg-indicators":17,"./row/svg-row":19,"./sub-components/svg-alignment-helper":20,"./sub-components/svg-general-components":21,"./sub-components/svg-marks":22}]},{},[7])(7)
+},{"../helpers/heuristics":2,"../helpers/svg":5,"../transformers/styling-converters":10,"./details-overlay/overlay-changes-pub-sub":13,"./details-overlay/svg-details-overlay-manager":14,"./row/svg-indicators":16,"./row/svg-row":18,"./sub-components/svg-alignment-helper":19,"./sub-components/svg-general-components":20,"./sub-components/svg-marks":21}]},{},[7])(7)
 });
