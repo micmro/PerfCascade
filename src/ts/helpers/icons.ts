@@ -145,7 +145,11 @@ export function image(x: number, y: number, title: string, scale: number = 1): S
     0,0.6188 -0.440625,1.0594 Q 17.11875,16.2 16.5,16.2 l -15,0 Q 0.88125,16.2 0.440625,15.7594 0,15.3188 0,14.7 L 0,3.3
     Q 0,2.6813 0.440625,2.2406 0.88125,1.8 1.5,1.8 l 15,0 q 0.61875,0 1.059375,0.4406 Q 18,2.6813 18,3.3 Z" />`); }
 
-export function html(x: number, y: number, title: string, scale: number = 1): SVGElement {
+export function svg(x: number, y: number, title: string, scale: number = 1): SVGElement {
+  return image(x, y, title, scale);
+}
+
+  export function html(x: number, y: number, title: string, scale: number = 1): SVGElement {
   return toSvg(x, y, title, "icon-html", scale, `<path d="m 5.62623,13.310467 -0.491804,0.4919 q -0.09836,0.098
     -0.226229,0.098 -0.127869,0 -0.22623,-0.098 L 0.098361,9.218667 Q 0,9.120367 0,8.992467 q 0,-0.1279 0.09836,-0.2262
     l 4.583606,-4.5836 q 0.09836,-0.098 0.22623,-0.098 0.127869,0 0.226229,0.098 l 0.491804,0.4918 q 0.09836,0.098
