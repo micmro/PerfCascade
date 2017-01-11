@@ -1,6 +1,5 @@
 import { makeLegend } from "./legend/legend";
-import * as paging from "./paging/paging";
-import * as waterfallDocsService from "./state/waterfall-docs-service";
+import Paging from "./paging/paging";
 import * as HarTransformer from "./transformers/har";
 import { Har } from "./typing/har";
 import { ChartOptions } from "./typing/options";
@@ -21,8 +20,8 @@ const defaultOptions: Readonly<ChartOptions> = {
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {
   const options: ChartOptions = {...defaultOptions, ...chartOptions};
 
-  // setup state services
-  waterfallDocsService.storeDocs(waterfallDocsData);
+  // setup paging helper
+  let paging = new Paging(waterfallDocsData);
 
   let doc = createWaterfallSvg(paging.getSelectedPage(), options);
 
