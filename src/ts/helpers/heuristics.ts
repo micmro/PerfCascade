@@ -1,6 +1,6 @@
 import {Entry} from "../typing/har";
 import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
-import {getHeader, hasHeader} from "./har";
+import {hasHeader} from "./har";
 import * as misc from "./misc";
 
 /**
@@ -43,7 +43,6 @@ function isCompressible(entry: WaterfallEntry): boolean {
 
 /**
  * Checks if response could be cacheable, but isn't due to lack of cache header.
- * Explicitly marking a response as non-cacheable is not considered a caching issue.
  * @param {WaterfallEntry} entry -  the waterfall entry.
  * @returns {boolean}
  */
@@ -57,9 +56,6 @@ export function hasCacheIssue(entry: WaterfallEntry) {
   }
 
   const headers = harEntry.response.headers;
-  if (/no-cache/.test(getHeader(headers, "Cache-Control"))) {
-    return false;
-  }
   return !(hasHeader(headers, "Cache-Control") || hasHeader(headers, "Expires"));
 }
 
