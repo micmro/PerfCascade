@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.2.18 (12/01/2017) */
+/*! github.com/micmro/PerfCascade Version:0.2.19 (12/01/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -57,25 +57,21 @@ function isCompressible(entry) {
     }
     return false;
 }
-function isCachable(entry) {
-    var harEntry = entry.rawResource;
-    var headers = harEntry.response.headers;
-    // do not cache non-gets,204 and non 2xx status codes
-    if (harEntry.request.method.toLocaleLowerCase() !== "get" ||
-        harEntry.response.status === 204 ||
-        !isInStatusCodeRange(harEntry, 200, 299)) {
-        return false;
-    }
-    if (!(har_1.hasHeader(headers, "Cache-Control") || har_1.hasHeader(headers, "Expires"))) {
-        return true;
-    }
-    return har_1.getHeader(headers, "Cache-Control").indexOf("no-cache") > -1
-        || har_1.getHeader(headers, "Pragma") === "no-cache";
-}
+/**
+ * Checks if response could be cacheable, but isn't due to lack of cache header.
+ * @param {WaterfallEntry} entry -  the waterfall entry.
+ * @returns {boolean}
+ */
 function hasCacheIssue(entry) {
     var harEntry = entry.rawResource;
+    if (harEntry.request.method.toLowerCase() !== "get") {
+        return false;
+    }
+    if (harEntry.response.status === 204 || !isInStatusCodeRange(harEntry, 200, 299)) {
+        return false;
+    }
     var headers = harEntry.response.headers;
-    return (!har_1.hasHeader(headers, "Content-Encoding") && isCachable(entry));
+    return !(har_1.hasHeader(headers, "Cache-Control") || har_1.hasHeader(headers, "Expires"));
 }
 exports.hasCacheIssue = hasCacheIssue;
 function hasCompressionIssue(entry) {
