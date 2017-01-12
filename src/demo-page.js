@@ -5,7 +5,7 @@
 (function (perfCascade) {
 
   /** holder DOM element to render PerfCascade into */
-  var outputHolder = document.getElementById("output");
+  var outputHolder = document.getElementsByClassName("output")[0];
   /** Select box for multi-page HARs */
   var pageSelectorEl = document.getElementById("page-selector");
   /** Holder element for legend HTML */
