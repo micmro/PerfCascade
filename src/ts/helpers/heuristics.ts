@@ -1,6 +1,6 @@
 import {Entry} from "../typing/har";
 import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
-import {getHeader, hasHeader} from "./har";
+import {hasHeader} from "./har";
 import * as misc from "./misc";
 
 /**
@@ -41,28 +41,22 @@ function isCompressible(entry: WaterfallEntry): boolean {
   return false;
 }
 
-function isCachable(entry: WaterfallEntry): boolean {
+/**
+ * Checks if response could be cacheable, but isn't due to lack of cache header.
+ * @param {WaterfallEntry} entry -  the waterfall entry.
+ * @returns {boolean}
+ */
+export function hasCacheIssue(entry: WaterfallEntry) {
   const harEntry = entry.rawResource;
-  const headers = harEntry.response.headers;
-
-  // do not cache non-gets,204 and non 2xx status codes
-  if (harEntry.request.method.toLocaleLowerCase() !== "get" ||
-    harEntry.response.status === 204 ||
-    !isInStatusCodeRange(harEntry, 200, 299)) {
+  if (harEntry.request.method.toLowerCase() !== "get") {
+    return false;
+  }
+  if (harEntry.response.status === 204 || !isInStatusCodeRange(harEntry, 200, 299)) {
     return false;
   }
 
-  if (!(hasHeader(headers, "Cache-Control") || hasHeader(headers, "Expires"))) {
-    return true;
-  }
-  return getHeader(headers, "Cache-Control").indexOf("no-cache") > -1
-    || getHeader(headers, "Pragma") === "no-cache";
-}
-
-export function hasCacheIssue(entry: WaterfallEntry) {
-  const harEntry = entry.rawResource;
   const headers = harEntry.response.headers;
-  return (!hasHeader(headers, "Content-Encoding") && isCachable(entry));
+  return !(hasHeader(headers, "Cache-Control") || hasHeader(headers, "Expires"));
 }
 
 export function hasCompressionIssue(entry: WaterfallEntry) {
