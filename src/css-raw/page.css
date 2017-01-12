@@ -19,7 +19,6 @@ html {
     text-shadow: none;
 }
 
-
 audio,
 canvas,
 iframe,
@@ -39,5 +38,8 @@ textarea {
     resize: vertical;
 }
 
-
-.page-selector {display: none; clear: both; margin: 1em 0;}
+.page-selector {
+    display: none;
+    clear: both;
+    margin: 1em 0;
+}
