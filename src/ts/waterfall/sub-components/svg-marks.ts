@@ -1,8 +1,8 @@
-import {roundNumber} from "../../helpers/misc";
+import { roundNumber } from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
-import {Context} from "../../typing/context";
-import {OverlayChangeEvent} from "../../typing/open-overlay";
-import {Mark} from "../../typing/waterfall";
+import { Context } from "../../typing/context";
+import { OverlayChangeEvent } from "../../typing/open-overlay";
+import { Mark } from "../../typing/waterfall";
 
 /**
  * Renders global marks for events like the onLoad event etc
@@ -21,7 +21,7 @@ export function createMarks(context: Context, marks: Mark[]) {
     let lineHolder = svg.newG("line-holder");
     let lineLabelHolder = svg.newG("line-label-holder");
     mark.x = x;
-    let lineLabel = svg.newTextEl(mark.name, {x: x + "%", y: diagramHeight + 25});
+    let lineLabel = svg.newTextEl(mark.name, { x: x + "%", y: diagramHeight + 25 });
 
     let line = svg.newLine({
       "x1": x + "%",
