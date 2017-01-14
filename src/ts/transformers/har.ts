@@ -1,4 +1,4 @@
-import {Entry, Har} from "../typing/har";
+import { Entry, Har, PageTimings } from "../typing/har";
 import {
   Mark,
   RequestType,
@@ -134,15 +134,15 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
     });
 
   const marks = Object.keys(pageTimings)
-    .filter((k) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
+    .filter((k: keyof PageTimings) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
     .sort((a: string, b: string) => pageTimings[a] > pageTimings[b] ? 1 : -1)
-    .map((k) => {
-      const startRelative = pageTimings[k];
+    .map((k: "onContentload" | "onLoad") => {
+      const startRelative: number = pageTimings[k];
 
       doneTime = Math.max(doneTime, startRelative);
 
       return {
-        "name": `${k.replace(/^[_]/, "")} (${startRelative}ms)`,
+        "name": `${k.replace(/^[_]/, "")} (${(Math.round(startRelative * 10) / 10)} ms)`,
         "startTime": startRelative,
       } as Mark;
     });
@@ -168,7 +168,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
 function buildDetailTimingBlocks(startRelative: number, harEntry: Entry): WaterfallEntryTiming[] {
   let t = harEntry.timings;
   return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[],
-                                                                          key: TimingType) => {
+    key: TimingType) => {
 
     const time = getTimePair(key, harEntry, collect, startRelative);
 
@@ -203,9 +203,9 @@ function buildDetailTimingBlocks(startRelative: number, harEntry: Entry): Waterf
 function getTimePair(key: string, harEntry: Entry, collect: WaterfallEntryTiming[], startRelative: number) {
   let wptKey;
   switch (key) {
-      case "wait": wptKey = "ttfb"; break;
-      case "receive": wptKey = "download"; break;
-      default: wptKey = key;
+    case "wait": wptKey = "ttfb"; break;
+    case "receive": wptKey = "download"; break;
+    default: wptKey = key;
   }
   const preciseStart = parseInt(harEntry[`_${wptKey}_start`], 10);
   const preciseEnd = parseInt(harEntry[`_${wptKey}_end`], 10);
