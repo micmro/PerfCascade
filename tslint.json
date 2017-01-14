@@ -1,13 +1,14 @@
 {
   "extends": "tslint:recommended",
   "rules": {
-    "interface-name": false,
+    "interface-name": [false],
 
     // Disable this until https://github.com/palantir/tslint/commit/16e8d0 is released to avoid crash
-    "object-literal-key-quotes": false,
+    "object-literal-key-quotes": [false],
 
-    "no-console": false,
+    "no-console": [false],
     "no-string-literal": false,
+    "align": [true, "parameters", "statements"],
 
     // allow-leading-underscore since _ is used to silence warnings about unused function parameters.
     "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
