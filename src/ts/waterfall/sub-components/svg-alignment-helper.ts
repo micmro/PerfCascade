@@ -2,6 +2,7 @@
  * vertical alignment helper lines
  */
 
+import { addClass, removeClass } from "../../helpers/dom";
 import * as svg from "../../helpers/svg";
 import {HoverElements, HoverEvtListeners} from "../../typing/svg-alignment-helpers.d";
 
@@ -36,7 +37,7 @@ export function makeHoverEvtListeners(hoverEl: HoverElements): HoverEvtListeners
     onMouseEnterPartial() {
       return (evt: MouseEvent) => {
         const targetRect = evt.target as SVGRectElement;
-        svg.addClass(targetRect, "active");
+        addClass(targetRect, "active");
 
         const xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
           targetRect.width.baseVal.valueInSpecifiedUnits + "%";
@@ -46,16 +47,16 @@ export function makeHoverEvtListeners(hoverEl: HoverElements): HoverEvtListeners
         hoverEl.endline.x2.baseVal.valueAsString = xPosEnd;
         hoverEl.startline.x1.baseVal.valueAsString = xPosStart;
         hoverEl.startline.x2.baseVal.valueAsString = xPosStart;
-        svg.addClass(hoverEl.endline, "active");
-        svg.addClass(hoverEl.startline, "active");
+        addClass(hoverEl.endline, "active");
+        addClass(hoverEl.startline, "active");
       };
     },
     onMouseLeavePartial() {
       return (evt: MouseEvent) => {
         const targetRect = evt.target as SVGRectElement;
-        svg.removeClass(targetRect, "active");
-        svg.removeClass(hoverEl.endline, "active");
-        svg.removeClass(hoverEl.startline, "active");
+        removeClass(targetRect, "active");
+        removeClass(hoverEl.endline, "active");
+        removeClass(hoverEl.startline, "active");
       };
     },
   };
