@@ -8,7 +8,6 @@
 
     "no-console": [false],
     "no-string-literal": false,
-    "align": [true, "parameters", "statements"],
 
     // allow-leading-underscore since _ is used to silence warnings about unused function parameters.
     "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
