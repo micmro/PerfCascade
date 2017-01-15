@@ -1,6 +1,55 @@
-/*! github.com/micmro/PerfCascade Version:0.2.20 (15/01/2017) */
+/*! github.com/micmro/PerfCascade Version:0.2.21 (16/01/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";
+/**
+ * Adds class `className` to `el`
+ * @param  {Element} el
+ * @param  {string} className
+ */
+function addClass(el, className) {
+    var classList = el.classList;
+    if (classList) {
+        className.split(" ").forEach(function (c) { return classList.add(c); });
+    }
+    else {
+        // IE doesn't support classList in SVG - also no need for duplication check i.t.m.
+        el.setAttribute("class", el.getAttribute("class") + " " + className);
+    }
+    return el;
+}
+exports.addClass = addClass;
+/**
+ * Removes class `className` from `el`
+ * @param  {Element} el
+ * @param  {string} className
+ */
+function removeClass(el, className) {
+    var classList = el.classList;
+    if (classList) {
+        classList.remove(className);
+    }
+    else {
+        // IE doesn't support classList in SVG
+        el.setAttribute("class", el.getAttribute("class")
+            .replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"));
+    }
+    return el;
+}
+exports.removeClass = removeClass;
+/**
+ * Removes all child DOM nodes from `el`
+ * @param  {Element} el
+ */
+function removeChildren(el) {
+    while (el.hasChildNodes()) {
+        el.removeChild(el.lastChild);
+    }
+    return el;
+}
+exports.removeChildren = removeChildren;
+
+},{}],2:[function(require,module,exports){
 "use strict";
 function matchHeaderFilter(lowercaseName) {
     return function (header) { return header.name.toLowerCase() === lowercaseName; };
@@ -17,7 +66,7 @@ function getHeader(headers, headerName) {
 }
 exports.getHeader = getHeader;
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 var har_1 = require("./har");
 var misc = require("./misc");
@@ -95,7 +144,7 @@ function documentIsSecure(data) {
 }
 exports.documentIsSecure = documentIsSecure;
 
-},{"./har":1,"./misc":4}],3:[function(require,module,exports){
+},{"./har":2,"./misc":5}],4:[function(require,module,exports){
 /**
  *  SVG Icons
  */
@@ -196,7 +245,7 @@ function audio(x, y, title, scale) {
 }
 exports.audio = audio;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /**
  *  Misc Helpers
  */
@@ -262,11 +311,12 @@ function roundNumber(num, decimals) {
 }
 exports.roundNumber = roundNumber;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /**
  *  SVG Helpers
  */
 "use strict";
+var dom_1 = require("./dom");
 function entries(obj) {
     var entries = [];
     for (var _i = 0, _a = Object.keys(obj); _i < _a.length; _i++) {
@@ -293,7 +343,7 @@ function newElement(tagName, _a) {
     var _b = _a === void 0 ? {} : _a, _c = _b.attributes, attributes = _c === void 0 ? {} : _c, _d = _b.css, css = _d === void 0 ? {} : _d, _e = _b.text, text = _e === void 0 ? "" : _e, _f = _b.className, className = _f === void 0 ? "" : _f;
     var element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
     if (className) {
-        addClass(element, className);
+        dom_1.addClass(element, className);
     }
     if (text) {
         element.textContent = text;
@@ -410,54 +460,8 @@ function getNodeTextWidth(textNode, skipClone) {
     return tmpTextNode.getBBox().width;
 }
 exports.getNodeTextWidth = getNodeTextWidth;
-/**
- * Adds class `className` to `el`
- * @param  {SVGElement|HTMLElement} el
- * @param  {string} className
- */
-function addClass(el, className) {
-    var classList = el.classList;
-    if (classList) {
-        className.split(" ").forEach(function (c) { return classList.add(c); });
-    }
-    else {
-        // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
-        el.setAttribute("class", el.getAttribute("class") + " " + className);
-    }
-    return el;
-}
-exports.addClass = addClass;
-/**
- * Removes class `className` from `el`
- * @param  {SVGElement|HTMLElement} el
- * @param  {string} className
- */
-function removeClass(el, className) {
-    var classList = el.classList;
-    if (classList) {
-        classList.remove(className);
-    }
-    else {
-        // IE doesn't support classList in SVG - also no need for dublication check i.t.m.
-        el.setAttribute("class", el.getAttribute("class")
-            .replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"));
-    }
-    return el;
-}
-exports.removeClass = removeClass;
-/**
- * Removes all child DOM nodes from `el`
- * @param  {SVGElement|HTMLElement} el
- */
-function removeChildren(el) {
-    while (el.hasChildNodes()) {
-        el.removeChild(el.lastChild);
-    }
-    return el;
-}
-exports.removeChildren = removeChildren;
 
-},{}],6:[function(require,module,exports){
+},{"./dom":1}],7:[function(require,module,exports){
 "use strict";
 /**
  * Creates the html for diagrams legend
@@ -470,7 +474,7 @@ function makeLegend() {
 }
 exports.makeLegend = makeLegend;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 var __assign = (this && this.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -542,9 +546,9 @@ exports.fromPerfCascadeFormat = fromPerfCascadeFormat;
 var transformHarToPerfCascade = HarTransformer.transformDoc;
 exports.transformHarToPerfCascade = transformHarToPerfCascade;
 
-},{"./legend/legend":6,"./paging/paging":8,"./transformers/har":9,"./waterfall/svg-chart":22}],8:[function(require,module,exports){
+},{"./legend/legend":7,"./paging/paging":9,"./transformers/har":10,"./waterfall/svg-chart":23}],9:[function(require,module,exports){
 "use strict";
-var svg = require("../helpers/svg");
+var dom_1 = require("../helpers/dom");
 /** Class to keep track of run of a multi-run har is beeing shown  */
 var Paging = (function () {
     function Paging(doc) {
@@ -615,7 +619,7 @@ var Paging = (function () {
             return;
         }
         // remove all existing options, like placeholders
-        svg.removeChildren(selectbox);
+        dom_1.removeChildren(selectbox);
         this.doc.pages.forEach(function (p, i) {
             var option = new Option(p.title, i.toString(), i === _this.selectedPageIndex);
             selectbox.add(option);
@@ -631,7 +635,7 @@ var Paging = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Paging;
 
-},{"../helpers/svg":5}],9:[function(require,module,exports){
+},{"../helpers/dom":1}],10:[function(require,module,exports){
 "use strict";
 var misc_1 = require("../helpers/misc");
 function createWaterfallEntry(name, start, end, segments, rawResource, requestType) {
@@ -819,7 +823,7 @@ function getTimePair(key, harEntry, collect, startRelative) {
     };
 }
 
-},{"../helpers/misc":4}],10:[function(require,module,exports){
+},{"../helpers/misc":5}],11:[function(require,module,exports){
 "use strict";
 /**
  * Convert a RequestType into a CSS class
@@ -838,7 +842,7 @@ function timingTypeToCssClass(timingType) {
 }
 exports.timingTypeToCssClass = timingTypeToCssClass;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 var har_1 = require("../../helpers/har");
 var ifValueDefined = function (value, fn) {
@@ -1012,7 +1016,7 @@ function getKeys(requestID, entry) {
 }
 exports.getKeys = getKeys;
 
-},{"../../helpers/har":1}],12:[function(require,module,exports){
+},{"../../helpers/har":2}],13:[function(require,module,exports){
 "use strict";
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues, addClass) {
@@ -1070,7 +1074,7 @@ function createDetailsBody(requestID, entry, accordeonHeight) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":11}],13:[function(require,module,exports){
+},{"./extract-details-keys":12}],14:[function(require,module,exports){
 "use strict";
 var PubSub = (function () {
     function PubSub() {
@@ -1088,9 +1092,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = PubSub;
 ;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
-var svg = require("../../helpers/svg");
+var dom_1 = require("../../helpers/dom");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 /** Overlay (popup) instance manager */
 var OverlayManager = (function () {
@@ -1175,7 +1179,7 @@ var OverlayManager = (function () {
      */
     OverlayManager.prototype.renderOverlays = function (accordionHeight) {
         var _this = this;
-        svg.removeChildren(this.overlayHolder);
+        dom_1.removeChildren(this.overlayHolder);
         var currY = 0;
         this.openOverlays
             .sort(function (a, b) { return a.index > b.index ? 1 : -1; })
@@ -1201,7 +1205,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = OverlayManager;
 ;
 
-},{"../../helpers/svg":5,"./svg-details-overlay":15}],15:[function(require,module,exports){
+},{"../../helpers/dom":1,"./svg-details-overlay":16}],16:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var html_details_body_1 = require("./html-details-body");
@@ -1272,7 +1276,7 @@ function createRowInfoOverlay(indexBackup, y, accordionHeight, entry, onClose) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/svg":5,"./html-details-body":12}],16:[function(require,module,exports){
+},{"../../helpers/svg":6,"./html-details-body":13}],17:[function(require,module,exports){
 /**
  * Creation of sub-components used in a resource request row
  */
@@ -1299,6 +1303,9 @@ function getMimeTypeIcon(entry) {
     }
     else if (heuristics.isInStatusCodeRange(harEntry, 500, 599)) {
         return makeIcon("err5xx", harEntry.response.status + " response status: " + harEntry.response.statusText);
+    }
+    else if (harEntry.response.status === 204) {
+        return makeIcon("plain", "No content");
     }
     else {
         return makeIcon(entry.requestType, entry.requestType);
@@ -1330,7 +1337,7 @@ function getIndicatorIcons(entry, docIsSsl) {
 }
 exports.getIndicatorIcons = getIndicatorIcons;
 
-},{"../../helpers/heuristics":2}],17:[function(require,module,exports){
+},{"../../helpers/heuristics":3}],18:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1428,6 +1435,21 @@ function createRect(rectData, segments, timeTotal) {
 }
 exports.createRect = createRect;
 /**
+ * Create a SVG text element for the request number label, right aligned within the specified width.
+ * @param {number} x horizontal position (in px).
+ * @param {number} y vertical position of related request block (in px).
+ * @param {string} requestNumber the request number string
+ * @param {number} height height of row
+ * @param {number} width width of the space within the right align the label.
+ * @returns {SVGTextElement}
+ */
+function createRequestNumberLabel(x, y, requestNumber, height, width) {
+    y += Math.round(height / 2) + 5;
+    x += width;
+    return svg.newTextEl(requestNumber, { x: x, y: y }, { "text-anchor": "end" });
+}
+exports.createRequestNumberLabel = createRequestNumberLabel;
+/**
  * Create a new clipper SVG Text element to label a request block to fit the left panel width
  * @param  {number}         x                horizontal position (in px)
  * @param  {number}         y                vertical position of related request block (in px)
@@ -1475,15 +1497,17 @@ function createRequestLabel(x, y, name, height) {
 /**
  * Appends the labels to `rowFixed` - TODO: see if this can be done more elegant
  * @param {SVGGElement}    rowFixed   [description]
+ * @param {SVGTextElement} requestNumberLabel a label placed in front of every shortLabel
  * @param {SVGTextElement} shortLabel [description]
  * @param {SVGGElement}    fullLabel  [description]
  */
-function appendRequestLabels(rowFixed, shortLabel, fullLabel) {
+function appendRequestLabels(rowFixed, requestNumberLabel, shortLabel, fullLabel) {
     var labelFullBg = fullLabel.getElementsByTagName("rect")[0];
     var fullLabelText = fullLabel.getElementsByTagName("text")[0];
     // use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
     fullLabel.style.display = "none";
     fullLabel.style.visibility = "hidden";
+    rowFixed.appendChild(requestNumberLabel);
     rowFixed.appendChild(shortLabel);
     rowFixed.appendChild(fullLabel);
     rowFixed.addEventListener("mouseenter", function () {
@@ -1545,9 +1569,9 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":4,"../../helpers/svg":5,"../../transformers/styling-converters":10}],18:[function(require,module,exports){
+},{"../../helpers/misc":5,"../../helpers/svg":6,"../../transformers/styling-converters":11}],19:[function(require,module,exports){
 "use strict";
-var heuristics = require("../../helpers/heuristics");
+var heuristics_1 = require("../../helpers/heuristics");
 var icons = require("../../helpers/icons");
 var misc = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
@@ -1559,24 +1583,28 @@ clipPathElProto.appendChild(svg.newRect({
     "height": "100%",
     "width": "100%",
 }));
+function getRowCssClasses(harEntry) {
+    var classes = ["row-item"];
+    if (heuristics_1.isInStatusCodeRange(harEntry, 500, 599)) {
+        classes.push("status5xx");
+    }
+    else if (heuristics_1.isInStatusCodeRange(harEntry, 400, 499)) {
+        classes.push("status4xx");
+    }
+    else if (harEntry.response.status !== 304 &&
+        heuristics_1.isInStatusCodeRange(harEntry, 300, 399)) {
+        // 304 == Not Modified, so not an issue
+        classes.push("status3xx");
+    }
+    return classes.join(" ");
+}
+var ROW_LEFT_MARGIN = 3;
 // Create row for a single request
-function createRow(context, index, rectData, entry, labelXPos, onDetailsOverlayShow) {
+function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entry, onDetailsOverlayShow) {
     var y = rectData.y;
     var rowHeight = rectData.height;
     var leftColumnWith = context.options.leftColumnWith;
-    var rowCssClass = ["row-item"];
-    if (heuristics.isInStatusCodeRange(entry.rawResource, 500, 599)) {
-        rowCssClass.push("status5xx");
-    }
-    if (heuristics.isInStatusCodeRange(entry.rawResource, 400, 499)) {
-        rowCssClass.push("status4xx");
-    }
-    else if (entry.rawResource.response.status !== 304 &&
-        heuristics.isInStatusCodeRange(entry.rawResource, 300, 399)) {
-        // 304 == Not Modified, so not an issue
-        rowCssClass.push("status3xx");
-    }
-    var rowItem = svg.newG(rowCssClass.join(" "));
+    var rowItem = svg.newG(getRowCssClasses(entry.rawResource));
     var leftFixedHolder = svg.newSvg("left-fixed-holder", {
         "width": leftColumnWith + "%",
         "x": "0",
@@ -1585,29 +1613,34 @@ function createRow(context, index, rectData, entry, labelXPos, onDetailsOverlayS
         "width": 100 - leftColumnWith + "%",
         "x": leftColumnWith + "%",
     });
-    var requestNumber = index + 1 + ". ";
     var rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
-    var shortLabel = rowSubComponents.createRequestLabelClipped(labelXPos, y, requestNumber + misc.resourceUrlFormatter(entry.name, 40), rowHeight);
-    var fullLabel = rowSubComponents.createRequestLabelFull(labelXPos, y, requestNumber + entry.name, rowHeight);
     var rowName = rowSubComponents.createNameRowBg(y, rowHeight, onDetailsOverlayShow);
     var rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow);
     var bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
-    // create and attach request block
-    rowBar.appendChild(rect);
-    var x = 3;
+    var x = ROW_LEFT_MARGIN + maxIconsWidth;
     if (context.options.showMimeTypeIcon) {
         var icon = indicators.getMimeTypeIcon(entry);
+        x -= icon.width;
         rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
-        x += icon.width;
     }
     if (context.options.showIndicatorIcons) {
         // Create and add warnings for potential issues
         indicators.getIndicatorIcons(entry, context.docIsSsl).forEach(function (icon) {
+            x -= icon.width;
             rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
-            x += icon.width;
         });
     }
-    rowSubComponents.appendRequestLabels(rowName, shortLabel, fullLabel);
+    // Jump to the largest offset of all rows
+    x = ROW_LEFT_MARGIN + maxIconsWidth;
+    var requestNumber = "" + (index + 1);
+    var requestNumberLabel = rowSubComponents.createRequestNumberLabel(x, y, requestNumber, rowHeight, maxNumberWidth);
+    // 4 is slightly bigger than the hover "glow" around the url
+    x += maxNumberWidth + 4;
+    var shortLabel = rowSubComponents.createRequestLabelClipped(x, y, misc.resourceUrlFormatter(entry.name, 40), rowHeight);
+    var fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.name, rowHeight);
+    // create and attach request block
+    rowBar.appendChild(rect);
+    rowSubComponents.appendRequestLabels(rowName, requestNumberLabel, shortLabel, fullLabel);
     flexScaleHolder.appendChild(rowBar);
     leftFixedHolder.appendChild(clipPathElProto.cloneNode(true));
     leftFixedHolder.appendChild(rowName);
@@ -1618,11 +1651,12 @@ function createRow(context, index, rectData, entry, labelXPos, onDetailsOverlayS
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":2,"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":5,"./svg-indicators":16,"./svg-row-subcomponents":17}],19:[function(require,module,exports){
+},{"../../helpers/heuristics":3,"../../helpers/icons":4,"../../helpers/misc":5,"../../helpers/svg":6,"./svg-indicators":17,"./svg-row-subcomponents":18}],20:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  */
 "use strict";
+var dom_1 = require("../../helpers/dom");
 var svg = require("../../helpers/svg");
 /**
  * Creates verticale alignment bars
@@ -1654,7 +1688,7 @@ function makeHoverEvtListeners(hoverEl) {
         onMouseEnterPartial: function () {
             return function (evt) {
                 var targetRect = evt.target;
-                svg.addClass(targetRect, "active");
+                dom_1.addClass(targetRect, "active");
                 var xPosEnd = targetRect.x.baseVal.valueInSpecifiedUnits +
                     targetRect.width.baseVal.valueInSpecifiedUnits + "%";
                 var xPosStart = targetRect.x.baseVal.valueInSpecifiedUnits + "%";
@@ -1662,23 +1696,23 @@ function makeHoverEvtListeners(hoverEl) {
                 hoverEl.endline.x2.baseVal.valueAsString = xPosEnd;
                 hoverEl.startline.x1.baseVal.valueAsString = xPosStart;
                 hoverEl.startline.x2.baseVal.valueAsString = xPosStart;
-                svg.addClass(hoverEl.endline, "active");
-                svg.addClass(hoverEl.startline, "active");
+                dom_1.addClass(hoverEl.endline, "active");
+                dom_1.addClass(hoverEl.startline, "active");
             };
         },
         onMouseLeavePartial: function () {
             return function (evt) {
                 var targetRect = evt.target;
-                svg.removeClass(targetRect, "active");
-                svg.removeClass(hoverEl.endline, "active");
-                svg.removeClass(hoverEl.startline, "active");
+                dom_1.removeClass(targetRect, "active");
+                dom_1.removeClass(hoverEl.endline, "active");
+                dom_1.removeClass(hoverEl.startline, "active");
             };
         },
     };
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/svg":5}],20:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":6}],21:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1768,8 +1802,9 @@ function createBgRect(context, entry) {
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/misc":4,"../../helpers/svg":5,"../../transformers/styling-converters":10}],21:[function(require,module,exports){
+},{"../../helpers/misc":5,"../../helpers/svg":6,"../../transformers/styling-converters":11}],22:[function(require,module,exports){
 "use strict";
+var dom_1 = require("../../helpers/dom");
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
 /**
@@ -1820,14 +1855,14 @@ function createMarks(context, marks) {
         var onLabelMouseEnter = function () {
             if (!isActive) {
                 isActive = true;
-                svg.addClass(lineHolder, "active");
+                dom_1.addClass(lineHolder, "active");
                 // firefox has issues with this
                 markHolder.parentNode.appendChild(markHolder);
             }
         };
         var onLabelMouseLeave = function () {
             isActive = false;
-            svg.removeClass(lineHolder, "active");
+            dom_1.removeClass(lineHolder, "active");
         };
         lineLabel.addEventListener("mouseenter", onLabelMouseEnter);
         lineLabel.addEventListener("mouseleave", onLabelMouseLeave);
@@ -1841,7 +1876,7 @@ function createMarks(context, marks) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/misc":4,"../../helpers/svg":5}],22:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/misc":5,"../../helpers/svg":6}],23:[function(require,module,exports){
 "use strict";
 var heuristics_1 = require("../helpers/heuristics");
 var svg = require("../helpers/svg");
@@ -1853,6 +1888,20 @@ var row = require("./row/svg-row");
 var alignmentHelper = require("./sub-components/svg-alignment-helper");
 var generalComponents = require("./sub-components/svg-general-components");
 var marks = require("./sub-components/svg-marks");
+/**
+ * Get a string that's as wide, or wider than any number from 0-n.
+ * @param {number} n the highest number that should fit within the returned string's width.
+ * @returns {string}
+ */
+function getWidestDigitString(n) {
+    var numDigits = Math.floor((Math.log(n) / Math.LN10)) + 1;
+    var s = "";
+    for (var i = 0; i < numDigits; i++) {
+        // No number should take more horizontal space than "0" does.
+        s += "0";
+    }
+    return s;
+}
 /**
  * Calculate the height of the SVG chart in px
  * @param {Mark[]}       marks      [description]
@@ -1932,18 +1981,21 @@ function createWaterfallSvg(data, options) {
     data.lines.forEach(function (entry) {
         timeLineHolder.appendChild(generalComponents.createBgRect(context, entry));
     });
-    var labelXPos = 5;
     // This assumes all icons (mime and indicators) have the same width
-    var iconWidth = indicators.getMimeTypeIcon(entriesToShow[0]).width;
+    var perIconWidth = indicators.getMimeTypeIcon(entriesToShow[0]).width;
+    var maxIcons = 0;
     if (options.showMimeTypeIcon) {
-        labelXPos += iconWidth;
+        maxIcons += 1;
     }
     if (options.showIndicatorIcons) {
         var iconsPerBlock = entriesToShow.map(function (entry) {
             return indicators.getIndicatorIcons(entry, context.docIsSsl).length;
         });
-        labelXPos += iconWidth * Math.max.apply(null, iconsPerBlock);
+        maxIcons += Math.max.apply(null, iconsPerBlock);
     }
+    var maxIconsWidth = maxIcons * perIconWidth;
+    var widestRequestNumber = getWidestDigitString(entriesToShow.length);
+    var maxNumberWidth = svg.getNodeTextWidth(svg.newTextEl("" + widestRequestNumber), true);
     var barEls = [];
     function getChartHeight() {
         return (chartHolderHeight + context.overlayManager.getCombinedOverlayHeight()).toString() + "px";
@@ -1971,7 +2023,7 @@ function createWaterfallSvg(data, options) {
         var showDetailsOverlay = function () {
             context.overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
         };
-        var rowItem = row.createRow(context, i, rectData, entry, labelXPos, showDetailsOverlay);
+        var rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);
         barEls.push(rowItem);
         rowHolder.appendChild(rowItem);
     }
@@ -1987,5 +2039,5 @@ function createWaterfallSvg(data, options) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/heuristics":2,"../helpers/svg":5,"../transformers/styling-converters":10,"./details-overlay/overlay-changes-pub-sub":13,"./details-overlay/svg-details-overlay-manager":14,"./row/svg-indicators":16,"./row/svg-row":18,"./sub-components/svg-alignment-helper":19,"./sub-components/svg-general-components":20,"./sub-components/svg-marks":21}]},{},[7])(7)
+},{"../helpers/heuristics":3,"../helpers/svg":6,"../transformers/styling-converters":11,"./details-overlay/overlay-changes-pub-sub":14,"./details-overlay/svg-details-overlay-manager":15,"./row/svg-indicators":17,"./row/svg-row":19,"./sub-components/svg-alignment-helper":20,"./sub-components/svg-general-components":21,"./sub-components/svg-marks":22}]},{},[8])(8)
 });
