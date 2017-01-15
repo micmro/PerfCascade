@@ -1,3 +1,4 @@
+import { roundNumber } from "../helpers/misc";
 import { Entry, Har, PageTimings } from "../typing/har";
 import {
   Mark,
@@ -136,13 +137,13 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   const marks = Object.keys(pageTimings)
     .filter((k: keyof PageTimings) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
     .sort((a: string, b: string) => pageTimings[a] > pageTimings[b] ? 1 : -1)
-    .map((k: "onContentload" | "onLoad") => {
+    .map((k) => {
       const startRelative: number = pageTimings[k];
 
       doneTime = Math.max(doneTime, startRelative);
 
       return {
-        "name": `${k.replace(/^[_]/, "")} (${(Math.round(startRelative * 10) / 10)} ms)`,
+        "name": `${k.replace(/^[_]/, "")} (${roundNumber(startRelative)} ms)`,
         "startTime": startRelative,
       } as Mark;
     });
