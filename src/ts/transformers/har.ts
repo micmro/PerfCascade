@@ -169,7 +169,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
 function buildDetailTimingBlocks(startRelative: number, harEntry: Entry): WaterfallEntryTiming[] {
   let t = harEntry.timings;
   return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[],
-    key: TimingType) => {
+                                                                          key: TimingType) => {
 
     const time = getTimePair(key, harEntry, collect, startRelative);
 
