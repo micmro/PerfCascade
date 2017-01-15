@@ -60,7 +60,7 @@ function newElement<T extends StylableSVGElement>(tagName: string,
 }
 
 export function newSvg(className: string, attributes: DomAttributeMap, css: CssStyleMap = {}): SVGSVGElement {
-  return newElement<SVGSVGElement>("svg:svg", {className, attributes, css});
+  return newElement<SVGSVGElement>("svg", {className, attributes, css});
 }
 
 export function newG(className: string, attributes: DomAttributeMap = {}, css: CssStyleMap = {}): SVGGElement {
