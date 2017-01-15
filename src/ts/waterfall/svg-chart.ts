@@ -17,14 +17,14 @@ import * as marks from  "./sub-components/svg-marks";
 
 /**
  * Get a string that's as wide, or wider than any number from 0-n.
- * @param n
+ * @param {number} n the highest number that should fit within the returned string's width.
  * @returns {string}
  */
 function getWidestDigitString(n: number): string {
   const numDigits = Math.floor((Math.log(n) / Math.LN10)) + 1;
   let s = "";
   for (let i = 0; i < numDigits; i++) {
-    // No number should take more horizonal space than 0 to write.
+    // No number should take more horizontal space than "0" does.
     s += "0";
   }
   return s;
