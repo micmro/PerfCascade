@@ -1,3 +1,4 @@
+import { addClass, removeClass } from "../../helpers/dom";
 import {roundNumber} from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
 import {Context} from "../../typing/context";
@@ -58,7 +59,7 @@ export function createMarks(context: Context, marks: Mark[]) {
     let onLabelMouseEnter = () => {
       if (!isActive) {
         isActive = true;
-        svg.addClass(lineHolder, "active");
+        addClass(lineHolder, "active");
         // firefox has issues with this
         markHolder.parentNode.appendChild(markHolder);
       }
@@ -66,7 +67,7 @@ export function createMarks(context: Context, marks: Mark[]) {
 
     let onLabelMouseLeave = () => {
       isActive = false;
-      svg.removeClass(lineHolder, "active");
+      removeClass(lineHolder, "active");
     };
 
     lineLabel.addEventListener("mouseenter", onLabelMouseEnter);

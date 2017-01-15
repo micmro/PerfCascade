@@ -1,4 +1,4 @@
-import * as svg from "../helpers/svg";
+import { removeChildren } from "../helpers/dom";
 import {OnPagingCb} from "../typing/paging";
 import {WaterfallData, WaterfallDocs} from "../typing/waterfall";
 
@@ -78,7 +78,7 @@ export default class Paging {
       return;
     }
     // remove all existing options, like placeholders
-    svg.removeChildren(selectbox);
+    removeChildren(selectbox);
     this.doc.pages.forEach((p, i) => {
       let option = new Option(p.title, i.toString(), i === this.selectedPageIndex);
       selectbox.add(option);

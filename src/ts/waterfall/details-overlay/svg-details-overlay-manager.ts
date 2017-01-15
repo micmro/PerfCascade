@@ -1,4 +1,4 @@
-import * as svg from "../../helpers/svg";
+import { removeChildren } from "../../helpers/dom";
 import {Context, OverlayManagerClass} from "../../typing/context";
 import {OpenOverlay, OverlayChangeEvent} from "../../typing/open-overlay";
 import {WaterfallEntry} from "../../typing/waterfall";
@@ -95,7 +95,7 @@ export default class OverlayManager implements OverlayManagerClass {
    * @param  {SVGGElement} overlayHolder
    */
   private renderOverlays(accordionHeight: number) {
-    svg.removeChildren(this.overlayHolder);
+    removeChildren(this.overlayHolder);
 
     let currY = 0;
     this.openOverlays
