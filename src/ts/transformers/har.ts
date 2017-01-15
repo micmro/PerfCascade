@@ -143,7 +143,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
       doneTime = Math.max(doneTime, startRelative);
 
       return {
-        "name": `${k.replace(/^[_]/, "")} (${roundNumber(startRelative)} ms)`,
+        "name": `${k.replace(/^[_]/, "")} (${roundNumber(startRelative, 0)} ms)`,
         "startTime": startRelative,
       } as Mark;
     });
