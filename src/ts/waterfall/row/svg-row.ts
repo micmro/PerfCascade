@@ -56,19 +56,19 @@ export function createRow(context: Context, index: number,
   let rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow);
   let bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
 
-  let x = ROW_LEFT_MARGIN;
+  let x = ROW_LEFT_MARGIN + maxIconsWidth;
 
   if (context.options.showMimeTypeIcon) {
     const icon = indicators.getMimeTypeIcon(entry);
+    x -= icon.width;
     rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
-    x += icon.width;
   }
 
   if (context.options.showIndicatorIcons) {
     // Create and add warnings for potential issues
     indicators.getIndicatorIcons(entry, context.docIsSsl).forEach((icon: indicators.Icon) => {
+      x -= icon.width;
       rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
-      x += icon.width;
     });
   }
 
