@@ -34,6 +34,8 @@ export function getMimeTypeIcon(entry: WaterfallEntry): Icon {
     return makeIcon("err4xx", `${harEntry.response.status} response status: ${harEntry.response.statusText}`);
   } else if (heuristics.isInStatusCodeRange(harEntry, 500, 599)) {
     return makeIcon("err5xx", `${harEntry.response.status} response status: ${harEntry.response.statusText}`);
+  } else if (harEntry.response.status === 204) {
+    return makeIcon("plain", "No content");
   } else {
     return makeIcon(entry.requestType, entry.requestType);
   }
