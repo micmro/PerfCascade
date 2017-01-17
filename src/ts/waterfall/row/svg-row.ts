@@ -30,7 +30,8 @@ function getRowCssClasses(harEntry: Entry): string {
   return classes.join(" ");
 }
 
-const ROW_LEFT_MARGIN = 3;
+const NUMBER_RIGHT_MARGIN = 4;
+const MIME_RIGHT_MARGIN = 4;
 
 // Create row for a single request
 export function createRow(context: Context, index: number,
@@ -56,7 +57,13 @@ export function createRow(context: Context, index: number,
   let rowBar = rowSubComponents.createRowBg(y, rowHeight, onDetailsOverlayShow);
   let bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
 
-  let x = ROW_LEFT_MARGIN + maxIconsWidth;
+  let x = maxNumberWidth + NUMBER_RIGHT_MARGIN + maxIconsWidth + MIME_RIGHT_MARGIN;
+
+  let shortLabel = rowSubComponents.createRequestLabelClipped(x, y, misc.resourceUrlFormatter(entry.name, 40),
+    rowHeight);
+  let fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.name, rowHeight);
+
+  x = maxNumberWidth + NUMBER_RIGHT_MARGIN + maxIconsWidth;
 
   if (context.options.showMimeTypeIcon) {
     const icon = indicators.getMimeTypeIcon(entry);
@@ -72,17 +79,11 @@ export function createRow(context: Context, index: number,
     });
   }
 
-  // Jump to the largest offset of all rows
-  x = ROW_LEFT_MARGIN + maxIconsWidth;
+  x = 0;
 
   let requestNumber = `${index + 1}`;
 
   const requestNumberLabel = rowSubComponents.createRequestNumberLabel(x, y, requestNumber, rowHeight, maxNumberWidth);
-  // 4 is slightly bigger than the hover "glow" around the url
-  x += maxNumberWidth + 4;
-  let shortLabel = rowSubComponents.createRequestLabelClipped(x, y, misc.resourceUrlFormatter(entry.name, 40),
-    rowHeight);
-  let fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.name, rowHeight);
 
   // create and attach request block
   rowBar.appendChild(rect);
