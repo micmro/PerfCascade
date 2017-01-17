@@ -13,9 +13,9 @@ let formatBytes = (size?: number) => ifValueDefined(size, (s) => `${s} byte (~${
 
 let formatTime = (size?: number) => ifValueDefined(size, (s) => `${s} ms`);
 
-let formatDate = (date?: string) => {
+const formatDate = (date?: string) => {
   if (!date) {
-    return "";
+    return undefined;
   }
   let dateToFormat = new Date(date);
   return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`;
