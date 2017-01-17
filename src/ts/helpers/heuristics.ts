@@ -69,6 +69,12 @@ export function isSecure(entry: WaterfallEntry) {
   return entry.name.indexOf("https://") === 0;
 }
 
+export function isPush(entry: WaterfallEntry) {
+  const harEntry = entry.rawResource;
+  // WebPageTest got "1" if an asset was pushed, Browsertime = true. If not pushed WPT has "0"
+  return ( harEntry["_was_pushed"] === true || Number(harEntry["_was_pushed"]) === 1);
+}
+
 /**
  * Check if the document (disregarding any initial http->https redirects) is loaded over a secure connection.
  * @param {WaterfallData} data -  the waterfall data.

@@ -50,6 +50,10 @@ export function getMimeTypeIcon(entry: WaterfallEntry): Icon {
   const harEntry = entry.rawResource;
   let output = [];
 
+  if (heuristics.isPush(entry)) {
+    output.push(makeIcon("push", "Response was pushed by the server"));
+  }
+
   if (docIsSsl && !heuristics.isSecure(entry)) {
     output.push(makeIcon("noTls", "Insecure Connection"));
   }
