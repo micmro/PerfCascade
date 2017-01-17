@@ -2,6 +2,28 @@ import {getHeader} from "../../helpers/har";
 import {Entry, Header} from "../../typing/har";
 import {WaterfallEntry} from "../../typing/waterfall";
 
+function parseAndFormat<S, T>(source: S, parseFn: ((_: S) => T), formatFn: ((_: T) => string)): string {
+  if (typeof source === "undefined") {
+    return undefined;
+  }
+  const parsed = parseFn(source);
+  if (typeof parsed === "undefined") {
+    return undefined;
+  }
+  return formatFn(parsed);
+}
+
+function parseNonNegative(n: number): number {
+  if (n < 0) {
+    return undefined;
+  }
+  return n;
+}
+
+function formatMilliseconds(millis: number): string {
+  return `${millis} ms`;
+}
+
 let ifValueDefined = (value: number, fn: (_: number) => any) => {
   if (!isFinite(value) || value <= 0) {
     return undefined;
@@ -154,16 +176,17 @@ function parseResponseDetails(harEntry: Entry): KvTuple[] {
 function parseTimings(entry: WaterfallEntry): KvTuple[] {
   const timings = entry.rawResource.timings;
 
-  // FIXME should only filter -1 values here, 0 is a valid timing.
+  const optionalTiming = (timing?: number) => parseAndFormat(timing, parseNonNegative, formatMilliseconds);
+
   return [
-    ["Total", `${entry.total} ms`],
-    ["Blocked", formatTime(timings["blocked"])],
-    ["DNS", formatTime(timings["dns"])],
-    ["Connect", formatTime(timings["connect"])],
-    ["SSL (TLS)", formatTime(timings["ssl"])],
-    ["Send", formatTime(timings["send"])],
-    ["Wait", formatTime(timings["wait"])],
-    ["Receive", formatTime(timings["receive"])],
+    ["Total", formatMilliseconds(entry.total)],
+    ["Blocked", optionalTiming(timings.blocked)],
+    ["DNS", optionalTiming(timings.dns)],
+    ["Connect", optionalTiming(timings.connect)],
+    ["SSL (TLS)", optionalTiming(timings.ssl)],
+    ["Send", formatMilliseconds(timings.send)],
+    ["Wait", formatMilliseconds(timings.wait)],
+    ["Receive", formatMilliseconds(timings.receive)],
   ];
 }
 
