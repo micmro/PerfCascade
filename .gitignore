@@ -4,9 +4,12 @@
 temp/
 src/ts/.baseDir.ts
 
+#Build dirs
+build/
+src/dist/
+
 #GH page dist
 gh-pages/
-src/dist/perf-cascade-gh-page.css
 
 #npm dist base (relative to root)
 /lib/
