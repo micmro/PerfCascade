@@ -45,11 +45,10 @@ let getExpAsByte = (harEntry: Entry, name: string): string => {
 
 function parseGeneralDetails(entry: WaterfallEntry, requestID: number): KvTuple[] {
   const harEntry = entry.rawResource;
-
   return [
     ["Request Number", `#${requestID}`],
-    ["Started", new Date(harEntry.startedDateTime).toLocaleString() + " (" + formatTime(entry.start) +
-    " after page request started)"],
+    ["Started", new Date(harEntry.startedDateTime).toLocaleString() + ((entry.start > 0) ?
+    " (" + formatTime(entry.start) + " after page request started)" : "")],
     ["Duration", formatTime(harEntry.time)],
     ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
     ["Server IPAddress", harEntry.serverIPAddress],
