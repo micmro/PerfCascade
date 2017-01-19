@@ -10,8 +10,8 @@ module.exports = {
   },
   dist: {
     files: {
-      "src/dist/perf-cascade.min.js": ["src/dist/perf-cascade.js"],
-      "src/dist/perf-cascade-file-reader.min.js": ["src/zip/zip.js", "src/zip/inflate.js", "src/dist/temp/perf-cascade-file-reader.js"]
+      "build/stage/perf-cascade.min.js": ["build/stage/perf-cascade.js"],
+      "build/stage/perf-cascade-file-reader.min.js": ["src/zip/zip.js", "src/zip/inflate.js", "build/stage/temp/perf-cascade-file-reader.js"]
     }
   }
 };

@@ -1,6 +1,6 @@
 module.exports = {
-  dist: ["temp/", "src/dist/", "./index.js", "./index.d.ts"],
-  pages: ["gh-pages/"],
-  lib: ["lib/", "types/", "./index.js", "./index.d.ts"],
+  all: ["build/"],
+  dist: ["build/stage/"],
+  npm: ["build/npm/"],
   js: ["src/ts/**/*.js", "src/ts/**/*.js.map"]
 };
