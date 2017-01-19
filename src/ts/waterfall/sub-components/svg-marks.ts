@@ -17,12 +17,12 @@ export function createMarks(context: Context, marks: Mark[]) {
   });
 
   marks.forEach((mark, i) => {
-    let x = roundNumber(mark.startTime / context.unit);
+    const x = roundNumber(mark.startTime / context.unit);
     let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase());
     let lineHolder = svg.newG("line-holder");
     let lineLabelHolder = svg.newG("line-label-holder");
-    mark.x = x;
     let lineLabel = svg.newTextEl(mark.name, {x: x + "%", y: diagramHeight + 25});
+    mark.x = x;
 
     let line = svg.newLine({
       "x1": x + "%",
@@ -32,9 +32,10 @@ export function createMarks(context: Context, marks: Mark[]) {
     });
 
     const lastMark = marks[i - 1];
-    if (lastMark && mark.x - lastMark.x < 1) {
-      lineLabel.setAttribute("x", lastMark.x + 1 + "%");
-      mark.x = lastMark.x + 1;
+    const minDistance = 2.5; // minimum distance between marks
+    if (lastMark && mark.x - lastMark.x < minDistance) {
+      lineLabel.setAttribute("x", lastMark.x + minDistance + "%");
+      mark.x = lastMark.x + minDistance;
     }
     // would use polyline but can't use percentage for points
     let lineConnection = svg.newLine({
