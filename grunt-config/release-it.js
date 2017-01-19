@@ -32,7 +32,7 @@ module.exports = {
     "dist": {
       "repo": "git@github.com:micmro/PerfCascade.git#release",
       "stageDir": ".stage",
-      // "baseDir": "dist",
+      "baseDir": "build/dist",
     //   "files": ["**/*"],
     //   "pkgFiles": null,
     //   "beforeStageCommand": false,
@@ -41,8 +41,8 @@ module.exports = {
     },
     "npm": {
       "publish": true,
-      "publishPath": "./npm",
-    //   "tag": "latest",
+      "publishPath": "build/npm",
+      "tag": "latest",
     //   "private": false,
     //   "forcePublishSourceRepo": false
     },

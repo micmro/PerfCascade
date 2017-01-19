@@ -5,13 +5,17 @@ module.exports = function (grunt) {
   "use strict";
 
   /** Version banner for static files (keep version format for "grunt-bump") */
-  let banner = "/*! github.com/micmro/PerfCascade Version:<%= package.version %> <%= grunt.template.today(\"(dd/mm/yyyy)\") %> */\n";
+  const banner = "/*! github.com/micmro/PerfCascade Version:<%= package.version %> <%= grunt.template.today(\"(dd/mm/yyyy)\") %> */\n";
+  let releaseIncrement = ["major", "minor"]
+    .indexOf(grunt.option('release-increment')) != -1 ? grunt.option('release-increment') : "patch";
 
+  // automatically loads configurations from `./grunt-config/*`
   require('load-grunt-config')(grunt, {
     configPath: path.join(process.cwd(), 'grunt-config'),
+    /* data made availabe to the tasks */
     data: {
-      banner: banner
-      // test: false
+      banner: banner,
+      releaseIncrement: releaseIncrement
     },
   });
 
@@ -20,17 +24,21 @@ module.exports = function (grunt) {
   // builds the TS into a single file
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:demoCss", "distFileReader"]);
 
+  //builds npm package - relies on /stage to be populated
+  grunt.registerTask("buildNpm", ["copy:npmDist", "run:tscEs6", "copy:npmBase", "copy:npmZipLib"])
+
   //Post build work, copying and combining files for NPM and regular release
-  grunt.registerTask("releasePrep", ["concat:mainCss", "uglify:dist", "copy:npm", "copy:npmBase", "copy:npmTypings", "copy:npmZipLib"])
+  grunt.registerTask("releasePrep", ["concat:mainCss", "uglify:dist", "copy:release"])
   //build a single file and a library of ES6 Modules for the NPM package
-  grunt.registerTask("releaseBuild", ["tslint", "clean:lib", "run:tscEs6", "distBase", "releasePrep"]);
+  grunt.registerTask("releaseBuild", ["tslint", "clean:all", "distBase", "releasePrep", "buildNpm", "concat:pages", "copy:pages"]);
 
 
   //releases the current version on master to github-pages (gh-pages branch)
-  grunt.registerTask("ghPages", ["clean:pages", "releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
+  grunt.registerTask("ghPages", [ "releaseBuild", "concat:pages", "copy:pages"/*, "gh-pages"*/]);
 
   //releases master and gh-pages at the same time (with auto-version bump)
-  grunt.registerTask("release", ["clean:pages", "releaseBuild", "bump", "concat:pages", "copy:pages", "gh-pages", "run:publish"]);
+  grunt.registerTask("release", ["releaseBuild", "release-it:repo", /*"bump", "concat:pages", "copy:pages", "gh-pages", "run:publish"*/]);
+  // grunt.registerTask("release", ["release-it:repo"])
 
-  grunt.registerTask("default", ["distBase", "watch"]);
+  grunt.registerTask("default", ["clean:all", "distBase", "watch"]);
 };
