@@ -107,6 +107,14 @@ export function transformDoc(harData: Har): WaterfallDocs {
  * @returns WaterfallData
  */
 export function transformPage(harData: Har, pageIndex: number = 0): WaterfallData {
+  function toInt(input: string | number): number {
+    if (typeof input === "string") {
+      return parseInt(input, 10);
+    } else {
+      return input;
+    }
+  }
+
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
 
@@ -127,7 +135,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
       const requestType = mimeToRequestType(entry.response.content.mimeType);
       return createWaterfallEntry(entry.request.url,
         startRelative,
-        parseInt(entry._all_end, 10) || (startRelative + entry.time),
+        toInt(entry._all_end) || (startRelative + entry.time),
         buildDetailTimingBlocks(startRelative, entry),
         entry,
         requestType,

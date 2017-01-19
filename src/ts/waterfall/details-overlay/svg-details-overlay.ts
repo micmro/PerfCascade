@@ -49,7 +49,7 @@ function createHolder(y: number, accordionHeight: number) {
 export function createRowInfoOverlay(indexBackup: number, y: number,
                                      accordionHeight: number, entry: WaterfallEntry,
                                      onClose: OnCloseFn): SVGGElement {
-  const requestID =  parseInt(entry.rawResource._index + 1, 10) || indexBackup + 1;
+  const requestID =  entry.rawResource._number || indexBackup + 1;
   let wrapper = svg.newG("outer-info-overlay-holder");
   let holder = createHolder(y, accordionHeight);
 
