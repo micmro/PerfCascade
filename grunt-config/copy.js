@@ -1,47 +1,55 @@
 module.exports = {
+  //github pages
   pages: {
     expand: true,
     flatten: true,
     src: [
-      "src/dist/perf-cascade-gh-page.css",
-      "src/dist/perf-cascade.min.js",
-      "src/dist/perf-cascade-file-reader.min.js"
+      "build/stage/perf-cascade-gh-page.css",
+      "build/stage/perf-cascade.min.js",
+      "build/stage/perf-cascade-file-reader.min.js"
     ],
-    dest: "gh-pages/src/",
+    dest: "build/gh-pages/src/",
     filter: "isFile",
   },
-  npm: {
+  //github release
+  release: {
     expand: true,
     flatten: true,
     src: [
-      "src/dist/perf-cascade.js",
-      "src/dist/perf-cascade.min.js",
-      "src/dist/perf-cascade-file-reader.js",
-      "src/dist/perf-cascade-file-reader.min.js",
-      "src/dist/perf-cascade.css"
+      "build/stage/perf-cascade.js",
+      "build/stage/perf-cascade.min.js",
+      "build/stage/perf-cascade-file-reader.js",
+      "build/stage/perf-cascade-file-reader.min.js",
+      "build/stage/perf-cascade.css"
     ],
-    dest: "dist/",
+    dest: "build/release/",
+    filter: "isFile",
+  },
+  npmDist: {
+    expand: true,
+    flatten: true,
+    src: [
+      "build/stage/perf-cascade.js",
+      "build/stage/perf-cascade.min.js",
+      "build/stage/perf-cascade-file-reader.js",
+      "build/stage/perf-cascade-file-reader.min.js",
+      "build/stage/perf-cascade.css"
+    ],
+    dest: "build/npm/dist/",
     filter: "isFile",
   },
   npmBase: {
     expand: true,
     flatten: true,
     src: ["npm-export/index.js", "npm-export/index.d.ts"],
-    dest: "./",
+    dest: "build/npm/",
     filter: "isFile",
   },
   npmZipLib: {
     expand: true,
     cwd: "src/",
     src: ["zip/**/*"],
-    dest: "./lib/",
-    filter: "isFile",
-  },
-  npmTypings: {
-    expand: true,
-    cwd: "src/ts/",
-    src: ["**/*.d.ts"],
-    dest: "./types",
+    dest: "build/npm/lib/",
     filter: "isFile",
   }
 };
