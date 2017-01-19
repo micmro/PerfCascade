@@ -2,15 +2,21 @@ import {getHeader} from "../../helpers/har";
 import {Entry, Header} from "../../typing/har";
 import {WaterfallEntry} from "../../typing/waterfall";
 
-function parseAndFormat<S, T>(source: S, parseFn: ((_: S) => T), formatFn: ((_: T) => string)): string {
-  if (typeof source === "undefined") {
+function parseAndFormat<S, T>(source?: S,
+                              parseFn: ((_: S) => T) = identity,
+                              formatFn: ((_: T) => string) = identity): string {
+  if (source === undefined) {
     return undefined;
   }
   const parsed = parseFn(source);
-  if (typeof parsed === "undefined") {
+  if (parsed === undefined) {
     return undefined;
   }
   return formatFn(parsed);
+}
+
+function identity<T>(source: T): T {
+  return source;
 }
 
 function parseDate(s: string): Date {
@@ -21,11 +27,27 @@ function parseDate(s: string): Date {
   return date;
 }
 
-function parseNonNegative(n: number): number {
-  if (n < 0) {
-    return undefined;
+function parseNonNegative(input: string | number): number {
+  const criteria = (n: number) => (n < 0);
+  return parseToNumber(input, criteria);
+}
+
+function parsePositive(input: string | number): number {
+  const criteria = (n: number) => (n <= 0);
+  return parseToNumber(input, criteria);
+}
+
+function parseToNumber(input: string | number, criteria: (_: number) => boolean): number {
+  const parse = (n: number) => criteria(n) ? undefined : n;
+
+  if (typeof input === "string") {
+    const n = parseInt(input, 10);
+    if (!isFinite(n)) {
+      return undefined;
+    }
+    return parse(n);
   }
-  return n;
+  return parse(input);
 }
 
 function formatMilliseconds(millis: number): string {
@@ -36,29 +58,13 @@ function formatDateLocalized(d: Date): string {
   return `${d.toUTCString()}</br>(local time: ${d.toLocaleString()})`;
 }
 
-let ifValueDefined = (value: number, fn: (_: number) => any) => {
-  if (!isFinite(value) || value <= 0) {
-    return undefined;
-  }
-  return fn(value);
-};
-
-let formatBytes = (size?: number) => ifValueDefined(size, (s) => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`);
-
-let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
-  let v = parseInt(val, 10);
-  return ifValueDefined(v, ifIntFn);
-};
+function formatBytes(size: number): string {
+  return `${size} byte (~${Math.round(size / 1024 * 10) / 10}kb)`;
+}
 
 /** get experimental feature (usually WebPageTest) */
 let getExp = (harEntry: Entry, name: string): string => {
   return harEntry[name] || harEntry["_" + name] || harEntry.request[name] || harEntry.request["_" + name] || "";
-};
-
-/** get experimental feature and ensure it's not a sting of `0` or `` */
-let getExpNotNull = (harEntry: Entry, name: string): string => {
-  let resp = getExp(harEntry, name);
-  return resp !== "0" ? resp : "";
 };
 
 /** get experimental feature and format it as byte */
@@ -72,7 +78,7 @@ function parseGeneralDetails(entry: WaterfallEntry, requestID: number): KvTuple[
   return [
     ["Request Number", `#${requestID}`],
     ["Started", new Date(harEntry.startedDateTime).toLocaleString() + ((entry.start > 0) ?
-    " (" + formatMilliseconds(entry.start) + " after page request started)" : "")],
+      " (" + formatMilliseconds(entry.start) + " after page request started)" : "")],
     ["Duration", formatMilliseconds(harEntry.time)],
     ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
     ["Server IPAddress", harEntry.serverIPAddress],
@@ -83,14 +89,14 @@ function parseGeneralDetails(entry: WaterfallEntry, requestID: number): KvTuple[
     ["Initiator Line", harEntry._initiator_line],
     ["Host", getHeader(harEntry.request.headers, "Host")],
     ["IP", harEntry._ip_addr],
-    ["Client Port", harEntry._client_port],
+    ["Client Port", parseAndFormat(harEntry._client_port, parsePositive)],
     ["Expires", harEntry._expires],
-    ["Cache Time", harEntry._cache_time],
+    ["Cache Time", parseAndFormat(harEntry._cache_time, parsePositive)],
     ["CDN Provider", harEntry._cdn_provider],
-    ["ObjectSize", harEntry._objectSize],
+    ["ObjectSize", parseAndFormat(harEntry._objectSize, parsePositive, formatBytes)],
     ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
     ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
-    ["JPEG Scan Count", getExpNotNull(harEntry, "jpeg_scan_count")],
+    ["JPEG Scan Count", parseAndFormat(harEntry._jpeg_scan_count, parsePositive)],
     ["Gzip Total", getExpAsByte(harEntry, "gzip_total")],
     ["Gzip Save", getExpAsByte(harEntry, "gzip_save")],
     ["Minify Total", getExpAsByte(harEntry, "minify_total")],
@@ -109,8 +115,8 @@ function parseRequestDetails(harEntry: Entry): KvTuple[] {
     ["Method", request.method],
     ["HTTP Version", request.httpVersion],
     ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
-    ["Headers Size", formatBytes(request.headersSize)],
-    ["Body Size", formatBytes(request.bodySize)],
+    ["Headers Size", parseAndFormat(request.headersSize, parseNonNegative, formatBytes)],
+    ["Body Size", parseAndFormat(request.bodySize, parseNonNegative, formatBytes)],
     ["Comment", request.comment],
     stringHeader("User-Agent"),
     stringHeader("Host"),
@@ -122,7 +128,7 @@ function parseRequestDetails(harEntry: Entry): KvTuple[] {
     stringHeader("If-Modified-Since"),
     stringHeader("If-Range"),
     stringHeader("If-Unmodified-Since"),
-    ["Querystring parameters count", request.queryString.length],
+    ["Querystring parameters count", parseAndFormat(request.queryString.length, parsePositive)],
     ["Cookies count", request.cookies.length],
   ];
 }
@@ -149,17 +155,17 @@ function parseResponseDetails(harEntry: Entry): KvTuple[] {
     ["Status", response.status + " " + response.statusText],
     ["HTTP Version", response.httpVersion],
     ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
-    ["Header Size", formatBytes(response.headersSize)],
-    ["Body Size", formatBytes(response.bodySize)],
+    ["Headers Size", parseAndFormat(response.headersSize, parseNonNegative, formatBytes)],
+    ["Body Size", parseAndFormat(response.bodySize, parseNonNegative, formatBytes)],
     ["Content-Type", contentType],
     stringHeader("Cache-Control"),
     stringHeader("Content-Encoding"),
     dateHeader("Expires"),
     dateHeader("Last-Modified"),
     stringHeader("Pragma"),
-    ["Content-Length", asIntPartial(contentLength, formatBytes)],
+    ["Content-Length", parseAndFormat(contentLength, parseNonNegative, formatBytes)],
     ["Content Size", (contentLength !== content.size.toString() ? formatBytes(content.size) : "")],
-    ["Content Compression", formatBytes(content.compression)],
+    ["Content Compression", parseAndFormat(content.compression, parsePositive, formatBytes)],
     stringHeader("Connection"),
     stringHeader("ETag"),
     stringHeader("Accept-Patch"),
