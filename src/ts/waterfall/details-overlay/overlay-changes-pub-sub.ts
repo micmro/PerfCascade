@@ -1,6 +1,6 @@
 // simple pub/sub for change to the overlay
-import {PubSubClass} from "../../typing/context.d";
-import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay.d";
+import {PubSubClass} from "../../typing/context";
+import {OverlayChangeEvent, OverlayChangeSubscriber} from "../../typing/open-overlay";
 
 export default class PubSub implements PubSubClass {
   private subscribers: OverlayChangeSubscriber[] = [];
