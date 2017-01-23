@@ -13,6 +13,14 @@ function parseAndFormat<S, T>(source: S, parseFn: ((_: S) => T), formatFn: ((_: 
   return formatFn(parsed);
 }
 
+function parseDate(s: string): Date {
+  const date = new Date(s);
+  if (isNaN(date.getTime())) {
+    return undefined;
+  }
+  return date;
+}
+
 function parseNonNegative(n: number): number {
   if (n < 0) {
     return undefined;
@@ -24,6 +32,10 @@ function formatMilliseconds(millis: number): string {
   return `${millis} ms`;
 }
 
+function formatDateLocalized(d: Date): string {
+  return `${d.toUTCString()}</br>(local time: ${d.toLocaleString()})`;
+}
+
 let ifValueDefined = (value: number, fn: (_: number) => any) => {
   if (!isFinite(value) || value <= 0) {
     return undefined;
@@ -32,14 +44,6 @@ let ifValueDefined = (value: number, fn: (_: number) => any) => {
 };
 
 let formatBytes = (size?: number) => ifValueDefined(size, (s) => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`);
-
-const formatDate = (date?: string) => {
-  if (!date) {
-    return undefined;
-  }
-  let dateToFormat = new Date(date);
-  return `${date} </br>(local time: ${dateToFormat.toLocaleString()})`;
-};
 
 let asIntPartial = (val: string, ifIntFn: (_: number) => any) => {
   let v = parseInt(val, 10);
@@ -129,7 +133,10 @@ function parseResponseDetails(harEntry: Entry): KvTuple[] {
   const headers = response.headers;
 
   const stringHeader = (title: string, name: string = title): KvTuple => [title, getHeader(headers, name)];
-  const dateHeader = (name: string): KvTuple => [name, formatDate(getHeader(headers, name))];
+  const dateHeader = (name: string): KvTuple => {
+    const header = getHeader(headers, name);
+    return [name, parseAndFormat(header, parseDate, formatDateLocalized)];
+  };
 
   const contentLength = getHeader(headers, "Content-Length");
 
