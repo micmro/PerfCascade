@@ -33,8 +33,6 @@ let ifValueDefined = (value: number, fn: (_: number) => any) => {
 
 let formatBytes = (size?: number) => ifValueDefined(size, (s) => `${s} byte (~${Math.round(s / 1024 * 10) / 10}kb)`);
 
-let formatTime = (size?: number) => ifValueDefined(size, (s) => `${s} ms`);
-
 const formatDate = (date?: string) => {
   if (!date) {
     return undefined;
@@ -70,8 +68,8 @@ function parseGeneralDetails(entry: WaterfallEntry, requestID: number): KvTuple[
   return [
     ["Request Number", `#${requestID}`],
     ["Started", new Date(harEntry.startedDateTime).toLocaleString() + ((entry.start > 0) ?
-    " (" + formatTime(entry.start) + " after page request started)" : "")],
-    ["Duration", formatTime(harEntry.time)],
+    " (" + formatMilliseconds(entry.start) + " after page request started)" : "")],
+    ["Duration", formatMilliseconds(harEntry.time)],
     ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
     ["Server IPAddress", harEntry.serverIPAddress],
     ["Connection", harEntry.connection],
