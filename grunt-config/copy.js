@@ -41,7 +41,13 @@ module.exports = {
   npmBase: {
     expand: true,
     flatten: true,
-    src: ["npm-export/index.js", "npm-export/index.d.ts"],
+    src: [
+      "npm-export/index.js",
+      "npm-export/index.d.ts",
+      "package.json",
+      "README.md",
+      "LICENSE",
+    ],
     dest: "build/npm/",
     filter: "isFile",
   },

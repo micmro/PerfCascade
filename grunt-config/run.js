@@ -1,3 +1,5 @@
+const process = require("process");
+
 module.exports = {
   options: {
     failOnError: true
@@ -14,8 +16,11 @@ module.exports = {
     --declarationDir ./build/npm/types
     `.replace(/\n[\t ]+/g,' ').split(' ').filter(x => x != '')
   },
-  publish: {
+  npmPublish: {
+    options: {
+      cwd: process.cwd() + "/build/npm"
+    },
     cmd: 'npm',
-    args: ['publish']
+    args: ['publish'],
   }
 };
