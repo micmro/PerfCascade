@@ -69,10 +69,16 @@ export function isSecure(entry: WaterfallEntry) {
   return entry.name.indexOf("https://") === 0;
 }
 
-export function isPush(entry: WaterfallEntry) {
+export function isPush(entry: WaterfallEntry): boolean {
+  function toInt(input: string | number): number {
+    if (typeof input === "string") {
+      return parseInt(input, 10);
+    } else {
+      return input;
+    }
+  }
   const harEntry = entry.rawResource;
-  // WebPageTest got "1" if an asset was pushed, Browsertime = true. If not pushed WPT has "0"
-  return ( harEntry["_was_pushed"] === true || Number(harEntry["_was_pushed"]) === 1);
+  return toInt(harEntry._was_pushed) === 1;
 }
 
 /**

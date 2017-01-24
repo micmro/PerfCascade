@@ -60,6 +60,85 @@ export interface Page {
   pageTimings: PageTimings;
   /**  A comment provided by the user or the application */
   comment?: string;
+
+  // WPT Custom Fields
+  _adult_site?: number;
+  _aft?: number;
+  _base_page_cdn?: string;
+  _base_page_redirects?: number;
+  _base_page_ttfb?: number;
+  _browser_main_memory_kb?: number;
+  _browser_name?: string;
+  _browser_other_private_memory_kb?: number;
+  _browser_process_count?: number;
+  _browser_version?: string;
+  _browser_working_set_kb?: number;
+  _bytesIn?: number;
+  _bytesInDoc?: number;
+  _bytesOut?: number;
+  _bytesOutDoc?: number;
+  _cached?: number;
+  _certificate_bytes?: number;
+  _connections?: number;
+  _date?: number;
+  _docCPUms?: number;
+  _docCPUpct?: number;
+  _docTime?: number;
+  _domContentLoadedEventEnd?: number;
+  _domContentLoadedEventStart?: number;
+  _domElements?: number;
+  _domInteractive?: number;
+  _domLoading?: number;
+  _domTime?: number;
+  _effectiveBps?: number;
+  _effectiveBpsDoc?: number;
+  _eventName?: string;
+  _firstPaint?: number;
+  _fixed_viewport?: number;
+  _fullyLoaded?: number;
+  _fullyLoadedCPUms?: number;
+  _fullyLoadedCPUpct?: number;
+  _gzip_savings?: number;
+  _gzip_total?: number;
+  _image_savings?: number;
+  _image_total?: number;
+  _isResponsive?: number;
+  _lastVisualChange?: number;
+  _loadEventEnd?: number;
+  _loadEventStart?: number;
+  _loadTime?: number;
+  _minify_savings?: number;
+  _minify_total?: number;
+  _optimization_checked?: number;
+  _pageSpeedVersion?: string;
+  _render?: number;
+  _requests?: number;
+  _requestsDoc?: number;
+  _requestsFull?: number;
+  _responses_200?: number;
+  _responses_404?: number;
+  _responses_other?: number;
+  _result?: number;
+  _run?: number;
+  _score_cache?: number;
+  _score_cdn?: number;
+  _score_combine?: number;
+  _score_compress?: number;
+  _score_cookies?: number;
+  _score_etags?: number;
+  _score_gzip?: number;
+  "_score_keep-alive"?: number;
+  _score_minify?: number;
+  _score_progressive_jpeg?: number;
+  _server_count?: number;
+  _server_rtt?: number;
+  _SpeedIndex?: number;
+  _step?: number;
+  _title?: string;
+  _titleTime?: number;
+  _TTFB?: number;
+  _URL?: string;
+  _visualComplete?: number;
 }
 
 /**
@@ -79,6 +158,9 @@ export interface PageTimings {
   onLoad?: number;
   /**  A comment provided by the user or the application */
   comment?: string;
+
+  // WPT Custom Fields
+  _startRender?: number;
 }
 
 /**
@@ -117,62 +199,86 @@ export interface Entry {
   comment?: string;
 
   // WPT Custom Fields
-  _index?: string;
-  _number?: string;
-  _ip_addr?: string;
-  _full_url?: string;
+  _all_end?: number | string;
+  _all_ms?: number | string;
+  _all_start?: number | string;
+  _bytesIn?: number | string;
+  _bytesOut?: number | string;
+  _cacheControl?: string;
+  _cache_time?: number | string;
+  _cdn_provider?: string;
+  _certificate_bytes?: number | string;
+  _client_port?: number | string;
+  _connect_end?: number | string;
+  _connect_ms?: number | string;
+  _connect_start?: number | string;
+  _contentEncoding?: string;
   _contentType?: string;
-  _is_secure?: string;
-  _type?: string;
-  _bytesOut?: string;
-  _bytesIn?: string;
-  _objectSize?: string;
-  _socket?: string;
-  _cache_time?: string;
-  _server_count?: string;
-  _server_rtt?: string;
-  _client_port?: string;
-  _jpeg_scan_count?: string;
-  _score_progressive_jpeg?: string;
-  // Scores
-  _score_cache?: string;
-  _score_cdn?: string;
-  _score_gzip?: string;
-  _score_cookies?: string;
-  "_score_keep-alive"?: string;
-  _score_minify?: string;
-  _score_combine?: string;
-  _score_compress?: string;
-  _score_etags?: string;
-  // possible savings
-  _gzip_total?: string;
-  _gzip_save?: string;
-  _minify_total?: string;
-  _minify_save?: string;
-  _image_total?: string;
-  _image_save?: string;
-  // Detail timings
-  _all_start?: string;
-  _all_end?: string;
-  _all_ms?: string;
-  _dns_start?: string;
-  _dns_end?: string;
-  _dns_ms?: number;
-  _connect_start?: string;
-  _connect_ms?: number;
-  _connect_end?: string;
-  _ssl_start?: string;
-  _ssl_end?: string;
-  _ssl_ms?: string;
-  _load_start?: string;
-  _load_end?: string;
-  _load_ms?: string;
-  _ttfb_start?: string;
-  _ttfb_end?: string;
-  _ttfb_ms?: string;
-  _download_start?: string;
-  _download_end?: string;
-  _download_ms?: string;
+  _dns_end?: number | string;
+  _dns_ms?: number | string;
+  _dns_start?: number | string;
+  _download_end?: number | string;
+  _download_ms?: number | string;
+  _download_start?: number | string;
+  _expires?: string;
+  _full_url?: string;
+  _gzip_save?: number | string;
+  _gzip_total?: number | string;
+  _host?: string;
+  _http2_stream_dependency?: number | string;
+  _http2_stream_exclusive?: number | string;
+  _http2_stream_id?: number | string;
+  _http2_stream_weight?: number | string;
+  _image_save?: number | string;
+  _image_total?: number | string;
+  _index?: number;
+  _initiator?: string;
+  _initiator_column?: string;
+  _initiator_detail?: string;
+  _initiator_function?: string;
+  _initiator_line?: string;
+  _initiator_type?: string;
+  _ip_addr?: string;
+  _is_secure?: number | string;
+  _jpeg_scan_count?: number | string;
+  _load_end?: number | string;
+  _load_ms?: number | string;
+  _load_start?: number | string;
+  _method?: string;
+  _minify_save?: number | string;
+  _minify_total?: number | string;
+  _number?: number;
+  _objectSize?: number | string;
+  _objectSizeUncompressed?: number | string;
+  _priority?: string;
+  _protocol?: number | string;
+  _request_id?: number | string;
+  _responseCode?: number | string;
+  _score_cache?: number | string;
+  _score_cdn?: number | string;
+  _score_combine?: number | string;
+  _score_compress?: number | string;
+  _score_cookies?: number | string;
+  _score_etags?: number | string;
+  _score_gzip?: number | string;
+  "_score_keep-alive"?: number | string;
+  _score_minify?: number | string;
+  _score_progressive_jpeg?: number;
+  _server_count?: number | string;
+  _server_rtt?: number | string;
+  _socket?: number | string;
+  _ssl_end?: number | string;
+  _ssl_ms?: number | string;
+  _ssl_start?: number | string;
+  _ttfb_end?: number | string;
+  _ttfb_ms?: number | string;
+  _ttfb_start?: number | string;
+  _type?: number | string;
+  _url?: string;
+  _was_pushed?: number | string;
+
+  // Browsertime Custom Fields
+  _initialPriority?: string;
 }
 
 /**
