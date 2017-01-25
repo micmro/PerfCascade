@@ -40,7 +40,6 @@
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-gh-pages": "^2.0.0",
-    "grunt-release-it": "^1.0.1",
     "grunt-run": "^0.6.0",
     "grunt-tslint": "^4.0.0",
     "live-server": "^1.2.0",
