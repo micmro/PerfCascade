@@ -1,66 +1,10 @@
 import {getHeader} from "../../helpers/har";
+import {
+  formatBytes, formatDateLocalized, formatMilliseconds, parseAndFormat, parseDate,
+  parseNonNegative, parsePositive,
+} from "../../helpers/parse";
 import {Entry, Header} from "../../typing/har";
 import {WaterfallEntry} from "../../typing/waterfall";
-
-function parseAndFormat<S, T>(source?: S,
-                              parseFn: ((_: S) => T) = identity,
-                              formatFn: ((_: T) => string) = identity): string {
-  if (source === undefined) {
-    return undefined;
-  }
-  const parsed = parseFn(source);
-  if (parsed === undefined) {
-    return undefined;
-  }
-  return formatFn(parsed);
-}
-
-function identity<T>(source: T): T {
-  return source;
-}
-
-function parseDate(s: string): Date {
-  const date = new Date(s);
-  if (isNaN(date.getTime())) {
-    return undefined;
-  }
-  return date;
-}
-
-function parseNonNegative(input: string | number): number {
-  const criteria = (n: number) => (n < 0);
-  return parseToNumber(input, criteria);
-}
-
-function parsePositive(input: string | number): number {
-  const criteria = (n: number) => (n <= 0);
-  return parseToNumber(input, criteria);
-}
-
-function parseToNumber(input: string | number, criteria: (_: number) => boolean): number {
-  const parse = (n: number) => criteria(n) ? undefined : n;
-
-  if (typeof input === "string") {
-    const n = parseInt(input, 10);
-    if (!isFinite(n)) {
-      return undefined;
-    }
-    return parse(n);
-  }
-  return parse(input);
-}
-
-function formatMilliseconds(millis: number): string {
-  return `${millis} ms`;
-}
-
-function formatDateLocalized(d: Date): string {
-  return `${d.toUTCString()}</br>(local time: ${d.toLocaleString()})`;
-}
-
-function formatBytes(size: number): string {
-  return `${size} byte (~${Math.round(size / 1024 * 10) / 10}kb)`;
-}
 
 /** get experimental feature (usually WebPageTest) */
 let getExp = (harEntry: Entry, name: string): string => {
