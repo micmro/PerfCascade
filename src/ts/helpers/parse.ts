@@ -58,7 +58,7 @@ function parseToNumber(input: string | number, filterFn: (_: number) => boolean)
 }
 
 export function formatMilliseconds(millis: number): string {
-  return `${millis} ms`;
+  return `${roundNumber(millis, 3)} ms`;
 }
 
 export function formatDateLocalized(date: Date): string {
