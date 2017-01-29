@@ -44,7 +44,7 @@ echo "make Github release"
 # make releases
 # TODO: make final not draft once confirmed working
 # TODO: add Changelog
-API_JSON=$(printf '{"tag_name": "v%s","target_commitish": "release","name": "v%s","body": "Release of version %s","draft": true,"prerelease": false}' $VERSION $VERSION $VERSION)
+API_JSON=$(printf '{"tag_name": "v%s", "target_commitish": "release", "name": "v%s", "body": "Release of version %s", "draft": false, "prerelease": false}' $VERSION $VERSION $VERSION)
 curl \
   --data "$API_JSON" \
   -H "Authorization: token ${GITHUB_TOKEN}" \
