@@ -21,27 +21,47 @@ module.exports = function (grunt) {
     },
   });
 
+  /*
+   * Helper Tasks
+   */
   //build for the file reader
   grunt.registerTask("distFileReader", ["browserify:fileReader", "concat:fileReader"]);
   // builds the TS into a single file
   grunt.registerTask("distBase", ["clean:dist", "browserify:dist", "concat:demoCss", "distFileReader"]);
 
-  //builds npm package - relies on /stage to be populated
+  // builds npm package - relies on /stage to be populated
   grunt.registerTask("buildNpm", ["copy:npmDist", "run:tscEs6", "copy:npmBase", "copy:npmZipLib"])
 
-  //Post build work, copying and combining files for NPM and regular release
+  // Post build work, copying and combining files for NPM and regular release
   grunt.registerTask("releasePrep", ["concat:mainCss", "uglify:dist", "copy:release"])
-  //build a single file and a library of ES6 Modules for the NPM package
+
+  // build a single file and a library of ES6 Modules for the NPM package
   grunt.registerTask("releaseBuild", ["distBase", "releasePrep", "buildNpm", "concat:pages", "copy:pages"]);
-  //
+
+  // All checks and cleanup
   grunt.registerTask("preBuild", ["tslint", "clean:all"]);
 
-  //releases the current version on master to github-pages (gh-pages branch)
-  grunt.registerTask("ghPages", ["releaseBuild", "concat:pages", "copy:pages"/*, "gh-pages"*/]);
+  // publish components (TODO: run in parallel)
+  grunt.registerTask("commitAndPush", [
+    "run:publishRelease",
+    "bump-commit",
+    "run:npmPublish",
+    "gh-pages"
+  ])
 
-  //releases master and gh-pages at the same time (with auto-version bump)
-  grunt.registerTask("release", ["preBuild", "bump:minor", "releaseBuild" /*"release-it:repo"*/, /*"concat:pages", "copy:pages", "gh-pages",*/ "run:npmPublish"]);
-  // grunt.registerTask("release", ["release-it:repo"])
+  /*
+   * Runnable Tasks
+   */
+  //releases the current version on master to github-pages (gh-pages branch)
+  grunt.registerTask("ghPages", ["releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
+
+  //releases new version with auto-version bump
+  grunt.registerTask("release", [
+    "preBuild",
+    `bump-only:${releaseIncrement}`,
+    "releaseBuild",
+    "commitAndPush"
+  ]);
 
   grunt.registerTask("default", ["clean:all", "distBase", "watch"]);
 };

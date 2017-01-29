@@ -22,5 +22,12 @@ module.exports = {
     },
     cmd: 'npm',
     args: ['publish'],
+  },
+  publishRelease: {
+    options: {
+      cwd: process.cwd()
+    },
+    exec: `(export VERSION=<%= package.version %> && bash release.sh)`
+
   }
 };

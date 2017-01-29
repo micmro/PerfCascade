@@ -12,6 +12,8 @@
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
     "ghPages": "grunt ghPages",
     "release": "grunt release",
+    "release-minor": "grunt release --release-increment=minor",
+    "release-major": "grunt release --release-increment=major",
     "tsc": "tsc"
   },
   "author": {

@@ -7,6 +7,10 @@ src/ts/.baseDir.ts
 #Build dirs
 build/
 src/dist/
+.release/
+
+#Environment variables
+ENV_VARS
 
 #GH page dist
 gh-pages/
