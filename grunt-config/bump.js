@@ -12,7 +12,7 @@ module.exports = {
     pushTo: 'upstream',
     gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d',
     // globalReplace: true,
-    prereleaseName: false,
+    prereleaseName: 'dev',
     metadata: '',
     // dryRun: true,
     regExp: false
