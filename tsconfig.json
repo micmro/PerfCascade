@@ -11,9 +11,8 @@
   },
   "exclude": [
     "node_modules",
-    "temp",
-    "types",
-    "npm-export",
-    "lib"
+    "build",
+    "build-utils",
+    "temp"
   ]
 }

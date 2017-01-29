@@ -13,7 +13,7 @@ module.exports = function (grunt) {
 
   // automatically loads configurations from `./grunt-config/*`
   require('load-grunt-config')(grunt, {
-    configPath: path.join(process.cwd(), 'grunt-config'),
+    configPath: path.join(process.cwd(), 'build-utils/grunt-config'),
     /* data made availabe to the tasks */
     data: {
       banner: banner,

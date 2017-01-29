@@ -42,8 +42,8 @@ module.exports = {
     expand: true,
     flatten: true,
     src: [
-      "npm-export/index.js",
-      "npm-export/index.d.ts",
+      "build-utils/npm-export/index.js",
+      "build-utils/npm-export/index.d.ts",
       "package.json",
       "README.md",
       "LICENSE",
