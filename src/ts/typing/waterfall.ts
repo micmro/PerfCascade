@@ -4,7 +4,7 @@ export type TimingType = "blocked" | "dns" | "connect" | "send" | "wait" | "rece
 export type RequestType = "other" | "image" | "video" | "audio" | "font" | "svg" |  "html" |
   "plain" | "css" | "javascript" | "flash";
 
-interface UserTiming {
+export interface UserTiming {
   duration?: number;
   name: string;
   startTime: number;

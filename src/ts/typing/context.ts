@@ -26,16 +26,16 @@ export interface PubSubClass {
   publishToOverlayChanges: (change: OverlayChangeEvent) => void;
 }
 
-export class OverlayManagerClass {
+export interface OverlayManagerClass {
   /** all open overlays height combined */
-  public getCombinedOverlayHeight: () => number;
+  getCombinedOverlayHeight: () => number;
 
   /** Opens an overlay - rerenders others  */
-  public openOverlay: (index: number, y: number, accordionHeight: number, entry: WaterfallEntry,
+  openOverlay: (index: number, y: number, accordionHeight: number, entry: WaterfallEntry,
                               barEls: SVGGElement[]) => void;
 
   /** closes on overlay - rerenders others internally */
-  public closeOverlay: (index: number, accordionHeight: number, barEls: SVGGElement[]) => void;
+  closeOverlay: (index: number, accordionHeight: number, barEls: SVGGElement[]) => void;
 
-  constructor(context: Context, overlayHolder: SVGGElement);
+  // constructor(context: Context, overlayHolder: SVGGElement);
 }

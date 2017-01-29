@@ -370,7 +370,7 @@ export interface Cookie {
 }
 
 // custom helper type
-interface NameValuePair {
+export interface NameValuePair {
   name: string;
   value: string;
   /**  A comment provided by the user or the application */

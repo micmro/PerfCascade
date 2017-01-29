@@ -72,4 +72,4 @@ export { fromPerfCascadeFormat }
 export { transformHarToPerfCascade }
 export { makeLegend }
 // export typings
-export * from "./typing/index.d"
+export * from "./typing/index"
