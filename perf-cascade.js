@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.6.0 (26/01/2017) */
+/*! github.com/micmro/PerfCascade Version:0.3.0 (29/01/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -134,9 +134,16 @@ function isSecure(entry) {
 }
 exports.isSecure = isSecure;
 function isPush(entry) {
+    function toInt(input) {
+        if (typeof input === "string") {
+            return parseInt(input, 10);
+        }
+        else {
+            return input;
+        }
+    }
     var harEntry = entry.rawResource;
-    // WebPageTest got "1" if an asset was pushed, Browsertime = true. If not pushed WPT has "0"
-    return (harEntry["_was_pushed"] === true || Number(harEntry["_was_pushed"]) === 1);
+    return toInt(harEntry._was_pushed) === 1;
 }
 exports.isPush = isPush;
 /**
@@ -739,6 +746,14 @@ exports.transformDoc = transformDoc;
  */
 function transformPage(harData, pageIndex) {
     if (pageIndex === void 0) { pageIndex = 0; }
+    function toInt(input) {
+        if (typeof input === "string") {
+            return parseInt(input, 10);
+        }
+        else {
+            return input;
+        }
+    }
     // make sure it's the *.log base node
     var data = (harData["log"] !== undefined ? harData["log"] : harData);
     var currPage = data.pages[pageIndex];
@@ -752,7 +767,7 @@ function transformPage(harData, pageIndex) {
         var startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
         doneTime = Math.max(doneTime, startRelative + entry.time);
         var requestType = mimeToRequestType(entry.response.content.mimeType);
-        return createWaterfallEntry(entry.request.url, startRelative, parseInt(entry._all_end, 10) || (startRelative + entry.time), buildDetailTimingBlocks(startRelative, entry), entry, requestType);
+        return createWaterfallEntry(entry.request.url, startRelative, toInt(entry._all_end) || (startRelative + entry.time), buildDetailTimingBlocks(startRelative, entry), entry, requestType);
     });
     var marks = Object.keys(pageTimings)
         .filter(function (k) { return (typeof pageTimings[k] === "number" && pageTimings[k] >= 0); })
@@ -899,18 +914,17 @@ function parseGeneralDetails(entry, requestID) {
         ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
         ["Server IPAddress", harEntry.serverIPAddress],
         ["Connection", harEntry.connection],
-        ["Browser Priority", getExp(harEntry, "priority") || getExp(harEntry, "newPriority") ||
-                getExp(harEntry, "initialPriority")],
-        ["Was pushed", getExp(harEntry, "was_pushed")],
-        ["Initiator (Loaded by)", getExp(harEntry, "initiator")],
-        ["Initiator Line", getExp(harEntry, "initiator_line")],
+        ["Browser Priority", harEntry._priority || harEntry._initialPriority],
+        ["Was pushed", harEntry._was_pushed],
+        ["Initiator (Loaded by)", harEntry._initiator],
+        ["Initiator Line", harEntry._initiator_line],
         ["Host", har_1.getHeader(harEntry.request.headers, "Host")],
-        ["IP", getExp(harEntry, "ip_addr")],
-        ["Client Port", getExpNotNull(harEntry, "client_port")],
-        ["Expires", getExp(harEntry, "expires")],
-        ["Cache Time", getExp(harEntry, "cache_time")],
-        ["CDN Provider", getExp(harEntry, "cdn_provider")],
-        ["ObjectSize", getExp(harEntry, "objectSize")],
+        ["IP", harEntry._ip_addr],
+        ["Client Port", harEntry._client_port],
+        ["Expires", harEntry._expires],
+        ["Cache Time", harEntry._cache_time],
+        ["CDN Provider", harEntry._cdn_provider],
+        ["ObjectSize", harEntry._objectSize],
         ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
         ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
         ["JPEG Scan Count", getExpNotNull(harEntry, "jpeg_scan_count")],
@@ -1255,7 +1269,7 @@ function createHolder(y, accordionHeight) {
     return innerHolder;
 }
 function createRowInfoOverlay(indexBackup, y, accordionHeight, entry, onClose) {
-    var requestID = parseInt(entry.rawResource._index + 1, 10) || indexBackup + 1;
+    var requestID = entry.rawResource._number || indexBackup + 1;
     var wrapper = svg.newG("outer-info-overlay-holder");
     var holder = createHolder(y, accordionHeight);
     var foreignObject = svg.newForeignObject({
