@@ -3,6 +3,7 @@ Extensible waterfall-viewer that works with [HAR](http://www.softwareishard.com/
 
 [![Build status][travis-image]][travis-url]
 
+Install via `npm install perf-cascade`  
 Live example at: https://micmro.github.io/PerfCascade/
 
 ![example screenshot](https://raw.githubusercontent.com/micmro/PerfCascade/gh-pages/img/PerfCascade-sample1.png)
@@ -11,7 +12,7 @@ Live example at: https://micmro.github.io/PerfCascade/
 PerfCascade is exported with [UMD](https://github.com/umdjs/umd), so you can use it as global object, via AMD (e.g. requireJS) or commonJS (internally it uses ES6 modules).
 
 If using it without any module system it exports as a global object `perfCascade`, you can use as following:
-```
+```javascript
 /** override selected options for PerfCascade (all have defaults) */
 var options = {
   showIndicatorIcons: false, //default: true
@@ -22,10 +23,10 @@ var options = {
 var perfCascadeSvg =  perfCascade.fromHar(harData.log, options)
 ```
 
-You can find the compiled (and minified) JS in [`src/dist`](https://github.com/micmro/PerfCascade/tree/master/src/dist). For the basic version without zHAR support you need [`perf-cascade.min.js`](https://github.com/micmro/PerfCascade/blob/master/src/dist/perf-cascade.min.js) and some basic CSS styles [`perf-cascade.css`](https://github.com/micmro/PerfCascade/blob/master/src/dist/perf-cascade.css).
+You can find the compiled (and minified) JS in the [releases tab](https://github.com/micmro/PerfCascade/releases). For the basic version without zHAR support you need [`perf-cascade.min.js`](https://github.com/micmro/PerfCascade/blob/release/perf-cascade.min.js) and some basic CSS styles [`perf-cascade.css`](https://github.com/micmro/PerfCascade/blob/release/perf-cascade.css).
 
 ### Use via npm
-As of `2.0.5` you can install PerfCascade via NPM as well:
+You can install PerfCascade via NPM as well:
 ```
 npm install perf-cascade
 ```
@@ -36,7 +37,7 @@ Directories:
 - `node_modules/perf-cascade/types`: Typescript typings
 
 ## Options
-see [options.d.ts](https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/options.d.ts) for source
+see [options.d.ts](https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/options.ts) for source
 
 ### `rowHeight`
 `number`, default: `23`
@@ -66,10 +67,10 @@ DOM `<select>` element to use to select a run if the HAR contains multiple runs.
 `HTMLElement` (DOM element) default: `undefined` (not shown)
 If set a legend explaining the waterfall colours is rendered in the `legendHolder` DOM element.
 
-## *.zhar - zipped HAR files
+## `*.zhar` - zipped HAR files
 By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/master/src/index.html#L73-L80) you can use `perfCascadeFileReader.readFile` to read a gzip and convert it to a JSON HAR object.
 
-```
+```javascript
 perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(error, data){
   if(error){
     // handle error
@@ -84,9 +85,8 @@ perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(error, d
 ## Dev
 - Start live-reload server and Typescript compiler with watch: `npm run watch`
 - Create uglified version: `npm run build` (not tracked ITM)
-- Build and publish assets to Github Page `npm run ghPages` (pushes to `gh-pages` branch) *(contributers only)*
 
-See `package.json` for other useful tasks like linting etc.
+See `package.json` for other useful tasks like linting, release etc.
 
 ## Specs and resources
 
