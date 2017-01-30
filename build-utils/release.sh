@@ -11,24 +11,21 @@
 
 echo "Start Github release for ${VERSION}..."
 
-CHANGELOG=${CHANGELOG}
+CHANGELOG="${CHANGELOG:-}"
 
 ###
 # Github Release
 ###
 [ -d .release ] && rm -rf .release
-git clone -b release git@github.com:micmro/PerfCascade.git .release
-
-# TODO: test this alternative (might be faster as it only uses one branch)
-# git init
-# git remote add -t refspec remotename git@github.com:micmro/PerfCascade.git
-# git fetch
+git clone -b release \
+  --branch=release \
+  --single-branch \
+  git@github.com:micmro/PerfCascade.git \
+  .release
 
 cd .release
-
-# TODO test
+# remove all to ensure deleted files get deleted as well
 git rm -rf .
-# git clean -fxd
 
 # Copy files
 cp -r ../build/release/ .
@@ -51,5 +48,5 @@ curl \
   -H "Authorization: token ${GITHUB_TOKEN}" \
   https://api.github.com/repos/micmro/PerfCascade/releases
 
-echo "Github release done - cleanup..."
+# echo "Github release done - cleanup..."
 # rm -rf .release
