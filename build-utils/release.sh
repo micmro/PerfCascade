@@ -9,8 +9,9 @@
 : "${VERSION?Need to set VERSION environment variable}"
 : "${GITHUB_TOKEN?Need to set GITHUB_TOKEN environment variable}"
 
-
 echo "Start Github release for ${VERSION}..."
+
+CHANGELOG=${CHANGELOG}
 
 ###
 # Github Release
@@ -44,7 +45,7 @@ echo "make Github release"
 # make releases
 # TODO: make final not draft once confirmed working
 # TODO: add Changelog
-API_JSON=$(printf '{"tag_name": "v%s", "target_commitish": "release", "name": "v%s", "body": "Release of version %s", "draft": false, "prerelease": false}' $VERSION $VERSION $VERSION)
+API_JSON=$(printf '{"tag_name": "v%s", "target_commitish": "release", "name": "v%s", "body": "%s", "draft": false, "prerelease": false}' $VERSION $VERSION $CHANGELOG)
 curl \
   --data "$API_JSON" \
   -H "Authorization: token ${GITHUB_TOKEN}" \

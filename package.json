@@ -32,6 +32,8 @@
   "types": "./index.d.ts",
   "license": "MIT",
   "devDependencies": {
+    "@types/grunt": "^0.4.21",
+    "conventional-changelog": "^1.1.0",
     "grunt": "^1.0.1",
     "grunt-banner": "^0.6.0",
     "grunt-browserify": "^5.0.0",

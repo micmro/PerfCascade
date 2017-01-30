@@ -27,7 +27,6 @@ module.exports = {
     options: {
       cwd: process.cwd()
     },
-    exec: `(export VERSION=<%= package.version %> && bash build-utils/release.sh)`
-
+    exec: `(export VERSION=<%= package.version %> && export CHANGELOG="<%= changelog %>" && bash build-utils/release.sh)`
   }
 };
