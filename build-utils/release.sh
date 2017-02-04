@@ -2,6 +2,8 @@
 # release.sh
 # assumes to run in repo root
 
+set -e #exit on errors
+
 # load (private) environment variables like RELEASE_KEY from non-commited file
 . ./ENV_VARS
 
@@ -12,6 +14,7 @@
 echo "Start Github release for ${VERSION}..."
 
 CHANGELOG="${CHANGELOG:-}"
+API_JSON=$(printf '{"body": "%s"}' "${CHANGELOG}")
 
 ###
 # Github Release
@@ -39,9 +42,6 @@ git tag "v$VERSION"
 git push --follow-tags
 
 echo "make Github release"
-# make releases
-# TODO: make final not draft once confirmed working
-# TODO: add Changelog
 API_JSON=$(printf '{"tag_name": "v%s", "target_commitish": "release", "name": "v%s", "body": "%s", "draft": false, "prerelease": false}' $VERSION $VERSION $CHANGELOG)
 curl \
   --data "$API_JSON" \
