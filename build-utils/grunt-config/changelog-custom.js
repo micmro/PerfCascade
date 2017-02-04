@@ -3,4 +3,4 @@ module.exports = {
     version: 'v<%= package.version %>',
     file: 'CHANGELOG.md'
   }
-}
+};

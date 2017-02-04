@@ -5,4 +5,4 @@ module.exports = {
     message: "Github Pages release for v<%= package.version %>"
   },
   src: ["**/*"]
-}
+};
