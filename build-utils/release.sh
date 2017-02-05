@@ -16,9 +16,6 @@ echo "Start Github release for ${VERSION}..."
 CHANGELOG="${CHANGELOG:-}"
 API_JSON=$(printf '{"body": "%s"}' "${CHANGELOG}")
 
-# add Changlog (updated via 'changelog-custom') to staged files
-git add CHANGELOG.md
-
 ###
 # Github Release
 ###

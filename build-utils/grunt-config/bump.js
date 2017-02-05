@@ -4,7 +4,7 @@ module.exports = {
     updateConfigs: ["package"],
     commit: true,
     commitMessage: 'Release v%VERSION%',
-    commitFiles: ['package.json'],
+    commitFiles: ['package.json', 'CHANGELOG.md'],
     createTag: true,
     tagName: 'v%VERSION%-source',
     tagMessage: 'Source of release v%VERSION%',
