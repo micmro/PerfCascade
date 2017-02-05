@@ -13,7 +13,7 @@ module.exports = function (grunt) {
     .indexOf(grunt.option('release-increment')) != -1 ? grunt.option('release-increment') : "patch";
 
   // manually load custom task
-  require("./build-utils/grunt-tasks/changelog-custom")(grunt)
+  grunt.loadTasks('./build-utils/grunt-tasks')
 
   // automatically loads configurations from `./grunt-config/*`
   require('load-grunt-config')(grunt, {
