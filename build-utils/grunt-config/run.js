@@ -14,7 +14,7 @@ module.exports = {
     --rootDir src/ts/
     --declaration true
     --declarationDir ./build/npm/types
-    `.replace(/\n[\t ]+/g,' ').split(' ').filter(x => x != '')
+    `.replace(/\n[\t ]+/g, ' ').split(' ').filter(x => x != '')
   },
   npmPublish: {
     options: {
@@ -27,7 +27,6 @@ module.exports = {
     options: {
       cwd: process.cwd()
     },
-    exec: `(export VERSION=<%= package.version %> && bash build-utils/release.sh)`
-
+    exec: `(export VERSION='<%= package.version %>' && export CHANGELOG='<%= changelog %>' && bash build-utils/release.sh)`
   }
 };

@@ -2,6 +2,8 @@
 # release.sh
 # assumes to run in repo root
 
+set -e #exit on errors
+
 # load (private) environment variables like RELEASE_KEY from non-commited file
 . ./ENV_VARS
 
@@ -9,25 +11,24 @@
 : "${VERSION?Need to set VERSION environment variable}"
 : "${GITHUB_TOKEN?Need to set GITHUB_TOKEN environment variable}"
 
-
 echo "Start Github release for ${VERSION}..."
+
+CHANGELOG="${CHANGELOG:-}"
+API_JSON=$(printf '{"body": "%s"}' "${CHANGELOG}")
 
 ###
 # Github Release
 ###
 [ -d .release ] && rm -rf .release
-git clone -b release git@github.com:micmro/PerfCascade.git .release
-
-# TODO: test this alternative (might be faster as it only uses one branch)
-# git init
-# git remote add -t refspec remotename git@github.com:micmro/PerfCascade.git
-# git fetch
+git clone -b release \
+  --branch=release \
+  --single-branch \
+  git@github.com:micmro/PerfCascade.git \
+  .release
 
 cd .release
-
-# TODO test
+# remove all to ensure deleted files get deleted as well
 git rm -rf .
-# git clean -fxd
 
 # Copy files
 cp -r ../build/release/ .
@@ -41,14 +42,11 @@ git tag "v$VERSION"
 git push --follow-tags
 
 echo "make Github release"
-# make releases
-# TODO: make final not draft once confirmed working
-# TODO: add Changelog
-API_JSON=$(printf '{"tag_name": "v%s", "target_commitish": "release", "name": "v%s", "body": "Release of version %s", "draft": false, "prerelease": false}' $VERSION $VERSION $VERSION)
+API_JSON=$(printf '{"tag_name": "v%s", "target_commitish": "release", "name": "v%s", "body": "%s", "draft": false, "prerelease": false}' $VERSION $VERSION $CHANGELOG)
 curl \
   --data "$API_JSON" \
   -H "Authorization: token ${GITHUB_TOKEN}" \
   https://api.github.com/repos/micmro/PerfCascade/releases
 
-echo "Github release done - cleanup..."
+# echo "Github release done - cleanup..."
 # rm -rf .release
