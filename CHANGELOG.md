@@ -2,6 +2,14 @@
 
 
 
+<a name="v0.3.6"></a>
+## v0.3.6 (2017-02-05)
+
+* #137 reverse changelog ([8a97f5d](https://github.com/micmro/PerfCascade/commit/8a97f5d))
+* #137 Write changelog Newest to oldest ([f94f2f5](https://github.com/micmro/PerfCascade/commit/f94f2f5))
+
+
+
 <a name="v0.3.5"></a>
 ## v0.3.5 (2017-02-05)
 
