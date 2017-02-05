@@ -20,3 +20,11 @@
 
 
 
+<a name="v0.3.5"></a>
+## v0.3.5 (2017-02-05)
+
+* #137 ensure CHANGELOG.md is committed ([645e53f](https://github.com/micmro/PerfCascade/commit/645e53f))
+* append missing v0.3.4 changelog ([c794281](https://github.com/micmro/PerfCascade/commit/c794281))
+
+
+
