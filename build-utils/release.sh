@@ -16,6 +16,9 @@ echo "Start Github release for ${VERSION}..."
 CHANGELOG="${CHANGELOG:-}"
 API_JSON=$(printf '{"body": "%s"}' "${CHANGELOG}")
 
+# add Changlog (updated via 'changelog-custom') to staged files
+git add CHANGELOG.md
+
 ###
 # Github Release
 ###
@@ -42,7 +45,7 @@ git tag "v$VERSION"
 git push --follow-tags
 
 echo "make Github release"
-API_JSON=$(printf '{"tag_name": "v%s", "target_commitish": "release", "name": "v%s", "body": "%s", "draft": false, "prerelease": false}' $VERSION $VERSION $CHANGELOG)
+API_JSON=$(printf '{"tag_name": "v%s", "target_commitish": "release", "name": "v%s", "body": "%s", "draft": false, "prerelease": false}' "${VERSION}" "${VERSION}" "${CHANGELOG}")
 curl \
   --data "$API_JSON" \
   -H "Authorization: token ${GITHUB_TOKEN}" \
