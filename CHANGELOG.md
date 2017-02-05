@@ -12,3 +12,11 @@
 
 
 
+<a name="v0.3.4"></a>
+## v0.3.4 (2017-02-05)
+
+* #137 fix release JSON ([e852425](https://github.com/micmro/PerfCascade/commit/e852425))
+* v0.3.3 ([db6ff0d](https://github.com/micmro/PerfCascade/commit/db6ff0d))
+
+
+
