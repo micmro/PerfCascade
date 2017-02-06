@@ -1,8 +1,8 @@
 import { removeChildren } from "../../helpers/dom";
-import {Context, OverlayManagerClass} from "../../typing/context";
-import {OpenOverlay, OverlayChangeEvent} from "../../typing/open-overlay";
-import {WaterfallEntry} from "../../typing/waterfall";
-import {createRowInfoOverlay} from "./svg-details-overlay";
+import { Context, OverlayManagerClass } from "../../typing/context";
+import { OpenOverlay, OverlayChangeEvent } from "../../typing/open-overlay";
+import { WaterfallEntry } from "../../typing/waterfall";
+import { createRowInfoOverlay } from "./svg-details-overlay";
 
 /** Overlay (popup) instance manager */
 export default class OverlayManager implements OverlayManagerClass {
@@ -42,9 +42,21 @@ export default class OverlayManager implements OverlayManagerClass {
     this.context.pubSub.publishToOverlayChanges({
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
       "openOverlays": self.openOverlays,
-      "type" : "open",
+      "type": "open",
     } as OverlayChangeEvent);
     this.realignBars(barEls);
+  }
+
+  /**
+   * Toggles an overlay - rerenders others
+   */
+  public toggleOverlay(index: number, y: number, accordionHeight: number,
+                       entry: WaterfallEntry, barEls: SVGGElement[]) {
+    if (this.openOverlays.some((o) => o.index === index)) {
+      this.closeOverlay(index, accordionHeight, barEls);
+    } else {
+      this.openOverlay(index, y, accordionHeight, entry, barEls);
+    }
   }
 
   /**
@@ -60,7 +72,7 @@ export default class OverlayManager implements OverlayManagerClass {
     this.context.pubSub.publishToOverlayChanges({
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
       "openOverlays": self.openOverlays,
-      "type" : "closed",
+      "type": "closed",
     } as OverlayChangeEvent);
     this.realignBars(barEls);
   }
