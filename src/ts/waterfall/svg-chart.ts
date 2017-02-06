@@ -7,8 +7,8 @@ import {RectData} from "../typing/rect-data";
 import {HoverEvtListeners} from "../typing/svg-alignment-helpers";
 import {Mark} from "../typing/waterfall";
 import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
-import PubSub from "./details-overlay/overlay-changes-pub-sub";
-import OverlayManager from "./details-overlay/svg-details-overlay-manager";
+import OverlayManager from "./details-overlay/overlay-manager";
+import PubSub from "./details-overlay/pub-sub";
 import * as indicators from "./row/svg-indicators";
 import * as row from "./row/svg-row";
 import * as alignmentHelper from  "./sub-components/svg-alignment-helper";
@@ -173,8 +173,10 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
       "y": y,
     } as RectData;
 
-    let showDetailsOverlay = () => {
+    let showDetailsOverlay: EventListener = (evt: Event) => {
       context.overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
+      if(context.overlayManager.closeOverlay)
+      console.log(evt.target, evt)
     };
 
     let rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);
