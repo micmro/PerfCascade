@@ -33,6 +33,9 @@ export interface OverlayManagerClass {
   /** Opens an overlay - rerenders others  */
   openOverlay: (index: number, y: number, accordionHeight: number, entry: WaterfallEntry,
                               barEls: SVGGElement[]) => void;
+  /** toggles an overlay - rerenders others  */
+  toggleOverlay: (index: number, y: number, accordionHeight: number, entry: WaterfallEntry,
+                              barEls: SVGGElement[]) => void;
 
   /** closes on overlay - rerenders others internally */
   closeOverlay: (index: number, accordionHeight: number, barEls: SVGGElement[]) => void;

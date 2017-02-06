@@ -173,10 +173,8 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
       "y": y,
     } as RectData;
 
-    let showDetailsOverlay: EventListener = (evt: Event) => {
-      context.overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
-      if(context.overlayManager.closeOverlay)
-      console.log(evt.target, evt)
+    let showDetailsOverlay = () => {
+      context.overlayManager.toggleOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
     };
 
     let rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);
