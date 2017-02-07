@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.3.6 (05/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.3.7 (07/02/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -1101,24 +1101,6 @@ exports.createDetailsBody = createDetailsBody;
 
 },{"./extract-details-keys":12}],14:[function(require,module,exports){
 "use strict";
-var PubSub = (function () {
-    function PubSub() {
-        this.subscribers = [];
-    }
-    PubSub.prototype.subscribeToOverlayChanges = function (fn) {
-        this.subscribers.push(fn);
-    };
-    PubSub.prototype.publishToOverlayChanges = function (change) {
-        this.subscribers.forEach(function (fn) { return fn(change); });
-    };
-    return PubSub;
-}());
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = PubSub;
-;
-
-},{}],15:[function(require,module,exports){
-"use strict";
 var dom_1 = require("../../helpers/dom");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 /** Overlay (popup) instance manager */
@@ -1157,6 +1139,17 @@ var OverlayManager = (function () {
             "type": "open",
         });
         this.realignBars(barEls);
+    };
+    /**
+     * Toggles an overlay - rerenders others
+     */
+    OverlayManager.prototype.toggleOverlay = function (index, y, accordionHeight, entry, barEls) {
+        if (this.openOverlays.some(function (o) { return o.index === index; })) {
+            this.closeOverlay(index, accordionHeight, barEls);
+        }
+        else {
+            this.openOverlay(index, y, accordionHeight, entry, barEls);
+        }
     };
     /**
      * closes on overlay - rerenders others internally
@@ -1230,7 +1223,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = OverlayManager;
 ;
 
-},{"../../helpers/dom":1,"./svg-details-overlay":16}],16:[function(require,module,exports){
+},{"../../helpers/dom":1,"./svg-details-overlay":16}],15:[function(require,module,exports){
+"use strict";
+var PubSub = (function () {
+    function PubSub() {
+        this.subscribers = [];
+    }
+    PubSub.prototype.subscribeToOverlayChanges = function (fn) {
+        this.subscribers.push(fn);
+    };
+    PubSub.prototype.publishToOverlayChanges = function (change) {
+        this.subscribers.forEach(function (fn) { return fn(change); });
+    };
+    return PubSub;
+}());
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = PubSub;
+;
+
+},{}],16:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var html_details_body_1 = require("./html-details-body");
@@ -1910,8 +1921,8 @@ exports.createMarks = createMarks;
 var heuristics_1 = require("../helpers/heuristics");
 var svg = require("../helpers/svg");
 var styling_converters_1 = require("../transformers/styling-converters");
-var overlay_changes_pub_sub_1 = require("./details-overlay/overlay-changes-pub-sub");
-var svg_details_overlay_manager_1 = require("./details-overlay/svg-details-overlay-manager");
+var overlay_manager_1 = require("./details-overlay/overlay-manager");
+var pub_sub_1 = require("./details-overlay/pub-sub");
 var indicators = require("./row/svg-indicators");
 var row = require("./row/svg-row");
 var alignmentHelper = require("./sub-components/svg-alignment-helper");
@@ -1958,13 +1969,13 @@ function createContext(data, options, entriesToShow, overlayHolder) {
     var context = {
         diagramHeight: diagramHeight,
         overlayManager: undefined,
-        pubSub: new overlay_changes_pub_sub_1.default(),
+        pubSub: new pub_sub_1.default(),
         unit: unit,
         options: options,
         docIsSsl: docIsSsl,
     };
     // `overlayManager` needs the `context` reference, so it's attached later
-    context.overlayManager = new svg_details_overlay_manager_1.default(context, overlayHolder);
+    context.overlayManager = new overlay_manager_1.default(context, overlayHolder);
     return context;
 }
 /**
@@ -2050,7 +2061,7 @@ function createWaterfallSvg(data, options) {
             "y": y,
         };
         var showDetailsOverlay = function () {
-            context.overlayManager.openOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
+            context.overlayManager.toggleOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
         };
         var rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);
         barEls.push(rowItem);
@@ -2068,5 +2079,5 @@ function createWaterfallSvg(data, options) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/heuristics":3,"../helpers/svg":6,"../transformers/styling-converters":11,"./details-overlay/overlay-changes-pub-sub":14,"./details-overlay/svg-details-overlay-manager":15,"./row/svg-indicators":17,"./row/svg-row":19,"./sub-components/svg-alignment-helper":20,"./sub-components/svg-general-components":21,"./sub-components/svg-marks":22}]},{},[8])(8)
+},{"../helpers/heuristics":3,"../helpers/svg":6,"../transformers/styling-converters":11,"./details-overlay/overlay-manager":14,"./details-overlay/pub-sub":15,"./row/svg-indicators":17,"./row/svg-row":19,"./sub-components/svg-alignment-helper":20,"./sub-components/svg-general-components":21,"./sub-components/svg-marks":22}]},{},[8])(8)
 });
