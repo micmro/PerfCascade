@@ -10,7 +10,7 @@ function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
     return `class="${className || "no-colour"}"`;
   };
   return dlKeyValues
-    .filter((tuple: KvTuple) => !tuple[1])
+    .filter((tuple: KvTuple) => tuple[1] !== undefined)
     .map((tuple) => `
       <dt ${makeClass(tuple[0])}>${tuple[0]}</dt>
       <dd>${tuple[1]}</dd>
