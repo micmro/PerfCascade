@@ -2,6 +2,15 @@
 
 
 
+<a name="v0.3.7"></a>
+## v0.3.7 (2017-02-07)
+
+* #88 allow to close details-view by clicking on bar (#140) ([a26f609](https://github.com/micmro/PerfCascade/commit/a26f609)), closes [#140](https://github.com/micmro/PerfCascade/issues/140)
+* fix dev-staging path ([36d2d2d](https://github.com/micmro/PerfCascade/commit/36d2d2d))
+* tooling: add seperate file-reader watch ([6abc417](https://github.com/micmro/PerfCascade/commit/6abc417))
+
+
+
 <a name="v0.3.6"></a>
 ## v0.3.6 (2017-02-05)
 
