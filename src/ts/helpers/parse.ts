@@ -26,6 +26,10 @@ function identity<T>(source: T): T {
   return source;
 }
 
+export function parseNonEmpty(input: string): string {
+  return input.trim().length > 0 ? input : undefined;
+}
+
 export function parseDate(input: string): Date {
   const date = new Date(input);
   if (isNaN(date.getTime())) {

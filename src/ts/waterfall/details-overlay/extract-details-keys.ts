@@ -1,6 +1,6 @@
 import {getHeader} from "../../helpers/har";
 import {
-  formatBytes, formatDateLocalized, formatMilliseconds, parseAndFormat, parseDate,
+  formatBytes, formatDateLocalized, formatMilliseconds, parseAndFormat, parseDate, parseNonEmpty,
   parseNonNegative, parsePositive,
 } from "../../helpers/parse";
 import {Entry, Header} from "../../typing/har";
@@ -57,7 +57,7 @@ function parseRequestDetails(harEntry: Entry): KvTuple[] {
     byteSizeProperty("Bytes Out (uploaded)", harEntry._bytesOut),
     byteSizeProperty("Headers Size", request.headersSize),
     byteSizeProperty("Body Size", request.bodySize),
-    ["Comment", request.comment],
+    ["Comment", parseAndFormat(request.comment, parseNonEmpty)],
     stringHeader("User-Agent"),
     stringHeader("Host"),
     stringHeader("Connection"),
@@ -119,8 +119,8 @@ function parseResponseDetails(harEntry: Entry): KvTuple[] {
     stringHeader("Upgrade"),
     stringHeader("Vary"),
     stringHeader("Timing-Allow-Origin"),
-    ["Redirect URL", response.redirectURL],
-    ["Comment", response.comment],
+    ["Redirect URL", parseAndFormat(response.redirectURL, parseNonEmpty)],
+    ["Comment", parseAndFormat(response.comment, parseNonEmpty)],
   ];
 }
 
