@@ -104,7 +104,7 @@ function parseResponseDetails(harEntry: Entry): KvTuple[] {
     dateHeader("Last-Modified"),
     stringHeader("Pragma"),
     byteSizeProperty("Content-Length", contentLength),
-    ["Content Size", (contentLength !== content.size.toString() ? formatBytes(content.size) : "")],
+    ["Content Size", (contentLength !== content.size.toString() ? formatBytes(content.size) : undefined)],
     byteSizeProperty("Content Compression", content.compression),
     stringHeader("Connection"),
     stringHeader("ETag"),
