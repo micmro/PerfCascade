@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "grunt tslint",
     "watch": "npm run start & grunt default",
-    "build": "grunt releaseBuild",
+    "build": "npm run lint & grunt releaseBuild",
     "start": "live-server --watch=build/stage/,src/index.html --ignore=build/stage/temp/ --open=src/index.html",
     "clearJS": "find ./src/ts -iname \"*.js\" -delete && find ./src/ts -iname \"*.map\" -delete",
     "ghPages": "grunt ghPages",
