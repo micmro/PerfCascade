@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.3.8 (11/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.3.9 (11/02/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -1181,6 +1181,7 @@ var OverlayManager = (function () {
             "onClose": function () {
                 self.closeOverlay(index, accordionHeight, barEls);
             },
+            "openTabIndex": 0,
         });
         this.renderOverlays(accordionHeight);
         this.context.pubSub.publishToOverlayChanges({
@@ -1253,7 +1254,7 @@ var OverlayManager = (function () {
             .sort(function (a, b) { return a.index > b.index ? 1 : -1; })
             .forEach(function (overlay) {
             var y = overlay.defaultY + currY;
-            var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(overlay.index, y, accordionHeight, overlay.entry, overlay.onClose);
+            var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(overlay, y, accordionHeight);
             // if overlay has a preview image show it
             var previewImg = infoOverlay.querySelector("img.preview");
             if (previewImg && !previewImg.src) {
@@ -1329,8 +1330,8 @@ function createHolder(y, accordionHeight) {
     innerHolder.appendChild(bg);
     return innerHolder;
 }
-function createRowInfoOverlay(indexBackup, y, accordionHeight, entry, onClose) {
-    var requestID = entry.rawResource._number || indexBackup + 1;
+function createRowInfoOverlay(overlay, y, accordionHeight) {
+    var requestID = overlay.entry.rawResource._number || overlay.index + 1;
     var wrapper = svg.newG("outer-info-overlay-holder");
     var holder = createHolder(y, accordionHeight);
     var foreignObject = svg.newForeignObject({
@@ -1340,20 +1341,21 @@ function createRowInfoOverlay(indexBackup, y, accordionHeight, entry, onClose) {
         "y": y,
     });
     var closeBtn = createCloseButtonSvg(y);
-    closeBtn.addEventListener("click", function () { return onClose(indexBackup, holder); });
-    var body = html_details_body_1.createDetailsBody(requestID, entry, accordionHeight);
+    closeBtn.addEventListener("click", function () { return overlay.onClose(overlay.index); });
+    var body = html_details_body_1.createDetailsBody(requestID, overlay.entry, accordionHeight);
     var buttons = body.getElementsByClassName("tab-button");
     var tabs = body.getElementsByClassName("tab");
-    var setTabStatus = function (index) {
+    var setTabStatus = function (tabIndex) {
+        overlay.openTabIndex = tabIndex;
         forEach(tabs, function (tab, j) {
-            tab.style.display = (index === j) ? "block" : "none";
-            buttons.item(j).classList.toggle("active", (index === j));
+            tab.style.display = (tabIndex === j) ? "block" : "none";
+            buttons.item(j).classList.toggle("active", (tabIndex === j));
         });
     };
-    forEach(buttons, function (btn, i) {
-        btn.addEventListener("click", function () { setTabStatus(i); });
+    forEach(buttons, function (btn, tabIndex) {
+        btn.addEventListener("click", function () { return setTabStatus(tabIndex); });
     });
-    setTabStatus(0);
+    setTabStatus(overlay.openTabIndex);
     foreignObject.appendChild(body);
     holder.appendChild(foreignObject);
     holder.appendChild(closeBtn);
