@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.3.7 (07/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.3.8 (11/02/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -330,6 +330,80 @@ function roundNumber(num, decimals) {
 exports.roundNumber = roundNumber;
 
 },{}],6:[function(require,module,exports){
+"use strict";
+var misc_1 = require("./misc");
+/**
+ * Type safe and null safe way to transform, filter and format an input value, e.g. parse a Date from a string,
+ * rejecting invalid dates, and formatting it as a localized string. If the input value is undefined, or the parseFn
+ * returns undefined, the function returns undefined.
+ * @param input
+ * @param parseFn an optional function to transform and/or filter the input value.
+ * @param formatFn an optional function to format the parsed input value.
+ * @returns {string} a formatted string representation of the input, or undefined.
+ */
+function parseAndFormat(input, parseFn, formatFn) {
+    if (parseFn === void 0) { parseFn = identity; }
+    if (formatFn === void 0) { formatFn = identity; }
+    if (input === undefined) {
+        return undefined;
+    }
+    var parsed = parseFn(input);
+    if (parsed === undefined) {
+        return undefined;
+    }
+    return formatFn(parsed);
+}
+exports.parseAndFormat = parseAndFormat;
+function identity(source) {
+    return source;
+}
+function parseNonEmpty(input) {
+    return input.trim().length > 0 ? input : undefined;
+}
+exports.parseNonEmpty = parseNonEmpty;
+function parseDate(input) {
+    var date = new Date(input);
+    if (isNaN(date.getTime())) {
+        return undefined;
+    }
+    return date;
+}
+exports.parseDate = parseDate;
+function parseNonNegative(input) {
+    var filter = function (n) { return (n >= 0); };
+    return parseToNumber(input, filter);
+}
+exports.parseNonNegative = parseNonNegative;
+function parsePositive(input) {
+    var filter = function (n) { return (n > 0); };
+    return parseToNumber(input, filter);
+}
+exports.parsePositive = parsePositive;
+function parseToNumber(input, filterFn) {
+    var filter = function (n) { return filterFn(n) ? n : undefined; };
+    if (typeof input === "string") {
+        var n = parseInt(input, 10);
+        if (!isFinite(n)) {
+            return undefined;
+        }
+        return filter(n);
+    }
+    return filter(input);
+}
+function formatMilliseconds(millis) {
+    return misc_1.roundNumber(millis, 3) + " ms";
+}
+exports.formatMilliseconds = formatMilliseconds;
+function formatDateLocalized(date) {
+    return date.toUTCString() + "</br>(local time: " + date.toLocaleString() + ")";
+}
+exports.formatDateLocalized = formatDateLocalized;
+function formatBytes(bytes) {
+    return bytes + " bytes (~" + misc_1.roundNumber(bytes / 1024, 1) + " kb)";
+}
+exports.formatBytes = formatBytes;
+
+},{"./misc":5}],7:[function(require,module,exports){
 /**
  *  SVG Helpers
  */
@@ -479,7 +553,7 @@ function getNodeTextWidth(textNode, skipClone) {
 }
 exports.getNodeTextWidth = getNodeTextWidth;
 
-},{"./dom":1}],7:[function(require,module,exports){
+},{"./dom":1}],8:[function(require,module,exports){
 "use strict";
 /**
  * Creates the html for diagrams legend
@@ -492,7 +566,7 @@ function makeLegend() {
 }
 exports.makeLegend = makeLegend;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 var __assign = (this && this.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -564,7 +638,7 @@ exports.fromPerfCascadeFormat = fromPerfCascadeFormat;
 var transformHarToPerfCascade = HarTransformer.transformDoc;
 exports.transformHarToPerfCascade = transformHarToPerfCascade;
 
-},{"./legend/legend":7,"./paging/paging":9,"./transformers/har":10,"./waterfall/svg-chart":23}],9:[function(require,module,exports){
+},{"./legend/legend":8,"./paging/paging":10,"./transformers/har":11,"./waterfall/svg-chart":24}],10:[function(require,module,exports){
 "use strict";
 var dom_1 = require("../helpers/dom");
 /** Class to keep track of run of a multi-run har is beeing shown  */
@@ -653,7 +727,7 @@ var Paging = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Paging;
 
-},{"../helpers/dom":1}],10:[function(require,module,exports){
+},{"../helpers/dom":1}],11:[function(require,module,exports){
 "use strict";
 var misc_1 = require("../helpers/misc");
 function createWaterfallEntry(name, start, end, segments, rawResource, requestType) {
@@ -849,7 +923,7 @@ function getTimePair(key, harEntry, collect, startRelative) {
     };
 }
 
-},{"../helpers/misc":5}],11:[function(require,module,exports){
+},{"../helpers/misc":5}],12:[function(require,module,exports){
 "use strict";
 /**
  * Convert a RequestType into a CSS class
@@ -868,72 +942,46 @@ function timingTypeToCssClass(timingType) {
 }
 exports.timingTypeToCssClass = timingTypeToCssClass;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 var har_1 = require("../../helpers/har");
-var ifValueDefined = function (value, fn) {
-    if (!isFinite(value) || value <= 0) {
-        return undefined;
-    }
-    return fn(value);
+var parse_1 = require("../../helpers/parse");
+var byteSizeProperty = function (title, input) {
+    return [title, parse_1.parseAndFormat(input, parse_1.parsePositive, parse_1.formatBytes)];
 };
-var formatBytes = function (size) { return ifValueDefined(size, function (s) { return s + " byte (~" + Math.round(s / 1024 * 10) / 10 + "kb)"; }); };
-var formatTime = function (size) { return ifValueDefined(size, function (s) { return s + " ms"; }); };
-var formatDate = function (date) {
-    if (!date) {
-        return "";
-    }
-    var dateToFormat = new Date(date);
-    return date + " </br>(local time: " + dateToFormat.toLocaleString() + ")";
-};
-var asIntPartial = function (val, ifIntFn) {
-    var v = parseInt(val, 10);
-    return ifValueDefined(v, ifIntFn);
-};
-/** get experimental feature (usually WebPageTest) */
-var getExp = function (harEntry, name) {
-    return harEntry[name] || harEntry["_" + name] || harEntry.request[name] || harEntry.request["_" + name] || "";
-};
-/** get experimental feature and ensure it's not a sting of `0` or `` */
-var getExpNotNull = function (harEntry, name) {
-    var resp = getExp(harEntry, name);
-    return resp !== "0" ? resp : "";
-};
-/** get experimental feature and format it as byte */
-var getExpAsByte = function (harEntry, name) {
-    var resp = parseInt(getExp(harEntry, name), 10);
-    return (isNaN(resp) || resp <= 0) ? "" : formatBytes(resp);
+var countProperty = function (title, input) {
+    return [title, parse_1.parseAndFormat(input, parse_1.parsePositive)];
 };
 function parseGeneralDetails(entry, requestID) {
     var harEntry = entry.rawResource;
     return [
         ["Request Number", "#" + requestID],
         ["Started", new Date(harEntry.startedDateTime).toLocaleString() + ((entry.start > 0) ?
-                " (" + formatTime(entry.start) + " after page request started)" : "")],
-        ["Duration", formatTime(harEntry.time)],
+                " (" + parse_1.formatMilliseconds(entry.start) + " after page request started)" : "")],
+        ["Duration", parse_1.formatMilliseconds(harEntry.time)],
         ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
         ["Server IPAddress", harEntry.serverIPAddress],
         ["Connection", harEntry.connection],
         ["Browser Priority", harEntry._priority || harEntry._initialPriority],
-        ["Was pushed", harEntry._was_pushed],
+        ["Was pushed", parse_1.parseAndFormat(harEntry._was_pushed, parse_1.parsePositive, function () { return "yes"; })],
         ["Initiator (Loaded by)", harEntry._initiator],
         ["Initiator Line", harEntry._initiator_line],
         ["Host", har_1.getHeader(harEntry.request.headers, "Host")],
         ["IP", harEntry._ip_addr],
-        ["Client Port", harEntry._client_port],
+        ["Client Port", parse_1.parseAndFormat(harEntry._client_port, parse_1.parsePositive)],
         ["Expires", harEntry._expires],
-        ["Cache Time", harEntry._cache_time],
+        ["Cache Time", parse_1.parseAndFormat(harEntry._cache_time, parse_1.parsePositive)],
         ["CDN Provider", harEntry._cdn_provider],
-        ["ObjectSize", harEntry._objectSize],
-        ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
-        ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
-        ["JPEG Scan Count", getExpNotNull(harEntry, "jpeg_scan_count")],
-        ["Gzip Total", getExpAsByte(harEntry, "gzip_total")],
-        ["Gzip Save", getExpAsByte(harEntry, "gzip_save")],
-        ["Minify Total", getExpAsByte(harEntry, "minify_total")],
-        ["Minify Save", getExpAsByte(harEntry, "minify_save")],
-        ["Image Total", getExpAsByte(harEntry, "image_total")],
-        ["Image Save", getExpAsByte(harEntry, "image_save")],
+        byteSizeProperty("ObjectSize", harEntry._objectSize),
+        byteSizeProperty("Bytes In (downloaded)", harEntry._bytesIn),
+        byteSizeProperty("Bytes Out (uploaded)", harEntry._bytesOut),
+        byteSizeProperty("JPEG Scan Count", harEntry._jpeg_scan_count),
+        byteSizeProperty("Gzip Total", harEntry._gzip_total),
+        byteSizeProperty("Gzip Save", harEntry._gzip_save),
+        byteSizeProperty("Minify Total", harEntry._minify_total),
+        byteSizeProperty("Minify Save", harEntry._minify_save),
+        byteSizeProperty("Image Total", harEntry._image_total),
+        byteSizeProperty("Image Save", harEntry._image_save),
     ];
 }
 function parseRequestDetails(harEntry) {
@@ -942,10 +990,10 @@ function parseRequestDetails(harEntry) {
     return [
         ["Method", request.method],
         ["HTTP Version", request.httpVersion],
-        ["Bytes Out (uploaded)", getExpAsByte(harEntry, "bytesOut")],
-        ["Headers Size", formatBytes(request.headersSize)],
-        ["Body Size", formatBytes(request.bodySize)],
-        ["Comment", request.comment],
+        byteSizeProperty("Bytes Out (uploaded)", harEntry._bytesOut),
+        byteSizeProperty("Headers Size", request.headersSize),
+        byteSizeProperty("Body Size", request.bodySize),
+        ["Comment", parse_1.parseAndFormat(request.comment, parse_1.parseNonEmpty)],
         stringHeader("User-Agent"),
         stringHeader("Host"),
         stringHeader("Connection"),
@@ -956,8 +1004,8 @@ function parseRequestDetails(harEntry) {
         stringHeader("If-Modified-Since"),
         stringHeader("If-Range"),
         stringHeader("If-Unmodified-Since"),
-        ["Querystring parameters count", request.queryString.length],
-        ["Cookies count", request.cookies.length],
+        countProperty("Querystring parameters count", request.queryString.length),
+        countProperty("Cookies count", request.cookies.length),
     ];
 }
 function parseResponseDetails(harEntry) {
@@ -968,8 +1016,15 @@ function parseResponseDetails(harEntry) {
         if (name === void 0) { name = title; }
         return [title, har_1.getHeader(headers, name)];
     };
-    var dateHeader = function (name) { return [name, formatDate(har_1.getHeader(headers, name))]; };
+    var dateHeader = function (name) {
+        var header = har_1.getHeader(headers, name);
+        return [name, parse_1.parseAndFormat(header, parse_1.parseDate, parse_1.formatDateLocalized)];
+    };
     var contentLength = har_1.getHeader(headers, "Content-Length");
+    var contentSize = undefined;
+    if (content.size !== -1 && contentLength !== content.size.toString()) {
+        contentSize = content.size;
+    }
     var contentType = har_1.getHeader(headers, "Content-Type");
     if (harEntry._contentType && harEntry._contentType !== contentType) {
         contentType = contentType + " | " + harEntry._contentType;
@@ -977,18 +1032,18 @@ function parseResponseDetails(harEntry) {
     return [
         ["Status", response.status + " " + response.statusText],
         ["HTTP Version", response.httpVersion],
-        ["Bytes In (downloaded)", getExpAsByte(harEntry, "bytesIn")],
-        ["Header Size", formatBytes(response.headersSize)],
-        ["Body Size", formatBytes(response.bodySize)],
+        byteSizeProperty("Bytes In (downloaded)", harEntry._bytesIn),
+        byteSizeProperty("Headers Size", response.headersSize),
+        byteSizeProperty("Body Size", response.bodySize),
         ["Content-Type", contentType],
         stringHeader("Cache-Control"),
         stringHeader("Content-Encoding"),
         dateHeader("Expires"),
         dateHeader("Last-Modified"),
         stringHeader("Pragma"),
-        ["Content-Length", asIntPartial(contentLength, formatBytes)],
-        ["Content Size", (contentLength !== content.size.toString() ? formatBytes(content.size) : "")],
-        ["Content Compression", formatBytes(content.compression)],
+        byteSizeProperty("Content-Length", contentLength),
+        byteSizeProperty("Content Size", contentSize),
+        byteSizeProperty("Content Compression", content.compression),
         stringHeader("Connection"),
         stringHeader("ETag"),
         stringHeader("Accept-Patch"),
@@ -1002,22 +1057,22 @@ function parseResponseDetails(harEntry) {
         stringHeader("Upgrade"),
         stringHeader("Vary"),
         stringHeader("Timing-Allow-Origin"),
-        ["Redirect URL", response.redirectURL],
-        ["Comment", response.comment],
+        ["Redirect URL", parse_1.parseAndFormat(response.redirectURL, parse_1.parseNonEmpty)],
+        ["Comment", parse_1.parseAndFormat(response.comment, parse_1.parseNonEmpty)],
     ];
 }
 function parseTimings(entry) {
     var timings = entry.rawResource.timings;
-    // FIXME should only filter -1 values here, 0 is a valid timing.
+    var optionalTiming = function (timing) { return parse_1.parseAndFormat(timing, parse_1.parseNonNegative, parse_1.formatMilliseconds); };
     return [
-        ["Total", entry.total + " ms"],
-        ["Blocked", formatTime(timings["blocked"])],
-        ["DNS", formatTime(timings["dns"])],
-        ["Connect", formatTime(timings["connect"])],
-        ["SSL (TLS)", formatTime(timings["ssl"])],
-        ["Send", formatTime(timings["send"])],
-        ["Wait", formatTime(timings["wait"])],
-        ["Receive", formatTime(timings["receive"])],
+        ["Total", parse_1.formatMilliseconds(entry.total)],
+        ["Blocked", optionalTiming(timings.blocked)],
+        ["DNS", optionalTiming(timings.dns)],
+        ["Connect", optionalTiming(timings.connect)],
+        ["SSL (TLS)", optionalTiming(timings.ssl)],
+        ["Send", parse_1.formatMilliseconds(timings.send)],
+        ["Wait", parse_1.formatMilliseconds(timings.wait)],
+        ["Receive", parse_1.formatMilliseconds(timings.receive)],
     ];
 }
 /**
@@ -1041,7 +1096,7 @@ function getKeys(requestID, entry) {
 }
 exports.getKeys = getKeys;
 
-},{"../../helpers/har":2}],13:[function(require,module,exports){
+},{"../../helpers/har":2,"../../helpers/parse":6}],14:[function(require,module,exports){
 "use strict";
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues, addClass) {
@@ -1053,13 +1108,8 @@ function makeDefinitionList(dlKeyValues, addClass) {
         var className = key.toLowerCase().replace(/[^a-z-]/g, "");
         return "class=\"" + (className || "no-colour") + "\"";
     };
-    var isValidTuple = function (tuple) {
-        var value = tuple[1];
-        return (typeof value === "string" && value.length > 0) ||
-            (typeof value === "number" && !(value === 0 || value === -1));
-    };
     return dlKeyValues
-        .filter(isValidTuple)
+        .filter(function (tuple) { return tuple[1] !== undefined; })
         .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + tuple[0] + "</dt>\n      <dd>" + tuple[1] + "</dd>\n    "; }).join("");
 }
 function makeTab(innerHtml, renderDl) {
@@ -1099,7 +1149,7 @@ function createDetailsBody(requestID, entry, accordeonHeight) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":12}],14:[function(require,module,exports){
+},{"./extract-details-keys":13}],15:[function(require,module,exports){
 "use strict";
 var dom_1 = require("../../helpers/dom");
 var svg_details_overlay_1 = require("./svg-details-overlay");
@@ -1223,7 +1273,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = OverlayManager;
 ;
 
-},{"../../helpers/dom":1,"./svg-details-overlay":16}],15:[function(require,module,exports){
+},{"../../helpers/dom":1,"./svg-details-overlay":17}],16:[function(require,module,exports){
 "use strict";
 var PubSub = (function () {
     function PubSub() {
@@ -1241,7 +1291,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = PubSub;
 ;
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var html_details_body_1 = require("./html-details-body");
@@ -1312,7 +1362,7 @@ function createRowInfoOverlay(indexBackup, y, accordionHeight, entry, onClose) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/svg":6,"./html-details-body":13}],17:[function(require,module,exports){
+},{"../../helpers/svg":7,"./html-details-body":14}],18:[function(require,module,exports){
 /**
  * Creation of sub-components used in a resource request row
  */
@@ -1376,7 +1426,7 @@ function getIndicatorIcons(entry, docIsSsl) {
 }
 exports.getIndicatorIcons = getIndicatorIcons;
 
-},{"../../helpers/heuristics":3}],18:[function(require,module,exports){
+},{"../../helpers/heuristics":3}],19:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1608,7 +1658,7 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":5,"../../helpers/svg":6,"../../transformers/styling-converters":11}],19:[function(require,module,exports){
+},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":12}],20:[function(require,module,exports){
 "use strict";
 var heuristics_1 = require("../../helpers/heuristics");
 var icons = require("../../helpers/icons");
@@ -1690,7 +1740,7 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":3,"../../helpers/icons":4,"../../helpers/misc":5,"../../helpers/svg":6,"./svg-indicators":17,"./svg-row-subcomponents":18}],20:[function(require,module,exports){
+},{"../../helpers/heuristics":3,"../../helpers/icons":4,"../../helpers/misc":5,"../../helpers/svg":7,"./svg-indicators":18,"./svg-row-subcomponents":19}],21:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  */
@@ -1751,7 +1801,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/dom":1,"../../helpers/svg":6}],21:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":7}],22:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1841,7 +1891,7 @@ function createBgRect(context, entry) {
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/misc":5,"../../helpers/svg":6,"../../transformers/styling-converters":11}],22:[function(require,module,exports){
+},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":12}],23:[function(require,module,exports){
 "use strict";
 var dom_1 = require("../../helpers/dom");
 var misc_1 = require("../../helpers/misc");
@@ -1916,7 +1966,7 @@ function createMarks(context, marks) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/dom":1,"../../helpers/misc":5,"../../helpers/svg":6}],23:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/misc":5,"../../helpers/svg":7}],24:[function(require,module,exports){
 "use strict";
 var heuristics_1 = require("../helpers/heuristics");
 var svg = require("../helpers/svg");
@@ -2079,5 +2129,5 @@ function createWaterfallSvg(data, options) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/heuristics":3,"../helpers/svg":6,"../transformers/styling-converters":11,"./details-overlay/overlay-manager":14,"./details-overlay/pub-sub":15,"./row/svg-indicators":17,"./row/svg-row":19,"./sub-components/svg-alignment-helper":20,"./sub-components/svg-general-components":21,"./sub-components/svg-marks":22}]},{},[8])(8)
+},{"../helpers/heuristics":3,"../helpers/svg":7,"../transformers/styling-converters":12,"./details-overlay/overlay-manager":15,"./details-overlay/pub-sub":16,"./row/svg-indicators":18,"./row/svg-row":20,"./sub-components/svg-alignment-helper":21,"./sub-components/svg-general-components":22,"./sub-components/svg-marks":23}]},{},[9])(9)
 });
