@@ -29,14 +29,18 @@ export default class OverlayManager implements OverlayManagerClass {
     }
     const self = this;
 
-    this.openOverlays.push({
+    let overlay = {
       "defaultY": y,
       "entry": entry,
       "index": index,
       "onClose": () => {
         self.closeOverlay(index, accordionHeight, barEls);
       },
-    });
+      "openTabIndex": 0,
+    };
+
+    this.openOverlays.push(overlay);
+
 
     this.renderOverlays(accordionHeight);
     this.context.pubSub.publishToOverlayChanges({
@@ -114,8 +118,7 @@ export default class OverlayManager implements OverlayManagerClass {
       .sort((a, b) => a.index > b.index ? 1 : -1)
       .forEach((overlay) => {
         let y = overlay.defaultY + currY;
-        let infoOverlay = createRowInfoOverlay(overlay.index, y, accordionHeight,
-          overlay.entry, overlay.onClose);
+        let infoOverlay = createRowInfoOverlay(overlay, y, accordionHeight);
         // if overlay has a preview image show it
         let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement;
         if (previewImg && !previewImg.src) {

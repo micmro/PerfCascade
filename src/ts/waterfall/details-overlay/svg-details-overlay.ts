@@ -1,7 +1,6 @@
 import * as svg from "../../helpers/svg";
-import {OnCloseFn} from "../../typing/open-overlay";
-import {WaterfallEntry} from "../../typing/waterfall";
-import {createDetailsBody} from "./html-details-body";
+import { OpenOverlay } from "../../typing/open-overlay";
+import { createDetailsBody } from "./html-details-body";
 
 export function forEach(els: NodeListOf<Element>, fn: (el: Element, index: number) => any) {
   Array.prototype.forEach.call(els, fn);
@@ -46,10 +45,8 @@ function createHolder(y: number, accordionHeight: number) {
   return innerHolder;
 }
 
-export function createRowInfoOverlay(indexBackup: number, y: number,
-                                     accordionHeight: number, entry: WaterfallEntry,
-                                     onClose: OnCloseFn): SVGGElement {
-  const requestID =  entry.rawResource._number || indexBackup + 1;
+export function createRowInfoOverlay(overlay: OpenOverlay, y: number, accordionHeight: number): SVGGElement {
+  const requestID = overlay.entry.rawResource._number || overlay.index + 1;
   let wrapper = svg.newG("outer-info-overlay-holder");
   let holder = createHolder(y, accordionHeight);
 
@@ -61,24 +58,25 @@ export function createRowInfoOverlay(indexBackup: number, y: number,
   });
 
   let closeBtn = createCloseButtonSvg(y);
-  closeBtn.addEventListener("click", () => onClose(indexBackup, holder));
+  closeBtn.addEventListener("click", () => overlay.onClose(overlay.index));
 
-  let body = createDetailsBody(requestID, entry, accordionHeight);
+  let body = createDetailsBody(requestID, overlay.entry, accordionHeight);
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
   let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
 
-  let setTabStatus = (index) => {
+  let setTabStatus = (tabIndex: number) => {
+    overlay.openTabIndex = tabIndex;
     forEach(tabs, (tab: HTMLDivElement, j) => {
-      tab.style.display = (index === j) ? "block" : "none";
-      buttons.item(j).classList.toggle("active", (index === j));
+      tab.style.display = (tabIndex === j) ? "block" : "none";
+      buttons.item(j).classList.toggle("active", (tabIndex === j));
     });
   };
 
-  forEach(buttons, (btn, i) => {
-    btn.addEventListener("click", () => { setTabStatus(i); });
+  forEach(buttons, (btn, tabIndex) => {
+    btn.addEventListener("click", () => setTabStatus(tabIndex));
   });
 
-  setTabStatus(0);
+  setTabStatus(overlay.openTabIndex);
 
   foreignObject.appendChild(body);
   holder.appendChild(foreignObject);
