@@ -29,7 +29,7 @@ export default class OverlayManager implements OverlayManagerClass {
     }
     const self = this;
 
-    let overlay = {
+    this.openOverlays.push({
       "defaultY": y,
       "entry": entry,
       "index": index,
@@ -37,10 +37,7 @@ export default class OverlayManager implements OverlayManagerClass {
         self.closeOverlay(index, accordionHeight, barEls);
       },
       "openTabIndex": 0,
-    };
-
-    this.openOverlays.push(overlay);
-
+    });
 
     this.renderOverlays(accordionHeight);
     this.context.pubSub.publishToOverlayChanges({
