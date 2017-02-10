@@ -2,6 +2,14 @@
 
 
 
+<a name="v0.3.9"></a>
+## v0.3.9 (2017-02-10)
+
+* #29 maintain the open tab while open or closing other overlays ([fc803e6](https://github.com/micmro/PerfCascade/commit/fc803e6))
+* lint fix ([ffe6235](https://github.com/micmro/PerfCascade/commit/ffe6235))
+
+
+
 <a name="v0.3.8"></a>
 ## v0.3.8 (2017-02-10)
 
