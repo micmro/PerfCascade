@@ -2,6 +2,24 @@
 
 
 
+<a name="v0.3.8"></a>
+## v0.3.8 (2017-02-10)
+
+* Don’t hide timings with value 0. ([b37735a](https://github.com/micmro/PerfCascade/commit/b37735a))
+* Extract parse and format helpers to separate file ([da80c7a](https://github.com/micmro/PerfCascade/commit/da80c7a))
+* Fix incorrect time formatting for first request. ([0e1b97a](https://github.com/micmro/PerfCascade/commit/0e1b97a))
+* Fix inverted filter for empty overlay details. ([edc5790](https://github.com/micmro/PerfCascade/commit/edc5790))
+* Hide Content Size if it’s same as Content-Length. ([1a3c082](https://github.com/micmro/PerfCascade/commit/1a3c082))
+* Hide content.size from response if it’s -1. ([69f9556](https://github.com/micmro/PerfCascade/commit/69f9556))
+* Hide empty Redirect URL and Comment properties. ([7262da6](https://github.com/micmro/PerfCascade/commit/7262da6))
+* Parse date headers using new parse helpers. ([770f9da](https://github.com/micmro/PerfCascade/commit/770f9da))
+* Parse function for positive numbers and formatter for bytes. ([75b75da](https://github.com/micmro/PerfCascade/commit/75b75da))
+* Refactor parsing of WPT HAR entry extensions. ([fd06cd3](https://github.com/micmro/PerfCascade/commit/fd06cd3))
+* Represent missing date headers as undefined. ([66ac350](https://github.com/micmro/PerfCascade/commit/66ac350))
+* Round milliseconds to at most 3 decimals. ([75587cc](https://github.com/micmro/PerfCascade/commit/75587cc))
+
+
+
 <a name="v0.3.7"></a>
 ## v0.3.7 (2017-02-07)
 
