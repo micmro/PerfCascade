@@ -66,7 +66,9 @@ export function getMimeTypeIcon(entry: WaterfallEntry): Icon {
     output.push(makeIcon("noGzip", "no gzip"));
   }
 
-  if (!harEntry.response.content.mimeType && heuristics.isInStatusCodeRange(harEntry, 200, 299)) {
+  if (!harEntry.response.content.mimeType &&
+    heuristics.isInStatusCodeRange(harEntry, 200, 299) &&
+    harEntry.response.status !== 204) {
     output.push(makeIcon("warning", "No MIME Type defined"));
   }
 
