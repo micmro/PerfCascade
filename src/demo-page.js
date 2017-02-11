@@ -80,7 +80,7 @@
   /** functionality for "use example HAR" */
   function getExampleHar() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', "./src/github.com.prep.har", true);
+    xhr.open('GET', "./src/github.com_chrome.har", true);
     xhr.addEventListener("readystatechange", function () {
       if (xhr.readyState == 4 && xhr.status == 200) {
         var response = JSON.parse(xhr.responseText);
