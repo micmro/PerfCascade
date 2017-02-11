@@ -65,6 +65,24 @@ export function formatMilliseconds(millis: number): string {
   return `${roundNumber(millis, 3)} ms`;
 }
 
+const SECONDS_PER_MINUTE = 60;
+const SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE;
+const SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR;
+
+export function formatSeconds(seconds: number): string {
+  const raw = `${roundNumber(seconds, 3)} s`;
+  if (seconds > SECONDS_PER_DAY) {
+    return `${raw} (~${roundNumber(seconds / SECONDS_PER_DAY, 0)} days)`;
+  }
+  if (seconds > SECONDS_PER_HOUR) {
+    return `${raw} (~${roundNumber(seconds / SECONDS_PER_HOUR, 0)} hours)`;
+  }
+  if (seconds > SECONDS_PER_MINUTE) {
+    return `${raw} (~${roundNumber(seconds / SECONDS_PER_MINUTE, 0)} minutes)`;
+  }
+  return raw;
+}
+
 export function formatDateLocalized(date: Date): string {
   return `${date.toUTCString()}</br>(local time: ${date.toLocaleString()})`;
 }

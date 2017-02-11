@@ -1,6 +1,6 @@
 import {getHeader} from "../../helpers/har";
 import {
-  formatBytes, formatDateLocalized, formatMilliseconds, parseAndFormat, parseDate, parseNonEmpty,
+  formatBytes, formatDateLocalized, formatMilliseconds, formatSeconds, parseAndFormat, parseDate, parseNonEmpty,
   parseNonNegative, parsePositive,
 } from "../../helpers/parse";
 import {Entry, Header} from "../../typing/har";
@@ -31,7 +31,7 @@ function parseGeneralDetails(entry: WaterfallEntry, requestID: number): KvTuple[
     ["IP", harEntry._ip_addr],
     ["Client Port", parseAndFormat(harEntry._client_port, parsePositive)],
     ["Expires", harEntry._expires],
-    ["Cache Time", parseAndFormat(harEntry._cache_time, parsePositive)],
+    ["Cache Time", parseAndFormat(harEntry._cache_time, parsePositive, formatSeconds)],
     ["CDN Provider", harEntry._cdn_provider],
     byteSizeProperty("ObjectSize", harEntry._objectSize),
     byteSizeProperty("Bytes In (downloaded)", harEntry._bytesIn),
@@ -113,7 +113,7 @@ function parseResponseDetails(harEntry: Entry): KvTuple[] {
     stringHeader("Connection"),
     stringHeader("ETag"),
     stringHeader("Accept-Patch"),
-    stringHeader("Age"),
+    ["Age", parseAndFormat(getHeader(headers, "Age"), parseNonNegative, formatSeconds)],
     stringHeader("Allow"),
     stringHeader("Content-Disposition"),
     stringHeader("Location"),
