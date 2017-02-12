@@ -46,5 +46,32 @@ export function getMimeTypeIcon(entry: WaterfallEntry): Icon {
  * @returns {Icon[]}
  */
 export function getIndicatorIcons(entry: WaterfallEntry): Icon[] {
-  return entry.indicators.map((i) => makeIcon(i.icon || i.type, i.title));
+  if (entry.indicators.length === 0) {
+    return [];
+  }
+
+  let combinedTitle = [];
+  let icon = "";
+  const errors = entry.indicators.filter((i) => i.type === "error");
+  const warnings = entry.indicators.filter((i) => i.type === "warning");
+  const info = entry.indicators.filter((i) => i.type !== "error" && i.type !== "warning");
+
+  if (errors.length > 0) {
+    combinedTitle.push(`Error${errors.length > 1 ? "s" : ""}:\n${errors.map((e) => e.title).join("\n")}`);
+    icon = "error";
+  }
+  if (warnings.length > 0) {
+    combinedTitle.push(`Warning${warnings.length > 1 ? "s" : ""}:\n${warnings.map((w) => w.title).join("\n")}`);
+    icon = icon || "warning";
+  }
+  if (info.length > 0) {
+    combinedTitle.push(`Info:\n${info.map((i) => i.title).join("\n")}`);
+    if (!icon && info.length === 1) {
+      icon = info[0].icon || info[0].type;
+    } else {
+      icon = icon || "info";
+    }
+  }
+
+  return [makeIcon(icon, combinedTitle.join("\n"))];
 }

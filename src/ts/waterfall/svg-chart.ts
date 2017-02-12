@@ -133,7 +133,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
 
   if (options.showIndicatorIcons) {
     const iconsPerBlock = entriesToShow.map((entry: WaterfallEntry) =>
-      entry.indicators.length);
+      entry.indicators.length > 0 ? 1 : 0);
     maxIcons += Math.max.apply(null, iconsPerBlock);
   }
 
