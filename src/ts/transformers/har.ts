@@ -196,7 +196,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
       doneTime = Math.max(doneTime, startRelative + entry.time);
 
       const requestType = mimeToRequestType(entry.response.content.mimeType);
-      const issues = collectIndicators(entry, isTLS, requestType)
+      const issues = collectIndicators(entry, isTLS, requestType);
       return createWaterfallEntry(entry.request.url,
         startRelative,
         toInt(entry._all_end) || (startRelative + entry.time),

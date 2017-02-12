@@ -36,7 +36,7 @@ function makeImgTab(accordionHeight: number, entry: WaterfallEntry) {
   return makeTab(imgTag, false);
 }
 
-function makeGeneralTab(generalData: KvTuple[], entry: WaterfallEntry){
+function makeGeneralTab(generalData: KvTuple[], entry: WaterfallEntry) {
   let content = makeDefinitionList(generalData);
   if (entry.indicators.length === 0) {
     return makeTab(content, true);

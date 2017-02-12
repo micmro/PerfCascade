@@ -8,7 +8,6 @@ import * as misc from "../helpers/misc";
 import { Entry } from "../typing/har";
 import { RequestType } from "../typing/waterfall";
 
-
 function isCompressible(entry: Entry, requestType: RequestType): boolean {
   const minCompressionSize = 1000;
   // small responses
