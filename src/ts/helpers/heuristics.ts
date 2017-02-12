@@ -1,5 +1,5 @@
 import {Entry} from "../typing/har";
-import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
+import {RequestType} from "../typing/waterfall";
 import {hasHeader} from "./har";
 import * as misc from "./misc";
 
@@ -14,18 +14,17 @@ export function isInStatusCodeRange(entry: Entry, lowerBound: number, upperBound
   return entry.response.status >= lowerBound && entry.response.status <= upperBound;
 }
 
-function isCompressible(entry: WaterfallEntry): boolean {
-  const harEntry = entry.rawResource;
+function isCompressible(entry: Entry, requestType: RequestType): boolean {
   const minCompressionSize = 1000;
   // small responses
-  if (harEntry.response.bodySize < minCompressionSize) {
+  if (entry.response.bodySize < minCompressionSize) {
     return false;
   }
 
-  if (misc.contains(["html", "css", "javascript", "svg", "plain"], entry.requestType)) {
+  if (misc.contains(["html", "css", "javascript", "svg", "plain"], requestType)) {
     return true;
   }
-  const mime = harEntry.response.content.mimeType;
+  const mime = entry.response.content.mimeType;
   const compressableMimes = ["application/vnd.ms-fontobject",
     "application/x-font-opentype",
     "application/x-font-truetype",
@@ -43,33 +42,32 @@ function isCompressible(entry: WaterfallEntry): boolean {
 
 /**
  * Checks if response could be cacheable, but isn't due to lack of cache header.
- * @param {WaterfallEntry} entry -  the waterfall entry.
+ * @param {Entry} entry -  the waterfall entry.
  * @returns {boolean}
  */
-export function hasCacheIssue(entry: WaterfallEntry) {
-  const harEntry = entry.rawResource;
-  if (harEntry.request.method.toLowerCase() !== "get") {
+export function hasCacheIssue(entry: Entry) {
+  if (entry.request.method.toLowerCase() !== "get") {
     return false;
   }
-  if (harEntry.response.status === 204 || !isInStatusCodeRange(harEntry, 200, 299)) {
+  if (entry.response.status === 204 || !isInStatusCodeRange(entry, 200, 299)) {
     return false;
   }
 
-  const headers = harEntry.response.headers;
+  const headers = entry.response.headers;
   return !(hasHeader(headers, "Cache-Control") || hasHeader(headers, "Expires"));
 }
 
-export function hasCompressionIssue(entry: WaterfallEntry) {
-  const harEntry = entry.rawResource;
-  const headers = harEntry.response.headers;
-  return (!hasHeader(headers, "Content-Encoding") && isCompressible(entry));
+export function hasCompressionIssue(entry: Entry, requestType: RequestType) {
+  const headers = entry.response.headers;
+  return (!hasHeader(headers, "Content-Encoding") && isCompressible(entry, requestType));
 }
 
-export function isSecure(entry: WaterfallEntry) {
-  return entry.name.indexOf("https://") === 0;
+/** Checks if the ressource uses https */
+export function isSecure(entry: Entry) {
+  return entry.request.url.indexOf("https://") === 0;
 }
 
-export function isPush(entry: WaterfallEntry): boolean {
+export function isPush(entry: Entry): boolean {
   function toInt(input: string | number): number {
     if (typeof input === "string") {
       return parseInt(input, 10);
@@ -77,16 +75,15 @@ export function isPush(entry: WaterfallEntry): boolean {
       return input;
     }
   }
-  const harEntry = entry.rawResource;
-  return toInt(harEntry._was_pushed) === 1;
+  return toInt(entry._was_pushed) === 1;
 }
 
 /**
  * Check if the document (disregarding any initial http->https redirects) is loaded over a secure connection.
- * @param {WaterfallData} data -  the waterfall data.
+ * @param {Entry[]} data - the waterfall entries data.
  * @returns {boolean}
  */
-export function documentIsSecure(data: WaterfallData) {
-  const rootDocument = data.entries.filter((e) => !e.rawResource.response.redirectURL)[0];
+export function documentIsSecure(data: Entry[]) {
+  const rootDocument = data.filter((e) => !e.response.redirectURL)[0];
   return isSecure(rootDocument);
 }

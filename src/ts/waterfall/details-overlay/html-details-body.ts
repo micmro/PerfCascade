@@ -36,6 +36,14 @@ function makeImgTab(accordionHeight: number, entry: WaterfallEntry) {
   return makeTab(imgTag, false);
 }
 
+function makeIndicatorTab(entry: WaterfallEntry) {
+  if (entry.indicators.length === 0) {
+    return "";
+  }
+  let content = makeDefinitionList(entry.indicators.map((i) => [i.title, i.description] as KvTuple));
+  return makeTab(content, false);
+}
+
 function makeTabBtn(name: string, tab: string) {
   return !!tab ? `<li><button class="tab-button">${name}</button></li>` : "";
 }
@@ -56,6 +64,7 @@ export function createDetailsBody(requestID: number, entry: WaterfallEntry, acco
   const responseDl = makeDefinitionList(tabsData.response);
   const responseHeadersDl = makeDefinitionList(tabsData.responseHeaders);
   const imgTab = makeImgTab(accordeonHeight, entry);
+  const indicatorTab = makeIndicatorTab(entry);
 
   body.innerHTML = `
     <div class="wrapper">
@@ -63,6 +72,7 @@ export function createDetailsBody(requestID: number, entry: WaterfallEntry, acco
         <h3><strong>#${requestID}</strong> ${entry.name}</h3>
         <nav class="tab-nav">
         <ul>
+          ${makeTabBtn("Issues & Info", indicatorTab)}
           ${makeTabBtn("General", generalTab)}
           <li><button class="tab-button">Request</button></li>
           <li><button class="tab-button">Response</button></li>
@@ -72,6 +82,7 @@ export function createDetailsBody(requestID: number, entry: WaterfallEntry, acco
         </ul>
         </nav>
       </header>
+      ${indicatorTab}
       ${generalTab}
       <div class="tab">
         <dl>

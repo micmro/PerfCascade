@@ -3,7 +3,7 @@
  */
 
 import * as heuristics from "../../helpers/heuristics";
-import {WaterfallEntry} from "../../typing/waterfall";
+import { WaterfallEntry } from "../../typing/waterfall";
 
 /**
  * Interface for `Icon` metadata
@@ -40,37 +40,11 @@ export function getMimeTypeIcon(entry: WaterfallEntry): Icon {
     return makeIcon(entry.requestType, entry.requestType);
   }
 }
-  /**
-   * Scan the request for errors or portential issues and highlight them
-   * @param  {WaterfallEntry} entry
-   * @param  {boolean} docIsSsl
-   * @returns {Icon[]}
-   */
-  export function getIndicatorIcons(entry: WaterfallEntry, docIsSsl: boolean): Icon[] {
-  const harEntry = entry.rawResource;
-  let output = [];
-
-  if (heuristics.isPush(entry)) {
-    output.push(makeIcon("push", "Response was pushed by the server"));
-  }
-
-  if (docIsSsl && !heuristics.isSecure(entry)) {
-    output.push(makeIcon("noTls", "Insecure Connection"));
-  }
-
-  if (heuristics.hasCacheIssue(entry)) {
-    output.push(makeIcon("noCache", "Response not cached"));
-  }
-
-  if (heuristics.hasCompressionIssue(entry)) {
-    output.push(makeIcon("noGzip", "no gzip"));
-  }
-
-  if (!harEntry.response.content.mimeType &&
-    heuristics.isInStatusCodeRange(harEntry, 200, 299) &&
-    harEntry.response.status !== 204) {
-    output.push(makeIcon("warning", "No MIME Type defined"));
-  }
-
-  return output;
+/**
+ * Gets the Indicators in Icon format
+ * @param  {WaterfallEntry} entry
+ * @returns {Icon[]}
+ */
+export function getIndicatorIcons(entry: WaterfallEntry): Icon[] {
+  return entry.indicators.map((i) => makeIcon(i.icon || i.type, i.title));
 }

@@ -4,6 +4,8 @@ export type TimingType = "blocked" | "dns" | "connect" | "send" | "wait" | "rece
 export type RequestType = "other" | "image" | "video" | "audio" | "font" | "svg" |  "html" |
   "plain" | "css" | "javascript" | "flash";
 
+export type IndicatorType = "error" | "warning" | "info";
+
 export interface UserTiming {
   duration?: number;
   name: string;
@@ -15,6 +17,7 @@ export interface Mark extends UserTiming {
   x?: number;
 }
 
+/** Representation of one loaded resource  */
 export interface WaterfallEntry {
   total: number;
   name: string;
@@ -23,6 +26,24 @@ export interface WaterfallEntry {
   segments: WaterfallEntryTiming[];
   rawResource: Entry;
   requestType: RequestType;
+  /** Warnings, Errors and Info indicators  */
+  indicators: WaterfallEntryIndicator[];
+}
+
+/** Type for issues of a request */
+export interface WaterfallEntryIndicator {
+  /** Issue ID e.g. `noTls`, used for CSS class */
+  id: string;
+  /** name of icon to use (member of `helpers/icons`) -
+   * falls back to `type` if not defined
+   */
+  icon?: string;
+  /** short title describing indicator */
+  title: string;
+  /** long description e.g. for details overlay view */
+  description: string;
+  /** catrgorizes the indicator */
+  type: IndicatorType;
 }
 
 export interface WaterfallEntryTiming {
@@ -38,6 +59,8 @@ export interface WaterfallData {
   entries: WaterfallEntry[];
   marks: Mark[];
   lines: WaterfallEntry[];
+  /** indicates if the parent document is loaded with TLS or SSL */
+  docIsTLS: boolean;
 }
 
 export interface WaterfallDocs {

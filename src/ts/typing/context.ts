@@ -17,8 +17,6 @@ export interface Context {
   diagramHeight: number;
   /** Chart config/customization options */
   options: ChartOptions;
-  /** Is the main document TLS/SSL */
-  docIsSsl: boolean;
 }
 
 export interface PubSubClass {
