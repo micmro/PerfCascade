@@ -2,7 +2,7 @@
  * Creation of sub-components used in a resource request row
  */
 
-import * as heuristics from "../../helpers/heuristics";
+import { isInStatusCodeRange } from "../../helpers/heuristics";
 import { WaterfallEntry } from "../../typing/waterfall";
 
 /**
@@ -30,9 +30,9 @@ export function getMimeTypeIcon(entry: WaterfallEntry): Icon {
   if (!!harEntry.response.redirectURL) {
     const url = encodeURI(harEntry.response.redirectURL.split("?")[0] || "");
     return makeIcon("err3xx", `${harEntry.response.status} response status: Redirect to ${url}...`);
-  } else if (heuristics.isInStatusCodeRange(harEntry, 400, 499)) {
+  } else if (isInStatusCodeRange(harEntry, 400, 499)) {
     return makeIcon("err4xx", `${harEntry.response.status} response status: ${harEntry.response.statusText}`);
-  } else if (heuristics.isInStatusCodeRange(harEntry, 500, 599)) {
+  } else if (isInStatusCodeRange(harEntry, 500, 599)) {
     return makeIcon("err5xx", `${harEntry.response.status} response status: ${harEntry.response.statusText}`);
   } else if (harEntry.response.status === 204) {
     return makeIcon("plain", "No content");

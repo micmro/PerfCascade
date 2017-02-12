@@ -1,4 +1,4 @@
-import * as heuristics from "../helpers/heuristics";
+import { isInStatusCodeRange } from "../helpers/heuristics";
 import { roundNumber } from "../helpers/misc";
 import { Entry, Har, PageTimings } from "../typing/har";
 import {
@@ -11,6 +11,7 @@ import {
   WaterfallEntryIndicator,
   WaterfallEntryTiming,
 } from "../typing/waterfall";
+import * as harHeuristics from "./har-heuristics";
 
 function createWaterfallEntry(name: string,
                               start: number,
@@ -95,7 +96,7 @@ function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: Request
   // const harEntry = entry;
   let output: WaterfallEntryIndicator[] = [];
 
-  if (heuristics.isPush(entry)) {
+  if (harHeuristics.isPush(entry)) {
     output.push({
       description: "Response was pushed by the server using HTTP2 push.",
       icon: "push",
@@ -105,27 +106,27 @@ function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: Request
     });
   }
 
-  if (docIsTLS && !heuristics.isSecure(entry)) {
+  if (docIsTLS && !harHeuristics.isSecure(entry)) {
     output.push({
-      description: "Insecure Connetion, it should uses TLS",
+      description: "Insecure request, it should use HTTPS.",
       id: "noTls",
       title: "Insecure Connection",
       type: "error",
     });
   }
 
-  if (heuristics.hasCacheIssue(entry)) {
+  if (harHeuristics.hasCacheIssue(entry)) {
     output.push({
-      description: "The response does not allow to be cached on the client. Consider setting 'Cache-Control' headers.",
+      description: "The response is not allow to be cached on the client. Consider setting 'Cache-Control' headers.",
       id: "noCache",
       title: "Response not cached",
       type: "error",
     });
   }
 
-  if (heuristics.hasCompressionIssue(entry, requestType)) {
+  if (harHeuristics.hasCompressionIssue(entry, requestType)) {
     output.push({
-      description: "The response is not compressed.",
+      description: "The response is not compressed. Consider enabling HTTP compression on your server.",
       id: "noGzip",
       title: "no gzip",
       type: "error",
@@ -133,10 +134,10 @@ function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: Request
   }
 
   if (!entry.response.content.mimeType &&
-      heuristics.isInStatusCodeRange(entry, 200, 299) &&
-      entry.response.status !== 204) {
+      isInStatusCodeRange(entry, 200, 299) &&
+    entry.response.status !== 204) {
     output.push({
-      description: "No MIME Type defined",
+      description: "Response doesn't contain a 'Content-Type' header.",
       id: "warning",
       title: "No MIME Type defined",
       type: "warning",
@@ -186,7 +187,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
 
   let doneTime = 0;
-  const isTLS = heuristics.documentIsSecure(data.entries);
+  const isTLS = harHeuristics.documentIsSecure(data.entries);
   const entries = data.entries
     .filter((entry) => entry.pageref === currPage.id)
     .map((entry) => {
