@@ -88,7 +88,7 @@ export function formatDateLocalized(date: Date): string {
 }
 
 const BYTES_PER_KB = 1024;
-const BYTES_PER_MB = 1014 * BYTES_PER_KB;
+const BYTES_PER_MB = 1024 * BYTES_PER_KB;
 
 export function formatBytes(bytes: number): string {
   const raw = `${bytes} bytes`;
