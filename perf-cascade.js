@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.3.9 (11/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.4.0 (13/02/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -68,8 +68,6 @@ exports.getHeader = getHeader;
 
 },{}],3:[function(require,module,exports){
 "use strict";
-var har_1 = require("./har");
-var misc = require("./misc");
 /**
  *
  * Checks if `entry.response.status` code is `>= lowerBound` and `<= upperBound`
@@ -81,83 +79,8 @@ function isInStatusCodeRange(entry, lowerBound, upperBound) {
     return entry.response.status >= lowerBound && entry.response.status <= upperBound;
 }
 exports.isInStatusCodeRange = isInStatusCodeRange;
-function isCompressible(entry) {
-    var harEntry = entry.rawResource;
-    var minCompressionSize = 1000;
-    // small responses
-    if (harEntry.response.bodySize < minCompressionSize) {
-        return false;
-    }
-    if (misc.contains(["html", "css", "javascript", "svg", "plain"], entry.requestType)) {
-        return true;
-    }
-    var mime = harEntry.response.content.mimeType;
-    var compressableMimes = ["application/vnd.ms-fontobject",
-        "application/x-font-opentype",
-        "application/x-font-truetype",
-        "application/x-font-ttf",
-        "application/xml",
-        "font/eot",
-        "font/opentype",
-        "font/otf",
-        "image/vnd.microsoft.icon"];
-    if (misc.contains(["text"], mime.split("/")[0]) || misc.contains(compressableMimes, mime.split(";")[0])) {
-        return true;
-    }
-    return false;
-}
-/**
- * Checks if response could be cacheable, but isn't due to lack of cache header.
- * @param {WaterfallEntry} entry -  the waterfall entry.
- * @returns {boolean}
- */
-function hasCacheIssue(entry) {
-    var harEntry = entry.rawResource;
-    if (harEntry.request.method.toLowerCase() !== "get") {
-        return false;
-    }
-    if (harEntry.response.status === 204 || !isInStatusCodeRange(harEntry, 200, 299)) {
-        return false;
-    }
-    var headers = harEntry.response.headers;
-    return !(har_1.hasHeader(headers, "Cache-Control") || har_1.hasHeader(headers, "Expires"));
-}
-exports.hasCacheIssue = hasCacheIssue;
-function hasCompressionIssue(entry) {
-    var harEntry = entry.rawResource;
-    var headers = harEntry.response.headers;
-    return (!har_1.hasHeader(headers, "Content-Encoding") && isCompressible(entry));
-}
-exports.hasCompressionIssue = hasCompressionIssue;
-function isSecure(entry) {
-    return entry.name.indexOf("https://") === 0;
-}
-exports.isSecure = isSecure;
-function isPush(entry) {
-    function toInt(input) {
-        if (typeof input === "string") {
-            return parseInt(input, 10);
-        }
-        else {
-            return input;
-        }
-    }
-    var harEntry = entry.rawResource;
-    return toInt(harEntry._was_pushed) === 1;
-}
-exports.isPush = isPush;
-/**
- * Check if the document (disregarding any initial http->https redirects) is loaded over a secure connection.
- * @param {WaterfallData} data -  the waterfall data.
- * @returns {boolean}
- */
-function documentIsSecure(data) {
-    var rootDocument = data.entries.filter(function (e) { return !e.rawResource.response.redirectURL; })[0];
-    return isSecure(rootDocument);
-}
-exports.documentIsSecure = documentIsSecure;
 
-},{"./har":2,"./misc":5}],4:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /**
  *  SVG Icons
  */
@@ -187,16 +110,6 @@ function err5xx(x, y, title, scale) {
     return toSvg(x, y, title, "icon-5xx", scale, "<path d=\"m 10.141566,13.833 0,-1.6945 q 0,-0.1249 -0.08472,-0.2096\n    -0.084725,-0.084 -0.2006658,-0.084 l -1.7123482,0 q -0.1159402,0 -0.2006658,0.084 -0.084725,0.084 -0.084725,0.2096 l\n    0,1.6945 q 0,0.1248 0.084725,0.2096 0.084725,0.084 0.2006658,0.084 l 1.7123482,0 q 0.1159402,0 0.2006658,-0.084\n    0.08472,-0.084 0.08472,-0.2096 z m -0.01784,-3.3356 0.160533,-4.0936 q 0,-0.107 -0.08919,-0.1694 -0.115941,-0.098\n    -0.2140439,-0.098 l -1.9620656,0 q -0.098103,0 -0.2140436,0.098 -0.089185,0.062 -0.089185,0.1873 l 0.1516221,4.0757\n    q 0,0.089 0.089185,0.1472 0.089185,0.058 0.2140435,0.058 l 1.6499188,0 q 0.1248588,0 0.2095847,-0.058 0.08473,-0.058\n    0.09364,-0.1472 z M 9.9988702,2.1676 16.848263,14.7248 q 0.312147,0.5619 -0.01784,1.1237 -0.151614,0.2587\n    -0.414709,0.4103 -0.263093,0.1516 -0.566321,0.1516 l -13.6987852,0 q -0.3032283,0 -0.5663235,-0.1516 Q\n    1.3211891,16.1072 1.169575,15.8485 0.83959124,15.2867 1.151738,14.7248 L 8.0011307,2.1676 Q 8.1527449,1.8911\n    8.4202993,1.7306 8.6878537,1.57 9.0000005,1.57 q 0.3121468,0 0.5797012,0.1606 0.2675544,0.1605 0.4191685,0.437\n    z\" />");
 }
 exports.err5xx = err5xx;
-function noCache(x, y, title, scale) {
-    if (scale === void 0) { scale = 1; }
-    return toSvg(x, y, title, "icon-no-cache", scale, "<path d=\"m 9,1 q 2.177084,0 4.015627,1.0728889 1.838542,1.0729778\n    2.911457,2.9114667 Q 17,6.8229333 17,9 q 0,2.177067 -1.072916,4.015644 -1.072915,1.838489 -2.911457,2.911467 Q\n    11.177084,17 9,17 6.8229156,17 4.9843733,15.927111 3.1458311,14.854133 2.0729156,13.015644 1,11.177067 1,9\n    1,6.8229333 2.0729156,4.9843556 3.1458311,3.1458667 4.9843733,2.0728889 6.8229156,1 9,1 Z m 1.333333,12.9896\n    0,-1.9792 q 0,-0.145778 -0.09375,-0.2448 -0.09375,-0.09893 -0.229164,-0.09893 l -2.0000001,0 q -0.1354222,0\n    -0.2395822,0.104177 -0.1041689,0.104178 -0.1041689,0.239556 l 0,1.9792 q 0,0.135378 0.1041689,0.239556\n    0.10416,0.104177 0.2395822,0.104177 l 2.0000001,0 q 0.135413,0 0.229164,-0.09893 0.09375,-0.09902 0.09375,-0.2448 z\n    m -0.0208,-3.583378 0.187503,-6.4687109 q 0,-0.1249778 -0.104169,-0.1874667 -0.104169,-0.083556 -0.25,-0.083556 l\n    -2.2916626,0 q -0.14584,0 -0.25,0.083556 -0.1041688,0.062222 -0.1041688,0.1874667 L 7.67712,10.406222 q 0,0.104178\n    0.1041689,0.182311 0.10416,0.07822 0.25,0.07822 l 1.9270755,0 q 0.1458396,0 0.2447996,-0.07822 0.09895,-0.07822\n    0.109369,-0.182311 z\" />");
-}
-exports.noCache = noCache;
-function noGzip(x, y, title, scale) {
-    if (scale === void 0) { scale = 1; }
-    return toSvg(x, y, title, "icon-no-gzip", scale, "<path d=\"m 9,1 q 2.177084,0 4.015627,1.0728889 1.838542,1.0729778\n    2.911457,2.9114667 Q 17,6.8229333 17,9 q 0,2.177067 -1.072916,4.015644 -1.072915,1.838489 -2.911457,2.911467 Q\n    11.177084,17 9,17 6.8229156,17 4.9843733,15.927111 3.1458311,14.854133 2.0729156,13.015644 1,11.177067 1,9\n    1,6.8229333 2.0729156,4.9843556 3.1458311,3.1458667 4.9843733,2.0728889 6.8229156,1 9,1 Z m 1.333333,12.9896\n    0,-1.9792 q 0,-0.145778 -0.09375,-0.2448 -0.09375,-0.09893 -0.229164,-0.09893 l -2.0000001,0 q -0.1354222,0\n    -0.2395822,0.104177 -0.1041689,0.104178 -0.1041689,0.239556 l 0,1.9792 q 0,0.135378 0.1041689,0.239556\n    0.10416,0.104177 0.2395822,0.104177 l 2.0000001,0 q 0.135413,0 0.229164,-0.09893 0.09375,-0.09902 0.09375,-0.2448 z\n    m -0.0208,-3.583378 0.187503,-6.4687109 q 0,-0.1249778 -0.104169,-0.1874667 -0.104169,-0.083556 -0.25,-0.083556 l\n    -2.2916626,0 q -0.14584,0 -0.25,0.083556 -0.1041688,0.062222 -0.1041688,0.1874667 L 7.67712,10.406222 q 0,0.104178\n    0.1041689,0.182311 0.10416,0.07822 0.25,0.07822 l 1.9270755,0 q 0.1458396,0 0.2447996,-0.07822 0.09895,-0.07822\n    0.109369,-0.182311 z\" />");
-}
-exports.noGzip = noGzip;
 function plain(x, y, title, scale) {
     if (scale === void 0) { scale = 1; }
     return toSvg(x, y, title, "icon-plain", scale, "<path d=\"m 15.247139,4.3928381 q 0.250004,0.2500571 0.428571,0.6786286\n    0.178575,0.4285714 0.178575,0.7856761 l 0,10.2857142 q 0,0.357181 -0.250003,0.607162 Q 15.354285,17 14.997143,17 L\n    2.9971428,17 Q 2.64,17 2.3899962,16.750019 2.14,16.500038 2.14,16.142857 l 0,-14.2857142 Q 2.14,1.5000381\n    2.3899962,1.249981 2.64,1 2.9971428,1 l 8.0000002,0 q 0.357142,0 0.785714,0.1785905 0.428571,0.1785905\n    0.678568,0.4285714 z m -3.964282,-2.1785143 0,3.3571047 3.357143,0 Q 14.550712,5.3125333 14.443573,5.2053333 L\n    11.64893,2.4107428 q -0.107147,-0.1072 -0.366073,-0.196419 z m 3.428571,13.6428192 0,-9.1428573 -3.714285,0 q\n    -0.357143,0 -0.607147,-0.2499809 Q 10.14,6.2143238 10.14,5.8571428 l 0,-3.7142856 -6.8571428,0 0,13.7142858\n    11.4285708,0 z M 5.5685715,8.1428569 q 0,-0.1250285 0.080358,-0.2053333 0.080358,-0.080382 0.2053562,-0.080382 l\n    6.2857143,0 q 0.124998,0 0.205356,0.080382 0.08036,0.080302 0.08036,0.2053333 l 0,0.5714284 q 0,0.1250294\n    -0.08036,0.2053334 Q 12.264998,9 12.14,9 L 5.8542857,9 Q 5.7292876,9 5.6489295,8.9196178 5.5685713,8.8393156\n    5.5685713,8.7142844 l 0,-0.5714284 z M 12.14,10.142857 q 0.124998,0 0.205356,0.08038 0.08036,0.0803 0.08036,0.205333\n    l 0,0.571429 q 0,0.125028 -0.08036,0.205333 -0.08036,0.08038 -0.205356,0.08038 l -6.2857143,0 q -0.1249981,0\n    -0.2053562,-0.08038 -0.080358,-0.0803 -0.080358,-0.205333 l 0,-0.571429 q 0,-0.125028 0.080358,-0.205333\n    0.080358,-0.08038 0.2053562,-0.08038 l 6.2857143,0 z m 0,2.285715 q 0.124998,0 0.205356,0.08038 0.08036,0.0803\n    0.08036,0.205333 l 0,0.571429 q 0,0.125029 -0.08036,0.205334 -0.08036,0.08038 -0.205356,0.08038 l -6.2857143,0 q\n    -0.1249981,0 -0.2053562,-0.08038 -0.080358,-0.0803 -0.080358,-0.205334 l 0,-0.571429 q 0,-0.125028\n    0.080358,-0.205333 0.080358,-0.08038 0.2053562,-0.08038 l 6.2857143,0 z\" />");
@@ -237,6 +150,11 @@ function warning(x, y, title, scale) {
     return toSvg(x, y, title, "icon-warning", scale, "<path d=\"m 10.141566,13.833 0,-1.6945 q 0,-0.1249 -0.08472,-0.2096\n    -0.084725,-0.084 -0.2006658,-0.084 l -1.7123482,0 q -0.1159402,0 -0.2006658,0.084 -0.084725,0.084 -0.084725,0.2096 l\n    0,1.6945 q 0,0.1248 0.084725,0.2096 0.084725,0.084 0.2006658,0.084 l 1.7123482,0 q 0.1159402,0 0.2006658,-0.084\n    0.08472,-0.084 0.08472,-0.2096 z m -0.01784,-3.3356 0.160533,-4.0936 q 0,-0.107 -0.08919,-0.1694 -0.115941,-0.098\n    -0.2140439,-0.098 l -1.9620656,0 q -0.098103,0 -0.2140436,0.098 -0.089185,0.062 -0.089185,0.1873 l 0.1516221,4.0757\n    q 0,0.089 0.089185,0.1472 0.089185,0.058 0.2140435,0.058 l 1.6499188,0 q 0.1248588,0 0.2095847,-0.058 0.08473,-0.058\n    0.09364,-0.1472 z M 9.9988702,2.1676 16.848263,14.7248 q 0.312147,0.5619 -0.01784,1.1237 -0.151614,0.2587\n    -0.414709,0.4103 -0.263093,0.1516 -0.566321,0.1516 l -13.6987852,0 q -0.3032283,0 -0.5663235,-0.1516 Q\n    1.3211891,16.1072 1.169575,15.8485 0.83959124,15.2867 1.151738,14.7248 L 8.0011307,2.1676 Q 8.1527449,1.8911\n    8.4202993,1.7306 8.6878537,1.57 9.0000005,1.57 q 0.3121468,0 0.5797012,0.1606 0.2675544,0.1605 0.4191685,0.437\n    z\" />");
 }
 exports.warning = warning;
+function error(x, y, title, scale) {
+    if (scale === void 0) { scale = 1; }
+    return toSvg(x, y, title, "icon-no-gzip", scale, "<path d=\"m 9,1 q 2.177084,0 4.015627,1.0728889 1.838542,1.0729778\n    2.911457,2.9114667 Q 17,6.8229333 17,9 q 0,2.177067 -1.072916,4.015644 -1.072915,1.838489 -2.911457,2.911467 Q\n    11.177084,17 9,17 6.8229156,17 4.9843733,15.927111 3.1458311,14.854133 2.0729156,13.015644 1,11.177067 1,9\n    1,6.8229333 2.0729156,4.9843556 3.1458311,3.1458667 4.9843733,2.0728889 6.8229156,1 9,1 Z m 1.333333,12.9896\n    0,-1.9792 q 0,-0.145778 -0.09375,-0.2448 -0.09375,-0.09893 -0.229164,-0.09893 l -2.0000001,0 q -0.1354222,0\n    -0.2395822,0.104177 -0.1041689,0.104178 -0.1041689,0.239556 l 0,1.9792 q 0,0.135378 0.1041689,0.239556\n    0.10416,0.104177 0.2395822,0.104177 l 2.0000001,0 q 0.135413,0 0.229164,-0.09893 0.09375,-0.09902 0.09375,-0.2448 z\n    m -0.0208,-3.583378 0.187503,-6.4687109 q 0,-0.1249778 -0.104169,-0.1874667 -0.104169,-0.083556 -0.25,-0.083556 l\n    -2.2916626,0 q -0.14584,0 -0.25,0.083556 -0.1041688,0.062222 -0.1041688,0.1874667 L 7.67712,10.406222 q 0,0.104178\n    0.1041689,0.182311 0.10416,0.07822 0.25,0.07822 l 1.9270755,0 q 0.1458396,0 0.2447996,-0.07822 0.09895,-0.07822\n    0.109369,-0.182311 z\" />");
+}
+exports.error = error;
 function font(x, y, title, scale) {
     if (scale === void 0) { scale = 1; }
     return toSvg(x, y, title, "icon-font", scale, "<path d=\"M 7.9711534,5.7542664 6.3365384,10.0812 q 0.3173075,0\n    1.3124995,0.01956 0.9951928,0.01956 1.5432692,0.01956 0.1826924,0 0.5480773,-0.01956 Q 8.9038458,7.6680441\n    7.9711534,5.754622 Z M 1,16.379245 1.0192356,15.619601 q 0.2211537,-0.06756 0.5384613,-0.120178 0.3173075,-0.05245\n    0.5480764,-0.100978 0.2307697,-0.048 0.4759617,-0.139378 0.245192,-0.09138 0.4278844,-0.278844 0.1826925,-0.187556\n    0.2980774,-0.4856 L 5.5865429,8.5715107 8.2788503,1.61 l 1.2307688,0 q 0.076924,0.1346666 0.1057698,0.2019555 L\n    11.586543,6.427333 q 0.317307,0.7499556 1.01923,2.475911 0.701923,1.726045 1.096153,2.639467 0.144232,0.326934\n    0.557693,1.389423 0.413462,1.062489 0.692307,1.620178 0.192309,0.432711 0.336539,0.548089 0.182692,0.144266\n    0.846154,0.283644 0.663462,0.139467 0.807692,0.197156 Q 17,15.946534 17,16.129289 q 0,0.03822 -0.0048,0.124978\n    -0.0048,0.08622 -0.0048,0.124978 -0.60577,0 -1.826923,-0.07644 -1.221154,-0.07733 -1.836539,-0.07733 -0.730769,0\n    -2.067307,0.06756 -1.3365382,0.06755 -1.7115381,0.07733 0,-0.413511 0.038462,-0.750044 L 10.84617,15.351076 q\n    0.0096,0 0.120192,-0.024 0.110577,-0.024 0.149039,-0.03378 0.03846,-0.0098 0.139423,-0.04356 0.100961,-0.03378\n    0.144231,-0.06222 0.04327,-0.02933 0.105769,-0.07733 0.0625,-0.048 0.08653,-0.105777 0.02403,-0.05778\n    0.02403,-0.134578 0,-0.153867 -0.298077,-0.927911 -0.298068,-0.774053 -0.692299,-1.706764 -0.394231,-0.932623\n    -0.403846,-0.961512 l -4.3269223,-0.01956 q -0.25,0.55769 -0.7355768,1.879823 -0.4855769,1.322044\n    -0.4855769,1.562489 0,0.211555 0.1346151,0.360533 0.1346151,0.149067 0.4182693,0.235556 0.2836533,0.08622\n    0.4663458,0.129866 0.1826924,0.04356 0.5480773,0.08178 0.365384,0.03822 0.3942302,0.03822 0.00962,0.182667\n    0.00962,0.557689 0,0.08622 -0.019236,0.259644 -0.5576924,0 -1.6778843,-0.09618 -1.1201929,-0.09618\n    -1.6778844,-0.09618 -0.076924,0 -0.254808,0.03822 -0.1778844,0.03822 -0.2067306,0.03822 Q 2.0384613,16.379245\n    1,16.379245 Z\" />");
@@ -354,6 +272,7 @@ function parseAndFormat(input, parseFn, formatFn) {
     return formatFn(parsed);
 }
 exports.parseAndFormat = parseAndFormat;
+/** Fallback dummy function - just maintains the type */
 function identity(source) {
     return source;
 }
@@ -394,12 +313,38 @@ function formatMilliseconds(millis) {
     return misc_1.roundNumber(millis, 3) + " ms";
 }
 exports.formatMilliseconds = formatMilliseconds;
+var SECONDS_PER_MINUTE = 60;
+var SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE;
+var SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR;
+function formatSeconds(seconds) {
+    var raw = misc_1.roundNumber(seconds, 3) + " s";
+    if (seconds > SECONDS_PER_DAY) {
+        return raw + " (~" + misc_1.roundNumber(seconds / SECONDS_PER_DAY, 0) + " days)";
+    }
+    if (seconds > SECONDS_PER_HOUR) {
+        return raw + " (~" + misc_1.roundNumber(seconds / SECONDS_PER_HOUR, 0) + " hours)";
+    }
+    if (seconds > SECONDS_PER_MINUTE) {
+        return raw + " (~" + misc_1.roundNumber(seconds / SECONDS_PER_MINUTE, 0) + " minutes)";
+    }
+    return raw;
+}
+exports.formatSeconds = formatSeconds;
 function formatDateLocalized(date) {
     return date.toUTCString() + "</br>(local time: " + date.toLocaleString() + ")";
 }
 exports.formatDateLocalized = formatDateLocalized;
+var BYTES_PER_KB = 1024;
+var BYTES_PER_MB = 1024 * BYTES_PER_KB;
 function formatBytes(bytes) {
-    return bytes + " bytes (~" + misc_1.roundNumber(bytes / 1024, 1) + " kb)";
+    var raw = bytes + " bytes";
+    if (bytes >= BYTES_PER_MB) {
+        return raw + " (~" + misc_1.roundNumber(bytes / BYTES_PER_KB, 1) + " MB)";
+    }
+    if (bytes >= BYTES_PER_KB) {
+        return raw + " (~" + misc_1.roundNumber(bytes / BYTES_PER_KB, 0) + " kB)";
+    }
+    return raw;
 }
 exports.formatBytes = formatBytes;
 
@@ -638,7 +583,7 @@ exports.fromPerfCascadeFormat = fromPerfCascadeFormat;
 var transformHarToPerfCascade = HarTransformer.transformDoc;
 exports.transformHarToPerfCascade = transformHarToPerfCascade;
 
-},{"./legend/legend":8,"./paging/paging":10,"./transformers/har":11,"./waterfall/svg-chart":24}],10:[function(require,module,exports){
+},{"./legend/legend":8,"./paging/paging":10,"./transformers/har":12,"./waterfall/svg-chart":25}],10:[function(require,module,exports){
 "use strict";
 var dom_1 = require("../helpers/dom");
 /** Class to keep track of run of a multi-run har is beeing shown  */
@@ -728,9 +673,92 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Paging;
 
 },{"../helpers/dom":1}],11:[function(require,module,exports){
+/**
+ * Heuristics used at parse-time for HAR data
+ */
 "use strict";
+var har_1 = require("../helpers/har");
+var heuristics_1 = require("../helpers/heuristics");
+var misc = require("../helpers/misc");
+function isCompressible(entry, requestType) {
+    var minCompressionSize = 1000;
+    // small responses
+    if (entry.response.bodySize < minCompressionSize) {
+        return false;
+    }
+    if (misc.contains(["html", "css", "javascript", "svg", "plain"], requestType)) {
+        return true;
+    }
+    var mime = entry.response.content.mimeType;
+    var compressableMimes = ["application/vnd.ms-fontobject",
+        "application/x-font-opentype",
+        "application/x-font-truetype",
+        "application/x-font-ttf",
+        "application/xml",
+        "font/eot",
+        "font/opentype",
+        "font/otf",
+        "image/vnd.microsoft.icon"];
+    if (misc.contains(["text"], mime.split("/")[0]) || misc.contains(compressableMimes, mime.split(";")[0])) {
+        return true;
+    }
+    return false;
+}
+/**
+ * Checks if response could be cacheable, but isn't due to lack of cache header.
+ * @param {Entry} entry -  the waterfall entry.
+ * @returns {boolean}
+ */
+function hasCacheIssue(entry) {
+    if (entry.request.method.toLowerCase() !== "get") {
+        return false;
+    }
+    if (entry.response.status === 204 || !heuristics_1.isInStatusCodeRange(entry, 200, 299)) {
+        return false;
+    }
+    var headers = entry.response.headers;
+    return !(har_1.hasHeader(headers, "Cache-Control") || har_1.hasHeader(headers, "Expires"));
+}
+exports.hasCacheIssue = hasCacheIssue;
+function hasCompressionIssue(entry, requestType) {
+    var headers = entry.response.headers;
+    return (!har_1.hasHeader(headers, "Content-Encoding") && isCompressible(entry, requestType));
+}
+exports.hasCompressionIssue = hasCompressionIssue;
+/** Checks if the ressource uses https */
+function isSecure(entry) {
+    return entry.request.url.indexOf("https://") === 0;
+}
+exports.isSecure = isSecure;
+function isPush(entry) {
+    function toInt(input) {
+        if (typeof input === "string") {
+            return parseInt(input, 10);
+        }
+        else {
+            return input;
+        }
+    }
+    return toInt(entry._was_pushed) === 1;
+}
+exports.isPush = isPush;
+/**
+ * Check if the document (disregarding any initial http->https redirects) is loaded over a secure connection.
+ * @param {Entry[]} data - the waterfall entries data.
+ * @returns {boolean}
+ */
+function documentIsSecure(data) {
+    var rootDocument = data.filter(function (e) { return !e.response.redirectURL; })[0];
+    return isSecure(rootDocument);
+}
+exports.documentIsSecure = documentIsSecure;
+
+},{"../helpers/har":2,"../helpers/heuristics":3,"../helpers/misc":5}],12:[function(require,module,exports){
+"use strict";
+var heuristics_1 = require("../helpers/heuristics");
 var misc_1 = require("../helpers/misc");
-function createWaterfallEntry(name, start, end, segments, rawResource, requestType) {
+var harHeuristics = require("./har-heuristics");
+function createWaterfallEntry(name, start, end, segments, rawResource, requestType, indicators) {
     if (segments === void 0) { segments = []; }
     var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
     return {
@@ -741,6 +769,7 @@ function createWaterfallEntry(name, start, end, segments, rawResource, requestTy
         segments: segments,
         rawResource: rawResource,
         requestType: requestType,
+        indicators: indicators,
     };
 }
 function createWaterfallEntryTiming(type, start, end) {
@@ -797,6 +826,55 @@ function mimeToRequestType(mimeType) {
         default: return "other";
     }
 }
+/** Scans `entry` for noteworthy issues or infos and highlights them */
+function collectIndicators(entry, docIsTLS, requestType) {
+    // const harEntry = entry;
+    var output = [];
+    if (harHeuristics.isPush(entry)) {
+        output.push({
+            description: "Response was pushed by the server using HTTP2 push.",
+            icon: "push",
+            id: "push",
+            title: "Response was pushed by the server",
+            type: "info",
+        });
+    }
+    if (docIsTLS && !harHeuristics.isSecure(entry)) {
+        output.push({
+            description: "Insecure request, it should use HTTPS.",
+            id: "noTls",
+            title: "Insecure Connection",
+            type: "error",
+        });
+    }
+    if (harHeuristics.hasCacheIssue(entry)) {
+        output.push({
+            description: "The response is not allow to be cached on the client. Consider setting 'Cache-Control' headers.",
+            id: "noCache",
+            title: "Response not cached",
+            type: "error",
+        });
+    }
+    if (harHeuristics.hasCompressionIssue(entry, requestType)) {
+        output.push({
+            description: "The response is not compressed. Consider enabling HTTP compression on your server.",
+            id: "noGzip",
+            title: "no gzip",
+            type: "error",
+        });
+    }
+    if (!entry.response.content.mimeType &&
+        heuristics_1.isInStatusCodeRange(entry, 200, 299) &&
+        entry.response.status !== 204) {
+        output.push({
+            description: "Response doesn't contain a 'Content-Type' header.",
+            id: "warning",
+            title: "No MIME Type defined",
+            type: "warning",
+        });
+    }
+    return output;
+}
 /**
  * Transforms the full HAR doc, including all pages
  * @param  {Har} harData - raw hhar object
@@ -835,13 +913,15 @@ function transformPage(harData, pageIndex) {
     var pageTimings = currPage.pageTimings;
     console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
     var doneTime = 0;
+    var isTLS = harHeuristics.documentIsSecure(data.entries);
     var entries = data.entries
         .filter(function (entry) { return entry.pageref === currPage.id; })
         .map(function (entry) {
         var startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
         doneTime = Math.max(doneTime, startRelative + entry.time);
         var requestType = mimeToRequestType(entry.response.content.mimeType);
-        return createWaterfallEntry(entry.request.url, startRelative, toInt(entry._all_end) || (startRelative + entry.time), buildDetailTimingBlocks(startRelative, entry), entry, requestType);
+        var issues = collectIndicators(entry, isTLS, requestType);
+        return createWaterfallEntry(entry.request.url, startRelative, toInt(entry._all_end) || (startRelative + entry.time), buildDetailTimingBlocks(startRelative, entry), entry, requestType, issues);
     });
     var marks = Object.keys(pageTimings)
         .filter(function (k) { return (typeof pageTimings[k] === "number" && pageTimings[k] >= 0); })
@@ -857,6 +937,7 @@ function transformPage(harData, pageIndex) {
     // Add 100ms margin to make room for labels
     doneTime += 100;
     return {
+        docIsTLS: isTLS,
         durationMs: doneTime,
         entries: entries,
         marks: marks,
@@ -923,7 +1004,7 @@ function getTimePair(key, harEntry, collect, startRelative) {
     };
 }
 
-},{"../helpers/misc":5}],12:[function(require,module,exports){
+},{"../helpers/heuristics":3,"../helpers/misc":5,"./har-heuristics":11}],13:[function(require,module,exports){
 "use strict";
 /**
  * Convert a RequestType into a CSS class
@@ -942,7 +1023,7 @@ function timingTypeToCssClass(timingType) {
 }
 exports.timingTypeToCssClass = timingTypeToCssClass;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 var har_1 = require("../../helpers/har");
 var parse_1 = require("../../helpers/parse");
@@ -970,7 +1051,7 @@ function parseGeneralDetails(entry, requestID) {
         ["IP", harEntry._ip_addr],
         ["Client Port", parse_1.parseAndFormat(harEntry._client_port, parse_1.parsePositive)],
         ["Expires", harEntry._expires],
-        ["Cache Time", parse_1.parseAndFormat(harEntry._cache_time, parse_1.parsePositive)],
+        ["Cache Time", parse_1.parseAndFormat(harEntry._cache_time, parse_1.parsePositive, parse_1.formatSeconds)],
         ["CDN Provider", harEntry._cdn_provider],
         byteSizeProperty("ObjectSize", harEntry._objectSize),
         byteSizeProperty("Bytes In (downloaded)", harEntry._bytesIn),
@@ -1047,7 +1128,7 @@ function parseResponseDetails(harEntry) {
         stringHeader("Connection"),
         stringHeader("ETag"),
         stringHeader("Accept-Patch"),
-        stringHeader("Age"),
+        ["Age", parse_1.parseAndFormat(har_1.getHeader(headers, "Age"), parse_1.parseNonNegative, parse_1.formatSeconds)],
         stringHeader("Allow"),
         stringHeader("Content-Disposition"),
         stringHeader("Location"),
@@ -1096,7 +1177,7 @@ function getKeys(requestID, entry) {
 }
 exports.getKeys = getKeys;
 
-},{"../../helpers/har":2,"../../helpers/parse":6}],14:[function(require,module,exports){
+},{"../../helpers/har":2,"../../helpers/parse":6}],15:[function(require,module,exports){
 "use strict";
 var extract_details_keys_1 = require("./extract-details-keys");
 function makeDefinitionList(dlKeyValues, addClass) {
@@ -1127,6 +1208,35 @@ function makeImgTab(accordionHeight, entry) {
     var imgTag = "<img class=\"preview\" style=\"max-height:" + (accordionHeight - 100) + "px\"\n                        data-src=\"" + entry.rawResource.request.url + "\" />";
     return makeTab(imgTag, false);
 }
+function makeGeneralTab(generalData, entry) {
+    var content = makeDefinitionList(generalData);
+    if (entry.indicators.length === 0) {
+        return makeTab(content, true);
+    }
+    var general = "<h2>General</h2>\n    <dl>" + content + "<dl>";
+    content = "";
+    // Make indicator sections
+    var errors = entry.indicators
+        .filter(function (i) { return i.type === "error"; })
+        .map(function (i) { return [i.title, i.description]; });
+    var warnings = entry.indicators
+        .filter(function (i) { return i.type === "warning"; })
+        .map(function (i) { return [i.title, i.description]; });
+    // all others
+    var info = entry.indicators
+        .filter(function (i) { return i.type !== "error" && i.type !== "warning"; })
+        .map(function (i) { return [i.title, i.description]; });
+    if (errors.length > 0) {
+        content += "<h2 class=\"no-boder\">Error" + (errors.length > 1 ? "s" : "") + "</h2>\n    <dl>" + makeDefinitionList(errors) + "</dl>";
+    }
+    if (warnings.length > 0) {
+        content += "<h2 class=\"no-boder\">Warning" + (warnings.length > 1 ? "s" : "") + "</h2>\n    <dl>" + makeDefinitionList(warnings) + "</dl>";
+    }
+    if (info.length > 0) {
+        content += "<h2 class=\"no-boder\">Info</h2>\n    <dl>" + makeDefinitionList(info) + "</dl>";
+    }
+    return makeTab(content + general, false);
+}
 function makeTabBtn(name, tab) {
     return !!tab ? "<li><button class=\"tab-button\">" + name + "</button></li>" : "";
 }
@@ -1136,7 +1246,7 @@ function createDetailsBody(requestID, entry, accordeonHeight) {
     body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
     var tabsData = extract_details_keys_1.getKeys(requestID, entry);
-    var generalTab = makeTab(makeDefinitionList(tabsData.general));
+    var generalTab = makeGeneralTab(tabsData.general, entry);
     var timingsTab = makeTab(makeDefinitionList(tabsData.timings, true));
     var requestDl = makeDefinitionList(tabsData.request);
     var requestHeadersDl = makeDefinitionList(tabsData.requestHeaders);
@@ -1149,7 +1259,7 @@ function createDetailsBody(requestID, entry, accordeonHeight) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":13}],15:[function(require,module,exports){
+},{"./extract-details-keys":14}],16:[function(require,module,exports){
 "use strict";
 var dom_1 = require("../../helpers/dom");
 var svg_details_overlay_1 = require("./svg-details-overlay");
@@ -1274,7 +1384,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = OverlayManager;
 ;
 
-},{"../../helpers/dom":1,"./svg-details-overlay":17}],16:[function(require,module,exports){
+},{"../../helpers/dom":1,"./svg-details-overlay":18}],17:[function(require,module,exports){
 "use strict";
 var PubSub = (function () {
     function PubSub() {
@@ -1292,7 +1402,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = PubSub;
 ;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var html_details_body_1 = require("./html-details-body");
@@ -1364,12 +1474,12 @@ function createRowInfoOverlay(overlay, y, accordionHeight) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/svg":7,"./html-details-body":14}],18:[function(require,module,exports){
+},{"../../helpers/svg":7,"./html-details-body":15}],19:[function(require,module,exports){
 /**
  * Creation of sub-components used in a resource request row
  */
 "use strict";
-var heuristics = require("../../helpers/heuristics");
+var heuristics_1 = require("../../helpers/heuristics");
 // helper to avoid typing out all key of the helper object
 function makeIcon(type, title) {
     return { "type": type, "title": title, "width": 20 };
@@ -1386,10 +1496,10 @@ function getMimeTypeIcon(entry) {
         var url = encodeURI(harEntry.response.redirectURL.split("?")[0] || "");
         return makeIcon("err3xx", harEntry.response.status + " response status: Redirect to " + url + "...");
     }
-    else if (heuristics.isInStatusCodeRange(harEntry, 400, 499)) {
+    else if (heuristics_1.isInStatusCodeRange(harEntry, 400, 499)) {
         return makeIcon("err4xx", harEntry.response.status + " response status: " + harEntry.response.statusText);
     }
-    else if (heuristics.isInStatusCodeRange(harEntry, 500, 599)) {
+    else if (heuristics_1.isInStatusCodeRange(harEntry, 500, 599)) {
         return makeIcon("err5xx", harEntry.response.status + " response status: " + harEntry.response.statusText);
     }
     else if (harEntry.response.status === 204) {
@@ -1401,34 +1511,41 @@ function getMimeTypeIcon(entry) {
 }
 exports.getMimeTypeIcon = getMimeTypeIcon;
 /**
- * Scan the request for errors or portential issues and highlight them
+ * Gets the Indicators in Icon format
  * @param  {WaterfallEntry} entry
- * @param  {boolean} docIsSsl
  * @returns {Icon[]}
  */
-function getIndicatorIcons(entry, docIsSsl) {
-    var harEntry = entry.rawResource;
-    var output = [];
-    if (heuristics.isPush(entry)) {
-        output.push(makeIcon("push", "Response was pushed by the server"));
+function getIndicatorIcons(entry) {
+    if (entry.indicators.length === 0) {
+        return [];
     }
-    if (docIsSsl && !heuristics.isSecure(entry)) {
-        output.push(makeIcon("noTls", "Insecure Connection"));
+    var combinedTitle = [];
+    var icon = "";
+    var errors = entry.indicators.filter(function (i) { return i.type === "error"; });
+    var warnings = entry.indicators.filter(function (i) { return i.type === "warning"; });
+    var info = entry.indicators.filter(function (i) { return i.type !== "error" && i.type !== "warning"; });
+    if (errors.length > 0) {
+        combinedTitle.push("Error" + (errors.length > 1 ? "s" : "") + ":\n" + errors.map(function (e) { return e.title; }).join("\n"));
+        icon = "error";
     }
-    if (heuristics.hasCacheIssue(entry)) {
-        output.push(makeIcon("noCache", "Response not cached"));
+    if (warnings.length > 0) {
+        combinedTitle.push("Warning" + (warnings.length > 1 ? "s" : "") + ":\n" + warnings.map(function (w) { return w.title; }).join("\n"));
+        icon = icon || "warning";
     }
-    if (heuristics.hasCompressionIssue(entry)) {
-        output.push(makeIcon("noGzip", "no gzip"));
+    if (info.length > 0) {
+        combinedTitle.push("Info:\n" + info.map(function (i) { return i.title; }).join("\n"));
+        if (!icon && info.length === 1) {
+            icon = info[0].icon || info[0].type;
+        }
+        else {
+            icon = icon || "info";
+        }
     }
-    if (!harEntry.response.content.mimeType && heuristics.isInStatusCodeRange(harEntry, 200, 299)) {
-        output.push(makeIcon("warning", "No MIME Type defined"));
-    }
-    return output;
+    return [makeIcon(icon, combinedTitle.join("\n"))];
 }
 exports.getIndicatorIcons = getIndicatorIcons;
 
-},{"../../helpers/heuristics":3}],19:[function(require,module,exports){
+},{"../../helpers/heuristics":3}],20:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1660,7 +1777,7 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":12}],20:[function(require,module,exports){
+},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":13}],21:[function(require,module,exports){
 "use strict";
 var heuristics_1 = require("../../helpers/heuristics");
 var icons = require("../../helpers/icons");
@@ -1716,7 +1833,7 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
     }
     if (context.options.showIndicatorIcons) {
         // Create and add warnings for potential issues
-        indicators.getIndicatorIcons(entry, context.docIsSsl).forEach(function (icon) {
+        indicators.getIndicatorIcons(entry).forEach(function (icon) {
             x -= icon.width;
             rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
         });
@@ -1742,7 +1859,7 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":3,"../../helpers/icons":4,"../../helpers/misc":5,"../../helpers/svg":7,"./svg-indicators":18,"./svg-row-subcomponents":19}],21:[function(require,module,exports){
+},{"../../helpers/heuristics":3,"../../helpers/icons":4,"../../helpers/misc":5,"../../helpers/svg":7,"./svg-indicators":19,"./svg-row-subcomponents":20}],22:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  */
@@ -1803,7 +1920,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/dom":1,"../../helpers/svg":7}],22:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":7}],23:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -1893,7 +2010,7 @@ function createBgRect(context, entry) {
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":12}],23:[function(require,module,exports){
+},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":13}],24:[function(require,module,exports){
 "use strict";
 var dom_1 = require("../../helpers/dom");
 var misc_1 = require("../../helpers/misc");
@@ -1968,9 +2085,8 @@ function createMarks(context, marks) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/dom":1,"../../helpers/misc":5,"../../helpers/svg":7}],24:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/misc":5,"../../helpers/svg":7}],25:[function(require,module,exports){
 "use strict";
-var heuristics_1 = require("../helpers/heuristics");
 var svg = require("../helpers/svg");
 var styling_converters_1 = require("../transformers/styling-converters");
 var overlay_manager_1 = require("./details-overlay/overlay-manager");
@@ -2017,14 +2133,12 @@ function getSvgHeight(marks, diagramHeight) {
 function createContext(data, options, entriesToShow, overlayHolder) {
     var unit = data.durationMs / 100;
     var diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
-    var docIsSsl = heuristics_1.documentIsSecure(data);
     var context = {
         diagramHeight: diagramHeight,
         overlayManager: undefined,
         pubSub: new pub_sub_1.default(),
         unit: unit,
         options: options,
-        docIsSsl: docIsSsl,
     };
     // `overlayManager` needs the `context` reference, so it's attached later
     context.overlayManager = new overlay_manager_1.default(context, overlayHolder);
@@ -2081,7 +2195,7 @@ function createWaterfallSvg(data, options) {
     }
     if (options.showIndicatorIcons) {
         var iconsPerBlock = entriesToShow.map(function (entry) {
-            return indicators.getIndicatorIcons(entry, context.docIsSsl).length;
+            return entry.indicators.length > 0 ? 1 : 0;
         });
         maxIcons += Math.max.apply(null, iconsPerBlock);
     }
@@ -2131,5 +2245,5 @@ function createWaterfallSvg(data, options) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/heuristics":3,"../helpers/svg":7,"../transformers/styling-converters":12,"./details-overlay/overlay-manager":15,"./details-overlay/pub-sub":16,"./row/svg-indicators":18,"./row/svg-row":20,"./sub-components/svg-alignment-helper":21,"./sub-components/svg-general-components":22,"./sub-components/svg-marks":23}]},{},[9])(9)
+},{"../helpers/svg":7,"../transformers/styling-converters":13,"./details-overlay/overlay-manager":16,"./details-overlay/pub-sub":17,"./row/svg-indicators":19,"./row/svg-row":21,"./sub-components/svg-alignment-helper":22,"./sub-components/svg-general-components":23,"./sub-components/svg-marks":24}]},{},[9])(9)
 });
