@@ -1,3 +1,4 @@
+import { isInStatusCodeRange } from "../helpers/heuristics";
 import { roundNumber } from "../helpers/misc";
 import { Entry, Har, PageTimings } from "../typing/har";
 import {
@@ -7,15 +8,18 @@ import {
   WaterfallData,
   WaterfallDocs,
   WaterfallEntry,
+  WaterfallEntryIndicator,
   WaterfallEntryTiming,
 } from "../typing/waterfall";
+import * as harHeuristics from "./har-heuristics";
 
 function createWaterfallEntry(name: string,
                               start: number,
                               end: number,
                               segments: WaterfallEntryTiming[] = [],
                               rawResource: Entry,
-                              requestType: RequestType): WaterfallEntry {
+                              requestType: RequestType,
+                              indicators: WaterfallEntryIndicator[]): WaterfallEntry {
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   return {
     total,
@@ -25,6 +29,7 @@ function createWaterfallEntry(name: string,
     segments,
     rawResource,
     requestType,
+    indicators,
   };
 }
 
@@ -86,6 +91,62 @@ function mimeToRequestType(mimeType: string): RequestType {
   }
 }
 
+/** Scans `entry` for noteworthy issues or infos and highlights them */
+function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: RequestType) {
+  // const harEntry = entry;
+  let output: WaterfallEntryIndicator[] = [];
+
+  if (harHeuristics.isPush(entry)) {
+    output.push({
+      description: "Response was pushed by the server using HTTP2 push.",
+      icon: "push",
+      id: "push",
+      title: "Response was pushed by the server",
+      type: "info",
+    });
+  }
+
+  if (docIsTLS && !harHeuristics.isSecure(entry)) {
+    output.push({
+      description: "Insecure request, it should use HTTPS.",
+      id: "noTls",
+      title: "Insecure Connection",
+      type: "error",
+    });
+  }
+
+  if (harHeuristics.hasCacheIssue(entry)) {
+    output.push({
+      description: "The response is not allow to be cached on the client. Consider setting 'Cache-Control' headers.",
+      id: "noCache",
+      title: "Response not cached",
+      type: "error",
+    });
+  }
+
+  if (harHeuristics.hasCompressionIssue(entry, requestType)) {
+    output.push({
+      description: "The response is not compressed. Consider enabling HTTP compression on your server.",
+      id: "noGzip",
+      title: "no gzip",
+      type: "error",
+    });
+  }
+
+  if (!entry.response.content.mimeType &&
+      isInStatusCodeRange(entry, 200, 299) &&
+    entry.response.status !== 204) {
+    output.push({
+      description: "Response doesn't contain a 'Content-Type' header.",
+      id: "warning",
+      title: "No MIME Type defined",
+      type: "warning",
+    });
+  }
+
+  return output;
+}
+
 /**
  * Transforms the full HAR doc, including all pages
  * @param  {Har} harData - raw hhar object
@@ -100,6 +161,7 @@ export function transformDoc(harData: Har): WaterfallDocs {
     pages: data.pages.map((_page, i) => this.transformPage(data, i)),
   };
 }
+
 /**
  * Transforms a HAR object into the format needed to render the PerfCascade
  * @param  {Har} harData - HAR document
@@ -125,6 +187,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
 
   let doneTime = 0;
+  const isTLS = harHeuristics.documentIsSecure(data.entries);
   const entries = data.entries
     .filter((entry) => entry.pageref === currPage.id)
     .map((entry) => {
@@ -133,12 +196,14 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
       doneTime = Math.max(doneTime, startRelative + entry.time);
 
       const requestType = mimeToRequestType(entry.response.content.mimeType);
+      const issues = collectIndicators(entry, isTLS, requestType);
       return createWaterfallEntry(entry.request.url,
         startRelative,
         toInt(entry._all_end) || (startRelative + entry.time),
         buildDetailTimingBlocks(startRelative, entry),
         entry,
         requestType,
+        issues,
       );
     });
 
@@ -160,6 +225,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   doneTime += 100;
 
   return {
+    docIsTLS: isTLS,
     durationMs: doneTime,
     entries,
     marks,
@@ -177,7 +243,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
 function buildDetailTimingBlocks(startRelative: number, harEntry: Entry): WaterfallEntryTiming[] {
   let t = harEntry.timings;
   return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[],
-                                                                          key: TimingType) => {
+    key: TimingType) => {
 
     const time = getTimePair(key, harEntry, collect, startRelative);
 

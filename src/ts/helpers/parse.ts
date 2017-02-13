@@ -22,6 +22,7 @@ export function parseAndFormat<S, T>(input?: S,
   return formatFn(parsed);
 }
 
+/** Fallback dummy function - just maintains the type */
 function identity<T>(source: T): T {
   return source;
 }

@@ -66,7 +66,7 @@ export function createRow(context: Context, index: number,
 
   if (context.options.showIndicatorIcons) {
     // Create and add warnings for potential issues
-    indicators.getIndicatorIcons(entry, context.docIsSsl).forEach((icon: indicators.Icon) => {
+    indicators.getIndicatorIcons(entry).forEach((icon: indicators.Icon) => {
       x -= icon.width;
       rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
     });

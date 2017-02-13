@@ -2,8 +2,8 @@
  * Creation of sub-components used in a resource request row
  */
 
-import * as heuristics from "../../helpers/heuristics";
-import {WaterfallEntry} from "../../typing/waterfall";
+import { isInStatusCodeRange } from "../../helpers/heuristics";
+import { WaterfallEntry } from "../../typing/waterfall";
 
 /**
  * Interface for `Icon` metadata
@@ -30,9 +30,9 @@ export function getMimeTypeIcon(entry: WaterfallEntry): Icon {
   if (!!harEntry.response.redirectURL) {
     const url = encodeURI(harEntry.response.redirectURL.split("?")[0] || "");
     return makeIcon("err3xx", `${harEntry.response.status} response status: Redirect to ${url}...`);
-  } else if (heuristics.isInStatusCodeRange(harEntry, 400, 499)) {
+  } else if (isInStatusCodeRange(harEntry, 400, 499)) {
     return makeIcon("err4xx", `${harEntry.response.status} response status: ${harEntry.response.statusText}`);
-  } else if (heuristics.isInStatusCodeRange(harEntry, 500, 599)) {
+  } else if (isInStatusCodeRange(harEntry, 500, 599)) {
     return makeIcon("err5xx", `${harEntry.response.status} response status: ${harEntry.response.statusText}`);
   } else if (harEntry.response.status === 204) {
     return makeIcon("plain", "No content");
@@ -40,37 +40,38 @@ export function getMimeTypeIcon(entry: WaterfallEntry): Icon {
     return makeIcon(entry.requestType, entry.requestType);
   }
 }
-  /**
-   * Scan the request for errors or portential issues and highlight them
-   * @param  {WaterfallEntry} entry
-   * @param  {boolean} docIsSsl
-   * @returns {Icon[]}
-   */
-  export function getIndicatorIcons(entry: WaterfallEntry, docIsSsl: boolean): Icon[] {
-  const harEntry = entry.rawResource;
-  let output = [];
-
-  if (heuristics.isPush(entry)) {
-    output.push(makeIcon("push", "Response was pushed by the server"));
+/**
+ * Gets the Indicators in Icon format
+ * @param  {WaterfallEntry} entry
+ * @returns {Icon[]}
+ */
+export function getIndicatorIcons(entry: WaterfallEntry): Icon[] {
+  if (entry.indicators.length === 0) {
+    return [];
   }
 
-  if (docIsSsl && !heuristics.isSecure(entry)) {
-    output.push(makeIcon("noTls", "Insecure Connection"));
+  let combinedTitle = [];
+  let icon = "";
+  const errors = entry.indicators.filter((i) => i.type === "error");
+  const warnings = entry.indicators.filter((i) => i.type === "warning");
+  const info = entry.indicators.filter((i) => i.type !== "error" && i.type !== "warning");
+
+  if (errors.length > 0) {
+    combinedTitle.push(`Error${errors.length > 1 ? "s" : ""}:\n${errors.map((e) => e.title).join("\n")}`);
+    icon = "error";
+  }
+  if (warnings.length > 0) {
+    combinedTitle.push(`Warning${warnings.length > 1 ? "s" : ""}:\n${warnings.map((w) => w.title).join("\n")}`);
+    icon = icon || "warning";
+  }
+  if (info.length > 0) {
+    combinedTitle.push(`Info:\n${info.map((i) => i.title).join("\n")}`);
+    if (!icon && info.length === 1) {
+      icon = info[0].icon || info[0].type;
+    } else {
+      icon = icon || "info";
+    }
   }
 
-  if (heuristics.hasCacheIssue(entry)) {
-    output.push(makeIcon("noCache", "Response not cached"));
-  }
-
-  if (heuristics.hasCompressionIssue(entry)) {
-    output.push(makeIcon("noGzip", "no gzip"));
-  }
-
-  if (!harEntry.response.content.mimeType &&
-    heuristics.isInStatusCodeRange(harEntry, 200, 299) &&
-    harEntry.response.status !== 204) {
-    output.push(makeIcon("warning", "No MIME Type defined"));
-  }
-
-  return output;
+  return [makeIcon(icon, combinedTitle.join("\n"))];
 }

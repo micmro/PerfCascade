@@ -1,4 +1,3 @@
-import {documentIsSecure} from "../helpers/heuristics";
 import * as svg from "../helpers/svg";
 import {requestTypeToCssClass} from "../transformers/styling-converters";
 import {Context} from "../typing/context";
@@ -56,7 +55,6 @@ function createContext(data: WaterfallData, options: ChartOptions,
                        entriesToShow: WaterfallEntry[], overlayHolder: SVGGElement): Context {
   const unit = data.durationMs / 100;
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
-  const docIsSsl = documentIsSecure(data);
 
   let context = {
     diagramHeight,
@@ -64,7 +62,6 @@ function createContext(data: WaterfallData, options: ChartOptions,
     pubSub : new PubSub(),
     unit,
     options,
-    docIsSsl,
   };
   // `overlayManager` needs the `context` reference, so it's attached later
   context.overlayManager = new OverlayManager(context, overlayHolder);
@@ -136,7 +133,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
 
   if (options.showIndicatorIcons) {
     const iconsPerBlock = entriesToShow.map((entry: WaterfallEntry) =>
-      indicators.getIndicatorIcons(entry, context.docIsSsl).length);
+      entry.indicators.length > 0 ? 1 : 0);
     maxIcons += Math.max.apply(null, iconsPerBlock);
   }
 
