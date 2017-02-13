@@ -2,6 +2,20 @@
 
 
 
+<a name="v0.4.0"></a>
+# v0.4.0 (2017-02-13)
+
+* #145 Add warnings and infos to general Tab and #129 show only the highest pritority icon ([08f2cd2](https://github.com/micmro/PerfCascade/commit/08f2cd2))
+* #146 Don’t format small sizes as kB. ([4ba02a9](https://github.com/micmro/PerfCascade/commit/4ba02a9))
+* #87 add new (unmodified) HARs to dev preview ([bfceec4](https://github.com/micmro/PerfCascade/commit/bfceec4))
+* #87 add new sample HAR files ([7d4c8ed](https://github.com/micmro/PerfCascade/commit/7d4c8ed))
+* #87 update example ([c1d9cef](https://github.com/micmro/PerfCascade/commit/c1d9cef))
+* Don’t warn about missing MIME for 204 responses. ([0a5eb99](https://github.com/micmro/PerfCascade/commit/0a5eb99))
+* ensure travis runs lint task ([41ad42f](https://github.com/micmro/PerfCascade/commit/41ad42f))
+* Show long cache values as days/hours/minutes. (#144) ([606eb0e](https://github.com/micmro/PerfCascade/commit/606eb0e))
+
+
+
 <a name="v0.3.9"></a>
 ## v0.3.9 (2017-02-10)
 
