@@ -3,10 +3,10 @@ Extensible waterfall-viewer that works with [HAR](http://www.softwareishard.com/
 
 [![Build status][travis-image]][travis-url]
 
-Install via `npm install perf-cascade`  
+Install via `npm install perf-cascade`
 Live example at: https://micmro.github.io/PerfCascade/
 
-![example screenshot](https://raw.githubusercontent.com/micmro/PerfCascade/gh-pages/img/PerfCascade-sample1.png)
+![example screenshot](https://raw.githubusercontent.com/micmro/PerfCascade/gh-pages/img/PerfCascade-sample2.png)
 
 ## How to use PerfCascade
 PerfCascade is exported with [UMD](https://github.com/umdjs/umd), so you can use it as global object, via AMD (e.g. requireJS) or commonJS (internally it uses ES6 modules).
