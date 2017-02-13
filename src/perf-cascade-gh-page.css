@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.3.9 (11/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.4.0 (13/02/2017) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -873,6 +873,7 @@ svg.water-fall-chart {width:100%; overflow: visible;}
 
 .info-overlay-holder .tab {float: left; width:100%; height: 350px; padding:12px 12px 24px;}
 .info-overlay-holder .tab h2 {font-size: 1.2em; margin:0.5em 0 0; padding: 0.5em 0 0.5em 1em; clear: both; border-top: solid 1px #efefef;}
+.info-overlay-holder .tab h2:first-child {border-top: 0; padding-top: 0;}
 .info-overlay-holder .tab pre {overflow-y: hidden;}
 .info-overlay-holder .tab .preview {width: auto; max-width: 100%; max-height: 500px; border: solid 1px #666;}
 .info-overlay-holder .tab dl:after {content: ""; display: table; clear: both;}
