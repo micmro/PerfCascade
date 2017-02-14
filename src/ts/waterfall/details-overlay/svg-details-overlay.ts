@@ -16,7 +16,7 @@ function createCloseButtonSvg(y: number): SVGGElement {
     "y": y,
   }));
 
-  closeBtn.appendChild(svg.newTextEl("X", {
+  closeBtn.appendChild(svg.newTextEl("✕", {
     dx: 7,
     dy: 16,
     x: "100%",
