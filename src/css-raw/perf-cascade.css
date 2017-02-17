@@ -27,6 +27,7 @@
 .time-scale line.sub-second-line {stroke: #ccc; opacity: 0.75; stroke-width:0.50;}
 .time-scale text {font-weight:bold;}
 
+.row-item {cursor: pointer}
 .row-item .even {fill: #ccc; opacity: 0.05;}
 .row-item .odd {fill: #000; opacity: 0.05;}
 .row-item:hover .odd,
@@ -126,9 +127,15 @@
 .info-overlay-holder body .wrapper { height: 450px; width: 100%; overflow: scroll;}
 
 /* Info overlay HTML - header */
-.info-overlay-holder header {position: relative; color: #fff; box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.25);}
+.info-overlay-holder header {position: relative; box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.25);}
+.info-overlay-holder header,
+.info-overlay-holder header a,
+.info-overlay-holder header button {color: #fff; text-decoration: none;}
+.info-overlay-holder header a:hover,
+.info-overlay-holder header a:focus {text-decoration: underline;}
 .info-overlay-holder .requestID {font-weight: bold;}
-.info-overlay-holder h3 {font-size: 1.1em; padding: 1em; margin:0; font-weight: normal;}
+.info-overlay-holder h3,
+.info-overlay-holder h3 a {font-size: 1.1em; padding: 1em; margin:0; font-weight: normal;}
 .info-overlay-holder h3 strong {font-size: 1.1em;}
 .info-overlay-holder .tab-nav ul {margin: 0; padding: 0;}
 .info-overlay-holder .tab-nav li {margin: 0; padding: 0; display: inline-block;}

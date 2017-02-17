@@ -20,11 +20,19 @@ export interface Mark extends UserTiming {
 /** Representation of one loaded resource  */
 export interface WaterfallEntry {
   total: number;
+  /** name of the entry - usually the URL */
   name: string;
+  /** URL of the resource entry */
+  url: string;
+  /** Start time in ms - relative to initial document request */
   start: number;
+  /** End time in ms - relative to initial document request */
   end: number;
+  /** time segments (dns, tls/ssl, connect...) */
   segments: WaterfallEntryTiming[];
+  /** raw e.g. HAR entry */
   rawResource: Entry;
+  /** media type category */
   requestType: RequestType;
   /** Warnings, Errors and Info indicators  */
   indicators: WaterfallEntryIndicator[];
@@ -46,10 +54,14 @@ export interface WaterfallEntryIndicator {
   type: IndicatorType;
 }
 
+/** Time segment of an `WaterfallEntry` */
 export interface WaterfallEntryTiming {
+  /** total duration in ms */
   total: number;
   type: TimingType;
+  /** start time in ms - relative to initial document request */
   start: number;
+  /** end time in ms - relative to initial document request */
   end: number;
 }
 
