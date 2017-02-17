@@ -128,7 +128,7 @@ export function createDetailsBody(requestID: number, entry: WaterfallEntry, acco
         </dl>
       </div>
       ${timingsTab}
-      <div class="tab">
+      <div class="tab raw-data">
         <pre><code>${JSON.stringify(entry.rawResource, null, 2)}</code></pre>
       </div>
       ${imgTab}
