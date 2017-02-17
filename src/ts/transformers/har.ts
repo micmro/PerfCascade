@@ -23,7 +23,6 @@ function createWaterfallEntry(url: string,
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   return {
     total,
-    "name": url,
     url,
     start,
     end,

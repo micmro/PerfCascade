@@ -96,7 +96,7 @@ export function createDetailsBody(requestID: number, entry: WaterfallEntry, acco
   body.innerHTML = `
     <div class="wrapper">
       <header class="type-${entry.requestType}">
-        <h3><strong>#${requestID}</strong> <a href="${entry.url}">${entry.name}</a></h3>
+        <h3><strong>#${requestID}</strong> <a href="${entry.url}">${entry.url}</a></h3>
         <nav class="tab-nav">
         <ul>
           ${makeTabBtn("General", generalTab)}
