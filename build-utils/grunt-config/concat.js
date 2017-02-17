@@ -3,7 +3,7 @@ module.exports = {
     banner: "<%= banner %>"
   },
   demoCss: {
-    src: ["src/css-raw/normalize.css", "src/css-raw/page.css", "src/css-raw/perf-cascade.css"],
+    src: ["src/css-raw/page.css", "src/css-raw/perf-cascade.css"],
     dest: "build/stage/perf-cascade-demo.css",
   },
   mainCss: {
