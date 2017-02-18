@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.4.0 (13/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.5.0 (18/02/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -758,12 +758,12 @@ exports.documentIsSecure = documentIsSecure;
 var heuristics_1 = require("../helpers/heuristics");
 var misc_1 = require("../helpers/misc");
 var harHeuristics = require("./har-heuristics");
-function createWaterfallEntry(name, start, end, segments, rawResource, requestType, indicators) {
+function createWaterfallEntry(url, start, end, segments, rawResource, requestType, indicators) {
     if (segments === void 0) { segments = []; }
     var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
     return {
         total: total,
-        name: name,
+        url: url,
         start: start,
         end: end,
         segments: segments,
@@ -1205,7 +1205,7 @@ function makeImgTab(accordionHeight, entry) {
     if (entry.requestType !== "image") {
         return "";
     }
-    var imgTag = "<img class=\"preview\" style=\"max-height:" + (accordionHeight - 100) + "px\"\n                        data-src=\"" + entry.rawResource.request.url + "\" />";
+    var imgTag = "<img class=\"preview\" style=\"max-height:" + (accordionHeight - 100) + "px\"\n                        data-src=\"" + entry.url + "\" />";
     return makeTab(imgTag, false);
 }
 function makeGeneralTab(generalData, entry) {
@@ -1253,7 +1253,7 @@ function createDetailsBody(requestID, entry, accordeonHeight) {
     var responseDl = makeDefinitionList(tabsData.response);
     var responseHeadersDl = makeDefinitionList(tabsData.responseHeaders);
     var imgTab = makeImgTab(accordeonHeight, entry);
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> " + entry.name + "</h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n          " + makeTabBtn("Preview", imgTab) + "\n        </ul>\n        </nav>\n      </header>\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab\">\n        <pre><code>" + JSON.stringify(entry.rawResource, null, 2) + "</code></pre>\n      </div>\n      " + imgTab + "\n    </div>\n    ";
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> <a href=\"" + entry.url + "\">" + entry.url + "</a></h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n          " + makeTabBtn("Preview", imgTab) + "\n        </ul>\n        </nav>\n      </header>\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab raw-data\">\n        <pre><code>" + JSON.stringify(entry.rawResource, null, 2) + "</code></pre>\n      </div>\n      " + imgTab + "\n    </div>\n    ";
     html.appendChild(body);
     return html;
 }
@@ -1418,7 +1418,7 @@ function createCloseButtonSvg(y) {
         "x": "100%",
         "y": y,
     }));
-    closeBtn.appendChild(svg.newTextEl("X", {
+    closeBtn.appendChild(svg.newTextEl("✕", {
         dx: 7,
         dy: 16,
         x: "100%",
@@ -1844,8 +1844,8 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
     var requestNumberLabel = rowSubComponents.createRequestNumberLabel(x, y, requestNumber, rowHeight, maxNumberWidth);
     // 4 is slightly bigger than the hover "glow" around the url
     x += maxNumberWidth + 4;
-    var shortLabel = rowSubComponents.createRequestLabelClipped(x, y, misc.resourceUrlFormatter(entry.name, 40), rowHeight);
-    var fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.name, rowHeight);
+    var shortLabel = rowSubComponents.createRequestLabelClipped(x, y, misc.resourceUrlFormatter(entry.url, 40), rowHeight);
+    var fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.url, rowHeight);
     // create and attach request block
     rowBar.appendChild(rect);
     rowSubComponents.appendRequestLabels(rowName, requestNumberLabel, shortLabel, fullLabel);
@@ -2005,7 +2005,7 @@ function createBgRect(context, entry) {
         "x": ((entry.start || 0.001) / context.unit) + "%",
         "y": 0,
     }, styling_converters_1.requestTypeToCssClass(entry.requestType));
-    rect.appendChild(svg.newTitle(entry.name)); // Add tile to wedge path
+    rect.appendChild(svg.newTitle(entry.url)); // Add tile to wedge path
     return rect;
 }
 exports.createBgRect = createBgRect;
@@ -2219,7 +2219,7 @@ function createWaterfallSvg(data, options) {
             "cssClass": styling_converters_1.requestTypeToCssClass(entry.requestType),
             "height": options.rowHeight,
             "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-            "label": entry.name + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
+            "label": entry.url + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
             "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
             "unit": context.unit,
             "width": entryWidth,
