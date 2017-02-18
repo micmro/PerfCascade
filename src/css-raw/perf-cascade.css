@@ -1,4 +1,4 @@
-.water-fall-chart {width:100%; overflow: visible; font-size: 12px; line-height: 1em;}
+.water-fall-chart {width:100%; overflow: visible; font-size: 12px; line-height: 1em;font-family: sans-serif;}
 .water-fall-chart * {box-sizing: border-box;}
 .water-fall-chart button {cursor: pointer;}
 
@@ -160,7 +160,7 @@
 .info-overlay-holder .tab.raw-data pre {padding:12px 12px 24px;}
 
 /** Legend */
-.resource-legend { margin: 0; padding: 0; font-size: 0.75em; line-height: 1.5em; display: inline-block;}
+.resource-legend { margin: 0; padding: 0; font-size: 0.75em; line-height: 1.5em; display: inline-block;font-family: sans-serif;}
 .resource-legend li {margin: 0 1em 0 0; padding: 0; white-space: nowrap; display: inline-block;}
 .resource-legend li:before {content:''; width: 1em; height: 1em; margin: 0 0.5em 0 0; vertical-align: text-top; display: inline-block; }
 
