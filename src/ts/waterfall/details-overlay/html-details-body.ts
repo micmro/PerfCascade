@@ -1,5 +1,5 @@
-import {WaterfallEntry} from "../../typing/waterfall";
-import {getKeys, KvTuple} from "./extract-details-keys";
+import { WaterfallEntry } from "../../typing/waterfall";
+import { getKeys, KvTuple } from "./extract-details-keys";
 
 function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
   let makeClass = (key: string) => {
@@ -76,6 +76,15 @@ function makeTabBtn(name: string, tab: string) {
   return !!tab ? `<li><button class="tab-button">${name}</button></li>` : "";
 }
 
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export function createDetailsBody(requestID: number, entry: WaterfallEntry, accordeonHeight: number) {
 
   let html = document.createElement("html") as HTMLHtmlElement;
@@ -129,7 +138,7 @@ export function createDetailsBody(requestID: number, entry: WaterfallEntry, acco
       </div>
       ${timingsTab}
       <div class="tab raw-data">
-        <pre><code>${JSON.stringify(entry.rawResource, null, 2)}</code></pre>
+        <pre><code>${escapeHtml(JSON.stringify(entry.rawResource, null, 2))}</code></pre>
       </div>
       ${imgTab}
     </div>
