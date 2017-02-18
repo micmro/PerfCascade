@@ -13,7 +13,7 @@ import {
 } from "../typing/waterfall";
 import * as harHeuristics from "./har-heuristics";
 
-function createWaterfallEntry(name: string,
+function createWaterfallEntry(url: string,
                               start: number,
                               end: number,
                               segments: WaterfallEntryTiming[] = [],
@@ -23,7 +23,7 @@ function createWaterfallEntry(name: string,
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   return {
     total,
-    name,
+    url,
     start,
     end,
     segments,

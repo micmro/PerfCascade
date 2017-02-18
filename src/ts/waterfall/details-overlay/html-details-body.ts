@@ -32,7 +32,7 @@ function makeImgTab(accordionHeight: number, entry: WaterfallEntry) {
     return "";
   }
   const imgTag = `<img class="preview" style="max-height:${(accordionHeight - 100)}px"
-                        data-src="${entry.rawResource.request.url}" />`;
+                        data-src="${entry.url}" />`;
   return makeTab(imgTag, false);
 }
 
@@ -96,7 +96,7 @@ export function createDetailsBody(requestID: number, entry: WaterfallEntry, acco
   body.innerHTML = `
     <div class="wrapper">
       <header class="type-${entry.requestType}">
-        <h3><strong>#${requestID}</strong> ${entry.name}</h3>
+        <h3><strong>#${requestID}</strong> <a href="${entry.url}">${entry.url}</a></h3>
         <nav class="tab-nav">
         <ul>
           ${makeTabBtn("General", generalTab)}
@@ -128,7 +128,7 @@ export function createDetailsBody(requestID: number, entry: WaterfallEntry, acco
         </dl>
       </div>
       ${timingsTab}
-      <div class="tab">
+      <div class="tab raw-data">
         <pre><code>${JSON.stringify(entry.rawResource, null, 2)}</code></pre>
       </div>
       ${imgTab}

@@ -95,7 +95,7 @@ export function createBgRect(context: Context, entry: WaterfallEntry): SVGRectEl
     "y": 0,
   }, requestTypeToCssClass(entry.requestType));
 
-  rect.appendChild(svg.newTitle(entry.name)); // Add tile to wedge path
+  rect.appendChild(svg.newTitle(entry.url)); // Add tile to wedge path
 
   return rect;
 }

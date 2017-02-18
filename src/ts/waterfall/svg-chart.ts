@@ -162,7 +162,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
       "cssClass": requestTypeToCssClass(entry.requestType),
       "height": options.rowHeight,
       "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-      "label": entry.name + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
+      "label": entry.url + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
       "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
       "unit": context.unit,
       "width": entryWidth,

@@ -80,9 +80,9 @@ export function createRow(context: Context, index: number,
   const requestNumberLabel = rowSubComponents.createRequestNumberLabel(x, y, requestNumber, rowHeight, maxNumberWidth);
   // 4 is slightly bigger than the hover "glow" around the url
   x += maxNumberWidth + 4;
-  let shortLabel = rowSubComponents.createRequestLabelClipped(x, y, misc.resourceUrlFormatter(entry.name, 40),
+  let shortLabel = rowSubComponents.createRequestLabelClipped(x, y, misc.resourceUrlFormatter(entry.url, 40),
     rowHeight);
-  let fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.name, rowHeight);
+  let fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.url, rowHeight);
 
   // create and attach request block
   rowBar.appendChild(rect);
