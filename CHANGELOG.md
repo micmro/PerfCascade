@@ -2,6 +2,16 @@
 
 
 
+<a name="v0.5.0"></a>
+# v0.5.0 (2017-02-18)
+
+* #142 UI/UX tweaks (#148) ([47c2d13](https://github.com/micmro/PerfCascade/commit/47c2d13))
+* #142 update icon character ([c13951e](https://github.com/micmro/PerfCascade/commit/c13951e))
+* fix image size ([370d932](https://github.com/micmro/PerfCascade/commit/370d932))
+* update sample screenshot ([0d82f45](https://github.com/micmro/PerfCascade/commit/0d82f45))
+
+
+
 <a name="v0.4.0"></a>
 # v0.4.0 (2017-02-13)
 
