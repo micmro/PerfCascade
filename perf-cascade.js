@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.5.0 (18/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.5.1 (19/02/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -1240,6 +1240,14 @@ function makeGeneralTab(generalData, entry) {
 function makeTabBtn(name, tab) {
     return !!tab ? "<li><button class=\"tab-button\">" + name + "</button></li>" : "";
 }
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 function createDetailsBody(requestID, entry, accordeonHeight) {
     var html = document.createElement("html");
     var body = document.createElement("body");
@@ -1253,7 +1261,7 @@ function createDetailsBody(requestID, entry, accordeonHeight) {
     var responseDl = makeDefinitionList(tabsData.response);
     var responseHeadersDl = makeDefinitionList(tabsData.responseHeaders);
     var imgTab = makeImgTab(accordeonHeight, entry);
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> <a href=\"" + entry.url + "\">" + entry.url + "</a></h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n          " + makeTabBtn("Preview", imgTab) + "\n        </ul>\n        </nav>\n      </header>\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab raw-data\">\n        <pre><code>" + JSON.stringify(entry.rawResource, null, 2) + "</code></pre>\n      </div>\n      " + imgTab + "\n    </div>\n    ";
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> <a href=\"" + entry.url + "\">" + entry.url + "</a></h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n          " + makeTabBtn("Preview", imgTab) + "\n        </ul>\n        </nav>\n      </header>\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab raw-data\">\n        <pre><code>" + escapeHtml(JSON.stringify(entry.rawResource, null, 2)) + "</code></pre>\n      </div>\n      " + imgTab + "\n    </div>\n    ";
     html.appendChild(body);
     return html;
 }
