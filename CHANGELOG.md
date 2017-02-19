@@ -2,6 +2,13 @@
 
 
 
+<a name="v0.5.1"></a>
+## v0.5.1 (2017-02-19)
+
+* #149 escape html characters of raw-content (#152) ([94fa52b](https://github.com/micmro/PerfCascade/commit/94fa52b))
+
+
+
 <a name="v0.5.0"></a>
 # v0.5.0 (2017-02-18)
 
