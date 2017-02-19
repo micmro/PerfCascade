@@ -22,7 +22,7 @@ export default class OverlayManager implements OverlayManagerClass {
   /**
    * Opens an overlay - rerenders others internaly
    */
-  public openOverlay(index: number, y: number, accordionHeight: number,
+  public openOverlay(index: number, y: number, detailsHeight: number,
                      entry: WaterfallEntry, barEls: SVGGElement[]) {
     if (this.openOverlays.some((o) => o.index === index)) {
       return;
@@ -34,12 +34,12 @@ export default class OverlayManager implements OverlayManagerClass {
       "entry": entry,
       "index": index,
       "onClose": () => {
-        self.closeOverlay(index, accordionHeight, barEls);
+        self.closeOverlay(index, detailsHeight, barEls);
       },
       "openTabIndex": 0,
     });
 
-    this.renderOverlays(accordionHeight);
+    this.renderOverlays(detailsHeight);
     this.context.pubSub.publishToOverlayChanges({
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
       "openOverlays": self.openOverlays,
@@ -51,25 +51,25 @@ export default class OverlayManager implements OverlayManagerClass {
   /**
    * Toggles an overlay - rerenders others
    */
-  public toggleOverlay(index: number, y: number, accordionHeight: number,
+  public toggleOverlay(index: number, y: number, detailsHeight: number,
                        entry: WaterfallEntry, barEls: SVGGElement[]) {
     if (this.openOverlays.some((o) => o.index === index)) {
-      this.closeOverlay(index, accordionHeight, barEls);
+      this.closeOverlay(index, detailsHeight, barEls);
     } else {
-      this.openOverlay(index, y, accordionHeight, entry, barEls);
+      this.openOverlay(index, y, detailsHeight, entry, barEls);
     }
   }
 
   /**
    * closes on overlay - rerenders others internally
    */
-  public closeOverlay(index: number, accordionHeight: number, barEls: SVGGElement[]) {
+  public closeOverlay(index: number, detailsHeight: number, barEls: SVGGElement[]) {
     const self = this;
     this.openOverlays.splice(this.openOverlays.reduce((prev: number, curr, i) => {
       return (curr.index === index) ? i : prev;
     }, -1), 1);
 
-    this.renderOverlays(accordionHeight);
+    this.renderOverlays(detailsHeight);
     this.context.pubSub.publishToOverlayChanges({
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
       "openOverlays": self.openOverlays,
@@ -104,10 +104,10 @@ export default class OverlayManager implements OverlayManagerClass {
    *
    * @summary this is to re-set the "y" position since there is a bug in chrome with
    * tranform of an SVG and positioning/scoll of a foreignObjects
-   * @param  {number} accordionHeight
+   * @param  {number} detailsHeight
    * @param  {SVGGElement} overlayHolder
    */
-  private renderOverlays(accordionHeight: number) {
+  private renderOverlays(detailsHeight: number) {
     removeChildren(this.overlayHolder);
 
     let currY = 0;
@@ -115,7 +115,7 @@ export default class OverlayManager implements OverlayManagerClass {
       .sort((a, b) => a.index > b.index ? 1 : -1)
       .forEach((overlay) => {
         let y = overlay.defaultY + currY;
-        let infoOverlay = createRowInfoOverlay(overlay, y, accordionHeight);
+        let infoOverlay = createRowInfoOverlay(overlay, y, detailsHeight);
         // if overlay has a preview image show it
         let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement;
         if (previewImg && !previewImg.src) {

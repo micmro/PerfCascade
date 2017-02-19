@@ -9,9 +9,11 @@ import {
   WaterfallDocs,
   WaterfallEntry,
   WaterfallEntryIndicator,
+  WaterfallEntryTab,
   WaterfallEntryTiming,
 } from "../typing/waterfall";
 import * as harHeuristics from "./har-heuristics";
+import { makeTabs } from "./har-tabs";
 
 function createWaterfallEntry(url: string,
                               start: number,
@@ -19,7 +21,8 @@ function createWaterfallEntry(url: string,
                               segments: WaterfallEntryTiming[] = [],
                               rawResource: Entry,
                               requestType: RequestType,
-                              indicators: WaterfallEntryIndicator[]): WaterfallEntry {
+                              indicators: WaterfallEntryIndicator[],
+                              tabs: WaterfallEntryTab[]): WaterfallEntry {
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   return {
     total,
@@ -30,6 +33,7 @@ function createWaterfallEntry(url: string,
     rawResource,
     requestType,
     indicators,
+    tabs,
   };
 }
 
@@ -190,20 +194,21 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   const isTLS = harHeuristics.documentIsSecure(data.entries);
   const entries = data.entries
     .filter((entry) => entry.pageref === currPage.id)
-    .map((entry) => {
+    .map((entry, index) => {
       const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
-
+      const endRelative = toInt(entry._all_end) || (startRelative + entry.time);
       doneTime = Math.max(doneTime, startRelative + entry.time);
 
       const requestType = mimeToRequestType(entry.response.content.mimeType);
-      const issues = collectIndicators(entry, isTLS, requestType);
+      const indicators = collectIndicators(entry, isTLS, requestType);
       return createWaterfallEntry(entry.request.url,
         startRelative,
-        toInt(entry._all_end) || (startRelative + entry.time),
+        endRelative,
         buildDetailTimingBlocks(startRelative, entry),
         entry,
         requestType,
-        issues,
+        indicators,
+        makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators),
       );
     });
 

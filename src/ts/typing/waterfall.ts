@@ -34,6 +34,22 @@ export interface WaterfallEntry {
   requestType: RequestType;
   /** Warnings, Errors and Info indicators  */
   indicators: WaterfallEntryIndicator[];
+  /** Tabs to render in the details-overlay view */
+  tabs: WaterfallEntryTab[];
+}
+
+export type TabRenderer = (datailsHeight: number) => string;
+
+/** Represents a single tab of a `WaterfallEntry` */
+export interface WaterfallEntryTab {
+  /** Tab title to show in tab-menu */
+  title: string;
+  /** stringified tab HTML */
+  content?: string;
+  /** lazy eveluation to create stringified tab HTML */
+  renderContent?: TabRenderer;
+  /** Add an additional CSS class-name to the tab */
+  tabClass?: string;
 }
 
 /** Type for issues of a request */

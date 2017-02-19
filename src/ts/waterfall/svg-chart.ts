@@ -157,7 +157,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
     const entryWidth = entry.total || 1;
     const y = options.rowHeight * i;
     const x = (entry.start || 0.001);
-    const accordionHeight = 450;
+    const detailsHeight = 450;
     const rectData = {
       "cssClass": requestTypeToCssClass(entry.requestType),
       "height": options.rowHeight,
@@ -171,7 +171,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
     } as RectData;
 
     let showDetailsOverlay = () => {
-      context.overlayManager.toggleOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
+      context.overlayManager.toggleOverlay(i, y + options.rowHeight, detailsHeight, entry, barEls);
     };
 
     let rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);

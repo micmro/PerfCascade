@@ -1,49 +1,47 @@
-import {getHeader} from "../../helpers/har";
+import { getHeader } from "../helpers/har";
 import {
   formatBytes, formatDateLocalized, formatMilliseconds, formatSeconds, parseAndFormat, parseDate, parseNonEmpty,
   parseNonNegative, parsePositive,
-} from "../../helpers/parse";
-import {Entry, Header} from "../../typing/har";
-import {WaterfallEntry} from "../../typing/waterfall";
+} from "../helpers/parse";
+import { Entry, Header } from "../typing/har";
 
-const byteSizeProperty = (title: string, input: string | number): KvTuple => {
+const byteSizeProperty = (title: string, input: string |  number): KvTuple => {
   return [title, parseAndFormat(input, parsePositive, formatBytes)];
 };
-const countProperty = (title: string, input: string | number): KvTuple => {
+const countProperty = (title: string, input: string |  number): KvTuple => {
   return [title, parseAndFormat(input, parsePositive)];
 };
 
-function parseGeneralDetails(entry: WaterfallEntry, requestID: number): KvTuple[] {
-  const harEntry = entry.rawResource;
+function parseGeneralDetails(entry: Entry, startRelative: number, requestID: number): KvTuple[] {
   return [
     ["Request Number", `#${requestID}`],
-    ["Started", new Date(harEntry.startedDateTime).toLocaleString() + ((entry.start > 0) ?
-      " (" + formatMilliseconds(entry.start) + " after page request started)" : "")],
-    ["Duration", formatMilliseconds(harEntry.time)],
-    ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
-    ["Server IPAddress", harEntry.serverIPAddress],
-    ["Connection", harEntry.connection],
-    ["Browser Priority", harEntry._priority || harEntry._initialPriority],
-    ["Was pushed", parseAndFormat(harEntry._was_pushed, parsePositive, () => "yes")],
-    ["Initiator (Loaded by)", harEntry._initiator],
-    ["Initiator Line", harEntry._initiator_line],
-    ["Host", getHeader(harEntry.request.headers, "Host")],
-    ["IP", harEntry._ip_addr],
-    ["Client Port", parseAndFormat(harEntry._client_port, parsePositive)],
-    ["Expires", harEntry._expires],
-    ["Cache Time", parseAndFormat(harEntry._cache_time, parsePositive, formatSeconds)],
-    ["CDN Provider", harEntry._cdn_provider],
-    byteSizeProperty("ObjectSize", harEntry._objectSize),
-    byteSizeProperty("Bytes In (downloaded)", harEntry._bytesIn),
-    byteSizeProperty("Bytes Out (uploaded)", harEntry._bytesOut),
-    byteSizeProperty("JPEG Scan Count", harEntry._jpeg_scan_count),
-    byteSizeProperty("Gzip Total", harEntry._gzip_total),
-    byteSizeProperty("Gzip Save", harEntry._gzip_save),
-    byteSizeProperty("Minify Total", harEntry._minify_total),
-    byteSizeProperty("Minify Save", harEntry._minify_save),
-    byteSizeProperty("Image Total", harEntry._image_total),
-    byteSizeProperty("Image Save", harEntry._image_save),
-  ];
+    ["Started", new Date(entry.startedDateTime).toLocaleString() + ((startRelative > 0) ?
+      " (" + formatMilliseconds(startRelative) + " after page request started)" : "")],
+    ["Duration", formatMilliseconds(entry.time)],
+    ["Error/Status Code", entry.response.status + " " + entry.response.statusText],
+    ["Server IPAddress", entry.serverIPAddress],
+    ["Connection", entry.connection],
+    ["Browser Priority", entry._priority || entry._initialPriority],
+    ["Was pushed", parseAndFormat(entry._was_pushed, parsePositive, () => "yes")],
+    ["Initiator (Loaded by)", entry._initiator],
+    ["Initiator Line", entry._initiator_line],
+    ["Host", getHeader(entry.request.headers, "Host")],
+    ["IP", entry._ip_addr],
+    ["Client Port", parseAndFormat(entry._client_port, parsePositive)],
+    ["Expires", entry._expires],
+    ["Cache Time", parseAndFormat(entry._cache_time, parsePositive, formatSeconds)],
+    ["CDN Provider", entry._cdn_provider],
+    byteSizeProperty("ObjectSize", entry._objectSize),
+    byteSizeProperty("Bytes In (downloaded)", entry._bytesIn),
+    byteSizeProperty("Bytes Out (uploaded)", entry._bytesOut),
+    byteSizeProperty("JPEG Scan Count", entry._jpeg_scan_count),
+    byteSizeProperty("Gzip Total", entry._gzip_total),
+    byteSizeProperty("Gzip Save", entry._gzip_save),
+    byteSizeProperty("Minify Total", entry._minify_total),
+    byteSizeProperty("Minify Save", entry._minify_save),
+    byteSizeProperty("Image Total", entry._image_total),
+    byteSizeProperty("Image Save", entry._image_save),
+  ].filter((k) => k[1] !== undefined && k[1] !== "") as KvTuple[];
 }
 
 function parseRequestDetails(harEntry: Entry): KvTuple[] {
@@ -70,11 +68,11 @@ function parseRequestDetails(harEntry: Entry): KvTuple[] {
     stringHeader("If-Unmodified-Since"),
     countProperty("Querystring parameters count", request.queryString.length),
     countProperty("Cookies count", request.cookies.length),
-  ];
+  ].filter((k) => k[1] !== undefined && k[1] !== "") as KvTuple[];
 }
 
-function parseResponseDetails(harEntry: Entry): KvTuple[] {
-  const response = harEntry.response;
+function parseResponseDetails(entry: Entry): KvTuple[] {
+  const response = entry.response;
   const content = response.content;
   const headers = response.headers;
 
@@ -91,14 +89,14 @@ function parseResponseDetails(harEntry: Entry): KvTuple[] {
   }
 
   let contentType = getHeader(headers, "Content-Type");
-  if (harEntry._contentType && harEntry._contentType !== contentType) {
-    contentType = contentType + " | " + harEntry._contentType;
+  if (entry._contentType && entry._contentType !== contentType) {
+    contentType = contentType + " | " + entry._contentType;
   }
 
   return [
     ["Status", response.status + " " + response.statusText],
     ["HTTP Version", response.httpVersion],
-    byteSizeProperty("Bytes In (downloaded)", harEntry._bytesIn),
+    byteSizeProperty("Bytes In (downloaded)", entry._bytesIn),
     byteSizeProperty("Headers Size", response.headersSize),
     byteSizeProperty("Body Size", response.bodySize),
     ["Content-Type", contentType],
@@ -128,13 +126,14 @@ function parseResponseDetails(harEntry: Entry): KvTuple[] {
   ];
 }
 
-function parseTimings(entry: WaterfallEntry): KvTuple[] {
-  const timings = entry.rawResource.timings;
+function parseTimings(entry: Entry, start: number, end: number): KvTuple[] {
+  const timings = entry.timings;
 
   const optionalTiming = (timing?: number) => parseAndFormat(timing, parseNonNegative, formatMilliseconds);
+  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
 
   return [
-    ["Total", formatMilliseconds(entry.total)],
+    ["Total", formatMilliseconds(total)],
     ["Blocked", optionalTiming(timings.blocked)],
     ["DNS", optionalTiming(timings.dns)],
     ["Connect", optionalTiming(timings.connect)],
@@ -153,19 +152,18 @@ export type KvTuple = [string, string];
  * @param  {number} requestID - request number
  * @param  {WaterfallEntry} entry
  */
-export function getKeys(requestID: number, entry: WaterfallEntry) {
-  const harEntry = entry.rawResource;
-  const requestHeaders = harEntry.request.headers;
-  const responseHeaders = harEntry.response.headers;
+export function getKeys(entry: Entry, requestID: number, startRelative: number, endRelative: number) {
+  const requestHeaders = entry.request.headers;
+  const responseHeaders = entry.response.headers;
 
   let headerToKvTuple = (header: Header): KvTuple => [header.name, header.value];
 
   return {
-    "general": parseGeneralDetails(entry, requestID),
-    "request": parseRequestDetails(harEntry),
+    "general": parseGeneralDetails(entry, startRelative, requestID),
+    "request": parseRequestDetails(entry),
     "requestHeaders": requestHeaders.map(headerToKvTuple),
-    "response": parseResponseDetails(harEntry),
+    "response": parseResponseDetails(entry),
     "responseHeaders": responseHeaders.map(headerToKvTuple),
-    "timings": parseTimings(entry),
+    "timings": parseTimings(entry, startRelative, endRelative),
   };
 }

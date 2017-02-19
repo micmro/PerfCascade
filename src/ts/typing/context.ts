@@ -29,14 +29,14 @@ export interface OverlayManagerClass {
   getCombinedOverlayHeight: () => number;
 
   /** Opens an overlay - rerenders others  */
-  openOverlay: (index: number, y: number, accordionHeight: number, entry: WaterfallEntry,
+  openOverlay: (index: number, y: number, detailsHeight: number, entry: WaterfallEntry,
                               barEls: SVGGElement[]) => void;
   /** toggles an overlay - rerenders others  */
-  toggleOverlay: (index: number, y: number, accordionHeight: number, entry: WaterfallEntry,
+  toggleOverlay: (index: number, y: number, detailsHeight: number, entry: WaterfallEntry,
                               barEls: SVGGElement[]) => void;
 
   /** closes on overlay - rerenders others internally */
-  closeOverlay: (index: number, accordionHeight: number, barEls: SVGGElement[]) => void;
+  closeOverlay: (index: number, detailsHeight: number, barEls: SVGGElement[]) => void;
 
   // constructor(context: Context, overlayHolder: SVGGElement);
 }

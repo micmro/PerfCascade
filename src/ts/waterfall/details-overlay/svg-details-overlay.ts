@@ -28,12 +28,12 @@ function createCloseButtonSvg(y: number): SVGGElement {
   return closeBtn;
 }
 
-function createHolder(y: number, accordionHeight: number) {
+function createHolder(y: number, detailsHeight: number) {
 
   let innerHolder = svg.newG("info-overlay-holder");
 
   let bg = svg.newRect({
-    "height": accordionHeight,
+    "height": detailsHeight,
     "rx": 2,
     "ry": 2,
     "width": "100%",
@@ -45,13 +45,13 @@ function createHolder(y: number, accordionHeight: number) {
   return innerHolder;
 }
 
-export function createRowInfoOverlay(overlay: OpenOverlay, y: number, accordionHeight: number): SVGGElement {
+export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHeight: number): SVGGElement {
   const requestID = overlay.entry.rawResource._number || overlay.index + 1;
   let wrapper = svg.newG("outer-info-overlay-holder");
-  let holder = createHolder(y, accordionHeight);
+  let holder = createHolder(y, detailsHeight);
 
   let foreignObject = svg.newForeignObject({
-    "height": accordionHeight,
+    "height": detailsHeight,
     "width": "100%",
     "x": "0",
     "y": y,
@@ -60,7 +60,7 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, accordionH
   let closeBtn = createCloseButtonSvg(y);
   closeBtn.addEventListener("click", () => overlay.onClose(overlay.index));
 
-  let body = createDetailsBody(requestID, overlay.entry, accordionHeight);
+  let body = createDetailsBody(requestID, detailsHeight, overlay.entry);
   let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
   let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
 
