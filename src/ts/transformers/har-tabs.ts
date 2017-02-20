@@ -7,7 +7,7 @@ import {
   WaterfallEntryTab,
 } from "../typing/waterfall";
 import { getKeys, KvTuple } from "./extract-details-keys";
-import { makeDefinitionList } from "./tab-helpers";
+import { makeDefinitionList } from "./helpers";
 
 /**
  * Generates the tabs for the details-overlay of a `Entry`

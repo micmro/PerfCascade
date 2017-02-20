@@ -133,3 +133,12 @@ export function escapeHtml(unsafe: string) {
     return htmlCharMap[match];
   });
 }
+
+/** Ensures `input` is casted to `number` */
+export function toInt(input: string | number): number {
+  if (typeof input === "string") {
+    return parseInt(input, 10);
+  } else {
+    return input;
+  }
+}
