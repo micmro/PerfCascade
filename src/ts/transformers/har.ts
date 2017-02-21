@@ -1,5 +1,5 @@
-import { isInStatusCodeRange } from "../helpers/heuristics";
 import { roundNumber } from "../helpers/misc";
+import { toInt } from "../helpers/parse";
 import { Entry, Har, PageTimings } from "../typing/har";
 import {
   Mark,
@@ -9,9 +9,12 @@ import {
   WaterfallDocs,
   WaterfallEntry,
   WaterfallEntryIndicator,
+  WaterfallEntryTab,
   WaterfallEntryTiming,
 } from "../typing/waterfall";
-import * as harHeuristics from "./har-heuristics";
+import { collectIndicators, documentIsSecure } from "./har-heuristics";
+import { makeTabs } from "./har-tabs";
+import { mimeToRequestType } from "./helpers";
 
 function createWaterfallEntry(url: string,
                               start: number,
@@ -19,7 +22,8 @@ function createWaterfallEntry(url: string,
                               segments: WaterfallEntryTiming[] = [],
                               rawResource: Entry,
                               requestType: RequestType,
-                              indicators: WaterfallEntryIndicator[]): WaterfallEntry {
+                              indicators: WaterfallEntryIndicator[],
+                              tabs: WaterfallEntryTab[]): WaterfallEntry {
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   return {
     total,
@@ -30,6 +34,7 @@ function createWaterfallEntry(url: string,
     rawResource,
     requestType,
     indicators,
+    tabs,
   };
 }
 
@@ -43,108 +48,6 @@ function createWaterfallEntryTiming(type: TimingType,
     start,
     end,
   };
-}
-
-/**
- * Convert a MIME type into it's WPT style request type (font, script etc)
- * @param {string} mimeType
- */
-function mimeToRequestType(mimeType: string): RequestType {
-  if (mimeType === undefined) {
-    return "other";
-  }
-  let types = mimeType.split("/");
-  let part2 = types[1];
-  // take care of text/css; charset=UTF-8 etc
-  if (part2 !== undefined) {
-    part2 = part2.indexOf(";") > -1 ? part2.split(";")[0] : part2;
-  }
-  switch (types[0]) {
-    case "image": {
-      if (part2 === "svg+xml") {
-        return "svg";
-      }
-      return "image";
-    }
-    case "font": return "font";
-    case "video": return "video";
-    case "audio": return "audio";
-    default: break;
-  }
-  switch (part2) {
-    case "xml":
-    case "html": return "html";
-    case "plain": return "plain";
-    case "css": return "css";
-    case "vnd.ms-fontobject":
-    case "font-woff":
-    case "font-woff2":
-    case "x-font-truetype":
-    case "x-font-opentype":
-    case "x-font-woff": return "font";
-    case "javascript":
-    case "x-javascript":
-    case "script":
-    case "json": return "javascript";
-    case "x-shockwave-flash": return "flash";
-    default: return "other";
-  }
-}
-
-/** Scans `entry` for noteworthy issues or infos and highlights them */
-function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: RequestType) {
-  // const harEntry = entry;
-  let output: WaterfallEntryIndicator[] = [];
-
-  if (harHeuristics.isPush(entry)) {
-    output.push({
-      description: "Response was pushed by the server using HTTP2 push.",
-      icon: "push",
-      id: "push",
-      title: "Response was pushed by the server",
-      type: "info",
-    });
-  }
-
-  if (docIsTLS && !harHeuristics.isSecure(entry)) {
-    output.push({
-      description: "Insecure request, it should use HTTPS.",
-      id: "noTls",
-      title: "Insecure Connection",
-      type: "error",
-    });
-  }
-
-  if (harHeuristics.hasCacheIssue(entry)) {
-    output.push({
-      description: "The response is not allow to be cached on the client. Consider setting 'Cache-Control' headers.",
-      id: "noCache",
-      title: "Response not cached",
-      type: "error",
-    });
-  }
-
-  if (harHeuristics.hasCompressionIssue(entry, requestType)) {
-    output.push({
-      description: "The response is not compressed. Consider enabling HTTP compression on your server.",
-      id: "noGzip",
-      title: "no gzip",
-      type: "error",
-    });
-  }
-
-  if (!entry.response.content.mimeType &&
-      isInStatusCodeRange(entry, 200, 299) &&
-    entry.response.status !== 204) {
-    output.push({
-      description: "Response doesn't contain a 'Content-Type' header.",
-      id: "warning",
-      title: "No MIME Type defined",
-      type: "warning",
-    });
-  }
-
-  return output;
 }
 
 /**
@@ -163,20 +66,35 @@ export function transformDoc(harData: Har): WaterfallDocs {
 }
 
 /**
+ * Converts an HAR `Entry` into PerfCascads `WaterfallEntry`
+ *
+ * @param  {Entry} entry
+ * @param  {number} index - resource entry index
+ * @param  {number} startRelative - entry start time relative to the document in ms
+ * @param  {boolean} isTLS
+ */
+function toWaterFallEntry(entry: Entry, index: number, startRelative: number, isTLS: boolean) {
+  const endRelative = toInt(entry._all_end) || (startRelative + entry.time);
+  const requestType = mimeToRequestType(entry.response.content.mimeType);
+  const indicators = collectIndicators(entry, isTLS, requestType);
+  return createWaterfallEntry(entry.request.url,
+    startRelative,
+    endRelative,
+    buildDetailTimingBlocks(startRelative, entry),
+    entry,
+    requestType,
+    indicators,
+    makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators),
+  );
+}
+
+/**
  * Transforms a HAR object into the format needed to render the PerfCascade
  * @param  {Har} harData - HAR document
  * @param {number=0} pageIndex - page to parse (for multi-page HAR)
  * @returns WaterfallData
  */
 export function transformPage(harData: Har, pageIndex: number = 0): WaterfallData {
-  function toInt(input: string | number): number {
-    if (typeof input === "string") {
-      return parseInt(input, 10);
-    } else {
-      return input;
-    }
-  }
-
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
 
@@ -187,24 +105,13 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
 
   let doneTime = 0;
-  const isTLS = harHeuristics.documentIsSecure(data.entries);
+  const isTLS = documentIsSecure(data.entries);
   const entries = data.entries
     .filter((entry) => entry.pageref === currPage.id)
-    .map((entry) => {
+    .map((entry, index) => {
       const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
-
       doneTime = Math.max(doneTime, startRelative + entry.time);
-
-      const requestType = mimeToRequestType(entry.response.content.mimeType);
-      const issues = collectIndicators(entry, isTLS, requestType);
-      return createWaterfallEntry(entry.request.url,
-        startRelative,
-        toInt(entry._all_end) || (startRelative + entry.time),
-        buildDetailTimingBlocks(startRelative, entry),
-        entry,
-        requestType,
-        issues,
-      );
+      return toWaterFallEntry(entry, index, startRelative, isTLS);
     });
 
   const marks = Object.keys(pageTimings)
@@ -212,9 +119,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
     .sort((a: string, b: string) => pageTimings[a] > pageTimings[b] ? 1 : -1)
     .map((k) => {
       const startRelative: number = pageTimings[k];
-
       doneTime = Math.max(doneTime, startRelative);
-
       return {
         "name": `${k.replace(/^[_]/, "")} (${roundNumber(startRelative, 0)} ms)`,
         "startTime": startRelative,
@@ -233,6 +138,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
     title: currPage.title,
   };
 }
+
 /**
  * Create `WaterfallEntry`s to represent the subtimings of a request
  * ("blocked", "dns", "connect", "send", "wait", "receive")

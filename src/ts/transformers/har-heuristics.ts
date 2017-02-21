@@ -6,6 +6,7 @@ import { hasHeader } from "../helpers/har";
 import { isInStatusCodeRange } from "../helpers/heuristics";
 import * as misc from "../helpers/misc";
 import { Entry } from "../typing/har";
+import { WaterfallEntryIndicator } from "../typing/waterfall";
 import { RequestType } from "../typing/waterfall";
 
 function isCompressible(entry: Entry, requestType: RequestType): boolean {
@@ -39,7 +40,7 @@ function isCompressible(entry: Entry, requestType: RequestType): boolean {
  * @param {Entry} entry -  the waterfall entry.
  * @returns {boolean}
  */
-export function hasCacheIssue(entry: Entry) {
+function hasCacheIssue(entry: Entry) {
   if (entry.request.method.toLowerCase() !== "get") {
     return false;
   }
@@ -51,17 +52,17 @@ export function hasCacheIssue(entry: Entry) {
   return !(hasHeader(headers, "Cache-Control") || hasHeader(headers, "Expires"));
 }
 
-export function hasCompressionIssue(entry: Entry, requestType: RequestType) {
+function hasCompressionIssue(entry: Entry, requestType: RequestType) {
   const headers = entry.response.headers;
   return (!hasHeader(headers, "Content-Encoding") && isCompressible(entry, requestType));
 }
 
 /** Checks if the ressource uses https */
-export function isSecure(entry: Entry) {
+function isSecure(entry: Entry) {
   return entry.request.url.indexOf("https://") === 0;
 }
 
-export function isPush(entry: Entry): boolean {
+function isPush(entry: Entry): boolean {
   function toInt(input: string | number): number {
     if (typeof input === "string") {
       return parseInt(input, 10);
@@ -80,4 +81,60 @@ export function isPush(entry: Entry): boolean {
 export function documentIsSecure(data: Entry[]) {
   const rootDocument = data.filter((e) => !e.response.redirectURL)[0];
   return isSecure(rootDocument);
+}
+
+/** Scans `entry` for noteworthy issues or infos and highlights them */
+export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: RequestType) {
+  // const harEntry = entry;
+  let output: WaterfallEntryIndicator[] = [];
+
+  if (isPush(entry)) {
+    output.push({
+      description: "Response was pushed by the server using HTTP2 push.",
+      icon: "push",
+      id: "push",
+      title: "Response was pushed by the server",
+      type: "info",
+    });
+  }
+
+  if (docIsTLS && !isSecure(entry)) {
+    output.push({
+      description: "Insecure request, it should use HTTPS.",
+      id: "noTls",
+      title: "Insecure Connection",
+      type: "error",
+    });
+  }
+
+  if (hasCacheIssue(entry)) {
+    output.push({
+      description: "The response is not allow to be cached on the client. Consider setting 'Cache-Control' headers.",
+      id: "noCache",
+      title: "Response not cached",
+      type: "error",
+    });
+  }
+
+  if (hasCompressionIssue(entry, requestType)) {
+    output.push({
+      description: "The response is not compressed. Consider enabling HTTP compression on your server.",
+      id: "noGzip",
+      title: "no gzip",
+      type: "error",
+    });
+  }
+
+  if (!entry.response.content.mimeType &&
+    isInStatusCodeRange(entry, 200, 299) &&
+    entry.response.status !== 204) {
+    output.push({
+      description: "Response doesn't contain a 'Content-Type' header.",
+      id: "warning",
+      title: "No MIME Type defined",
+      type: "warning",
+    });
+  }
+
+  return output;
 }

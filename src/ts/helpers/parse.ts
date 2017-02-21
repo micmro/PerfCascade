@@ -1,4 +1,4 @@
-import {roundNumber} from "./misc";
+import { roundNumber } from "./misc";
 
 /**
  * Type safe and null safe way to transform, filter and format an input value, e.g. parse a Date from a string,
@@ -11,7 +11,7 @@ import {roundNumber} from "./misc";
  */
 export function parseAndFormat<S, T>(input?: S,
                                      parseFn: ((_: S) => T) = identity,
-                                     formatFn: ((_: T) => string) = identity): string {
+                                     formatFn: ((_: T) => string) = toString): string {
   if (input === undefined) {
     return undefined;
   }
@@ -25,6 +25,14 @@ export function parseAndFormat<S, T>(input?: S,
 /** Fallback dummy function - just maintains the type */
 function identity<T>(source: T): T {
   return source;
+}
+
+function toString<T>(source: T): string {
+  if (typeof source["toString"] === "function") {
+    return source.toString();
+  } else {
+    throw TypeError("Can't convert type ${typeof source} to string");
+  }
 }
 
 export function parseNonEmpty(input: string): string {
@@ -66,20 +74,20 @@ export function formatMilliseconds(millis: number): string {
   return `${roundNumber(millis, 3)} ms`;
 }
 
-const SECONDS_PER_MINUTE = 60;
-const SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE;
-const SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR;
+const secondsPerMinute = 60;
+const secondsPerHour = 60 * secondsPerMinute;
+const secondsPerDay = 24 * secondsPerHour;
 
 export function formatSeconds(seconds: number): string {
   const raw = `${roundNumber(seconds, 3)} s`;
-  if (seconds > SECONDS_PER_DAY) {
-    return `${raw} (~${roundNumber(seconds / SECONDS_PER_DAY, 0)} days)`;
+  if (seconds > secondsPerDay) {
+    return `${raw} (~${roundNumber(seconds / secondsPerDay, 0)} days)`;
   }
-  if (seconds > SECONDS_PER_HOUR) {
-    return `${raw} (~${roundNumber(seconds / SECONDS_PER_HOUR, 0)} hours)`;
+  if (seconds > secondsPerHour) {
+    return `${raw} (~${roundNumber(seconds / secondsPerHour, 0)} hours)`;
   }
-  if (seconds > SECONDS_PER_MINUTE) {
-    return `${raw} (~${roundNumber(seconds / SECONDS_PER_MINUTE, 0)} minutes)`;
+  if (seconds > secondsPerMinute) {
+    return `${raw} (~${roundNumber(seconds / secondsPerMinute, 0)} minutes)`;
   }
   return raw;
 }
@@ -88,16 +96,49 @@ export function formatDateLocalized(date: Date): string {
   return `${date.toUTCString()}</br>(local time: ${date.toLocaleString()})`;
 }
 
-const BYTES_PER_KB = 1024;
-const BYTES_PER_MB = 1024 * BYTES_PER_KB;
+const bytesPerKb = 1024;
+const bytesPerMb = 1024 * bytesPerKb;
 
 export function formatBytes(bytes: number): string {
   const raw = `${bytes} bytes`;
-  if (bytes >= BYTES_PER_MB) {
-    return `${raw} (~${roundNumber(bytes / BYTES_PER_KB, 1)} MB)`;
+  if (bytes >= bytesPerMb) {
+    return `${raw} (~${roundNumber(bytes / bytesPerKb, 1)} MB)`;
   }
-  if (bytes >= BYTES_PER_KB) {
-    return `${raw} (~${roundNumber(bytes / BYTES_PER_KB, 0)} kB)`;
+  if (bytes >= bytesPerKb) {
+    return `${raw} (~${roundNumber(bytes / bytesPerKb, 0)} kB)`;
   }
   return raw;
+}
+
+/** HTML character to escape */
+const htmlCharMap = {
+  "\"": "&quot",
+  "&": "&amp",
+  "'": "&#039",
+  "<": "&lt",
+  ">": "&gt",
+};
+/**
+ * Reusable regex to escape HTML chars
+ * Combined to improve performance
+ */
+const htmlChars = new RegExp(Object.keys(htmlCharMap).join("|"), "g");
+
+/**
+ * Escapes unsafe characters is a string to render safely in HTML
+ * @param  {string} unsafe - string to be rendered in HTML
+ */
+export function escapeHtml(unsafe: string) {
+  return unsafe.replace(htmlChars, (match) => {
+    return htmlCharMap[match];
+  });
+}
+
+/** Ensures `input` is casted to `number` */
+export function toInt(input: string | number): number {
+  if (typeof input === "string") {
+    return parseInt(input, 10);
+  } else {
+    return input;
+  }
 }
