@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.5.1 (19/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.6.0 (21/02/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -261,7 +261,7 @@ var misc_1 = require("./misc");
  */
 function parseAndFormat(input, parseFn, formatFn) {
     if (parseFn === void 0) { parseFn = identity; }
-    if (formatFn === void 0) { formatFn = identity; }
+    if (formatFn === void 0) { formatFn = toString; }
     if (input === undefined) {
         return undefined;
     }
@@ -275,6 +275,14 @@ exports.parseAndFormat = parseAndFormat;
 /** Fallback dummy function - just maintains the type */
 function identity(source) {
     return source;
+}
+function toString(source) {
+    if (typeof source["toString"] === "function") {
+        return source.toString();
+    }
+    else {
+        throw TypeError("Can't convert type ${typeof source} to string");
+    }
 }
 function parseNonEmpty(input) {
     return input.trim().length > 0 ? input : undefined;
@@ -313,19 +321,19 @@ function formatMilliseconds(millis) {
     return misc_1.roundNumber(millis, 3) + " ms";
 }
 exports.formatMilliseconds = formatMilliseconds;
-var SECONDS_PER_MINUTE = 60;
-var SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE;
-var SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR;
+var secondsPerMinute = 60;
+var secondsPerHour = 60 * secondsPerMinute;
+var secondsPerDay = 24 * secondsPerHour;
 function formatSeconds(seconds) {
     var raw = misc_1.roundNumber(seconds, 3) + " s";
-    if (seconds > SECONDS_PER_DAY) {
-        return raw + " (~" + misc_1.roundNumber(seconds / SECONDS_PER_DAY, 0) + " days)";
+    if (seconds > secondsPerDay) {
+        return raw + " (~" + misc_1.roundNumber(seconds / secondsPerDay, 0) + " days)";
     }
-    if (seconds > SECONDS_PER_HOUR) {
-        return raw + " (~" + misc_1.roundNumber(seconds / SECONDS_PER_HOUR, 0) + " hours)";
+    if (seconds > secondsPerHour) {
+        return raw + " (~" + misc_1.roundNumber(seconds / secondsPerHour, 0) + " hours)";
     }
-    if (seconds > SECONDS_PER_MINUTE) {
-        return raw + " (~" + misc_1.roundNumber(seconds / SECONDS_PER_MINUTE, 0) + " minutes)";
+    if (seconds > secondsPerMinute) {
+        return raw + " (~" + misc_1.roundNumber(seconds / secondsPerMinute, 0) + " minutes)";
     }
     return raw;
 }
@@ -334,19 +342,52 @@ function formatDateLocalized(date) {
     return date.toUTCString() + "</br>(local time: " + date.toLocaleString() + ")";
 }
 exports.formatDateLocalized = formatDateLocalized;
-var BYTES_PER_KB = 1024;
-var BYTES_PER_MB = 1024 * BYTES_PER_KB;
+var bytesPerKb = 1024;
+var bytesPerMb = 1024 * bytesPerKb;
 function formatBytes(bytes) {
     var raw = bytes + " bytes";
-    if (bytes >= BYTES_PER_MB) {
-        return raw + " (~" + misc_1.roundNumber(bytes / BYTES_PER_KB, 1) + " MB)";
+    if (bytes >= bytesPerMb) {
+        return raw + " (~" + misc_1.roundNumber(bytes / bytesPerKb, 1) + " MB)";
     }
-    if (bytes >= BYTES_PER_KB) {
-        return raw + " (~" + misc_1.roundNumber(bytes / BYTES_PER_KB, 0) + " kB)";
+    if (bytes >= bytesPerKb) {
+        return raw + " (~" + misc_1.roundNumber(bytes / bytesPerKb, 0) + " kB)";
     }
     return raw;
 }
 exports.formatBytes = formatBytes;
+/** HTML character to escape */
+var htmlCharMap = {
+    "\"": "&quot",
+    "&": "&amp",
+    "'": "&#039",
+    "<": "&lt",
+    ">": "&gt",
+};
+/**
+ * Reusable regex to escape HTML chars
+ * Combined to improve performance
+ */
+var htmlChars = new RegExp(Object.keys(htmlCharMap).join("|"), "g");
+/**
+ * Escapes unsafe characters is a string to render safely in HTML
+ * @param  {string} unsafe - string to be rendered in HTML
+ */
+function escapeHtml(unsafe) {
+    return unsafe.replace(htmlChars, function (match) {
+        return htmlCharMap[match];
+    });
+}
+exports.escapeHtml = escapeHtml;
+/** Ensures `input` is casted to `number` */
+function toInt(input) {
+    if (typeof input === "string") {
+        return parseInt(input, 10);
+    }
+    else {
+        return input;
+    }
+}
+exports.toInt = toInt;
 
 },{"./misc":5}],7:[function(require,module,exports){
 /**
@@ -583,7 +624,7 @@ exports.fromPerfCascadeFormat = fromPerfCascadeFormat;
 var transformHarToPerfCascade = HarTransformer.transformDoc;
 exports.transformHarToPerfCascade = transformHarToPerfCascade;
 
-},{"./legend/legend":8,"./paging/paging":10,"./transformers/har":12,"./waterfall/svg-chart":25}],10:[function(require,module,exports){
+},{"./legend/legend":8,"./paging/paging":10,"./transformers/har":14,"./waterfall/svg-chart":27}],10:[function(require,module,exports){
 "use strict";
 var dom_1 = require("../helpers/dom");
 /** Class to keep track of run of a multi-run har is beeing shown  */
@@ -673,6 +714,159 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Paging;
 
 },{"../helpers/dom":1}],11:[function(require,module,exports){
+"use strict";
+var har_1 = require("../helpers/har");
+var parse_1 = require("../helpers/parse");
+var byteSizeProperty = function (title, input) {
+    return [title, parse_1.parseAndFormat(input, parse_1.parsePositive, parse_1.formatBytes)];
+};
+var countProperty = function (title, input) {
+    return [title, parse_1.parseAndFormat(input, parse_1.parsePositive)];
+};
+function parseGeneralDetails(entry, startRelative, requestID) {
+    return [
+        ["Request Number", "#" + requestID],
+        ["Started", new Date(entry.startedDateTime).toLocaleString() + ((startRelative > 0) ?
+                " (" + parse_1.formatMilliseconds(startRelative) + " after page request started)" : "")],
+        ["Duration", parse_1.formatMilliseconds(entry.time)],
+        ["Error/Status Code", entry.response.status + " " + entry.response.statusText],
+        ["Server IPAddress", entry.serverIPAddress],
+        ["Connection", entry.connection],
+        ["Browser Priority", entry._priority || entry._initialPriority],
+        ["Was pushed", parse_1.parseAndFormat(entry._was_pushed, parse_1.parsePositive, function () { return "yes"; })],
+        ["Initiator (Loaded by)", entry._initiator],
+        ["Initiator Line", entry._initiator_line],
+        ["Host", har_1.getHeader(entry.request.headers, "Host")],
+        ["IP", entry._ip_addr],
+        ["Client Port", parse_1.parseAndFormat(entry._client_port, parse_1.parsePositive)],
+        ["Expires", entry._expires],
+        ["Cache Time", parse_1.parseAndFormat(entry._cache_time, parse_1.parsePositive, parse_1.formatSeconds)],
+        ["CDN Provider", entry._cdn_provider],
+        byteSizeProperty("ObjectSize", entry._objectSize),
+        byteSizeProperty("Bytes In (downloaded)", entry._bytesIn),
+        byteSizeProperty("Bytes Out (uploaded)", entry._bytesOut),
+        byteSizeProperty("JPEG Scan Count", entry._jpeg_scan_count),
+        byteSizeProperty("Gzip Total", entry._gzip_total),
+        byteSizeProperty("Gzip Save", entry._gzip_save),
+        byteSizeProperty("Minify Total", entry._minify_total),
+        byteSizeProperty("Minify Save", entry._minify_save),
+        byteSizeProperty("Image Total", entry._image_total),
+        byteSizeProperty("Image Save", entry._image_save),
+    ].filter(function (k) { return k[1] !== undefined && k[1] !== ""; });
+}
+function parseRequestDetails(harEntry) {
+    var request = harEntry.request;
+    var stringHeader = function (name) { return [name, har_1.getHeader(request.headers, name)]; };
+    return [
+        ["Method", request.method],
+        ["HTTP Version", request.httpVersion],
+        byteSizeProperty("Bytes Out (uploaded)", harEntry._bytesOut),
+        byteSizeProperty("Headers Size", request.headersSize),
+        byteSizeProperty("Body Size", request.bodySize),
+        ["Comment", parse_1.parseAndFormat(request.comment, parse_1.parseNonEmpty)],
+        stringHeader("User-Agent"),
+        stringHeader("Host"),
+        stringHeader("Connection"),
+        stringHeader("Accept"),
+        stringHeader("Accept-Encoding"),
+        stringHeader("Expect"),
+        stringHeader("Forwarded"),
+        stringHeader("If-Modified-Since"),
+        stringHeader("If-Range"),
+        stringHeader("If-Unmodified-Since"),
+        countProperty("Querystring parameters count", request.queryString.length),
+        countProperty("Cookies count", request.cookies.length),
+    ].filter(function (k) { return k[1] !== undefined && k[1] !== ""; });
+}
+function parseResponseDetails(entry) {
+    var response = entry.response;
+    var content = response.content;
+    var headers = response.headers;
+    var stringHeader = function (title, name) {
+        if (name === void 0) { name = title; }
+        return [title, har_1.getHeader(headers, name)];
+    };
+    var dateHeader = function (name) {
+        var header = har_1.getHeader(headers, name);
+        return [name, parse_1.parseAndFormat(header, parse_1.parseDate, parse_1.formatDateLocalized)];
+    };
+    var contentLength = har_1.getHeader(headers, "Content-Length");
+    var contentSize = undefined;
+    if (content.size !== -1 && contentLength !== content.size.toString()) {
+        contentSize = content.size;
+    }
+    var contentType = har_1.getHeader(headers, "Content-Type");
+    if (entry._contentType && entry._contentType !== contentType) {
+        contentType = contentType + " | " + entry._contentType;
+    }
+    return [
+        ["Status", response.status + " " + response.statusText],
+        ["HTTP Version", response.httpVersion],
+        byteSizeProperty("Bytes In (downloaded)", entry._bytesIn),
+        byteSizeProperty("Headers Size", response.headersSize),
+        byteSizeProperty("Body Size", response.bodySize),
+        ["Content-Type", contentType],
+        stringHeader("Cache-Control"),
+        stringHeader("Content-Encoding"),
+        dateHeader("Expires"),
+        dateHeader("Last-Modified"),
+        stringHeader("Pragma"),
+        byteSizeProperty("Content-Length", contentLength),
+        byteSizeProperty("Content Size", contentSize),
+        byteSizeProperty("Content Compression", content.compression),
+        stringHeader("Connection"),
+        stringHeader("ETag"),
+        stringHeader("Accept-Patch"),
+        ["Age", parse_1.parseAndFormat(har_1.getHeader(headers, "Age"), parse_1.parseNonNegative, parse_1.formatSeconds)],
+        stringHeader("Allow"),
+        stringHeader("Content-Disposition"),
+        stringHeader("Location"),
+        stringHeader("Strict-Transport-Security"),
+        stringHeader("Trailer (for chunked transfer coding)", "Trailer"),
+        stringHeader("Transfer-Encoding"),
+        stringHeader("Upgrade"),
+        stringHeader("Vary"),
+        stringHeader("Timing-Allow-Origin"),
+        ["Redirect URL", parse_1.parseAndFormat(response.redirectURL, parse_1.parseNonEmpty)],
+        ["Comment", parse_1.parseAndFormat(response.comment, parse_1.parseNonEmpty)],
+    ];
+}
+function parseTimings(entry, start, end) {
+    var timings = entry.timings;
+    var optionalTiming = function (timing) { return parse_1.parseAndFormat(timing, parse_1.parseNonNegative, parse_1.formatMilliseconds); };
+    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    return [
+        ["Total", parse_1.formatMilliseconds(total)],
+        ["Blocked", optionalTiming(timings.blocked)],
+        ["DNS", optionalTiming(timings.dns)],
+        ["Connect", optionalTiming(timings.connect)],
+        ["SSL (TLS)", optionalTiming(timings.ssl)],
+        ["Send", parse_1.formatMilliseconds(timings.send)],
+        ["Wait", parse_1.formatMilliseconds(timings.wait)],
+        ["Receive", parse_1.formatMilliseconds(timings.receive)],
+    ];
+}
+/**
+ * Data to show in overlay tabs
+ * @param  {number} requestID - request number
+ * @param  {WaterfallEntry} entry
+ */
+function getKeys(entry, requestID, startRelative, endRelative) {
+    var requestHeaders = entry.request.headers;
+    var responseHeaders = entry.response.headers;
+    var headerToKvTuple = function (header) { return [header.name, header.value]; };
+    return {
+        "general": parseGeneralDetails(entry, startRelative, requestID),
+        "request": parseRequestDetails(entry),
+        "requestHeaders": requestHeaders.map(headerToKvTuple),
+        "response": parseResponseDetails(entry),
+        "responseHeaders": responseHeaders.map(headerToKvTuple),
+        "timings": parseTimings(entry, startRelative, endRelative),
+    };
+}
+exports.getKeys = getKeys;
+
+},{"../helpers/har":2,"../helpers/parse":6}],12:[function(require,module,exports){
 /**
  * Heuristics used at parse-time for HAR data
  */
@@ -719,17 +913,14 @@ function hasCacheIssue(entry) {
     var headers = entry.response.headers;
     return !(har_1.hasHeader(headers, "Cache-Control") || har_1.hasHeader(headers, "Expires"));
 }
-exports.hasCacheIssue = hasCacheIssue;
 function hasCompressionIssue(entry, requestType) {
     var headers = entry.response.headers;
     return (!har_1.hasHeader(headers, "Content-Encoding") && isCompressible(entry, requestType));
 }
-exports.hasCompressionIssue = hasCompressionIssue;
 /** Checks if the ressource uses https */
 function isSecure(entry) {
     return entry.request.url.indexOf("https://") === 0;
 }
-exports.isSecure = isSecure;
 function isPush(entry) {
     function toInt(input) {
         if (typeof input === "string") {
@@ -741,7 +932,6 @@ function isPush(entry) {
     }
     return toInt(entry._was_pushed) === 1;
 }
-exports.isPush = isPush;
 /**
  * Check if the document (disregarding any initial http->https redirects) is loaded over a secure connection.
  * @param {Entry[]} data - the waterfall entries data.
@@ -752,85 +942,11 @@ function documentIsSecure(data) {
     return isSecure(rootDocument);
 }
 exports.documentIsSecure = documentIsSecure;
-
-},{"../helpers/har":2,"../helpers/heuristics":3,"../helpers/misc":5}],12:[function(require,module,exports){
-"use strict";
-var heuristics_1 = require("../helpers/heuristics");
-var misc_1 = require("../helpers/misc");
-var harHeuristics = require("./har-heuristics");
-function createWaterfallEntry(url, start, end, segments, rawResource, requestType, indicators) {
-    if (segments === void 0) { segments = []; }
-    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
-    return {
-        total: total,
-        url: url,
-        start: start,
-        end: end,
-        segments: segments,
-        rawResource: rawResource,
-        requestType: requestType,
-        indicators: indicators,
-    };
-}
-function createWaterfallEntryTiming(type, start, end) {
-    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
-    return {
-        total: total,
-        type: type,
-        start: start,
-        end: end,
-    };
-}
-/**
- * Convert a MIME type into it's WPT style request type (font, script etc)
- * @param {string} mimeType
- */
-function mimeToRequestType(mimeType) {
-    if (mimeType === undefined) {
-        return "other";
-    }
-    var types = mimeType.split("/");
-    var part2 = types[1];
-    // take care of text/css; charset=UTF-8 etc
-    if (part2 !== undefined) {
-        part2 = part2.indexOf(";") > -1 ? part2.split(";")[0] : part2;
-    }
-    switch (types[0]) {
-        case "image": {
-            if (part2 === "svg+xml") {
-                return "svg";
-            }
-            return "image";
-        }
-        case "font": return "font";
-        case "video": return "video";
-        case "audio": return "audio";
-        default: break;
-    }
-    switch (part2) {
-        case "xml":
-        case "html": return "html";
-        case "plain": return "plain";
-        case "css": return "css";
-        case "vnd.ms-fontobject":
-        case "font-woff":
-        case "font-woff2":
-        case "x-font-truetype":
-        case "x-font-opentype":
-        case "x-font-woff": return "font";
-        case "javascript":
-        case "x-javascript":
-        case "script":
-        case "json": return "javascript";
-        case "x-shockwave-flash": return "flash";
-        default: return "other";
-    }
-}
 /** Scans `entry` for noteworthy issues or infos and highlights them */
 function collectIndicators(entry, docIsTLS, requestType) {
     // const harEntry = entry;
     var output = [];
-    if (harHeuristics.isPush(entry)) {
+    if (isPush(entry)) {
         output.push({
             description: "Response was pushed by the server using HTTP2 push.",
             icon: "push",
@@ -839,7 +955,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
             type: "info",
         });
     }
-    if (docIsTLS && !harHeuristics.isSecure(entry)) {
+    if (docIsTLS && !isSecure(entry)) {
         output.push({
             description: "Insecure request, it should use HTTPS.",
             id: "noTls",
@@ -847,7 +963,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
             type: "error",
         });
     }
-    if (harHeuristics.hasCacheIssue(entry)) {
+    if (hasCacheIssue(entry)) {
         output.push({
             description: "The response is not allow to be cached on the client. Consider setting 'Cache-Control' headers.",
             id: "noCache",
@@ -855,7 +971,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
             type: "error",
         });
     }
-    if (harHeuristics.hasCompressionIssue(entry, requestType)) {
+    if (hasCompressionIssue(entry, requestType)) {
         output.push({
             description: "The response is not compressed. Consider enabling HTTP compression on your server.",
             id: "noGzip",
@@ -875,6 +991,134 @@ function collectIndicators(entry, docIsTLS, requestType) {
     }
     return output;
 }
+exports.collectIndicators = collectIndicators;
+
+},{"../helpers/har":2,"../helpers/heuristics":3,"../helpers/misc":5}],13:[function(require,module,exports){
+"use strict";
+var parse_1 = require("../helpers/parse");
+var extract_details_keys_1 = require("./extract-details-keys");
+var helpers_1 = require("./helpers");
+/**
+ * Generates the tabs for the details-overlay of a `Entry`
+ * @param  {Entry} entry - the entry to parse
+ * @param  {number} requestID
+ * @param  {RequestType} requestType
+ * @param  {number} startRelative - start time in ms, relative to the page's start time
+ * @param  {number} endRelative - end time in ms, relative to the page's start time
+ * @param  {number} detailsHeight - height of the details-overlay
+ * @param  {WaterfallEntryIndicator[]} indicators
+ * @returns WaterfallEntryTab
+ */
+function makeTabs(entry, requestID, requestType, startRelative, endRelative, indicators) {
+    var tabs = [];
+    var tabsData = extract_details_keys_1.getKeys(entry, requestID, startRelative, endRelative);
+    tabs.push(makeGeneralTab(tabsData.general, indicators));
+    tabs.push(makeRequestTab(tabsData.request, tabsData.requestHeaders));
+    tabs.push(makeResponseTab(tabsData.response, tabsData.responseHeaders));
+    tabs.push(makeWaterfallEntryTab("Timings", helpers_1.makeDefinitionList(tabsData.timings, true)));
+    tabs.push(makeRawData(entry));
+    if (requestType === "image") {
+        tabs.push(makeImgTab(entry));
+    }
+    return tabs.filter(function (t) { return t !== undefined; });
+}
+exports.makeTabs = makeTabs;
+/** Helper to create `WaterfallEntryTab` object literal  */
+function makeWaterfallEntryTab(title, content, tabClass) {
+    if (tabClass === void 0) { tabClass = ""; }
+    return {
+        title: title,
+        content: content,
+        tabClass: tabClass,
+    };
+}
+/** Helper to create `WaterfallEntryTab` object literal that is evaluated lazyly at runtime (e.g. for performance) */
+function makeLazyWaterfallEntryTab(title, renderContent, tabClass) {
+    if (tabClass === void 0) { tabClass = ""; }
+    return {
+        title: title,
+        renderContent: renderContent,
+        tabClass: tabClass,
+    };
+}
+/** General tab with warnings etc. */
+function makeGeneralTab(generalData, indicators) {
+    var content = helpers_1.makeDefinitionList(generalData);
+    if (indicators.length === 0) {
+        return makeWaterfallEntryTab("General", content);
+    }
+    var general = "<h2>General</h2>\n    <dl>" + content + "<dl>";
+    content = "";
+    // Make indicator sections
+    var errors = indicators
+        .filter(function (i) { return i.type === "error"; })
+        .map(function (i) { return [i.title, i.description]; });
+    var warnings = indicators
+        .filter(function (i) { return i.type === "warning"; })
+        .map(function (i) { return [i.title, i.description]; });
+    // all others
+    var info = indicators
+        .filter(function (i) { return i.type !== "error" && i.type !== "warning"; })
+        .map(function (i) { return [i.title, i.description]; });
+    if (errors.length > 0) {
+        content += "<h2 class=\"no-boder\">Error" + (errors.length > 1 ? "s" : "") + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(errors) + "</dl>";
+    }
+    if (warnings.length > 0) {
+        content += "<h2 class=\"no-boder\">Warning" + (warnings.length > 1 ? "s" : "") + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(warnings) + "</dl>";
+    }
+    if (info.length > 0) {
+        content += "<h2 class=\"no-boder\">Info</h2>\n    <dl>" + helpers_1.makeDefinitionList(info) + "</dl>";
+    }
+    makeWaterfallEntryTab("General", content + general);
+}
+function makeRequestTab(request, requestHeaders) {
+    var content = "<dl>\n      " + helpers_1.makeDefinitionList(request) + "\n    </dl>\n    <h2>All Request Headers</h2>\n    <dl>\n      " + helpers_1.makeDefinitionList(requestHeaders) + "\n    </dl>";
+    return makeWaterfallEntryTab("Request", content);
+}
+function makeResponseTab(respose, responseHeaders) {
+    var content = "<dl>\n      " + helpers_1.makeDefinitionList(respose) + "\n    </dl>\n    <h2>All Response Headers</h2>\n    <dl>\n      " + helpers_1.makeDefinitionList(responseHeaders) + "\n    </dl>";
+    return makeWaterfallEntryTab("Response", content);
+}
+function makeRawData(entry) {
+    // const content = `<pre><code>${escapeHtml(JSON.stringify(entry, null, 2))}</code></pre>`;
+    return makeLazyWaterfallEntryTab("Raw Data", function () { return "<pre><code>" + parse_1.escapeHtml(JSON.stringify(entry, null, 2)) + "</code></pre>"; }, "raw-data");
+}
+/** Image preview tab */
+function makeImgTab(entry) {
+    return makeLazyWaterfallEntryTab("Preview", function (detailsHeight) { return "<img class=\"preview\" style=\"max-height:" + (detailsHeight - 100) + "px\"\n data-src=\"" + entry.request.url + "\" />"; });
+}
+
+},{"../helpers/parse":6,"./extract-details-keys":11,"./helpers":15}],14:[function(require,module,exports){
+"use strict";
+var misc_1 = require("../helpers/misc");
+var parse_1 = require("../helpers/parse");
+var har_heuristics_1 = require("./har-heuristics");
+var har_tabs_1 = require("./har-tabs");
+var helpers_1 = require("./helpers");
+function createWaterfallEntry(url, start, end, segments, rawResource, requestType, indicators, tabs) {
+    if (segments === void 0) { segments = []; }
+    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    return {
+        total: total,
+        url: url,
+        start: start,
+        end: end,
+        segments: segments,
+        rawResource: rawResource,
+        requestType: requestType,
+        indicators: indicators,
+        tabs: tabs,
+    };
+}
+function createWaterfallEntryTiming(type, start, end) {
+    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    return {
+        total: total,
+        type: type,
+        start: start,
+        end: end,
+    };
+}
 /**
  * Transforms the full HAR doc, including all pages
  * @param  {Har} harData - raw hhar object
@@ -891,6 +1135,20 @@ function transformDoc(harData) {
 }
 exports.transformDoc = transformDoc;
 /**
+ * Converts an HAR `Entry` into PerfCascads `WaterfallEntry`
+ *
+ * @param  {Entry} entry
+ * @param  {number} index - resource entry index
+ * @param  {number} startRelative - entry start time relative to the document in ms
+ * @param  {boolean} isTLS
+ */
+function toWaterFallEntry(entry, index, startRelative, isTLS) {
+    var endRelative = parse_1.toInt(entry._all_end) || (startRelative + entry.time);
+    var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
+    var indicators = har_heuristics_1.collectIndicators(entry, isTLS, requestType);
+    return createWaterfallEntry(entry.request.url, startRelative, endRelative, buildDetailTimingBlocks(startRelative, entry), entry, requestType, indicators, har_tabs_1.makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators));
+}
+/**
  * Transforms a HAR object into the format needed to render the PerfCascade
  * @param  {Har} harData - HAR document
  * @param {number=0} pageIndex - page to parse (for multi-page HAR)
@@ -898,14 +1156,6 @@ exports.transformDoc = transformDoc;
  */
 function transformPage(harData, pageIndex) {
     if (pageIndex === void 0) { pageIndex = 0; }
-    function toInt(input) {
-        if (typeof input === "string") {
-            return parseInt(input, 10);
-        }
-        else {
-            return input;
-        }
-    }
     // make sure it's the *.log base node
     var data = (harData["log"] !== undefined ? harData["log"] : harData);
     var currPage = data.pages[pageIndex];
@@ -913,15 +1163,13 @@ function transformPage(harData, pageIndex) {
     var pageTimings = currPage.pageTimings;
     console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
     var doneTime = 0;
-    var isTLS = harHeuristics.documentIsSecure(data.entries);
+    var isTLS = har_heuristics_1.documentIsSecure(data.entries);
     var entries = data.entries
         .filter(function (entry) { return entry.pageref === currPage.id; })
-        .map(function (entry) {
+        .map(function (entry, index) {
         var startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
         doneTime = Math.max(doneTime, startRelative + entry.time);
-        var requestType = mimeToRequestType(entry.response.content.mimeType);
-        var issues = collectIndicators(entry, isTLS, requestType);
-        return createWaterfallEntry(entry.request.url, startRelative, toInt(entry._all_end) || (startRelative + entry.time), buildDetailTimingBlocks(startRelative, entry), entry, requestType, issues);
+        return toWaterFallEntry(entry, index, startRelative, isTLS);
     });
     var marks = Object.keys(pageTimings)
         .filter(function (k) { return (typeof pageTimings[k] === "number" && pageTimings[k] >= 0); })
@@ -1004,7 +1252,73 @@ function getTimePair(key, harEntry, collect, startRelative) {
     };
 }
 
-},{"../helpers/heuristics":3,"../helpers/misc":5,"./har-heuristics":11}],13:[function(require,module,exports){
+},{"../helpers/misc":5,"../helpers/parse":6,"./har-heuristics":12,"./har-tabs":13,"./helpers":15}],15:[function(require,module,exports){
+"use strict";
+/** Helpers that are not file-fromat specific */
+var parse_1 = require("../helpers/parse");
+/** render a dl */
+function makeDefinitionList(dlKeyValues, addClass) {
+    if (addClass === void 0) { addClass = false; }
+    var makeClass = function (key) {
+        if (!addClass) {
+            return "";
+        }
+        var className = key.toLowerCase().replace(/[^a-z-]/g, "");
+        return "class=\"" + (className || "no-colour") + "\"";
+    };
+    return dlKeyValues
+        .filter(function (tuple) { return tuple[1] !== undefined; })
+        .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + tuple[0] + "</dt>\n      <dd>" + parse_1.escapeHtml(tuple[1]) + "</dd>\n    "; }).join("");
+}
+exports.makeDefinitionList = makeDefinitionList;
+/**
+ * Convert a MIME type into it's WPT style request type (font, script etc)
+ * @param {string} mimeType - a HTTP headers mime-type
+ */
+function mimeToRequestType(mimeType) {
+    if (mimeType === undefined) {
+        return "other";
+    }
+    var types = mimeType.split("/");
+    var part2 = types[1];
+    // take care of text/css; charset=UTF-8 etc
+    if (part2 !== undefined) {
+        part2 = part2.indexOf(";") > -1 ? part2.split(";")[0] : part2;
+    }
+    switch (types[0]) {
+        case "image": {
+            if (part2 === "svg+xml") {
+                return "svg";
+            }
+            return "image";
+        }
+        case "font": return "font";
+        case "video": return "video";
+        case "audio": return "audio";
+        default: break;
+    }
+    switch (part2) {
+        case "xml":
+        case "html": return "html";
+        case "plain": return "plain";
+        case "css": return "css";
+        case "vnd.ms-fontobject":
+        case "font-woff":
+        case "font-woff2":
+        case "x-font-truetype":
+        case "x-font-opentype":
+        case "x-font-woff": return "font";
+        case "javascript":
+        case "x-javascript":
+        case "script":
+        case "json": return "javascript";
+        case "x-shockwave-flash": return "flash";
+        default: return "other";
+    }
+}
+exports.mimeToRequestType = mimeToRequestType;
+
+},{"../helpers/parse":6}],16:[function(require,module,exports){
 "use strict";
 /**
  * Convert a RequestType into a CSS class
@@ -1023,251 +1337,42 @@ function timingTypeToCssClass(timingType) {
 }
 exports.timingTypeToCssClass = timingTypeToCssClass;
 
-},{}],14:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
-var har_1 = require("../../helpers/har");
-var parse_1 = require("../../helpers/parse");
-var byteSizeProperty = function (title, input) {
-    return [title, parse_1.parseAndFormat(input, parse_1.parsePositive, parse_1.formatBytes)];
-};
-var countProperty = function (title, input) {
-    return [title, parse_1.parseAndFormat(input, parse_1.parsePositive)];
-};
-function parseGeneralDetails(entry, requestID) {
-    var harEntry = entry.rawResource;
-    return [
-        ["Request Number", "#" + requestID],
-        ["Started", new Date(harEntry.startedDateTime).toLocaleString() + ((entry.start > 0) ?
-                " (" + parse_1.formatMilliseconds(entry.start) + " after page request started)" : "")],
-        ["Duration", parse_1.formatMilliseconds(harEntry.time)],
-        ["Error/Status Code", harEntry.response.status + " " + harEntry.response.statusText],
-        ["Server IPAddress", harEntry.serverIPAddress],
-        ["Connection", harEntry.connection],
-        ["Browser Priority", harEntry._priority || harEntry._initialPriority],
-        ["Was pushed", parse_1.parseAndFormat(harEntry._was_pushed, parse_1.parsePositive, function () { return "yes"; })],
-        ["Initiator (Loaded by)", harEntry._initiator],
-        ["Initiator Line", harEntry._initiator_line],
-        ["Host", har_1.getHeader(harEntry.request.headers, "Host")],
-        ["IP", harEntry._ip_addr],
-        ["Client Port", parse_1.parseAndFormat(harEntry._client_port, parse_1.parsePositive)],
-        ["Expires", harEntry._expires],
-        ["Cache Time", parse_1.parseAndFormat(harEntry._cache_time, parse_1.parsePositive, parse_1.formatSeconds)],
-        ["CDN Provider", harEntry._cdn_provider],
-        byteSizeProperty("ObjectSize", harEntry._objectSize),
-        byteSizeProperty("Bytes In (downloaded)", harEntry._bytesIn),
-        byteSizeProperty("Bytes Out (uploaded)", harEntry._bytesOut),
-        byteSizeProperty("JPEG Scan Count", harEntry._jpeg_scan_count),
-        byteSizeProperty("Gzip Total", harEntry._gzip_total),
-        byteSizeProperty("Gzip Save", harEntry._gzip_save),
-        byteSizeProperty("Minify Total", harEntry._minify_total),
-        byteSizeProperty("Minify Save", harEntry._minify_save),
-        byteSizeProperty("Image Total", harEntry._image_total),
-        byteSizeProperty("Image Save", harEntry._image_save),
-    ];
-}
-function parseRequestDetails(harEntry) {
-    var request = harEntry.request;
-    var stringHeader = function (name) { return [name, har_1.getHeader(request.headers, name)]; };
-    return [
-        ["Method", request.method],
-        ["HTTP Version", request.httpVersion],
-        byteSizeProperty("Bytes Out (uploaded)", harEntry._bytesOut),
-        byteSizeProperty("Headers Size", request.headersSize),
-        byteSizeProperty("Body Size", request.bodySize),
-        ["Comment", parse_1.parseAndFormat(request.comment, parse_1.parseNonEmpty)],
-        stringHeader("User-Agent"),
-        stringHeader("Host"),
-        stringHeader("Connection"),
-        stringHeader("Accept"),
-        stringHeader("Accept-Encoding"),
-        stringHeader("Expect"),
-        stringHeader("Forwarded"),
-        stringHeader("If-Modified-Since"),
-        stringHeader("If-Range"),
-        stringHeader("If-Unmodified-Since"),
-        countProperty("Querystring parameters count", request.queryString.length),
-        countProperty("Cookies count", request.cookies.length),
-    ];
-}
-function parseResponseDetails(harEntry) {
-    var response = harEntry.response;
-    var content = response.content;
-    var headers = response.headers;
-    var stringHeader = function (title, name) {
-        if (name === void 0) { name = title; }
-        return [title, har_1.getHeader(headers, name)];
-    };
-    var dateHeader = function (name) {
-        var header = har_1.getHeader(headers, name);
-        return [name, parse_1.parseAndFormat(header, parse_1.parseDate, parse_1.formatDateLocalized)];
-    };
-    var contentLength = har_1.getHeader(headers, "Content-Length");
-    var contentSize = undefined;
-    if (content.size !== -1 && contentLength !== content.size.toString()) {
-        contentSize = content.size;
-    }
-    var contentType = har_1.getHeader(headers, "Content-Type");
-    if (harEntry._contentType && harEntry._contentType !== contentType) {
-        contentType = contentType + " | " + harEntry._contentType;
-    }
-    return [
-        ["Status", response.status + " " + response.statusText],
-        ["HTTP Version", response.httpVersion],
-        byteSizeProperty("Bytes In (downloaded)", harEntry._bytesIn),
-        byteSizeProperty("Headers Size", response.headersSize),
-        byteSizeProperty("Body Size", response.bodySize),
-        ["Content-Type", contentType],
-        stringHeader("Cache-Control"),
-        stringHeader("Content-Encoding"),
-        dateHeader("Expires"),
-        dateHeader("Last-Modified"),
-        stringHeader("Pragma"),
-        byteSizeProperty("Content-Length", contentLength),
-        byteSizeProperty("Content Size", contentSize),
-        byteSizeProperty("Content Compression", content.compression),
-        stringHeader("Connection"),
-        stringHeader("ETag"),
-        stringHeader("Accept-Patch"),
-        ["Age", parse_1.parseAndFormat(har_1.getHeader(headers, "Age"), parse_1.parseNonNegative, parse_1.formatSeconds)],
-        stringHeader("Allow"),
-        stringHeader("Content-Disposition"),
-        stringHeader("Location"),
-        stringHeader("Strict-Transport-Security"),
-        stringHeader("Trailer (for chunked transfer coding)", "Trailer"),
-        stringHeader("Transfer-Encoding"),
-        stringHeader("Upgrade"),
-        stringHeader("Vary"),
-        stringHeader("Timing-Allow-Origin"),
-        ["Redirect URL", parse_1.parseAndFormat(response.redirectURL, parse_1.parseNonEmpty)],
-        ["Comment", parse_1.parseAndFormat(response.comment, parse_1.parseNonEmpty)],
-    ];
-}
-function parseTimings(entry) {
-    var timings = entry.rawResource.timings;
-    var optionalTiming = function (timing) { return parse_1.parseAndFormat(timing, parse_1.parseNonNegative, parse_1.formatMilliseconds); };
-    return [
-        ["Total", parse_1.formatMilliseconds(entry.total)],
-        ["Blocked", optionalTiming(timings.blocked)],
-        ["DNS", optionalTiming(timings.dns)],
-        ["Connect", optionalTiming(timings.connect)],
-        ["SSL (TLS)", optionalTiming(timings.ssl)],
-        ["Send", parse_1.formatMilliseconds(timings.send)],
-        ["Wait", parse_1.formatMilliseconds(timings.wait)],
-        ["Receive", parse_1.formatMilliseconds(timings.receive)],
-    ];
-}
-/**
- * Data to show in overlay tabs
- * @param  {number} requestID - request number
- * @param  {WaterfallEntry} entry
- */
-function getKeys(requestID, entry) {
-    var harEntry = entry.rawResource;
-    var requestHeaders = harEntry.request.headers;
-    var responseHeaders = harEntry.response.headers;
-    var headerToKvTuple = function (header) { return [header.name, header.value]; };
-    return {
-        "general": parseGeneralDetails(entry, requestID),
-        "request": parseRequestDetails(harEntry),
-        "requestHeaders": requestHeaders.map(headerToKvTuple),
-        "response": parseResponseDetails(harEntry),
-        "responseHeaders": responseHeaders.map(headerToKvTuple),
-        "timings": parseTimings(entry),
-    };
-}
-exports.getKeys = getKeys;
-
-},{"../../helpers/har":2,"../../helpers/parse":6}],15:[function(require,module,exports){
-"use strict";
-var extract_details_keys_1 = require("./extract-details-keys");
-function makeDefinitionList(dlKeyValues, addClass) {
-    if (addClass === void 0) { addClass = false; }
-    var makeClass = function (key) {
-        if (!addClass) {
-            return "";
-        }
-        var className = key.toLowerCase().replace(/[^a-z-]/g, "");
-        return "class=\"" + (className || "no-colour") + "\"";
-    };
-    return dlKeyValues
-        .filter(function (tuple) { return tuple[1] !== undefined; })
-        .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + tuple[0] + "</dt>\n      <dd>" + tuple[1] + "</dd>\n    "; }).join("");
-}
-function makeTab(innerHtml, renderDl) {
-    if (renderDl === void 0) { renderDl = true; }
-    if (innerHtml.trim() === "") {
-        return "";
-    }
-    var inner = renderDl ? "<dl>" + innerHtml + "</dl>" : innerHtml;
-    return "<div class=\"tab\">\n    " + inner + "\n  </div>";
-}
-function makeImgTab(accordionHeight, entry) {
-    if (entry.requestType !== "image") {
-        return "";
-    }
-    var imgTag = "<img class=\"preview\" style=\"max-height:" + (accordionHeight - 100) + "px\"\n                        data-src=\"" + entry.url + "\" />";
-    return makeTab(imgTag, false);
-}
-function makeGeneralTab(generalData, entry) {
-    var content = makeDefinitionList(generalData);
-    if (entry.indicators.length === 0) {
-        return makeTab(content, true);
-    }
-    var general = "<h2>General</h2>\n    <dl>" + content + "<dl>";
-    content = "";
-    // Make indicator sections
-    var errors = entry.indicators
-        .filter(function (i) { return i.type === "error"; })
-        .map(function (i) { return [i.title, i.description]; });
-    var warnings = entry.indicators
-        .filter(function (i) { return i.type === "warning"; })
-        .map(function (i) { return [i.title, i.description]; });
-    // all others
-    var info = entry.indicators
-        .filter(function (i) { return i.type !== "error" && i.type !== "warning"; })
-        .map(function (i) { return [i.title, i.description]; });
-    if (errors.length > 0) {
-        content += "<h2 class=\"no-boder\">Error" + (errors.length > 1 ? "s" : "") + "</h2>\n    <dl>" + makeDefinitionList(errors) + "</dl>";
-    }
-    if (warnings.length > 0) {
-        content += "<h2 class=\"no-boder\">Warning" + (warnings.length > 1 ? "s" : "") + "</h2>\n    <dl>" + makeDefinitionList(warnings) + "</dl>";
-    }
-    if (info.length > 0) {
-        content += "<h2 class=\"no-boder\">Info</h2>\n    <dl>" + makeDefinitionList(info) + "</dl>";
-    }
-    return makeTab(content + general, false);
-}
-function makeTabBtn(name, tab) {
-    return !!tab ? "<li><button class=\"tab-button\">" + name + "</button></li>" : "";
-}
-function escapeHtml(unsafe) {
-    return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-function createDetailsBody(requestID, entry, accordeonHeight) {
+function createDetailsBody(requestID, detailsHeight, entry) {
     var html = document.createElement("html");
     var body = document.createElement("body");
     body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
-    var tabsData = extract_details_keys_1.getKeys(requestID, entry);
-    var generalTab = makeGeneralTab(tabsData.general, entry);
-    var timingsTab = makeTab(makeDefinitionList(tabsData.timings, true));
-    var requestDl = makeDefinitionList(tabsData.request);
-    var requestHeadersDl = makeDefinitionList(tabsData.requestHeaders);
-    var responseDl = makeDefinitionList(tabsData.response);
-    var responseHeadersDl = makeDefinitionList(tabsData.responseHeaders);
-    var imgTab = makeImgTab(accordeonHeight, entry);
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> <a href=\"" + entry.url + "\">" + entry.url + "</a></h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + makeTabBtn("General", generalTab) + "\n          <li><button class=\"tab-button\">Request</button></li>\n          <li><button class=\"tab-button\">Response</button></li>\n          " + makeTabBtn("Timings", timingsTab) + "\n          <li><button class=\"tab-button\">Raw Data</button></li>\n          " + makeTabBtn("Preview", imgTab) + "\n        </ul>\n        </nav>\n      </header>\n      " + generalTab + "\n      <div class=\"tab\">\n        <dl>\n          " + requestDl + "\n        </dl>\n        <h2>All Request Headers</h2>\n        <dl>\n          " + requestHeadersDl + "\n        </dl>\n      </div>\n      <div class=\"tab\">\n        <dl>\n          " + responseDl + "\n        </dl>\n        <h2>All Response Headers</h2>\n        <dl>\n          " + responseHeadersDl + "\n        </dl>\n      </div>\n      " + timingsTab + "\n      <div class=\"tab raw-data\">\n        <pre><code>" + escapeHtml(JSON.stringify(entry.rawResource, null, 2)) + "</code></pre>\n      </div>\n      " + imgTab + "\n    </div>\n    ";
+    var tabMenu = entry.tabs.map(function (t) {
+        return "<li><button class=\"tab-button\">" + t.title + "</button></li>";
+    }).join("\n");
+    var tabBody = entry.tabs.map(function (t) {
+        var cssClasses = "tab";
+        if (t.tabClass) {
+            cssClasses += " " + t.tabClass;
+        }
+        var content = "";
+        if (t.content) {
+            content = t.content;
+        }
+        else if (typeof t.renderContent === "function") {
+            content = t.renderContent(detailsHeight);
+            // keep content for later
+            t.content = content;
+        }
+        else {
+            throw TypeError("Invalid Details Tab");
+        }
+        return "<div class=\"tab " + cssClasses + "\">" + content + "</div>";
+    }).join("\n");
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> <a href=\"" + entry.url + "\">" + entry.url + "</a></h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + tabMenu + "\n        </ul>\n        </nav>\n      </header>\n      " + tabBody + "\n    </div>\n    ";
     html.appendChild(body);
     return html;
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"./extract-details-keys":14}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 var dom_1 = require("../../helpers/dom");
 var svg_details_overlay_1 = require("./svg-details-overlay");
@@ -1287,7 +1392,7 @@ var OverlayManager = (function () {
     /**
      * Opens an overlay - rerenders others internaly
      */
-    OverlayManager.prototype.openOverlay = function (index, y, accordionHeight, entry, barEls) {
+    OverlayManager.prototype.openOverlay = function (index, y, detailsHeight, entry, barEls) {
         if (this.openOverlays.some(function (o) { return o.index === index; })) {
             return;
         }
@@ -1297,11 +1402,11 @@ var OverlayManager = (function () {
             "entry": entry,
             "index": index,
             "onClose": function () {
-                self.closeOverlay(index, accordionHeight, barEls);
+                self.closeOverlay(index, detailsHeight, barEls);
             },
             "openTabIndex": 0,
         });
-        this.renderOverlays(accordionHeight);
+        this.renderOverlays(detailsHeight);
         this.context.pubSub.publishToOverlayChanges({
             "combinedOverlayHeight": self.getCombinedOverlayHeight(),
             "openOverlays": self.openOverlays,
@@ -1312,23 +1417,23 @@ var OverlayManager = (function () {
     /**
      * Toggles an overlay - rerenders others
      */
-    OverlayManager.prototype.toggleOverlay = function (index, y, accordionHeight, entry, barEls) {
+    OverlayManager.prototype.toggleOverlay = function (index, y, detailsHeight, entry, barEls) {
         if (this.openOverlays.some(function (o) { return o.index === index; })) {
-            this.closeOverlay(index, accordionHeight, barEls);
+            this.closeOverlay(index, detailsHeight, barEls);
         }
         else {
-            this.openOverlay(index, y, accordionHeight, entry, barEls);
+            this.openOverlay(index, y, detailsHeight, entry, barEls);
         }
     };
     /**
      * closes on overlay - rerenders others internally
      */
-    OverlayManager.prototype.closeOverlay = function (index, accordionHeight, barEls) {
+    OverlayManager.prototype.closeOverlay = function (index, detailsHeight, barEls) {
         var self = this;
         this.openOverlays.splice(this.openOverlays.reduce(function (prev, curr, i) {
             return (curr.index === index) ? i : prev;
         }, -1), 1);
-        this.renderOverlays(accordionHeight);
+        this.renderOverlays(detailsHeight);
         this.context.pubSub.publishToOverlayChanges({
             "combinedOverlayHeight": self.getCombinedOverlayHeight(),
             "openOverlays": self.openOverlays,
@@ -1361,10 +1466,10 @@ var OverlayManager = (function () {
      *
      * @summary this is to re-set the "y" position since there is a bug in chrome with
      * tranform of an SVG and positioning/scoll of a foreignObjects
-     * @param  {number} accordionHeight
+     * @param  {number} detailsHeight
      * @param  {SVGGElement} overlayHolder
      */
-    OverlayManager.prototype.renderOverlays = function (accordionHeight) {
+    OverlayManager.prototype.renderOverlays = function (detailsHeight) {
         var _this = this;
         dom_1.removeChildren(this.overlayHolder);
         var currY = 0;
@@ -1372,7 +1477,7 @@ var OverlayManager = (function () {
             .sort(function (a, b) { return a.index > b.index ? 1 : -1; })
             .forEach(function (overlay) {
             var y = overlay.defaultY + currY;
-            var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(overlay, y, accordionHeight);
+            var infoOverlay = svg_details_overlay_1.createRowInfoOverlay(overlay, y, detailsHeight);
             // if overlay has a preview image show it
             var previewImg = infoOverlay.querySelector("img.preview");
             if (previewImg && !previewImg.src) {
@@ -1392,7 +1497,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = OverlayManager;
 ;
 
-},{"../../helpers/dom":1,"./svg-details-overlay":18}],17:[function(require,module,exports){
+},{"../../helpers/dom":1,"./svg-details-overlay":20}],19:[function(require,module,exports){
 "use strict";
 var PubSub = (function () {
     function PubSub() {
@@ -1410,7 +1515,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = PubSub;
 ;
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 var svg = require("../../helpers/svg");
 var html_details_body_1 = require("./html-details-body");
@@ -1435,10 +1540,10 @@ function createCloseButtonSvg(y) {
     closeBtn.appendChild(svg.newTitle("Close Overlay"));
     return closeBtn;
 }
-function createHolder(y, accordionHeight) {
+function createHolder(y, detailsHeight) {
     var innerHolder = svg.newG("info-overlay-holder");
     var bg = svg.newRect({
-        "height": accordionHeight,
+        "height": detailsHeight,
         "rx": 2,
         "ry": 2,
         "width": "100%",
@@ -1448,19 +1553,19 @@ function createHolder(y, accordionHeight) {
     innerHolder.appendChild(bg);
     return innerHolder;
 }
-function createRowInfoOverlay(overlay, y, accordionHeight) {
+function createRowInfoOverlay(overlay, y, detailsHeight) {
     var requestID = overlay.entry.rawResource._number || overlay.index + 1;
     var wrapper = svg.newG("outer-info-overlay-holder");
-    var holder = createHolder(y, accordionHeight);
+    var holder = createHolder(y, detailsHeight);
     var foreignObject = svg.newForeignObject({
-        "height": accordionHeight,
+        "height": detailsHeight,
         "width": "100%",
         "x": "0",
         "y": y,
     });
     var closeBtn = createCloseButtonSvg(y);
     closeBtn.addEventListener("click", function () { return overlay.onClose(overlay.index); });
-    var body = html_details_body_1.createDetailsBody(requestID, overlay.entry, accordionHeight);
+    var body = html_details_body_1.createDetailsBody(requestID, detailsHeight, overlay.entry);
     var buttons = body.getElementsByClassName("tab-button");
     var tabs = body.getElementsByClassName("tab");
     var setTabStatus = function (tabIndex) {
@@ -1482,7 +1587,7 @@ function createRowInfoOverlay(overlay, y, accordionHeight) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/svg":7,"./html-details-body":15}],19:[function(require,module,exports){
+},{"../../helpers/svg":7,"./html-details-body":17}],21:[function(require,module,exports){
 /**
  * Creation of sub-components used in a resource request row
  */
@@ -1553,7 +1658,7 @@ function getIndicatorIcons(entry) {
 }
 exports.getIndicatorIcons = getIndicatorIcons;
 
-},{"../../helpers/heuristics":3}],20:[function(require,module,exports){
+},{"../../helpers/heuristics":3}],22:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
@@ -1785,7 +1890,7 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":13}],21:[function(require,module,exports){
+},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":16}],23:[function(require,module,exports){
 "use strict";
 var heuristics_1 = require("../../helpers/heuristics");
 var icons = require("../../helpers/icons");
@@ -1867,7 +1972,7 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":3,"../../helpers/icons":4,"../../helpers/misc":5,"../../helpers/svg":7,"./svg-indicators":19,"./svg-row-subcomponents":20}],22:[function(require,module,exports){
+},{"../../helpers/heuristics":3,"../../helpers/icons":4,"../../helpers/misc":5,"../../helpers/svg":7,"./svg-indicators":21,"./svg-row-subcomponents":22}],24:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  */
@@ -1928,7 +2033,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/dom":1,"../../helpers/svg":7}],23:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":7}],25:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
@@ -2018,7 +2123,7 @@ function createBgRect(context, entry) {
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":13}],24:[function(require,module,exports){
+},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":16}],26:[function(require,module,exports){
 "use strict";
 var dom_1 = require("../../helpers/dom");
 var misc_1 = require("../../helpers/misc");
@@ -2093,7 +2198,7 @@ function createMarks(context, marks) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/dom":1,"../../helpers/misc":5,"../../helpers/svg":7}],25:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/misc":5,"../../helpers/svg":7}],27:[function(require,module,exports){
 "use strict";
 var svg = require("../helpers/svg");
 var styling_converters_1 = require("../transformers/styling-converters");
@@ -2222,7 +2327,7 @@ function createWaterfallSvg(data, options) {
         var entryWidth = entry.total || 1;
         var y = options.rowHeight * i;
         var x = (entry.start || 0.001);
-        var accordionHeight = 450;
+        var detailsHeight = 450;
         var rectData = {
             "cssClass": styling_converters_1.requestTypeToCssClass(entry.requestType),
             "height": options.rowHeight,
@@ -2235,7 +2340,7 @@ function createWaterfallSvg(data, options) {
             "y": y,
         };
         var showDetailsOverlay = function () {
-            context.overlayManager.toggleOverlay(i, y + options.rowHeight, accordionHeight, entry, barEls);
+            context.overlayManager.toggleOverlay(i, y + options.rowHeight, detailsHeight, entry, barEls);
         };
         var rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);
         barEls.push(rowItem);
@@ -2253,5 +2358,5 @@ function createWaterfallSvg(data, options) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":7,"../transformers/styling-converters":13,"./details-overlay/overlay-manager":16,"./details-overlay/pub-sub":17,"./row/svg-indicators":19,"./row/svg-row":21,"./sub-components/svg-alignment-helper":22,"./sub-components/svg-general-components":23,"./sub-components/svg-marks":24}]},{},[9])(9)
+},{"../helpers/svg":7,"../transformers/styling-converters":16,"./details-overlay/overlay-manager":18,"./details-overlay/pub-sub":19,"./row/svg-indicators":21,"./row/svg-row":23,"./sub-components/svg-alignment-helper":24,"./sub-components/svg-general-components":25,"./sub-components/svg-marks":26}]},{},[9])(9)
 });
