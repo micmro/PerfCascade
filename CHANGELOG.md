@@ -2,6 +2,13 @@
 
 
 
+<a name="v0.6.0"></a>
+# v0.6.0 (2017-02-21)
+
+* #155 move tabs creation to parse-time. (#157) ([6c294c3](https://github.com/micmro/PerfCascade/commit/6c294c3))
+
+
+
 <a name="v0.5.1"></a>
 ## v0.5.1 (2017-02-19)
 

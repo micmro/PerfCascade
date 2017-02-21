@@ -1,6 +1,6 @@
 {
   "name": "perf-cascade",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Har file visualizer",
   "main": "./index.js",
   "scripts": {
