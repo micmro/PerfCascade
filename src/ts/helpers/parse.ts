@@ -128,7 +128,14 @@ const htmlChars = new RegExp(Object.keys(htmlCharMap).join("|"), "g");
  * Escapes unsafe characters is a string to render safely in HTML
  * @param  {string} unsafe - string to be rendered in HTML
  */
-export function escapeHtml(unsafe: string) {
+export function escapeHtml(unsafe: string | number | boolean = "") {
+  if (typeof unsafe !== "string") {
+    if (typeof unsafe["toString"] === "function") {
+      unsafe = unsafe.toString();
+    } else {
+      throw TypeError("Invalid parameter");
+    }
+  }
   return unsafe.replace(htmlChars, (match) => {
     return htmlCharMap[match];
   });
