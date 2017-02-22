@@ -2,6 +2,13 @@
 
 
 
+<a name="v0.6.1"></a>
+## v0.6.1 (2017-02-22)
+
+* #155 handle non-string arguments ([5f158c9](https://github.com/micmro/PerfCascade/commit/5f158c9))
+
+
+
 <a name="v0.6.0"></a>
 # v0.6.0 (2017-02-21)
 
