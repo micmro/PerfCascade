@@ -8,7 +8,6 @@ import {Mark} from "../typing/waterfall";
 import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
 import OverlayManager from "./details-overlay/overlay-manager";
 import PubSub from "./details-overlay/pub-sub";
-import * as indicators from "./row/svg-indicators";
 import * as row from "./row/svg-row";
 import * as alignmentHelper from  "./sub-components/svg-alignment-helper";
 import * as generalComponents from "./sub-components/svg-general-components";
@@ -123,7 +122,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   });
 
   // This assumes all icons (mime and indicators) have the same width
-  const perIconWidth = indicators.getMimeTypeIcon(entriesToShow[0]).width;
+  const perIconWidth = entriesToShow[0].responseDetails.icon.width;
 
   let maxIcons = 0;
 
@@ -133,7 +132,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
 
   if (options.showIndicatorIcons) {
     const iconsPerBlock = entriesToShow.map((entry: WaterfallEntry) =>
-      entry.indicators.length > 0 ? 1 : 0);
+      entry.responseDetails.indicators.length > 0 ? 1 : 0);
     maxIcons += Math.max.apply(null, iconsPerBlock);
   }
 
@@ -159,7 +158,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
     const x = (entry.start || 0.001);
     const detailsHeight = 450;
     const rectData = {
-      "cssClass": requestTypeToCssClass(entry.requestType),
+      "cssClass": requestTypeToCssClass(entry.responseDetails.requestType),
       "height": options.rowHeight,
       "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
       "label": entry.url + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",

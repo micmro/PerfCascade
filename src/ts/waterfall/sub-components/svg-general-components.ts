@@ -93,7 +93,7 @@ export function createBgRect(context: Context, entry: WaterfallEntry): SVGRectEl
     "width": ((entry.total || 1) / context.unit) + "%",
     "x": ((entry.start || 0.001) / context.unit) + "%",
     "y": 0,
-  }, requestTypeToCssClass(entry.requestType));
+  }, requestTypeToCssClass(entry.responseDetails.requestType));
 
   rect.appendChild(svg.newTitle(entry.url)); // Add tile to wedge path
 

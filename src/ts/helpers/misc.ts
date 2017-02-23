@@ -64,3 +64,14 @@ export function resourceUrlFormatter(url: string, maxLength: number): string {
 export function roundNumber(num: number, decimals: number = 2) {
   return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }
+
+/**
+ *
+ * Checks if `status` code is `>= lowerBound` and `<= upperBound`
+ * @param  {number} entry
+ * @param  {number} lowerBound - inclusive lower bound
+ * @param  {number} upperBound - inclusive upper bound
+ */
+export function isInStatusCodeRange(status: number, lowerBound: number, upperBound: number) {
+  return status >= lowerBound && status <= upperBound;
+}
