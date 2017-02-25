@@ -2,6 +2,15 @@
 
 
 
+<a name="v0.6.2"></a>
+## v0.6.2 (2017-02-25)
+
+* # fix TS 2.2 change that broke travis ([1ecd5bd](https://github.com/micmro/PerfCascade/commit/1ecd5bd))
+* #155 refactor to remove rawRessource ([faa269d](https://github.com/micmro/PerfCascade/commit/faa269d))
+* build: remove console logs ([612e940](https://github.com/micmro/PerfCascade/commit/612e940))
+
+
+
 <a name="v0.6.1"></a>
 ## v0.6.1 (2017-02-22)
 
