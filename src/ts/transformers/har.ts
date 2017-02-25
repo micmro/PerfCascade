@@ -1,6 +1,11 @@
 import { roundNumber } from "../helpers/misc";
 import { toInt } from "../helpers/parse";
-import { Entry, Har, PageTimings } from "../typing/har";
+import {
+  Entry,
+  Har,
+  Page,
+  PageTimings,
+} from "../typing/har";
 import {
   Mark,
   TimingType,
@@ -28,10 +33,11 @@ import {
 export function transformDoc(harData: Har): WaterfallDocs {
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
-  console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length);
+  const pages = getPages(data);
+  console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, pages.length);
 
   return {
-    pages: data.pages.map((_page, i) => this.transformPage(data, i)),
+    pages: pages.map((_page, i) => this.transformPage(data, i)),
   };
 }
 
@@ -57,6 +63,25 @@ function toWaterFallEntry(entry: Entry, index: number, startRelative: number, is
   );
 }
 
+/** retuns the page or a mock page object */
+function getPages(data: Har) {
+  if (data.pages && data.pages.length > 0) {
+    return data.pages;
+  }
+  const statedTime = data.entries.reduce((earliest, curr) => {
+    const currDate = Date.parse(curr.startedDateTime);
+    const earliestDate = Date.parse(earliest);
+    return earliestDate < currDate ? earliest : curr.startedDateTime;
+  }, data.entries[0].startedDateTime);
+  console.log(statedTime);
+  return [{
+    id: "",
+    pageTimings: {},
+    startedDateTime: data.entries[0].startedDateTime,
+    title: "n/a",
+  } as Page];
+}
+
 /**
  * Transforms a HAR object into the format needed to render the PerfCascade
  * @param  {Har} harData - HAR document
@@ -67,16 +92,22 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
 
-  const currPage = data.pages[pageIndex];
+  const pages = getPages(data);
+  const currPage = pages[pageIndex];
   const pageStartTime = new Date(currPage.startedDateTime).getTime();
   const pageTimings = currPage.pageTimings;
 
-  console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
+  console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, pages.length);
 
   let doneTime = 0;
   const isTLS = documentIsSecure(data.entries);
   const entries = data.entries
-    .filter((entry) => entry.pageref === currPage.id)
+    .filter((entry) => {
+      if (pages.length === 1 && currPage.id === "") {
+        return true;
+      }
+      return entry.pageref === currPage.id;
+    })
     .map((entry, index) => {
       const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
       doneTime = Math.max(doneTime, startRelative + entry.time);
