@@ -1,7 +1,8 @@
-/*! github.com/micmro/PerfCascade Version:0.6.1 (22/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.6.2 (25/02/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Adds class `className` to `el`
  * @param  {Element} el
@@ -51,6 +52,7 @@ exports.removeChildren = removeChildren;
 
 },{}],2:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function matchHeaderFilter(lowercaseName) {
     return function (header) { return header.name.toLowerCase() === lowercaseName; };
 }
@@ -67,24 +69,11 @@ function getHeader(headers, headerName) {
 exports.getHeader = getHeader;
 
 },{}],3:[function(require,module,exports){
-"use strict";
-/**
- *
- * Checks if `entry.response.status` code is `>= lowerBound` and `<= upperBound`
- * @param  {Entry} entry
- * @param  {number} lowerBound - inclusive lower bound
- * @param  {number} upperBound - inclusive upper bound
- */
-function isInStatusCodeRange(entry, lowerBound, upperBound) {
-    return entry.response.status >= lowerBound && entry.response.status <= upperBound;
-}
-exports.isInStatusCodeRange = isInStatusCodeRange;
-
-},{}],4:[function(require,module,exports){
 /**
  *  SVG Icons
  */
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var toSvg = function (x, y, title, className, scale, svgDoc) {
     var parser = new DOMParser();
     var doc = parser.parseFromString("<svg x=\"" + x + "\" y=\"" + y + "\" xmlns=\"http://www.w3.org/2000/svg\">\n    <g class=\"icon " + className + "\" transform=\"scale(" + scale + ")\">\n      " + svgDoc + "\n      <title>" + title + "</title>\n    </g>\n  </svg>", "image/svg+xml");
@@ -181,11 +170,12 @@ function push(x, y, title, scale) {
 }
 exports.push = push;
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /**
  *  Misc Helpers
  */
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Parses URL into its components
  * @param  {string} url
@@ -246,9 +236,21 @@ function roundNumber(num, decimals) {
     return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }
 exports.roundNumber = roundNumber;
+/**
+ *
+ * Checks if `status` code is `>= lowerBound` and `<= upperBound`
+ * @param  {number} entry
+ * @param  {number} lowerBound - inclusive lower bound
+ * @param  {number} upperBound - inclusive upper bound
+ */
+function isInStatusCodeRange(status, lowerBound, upperBound) {
+    return status >= lowerBound && status <= upperBound;
+}
+exports.isInStatusCodeRange = isInStatusCodeRange;
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var misc_1 = require("./misc");
 /**
  * Type safe and null safe way to transform, filter and format an input value, e.g. parse a Date from a string,
@@ -369,7 +371,7 @@ var htmlCharMap = {
  */
 var htmlChars = new RegExp(Object.keys(htmlCharMap).join("|"), "g");
 /**
- * Escapes unsafe characters is a string to render safely in HTML
+ * Escapes unsafe characters in a string to render safely in HTML
  * @param  {string} unsafe - string to be rendered in HTML
  */
 function escapeHtml(unsafe) {
@@ -398,11 +400,12 @@ function toInt(input) {
 }
 exports.toInt = toInt;
 
-},{"./misc":5}],7:[function(require,module,exports){
+},{"./misc":4}],6:[function(require,module,exports){
 /**
  *  SVG Helpers
  */
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("./dom");
 function entries(obj) {
     var entries = [];
@@ -548,8 +551,9 @@ function getNodeTextWidth(textNode, skipClone) {
 }
 exports.getNodeTextWidth = getNodeTextWidth;
 
-},{"./dom":1}],8:[function(require,module,exports){
+},{"./dom":1}],7:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Creates the html for diagrams legend
  */
@@ -561,7 +565,7 @@ function makeLegend() {
 }
 exports.makeLegend = makeLegend;
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 var __assign = (this && this.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -571,6 +575,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
+Object.defineProperty(exports, "__esModule", { value: true });
 var legend_1 = require("./legend/legend");
 exports.makeLegend = legend_1.makeLegend;
 var paging_1 = require("./paging/paging");
@@ -633,8 +638,9 @@ exports.fromPerfCascadeFormat = fromPerfCascadeFormat;
 var transformHarToPerfCascade = HarTransformer.transformDoc;
 exports.transformHarToPerfCascade = transformHarToPerfCascade;
 
-},{"./legend/legend":8,"./paging/paging":10,"./transformers/har":14,"./waterfall/svg-chart":27}],10:[function(require,module,exports){
+},{"./legend/legend":7,"./paging/paging":9,"./transformers/har":13,"./waterfall/svg-chart":26}],9:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../helpers/dom");
 /** Class to keep track of run of a multi-run har is beeing shown  */
 var Paging = (function () {
@@ -719,11 +725,11 @@ var Paging = (function () {
     };
     return Paging;
 }());
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Paging;
 
-},{"../helpers/dom":1}],11:[function(require,module,exports){
+},{"../helpers/dom":1}],10:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var har_1 = require("../helpers/har");
 var parse_1 = require("../helpers/parse");
 var byteSizeProperty = function (title, input) {
@@ -875,13 +881,13 @@ function getKeys(entry, requestID, startRelative, endRelative) {
 }
 exports.getKeys = getKeys;
 
-},{"../helpers/har":2,"../helpers/parse":6}],12:[function(require,module,exports){
+},{"../helpers/har":2,"../helpers/parse":5}],11:[function(require,module,exports){
 /**
  * Heuristics used at parse-time for HAR data
  */
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var har_1 = require("../helpers/har");
-var heuristics_1 = require("../helpers/heuristics");
 var misc = require("../helpers/misc");
 function isCompressible(entry, requestType) {
     var minCompressionSize = 1000;
@@ -916,7 +922,7 @@ function hasCacheIssue(entry) {
     if (entry.request.method.toLowerCase() !== "get") {
         return false;
     }
-    if (entry.response.status === 204 || !heuristics_1.isInStatusCodeRange(entry, 200, 299)) {
+    if (entry.response.status === 204 || !misc.isInStatusCodeRange(entry.response.status, 200, 299)) {
         return false;
     }
     var headers = entry.response.headers;
@@ -989,7 +995,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
         });
     }
     if (!entry.response.content.mimeType &&
-        heuristics_1.isInStatusCodeRange(entry, 200, 299) &&
+        misc.isInStatusCodeRange(entry.response.status, 200, 299) &&
         entry.response.status !== 204) {
         output.push({
             description: "Response doesn't contain a 'Content-Type' header.",
@@ -1002,8 +1008,9 @@ function collectIndicators(entry, docIsTLS, requestType) {
 }
 exports.collectIndicators = collectIndicators;
 
-},{"../helpers/har":2,"../helpers/heuristics":3,"../helpers/misc":5}],13:[function(require,module,exports){
+},{"../helpers/har":2,"../helpers/misc":4}],12:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var parse_1 = require("../helpers/parse");
 var extract_details_keys_1 = require("./extract-details-keys");
 var helpers_1 = require("./helpers");
@@ -1097,14 +1104,16 @@ function makeImgTab(entry) {
     return makeLazyWaterfallEntryTab("Preview", function (detailsHeight) { return "<img class=\"preview\" style=\"max-height:" + (detailsHeight - 100) + "px\"\n data-src=\"" + entry.request.url + "\" />"; });
 }
 
-},{"../helpers/parse":6,"./extract-details-keys":11,"./helpers":15}],14:[function(require,module,exports){
+},{"../helpers/parse":5,"./extract-details-keys":10,"./helpers":14}],13:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
+var svg_indicators_1 = require("../waterfall/row/svg-indicators");
 var har_heuristics_1 = require("./har-heuristics");
 var har_tabs_1 = require("./har-tabs");
 var helpers_1 = require("./helpers");
-function createWaterfallEntry(url, start, end, segments, rawResource, requestType, indicators, tabs) {
+function createWaterfallEntry(url, start, end, segments, responseDetails, tabs) {
     if (segments === void 0) { segments = []; }
     var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
     return {
@@ -1113,9 +1122,7 @@ function createWaterfallEntry(url, start, end, segments, rawResource, requestTyp
         start: start,
         end: end,
         segments: segments,
-        rawResource: rawResource,
-        requestType: requestType,
-        indicators: indicators,
+        responseDetails: responseDetails,
         tabs: tabs,
     };
 }
@@ -1155,7 +1162,8 @@ function toWaterFallEntry(entry, index, startRelative, isTLS) {
     var endRelative = parse_1.toInt(entry._all_end) || (startRelative + entry.time);
     var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
     var indicators = har_heuristics_1.collectIndicators(entry, isTLS, requestType);
-    return createWaterfallEntry(entry.request.url, startRelative, endRelative, buildDetailTimingBlocks(startRelative, entry), entry, requestType, indicators, har_tabs_1.makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators));
+    var responseDetails = createResponseDetails(entry, indicators);
+    return createWaterfallEntry(entry.request.url, startRelative, endRelative, buildDetailTimingBlocks(startRelative, entry), responseDetails, har_tabs_1.makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators));
 }
 /**
  * Transforms a HAR object into the format needed to render the PerfCascade
@@ -1260,9 +1268,60 @@ function getTimePair(key, harEntry, collect, startRelative) {
         "start": start,
     };
 }
+function createResponseDetails(entry, indicators) {
+    var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
+    return {
+        icon: getMimeTypeIcon(entry, requestType),
+        rowClass: getRowCssClasses(entry),
+        indicators: indicators,
+        requestType: requestType,
+        statusCode: entry.response.status,
+    };
+}
+/**
+ * Scan the request for errors or potential issues and highlight them
+ * @param  {Entry} entry
+ * @returns {Icon}
+ */
+function getMimeTypeIcon(entry, requestType) {
+    var status = entry.response.status;
+    // highlight redirects
+    if (!!entry.response.redirectURL) {
+        var url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
+        return svg_indicators_1.makeIcon("err3xx", status + " response status: Redirect to " + url + "...");
+    }
+    else if (misc_1.isInStatusCodeRange(status, 400, 499)) {
+        return svg_indicators_1.makeIcon("err4xx", status + " response status: " + entry.response.statusText);
+    }
+    else if (misc_1.isInStatusCodeRange(status, 500, 599)) {
+        return svg_indicators_1.makeIcon("err5xx", status + " response status: " + entry.response.statusText);
+    }
+    else if (status === 204) {
+        return svg_indicators_1.makeIcon("plain", "No content");
+    }
+    else {
+        return svg_indicators_1.makeIcon(requestType, requestType);
+    }
+}
+function getRowCssClasses(entry) {
+    var classes = ["row-item"];
+    if (misc_1.isInStatusCodeRange(entry.response.status, 500, 599)) {
+        classes.push("status5xx");
+    }
+    else if (misc_1.isInStatusCodeRange(entry.response.status, 400, 499)) {
+        classes.push("status4xx");
+    }
+    else if (entry.response.status !== 304 &&
+        misc_1.isInStatusCodeRange(entry.response.status, 300, 399)) {
+        // 304 == Not Modified, so not an issue
+        classes.push("status3xx");
+    }
+    return classes.join(" ");
+}
 
-},{"../helpers/misc":5,"../helpers/parse":6,"./har-heuristics":12,"./har-tabs":13,"./helpers":15}],15:[function(require,module,exports){
+},{"../helpers/misc":4,"../helpers/parse":5,"../waterfall/row/svg-indicators":20,"./har-heuristics":11,"./har-tabs":12,"./helpers":14}],14:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /** Helpers that are not file-fromat specific */
 var parse_1 = require("../helpers/parse");
 /** render a dl */
@@ -1327,8 +1386,9 @@ function mimeToRequestType(mimeType) {
 }
 exports.mimeToRequestType = mimeToRequestType;
 
-},{"../helpers/parse":6}],16:[function(require,module,exports){
+},{"../helpers/parse":5}],15:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Convert a RequestType into a CSS class
  * @param {RequestType} requestType
@@ -1346,8 +1406,9 @@ function timingTypeToCssClass(timingType) {
 }
 exports.timingTypeToCssClass = timingTypeToCssClass;
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function createDetailsBody(requestID, detailsHeight, entry) {
     var html = document.createElement("html");
     var body = document.createElement("body");
@@ -1375,14 +1436,15 @@ function createDetailsBody(requestID, detailsHeight, entry) {
         }
         return "<div class=\"tab " + cssClasses + "\">" + content + "</div>";
     }).join("\n");
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> <a href=\"" + entry.url + "\">" + entry.url + "</a></h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + tabMenu + "\n        </ul>\n        </nav>\n      </header>\n      " + tabBody + "\n    </div>\n    ";
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.responseDetails.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> <a href=\"" + entry.url + "\">" + entry.url + "</a></h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + tabMenu + "\n        </ul>\n        </nav>\n      </header>\n      " + tabBody + "\n    </div>\n    ";
     html.appendChild(body);
     return html;
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../../helpers/dom");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 /** Overlay (popup) instance manager */
@@ -1502,12 +1564,12 @@ var OverlayManager = (function () {
     };
     return OverlayManager;
 }());
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = OverlayManager;
 ;
 
-},{"../../helpers/dom":1,"./svg-details-overlay":20}],19:[function(require,module,exports){
+},{"../../helpers/dom":1,"./svg-details-overlay":19}],18:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var PubSub = (function () {
     function PubSub() {
         this.subscribers = [];
@@ -1520,12 +1582,12 @@ var PubSub = (function () {
     };
     return PubSub;
 }());
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = PubSub;
 ;
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var svg = require("../../helpers/svg");
 var html_details_body_1 = require("./html-details-body");
 function forEach(els, fn) {
@@ -1563,7 +1625,7 @@ function createHolder(y, detailsHeight) {
     return innerHolder;
 }
 function createRowInfoOverlay(overlay, y, detailsHeight) {
-    var requestID = overlay.entry.rawResource._number || overlay.index + 1;
+    var requestID = overlay.index + 1;
     var wrapper = svg.newG("outer-info-overlay-holder");
     var holder = createHolder(y, detailsHeight);
     var foreignObject = svg.newForeignObject({
@@ -1596,56 +1658,33 @@ function createRowInfoOverlay(overlay, y, detailsHeight) {
 }
 exports.createRowInfoOverlay = createRowInfoOverlay;
 
-},{"../../helpers/svg":7,"./html-details-body":17}],21:[function(require,module,exports){
-/**
- * Creation of sub-components used in a resource request row
- */
+},{"../../helpers/svg":6,"./html-details-body":16}],20:[function(require,module,exports){
 "use strict";
-var heuristics_1 = require("../../helpers/heuristics");
-// helper to avoid typing out all key of the helper object
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Convinience helper to create a new `Icon`
+ *
+ * _Width of icons is fixed_
+ */
 function makeIcon(type, title) {
     return { "type": type, "title": title, "width": 20 };
 }
-/**
- * Scan the request for errors or potential issues and highlight them
- * @param  {WaterfallEntry} entry
- * @returns {Icon}
- */
-function getMimeTypeIcon(entry) {
-    var harEntry = entry.rawResource;
-    // highlight redirects
-    if (!!harEntry.response.redirectURL) {
-        var url = encodeURI(harEntry.response.redirectURL.split("?")[0] || "");
-        return makeIcon("err3xx", harEntry.response.status + " response status: Redirect to " + url + "...");
-    }
-    else if (heuristics_1.isInStatusCodeRange(harEntry, 400, 499)) {
-        return makeIcon("err4xx", harEntry.response.status + " response status: " + harEntry.response.statusText);
-    }
-    else if (heuristics_1.isInStatusCodeRange(harEntry, 500, 599)) {
-        return makeIcon("err5xx", harEntry.response.status + " response status: " + harEntry.response.statusText);
-    }
-    else if (harEntry.response.status === 204) {
-        return makeIcon("plain", "No content");
-    }
-    else {
-        return makeIcon(entry.requestType, entry.requestType);
-    }
-}
-exports.getMimeTypeIcon = getMimeTypeIcon;
+exports.makeIcon = makeIcon;
 /**
  * Gets the Indicators in Icon format
  * @param  {WaterfallEntry} entry
  * @returns {Icon[]}
  */
 function getIndicatorIcons(entry) {
-    if (entry.indicators.length === 0) {
+    var indicators = entry.responseDetails.indicators;
+    if (indicators.length === 0) {
         return [];
     }
     var combinedTitle = [];
     var icon = "";
-    var errors = entry.indicators.filter(function (i) { return i.type === "error"; });
-    var warnings = entry.indicators.filter(function (i) { return i.type === "warning"; });
-    var info = entry.indicators.filter(function (i) { return i.type !== "error" && i.type !== "warning"; });
+    var errors = indicators.filter(function (i) { return i.type === "error"; });
+    var warnings = indicators.filter(function (i) { return i.type === "warning"; });
+    var info = indicators.filter(function (i) { return i.type !== "error" && i.type !== "warning"; });
     if (errors.length > 0) {
         combinedTitle.push("Error" + (errors.length > 1 ? "s" : "") + ":\n" + errors.map(function (e) { return e.title; }).join("\n"));
         icon = "error";
@@ -1667,11 +1706,12 @@ function getIndicatorIcons(entry) {
 }
 exports.getIndicatorIcons = getIndicatorIcons;
 
-},{"../../helpers/heuristics":3}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var misc = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
 var styling_converters_1 = require("../../transformers/styling-converters");
@@ -1899,13 +1939,13 @@ function createRowBg(y, rowHeight, onClick) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":16}],23:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":6,"../../transformers/styling-converters":15}],22:[function(require,module,exports){
 "use strict";
-var heuristics_1 = require("../../helpers/heuristics");
+Object.defineProperty(exports, "__esModule", { value: true });
 var icons = require("../../helpers/icons");
 var misc = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
-var indicators = require("./svg-indicators");
+var svg_indicators_1 = require("./svg-indicators");
 var rowSubComponents = require("./svg-row-subcomponents");
 // initial clip path
 var clipPathElProto = svg.newClipPath("titleClipPath");
@@ -1913,28 +1953,13 @@ clipPathElProto.appendChild(svg.newRect({
     "height": "100%",
     "width": "100%",
 }));
-function getRowCssClasses(harEntry) {
-    var classes = ["row-item"];
-    if (heuristics_1.isInStatusCodeRange(harEntry, 500, 599)) {
-        classes.push("status5xx");
-    }
-    else if (heuristics_1.isInStatusCodeRange(harEntry, 400, 499)) {
-        classes.push("status4xx");
-    }
-    else if (harEntry.response.status !== 304 &&
-        heuristics_1.isInStatusCodeRange(harEntry, 300, 399)) {
-        // 304 == Not Modified, so not an issue
-        classes.push("status3xx");
-    }
-    return classes.join(" ");
-}
 var ROW_LEFT_MARGIN = 3;
 // Create row for a single request
 function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entry, onDetailsOverlayShow) {
     var y = rectData.y;
     var rowHeight = rectData.height;
     var leftColumnWith = context.options.leftColumnWith;
-    var rowItem = svg.newG(getRowCssClasses(entry.rawResource));
+    var rowItem = svg.newG(entry.responseDetails.rowClass);
     var leftFixedHolder = svg.newSvg("left-fixed-holder", {
         "width": leftColumnWith + "%",
         "x": "0",
@@ -1949,13 +1974,13 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
     var bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
     var x = ROW_LEFT_MARGIN + maxIconsWidth;
     if (context.options.showMimeTypeIcon) {
-        var icon = indicators.getMimeTypeIcon(entry);
+        var icon = entry.responseDetails.icon;
         x -= icon.width;
         rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
     }
     if (context.options.showIndicatorIcons) {
-        // Create and add warnings for potential issues
-        indicators.getIndicatorIcons(entry).forEach(function (icon) {
+        // Create and add warnings for potentia;l issues
+        svg_indicators_1.getIndicatorIcons(entry).forEach(function (icon) {
             x -= icon.width;
             rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
         });
@@ -1981,11 +2006,12 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
 }
 exports.createRow = createRow;
 
-},{"../../helpers/heuristics":3,"../../helpers/icons":4,"../../helpers/misc":5,"../../helpers/svg":7,"./svg-indicators":21,"./svg-row-subcomponents":22}],24:[function(require,module,exports){
+},{"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":6,"./svg-indicators":20,"./svg-row-subcomponents":21}],23:[function(require,module,exports){
 /**
  * vertical alignment helper lines
  */
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../../helpers/dom");
 var svg = require("../../helpers/svg");
 /**
@@ -2042,11 +2068,12 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/dom":1,"../../helpers/svg":7}],25:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":6}],24:[function(require,module,exports){
 /**
  * Creation of sub-components of the waterfall chart
  */
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
 var styling_converters_1 = require("../../transformers/styling-converters");
@@ -2126,14 +2153,15 @@ function createBgRect(context, entry) {
         "width": ((entry.total || 1) / context.unit) + "%",
         "x": ((entry.start || 0.001) / context.unit) + "%",
         "y": 0,
-    }, styling_converters_1.requestTypeToCssClass(entry.requestType));
+    }, styling_converters_1.requestTypeToCssClass(entry.responseDetails.requestType));
     rect.appendChild(svg.newTitle(entry.url)); // Add tile to wedge path
     return rect;
 }
 exports.createBgRect = createBgRect;
 
-},{"../../helpers/misc":5,"../../helpers/svg":7,"../../transformers/styling-converters":16}],26:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":6,"../../transformers/styling-converters":15}],25:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../../helpers/dom");
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
@@ -2207,13 +2235,13 @@ function createMarks(context, marks) {
 }
 exports.createMarks = createMarks;
 
-},{"../../helpers/dom":1,"../../helpers/misc":5,"../../helpers/svg":7}],27:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/misc":4,"../../helpers/svg":6}],26:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var svg = require("../helpers/svg");
 var styling_converters_1 = require("../transformers/styling-converters");
 var overlay_manager_1 = require("./details-overlay/overlay-manager");
 var pub_sub_1 = require("./details-overlay/pub-sub");
-var indicators = require("./row/svg-indicators");
 var row = require("./row/svg-row");
 var alignmentHelper = require("./sub-components/svg-alignment-helper");
 var generalComponents = require("./sub-components/svg-general-components");
@@ -2310,14 +2338,14 @@ function createWaterfallSvg(data, options) {
         timeLineHolder.appendChild(generalComponents.createBgRect(context, entry));
     });
     // This assumes all icons (mime and indicators) have the same width
-    var perIconWidth = indicators.getMimeTypeIcon(entriesToShow[0]).width;
+    var perIconWidth = entriesToShow[0].responseDetails.icon.width;
     var maxIcons = 0;
     if (options.showMimeTypeIcon) {
         maxIcons += 1;
     }
     if (options.showIndicatorIcons) {
         var iconsPerBlock = entriesToShow.map(function (entry) {
-            return entry.indicators.length > 0 ? 1 : 0;
+            return entry.responseDetails.indicators.length > 0 ? 1 : 0;
         });
         maxIcons += Math.max.apply(null, iconsPerBlock);
     }
@@ -2338,7 +2366,7 @@ function createWaterfallSvg(data, options) {
         var x = (entry.start || 0.001);
         var detailsHeight = 450;
         var rectData = {
-            "cssClass": styling_converters_1.requestTypeToCssClass(entry.requestType),
+            "cssClass": styling_converters_1.requestTypeToCssClass(entry.responseDetails.requestType),
             "height": options.rowHeight,
             "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
             "label": entry.url + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
@@ -2367,5 +2395,5 @@ function createWaterfallSvg(data, options) {
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":7,"../transformers/styling-converters":16,"./details-overlay/overlay-manager":18,"./details-overlay/pub-sub":19,"./row/svg-indicators":21,"./row/svg-row":23,"./sub-components/svg-alignment-helper":24,"./sub-components/svg-general-components":25,"./sub-components/svg-marks":26}]},{},[9])(9)
+},{"../helpers/svg":6,"../transformers/styling-converters":15,"./details-overlay/overlay-manager":17,"./details-overlay/pub-sub":18,"./row/svg-row":22,"./sub-components/svg-alignment-helper":23,"./sub-components/svg-general-components":24,"./sub-components/svg-marks":25}]},{},[8])(8)
 });
