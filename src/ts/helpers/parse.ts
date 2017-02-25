@@ -96,16 +96,16 @@ export function formatDateLocalized(date: Date): string {
   return `${date.toUTCString()}</br>(local time: ${date.toLocaleString()})`;
 }
 
-const bytesPerKb = 1024;
-const bytesPerMb = 1024 * bytesPerKb;
+const bytesPerKB = 1024;
+const bytesPerMB = 1024 * bytesPerKB;
 
 export function formatBytes(bytes: number): string {
   const raw = `${bytes} bytes`;
-  if (bytes >= bytesPerMb) {
-    return `${raw} (~${roundNumber(bytes / bytesPerKb, 1)} MB)`;
+  if (bytes >= bytesPerMB) {
+    return `${raw} (~${roundNumber(bytes / bytesPerMB, 1)} MB)`;
   }
-  if (bytes >= bytesPerKb) {
-    return `${raw} (~${roundNumber(bytes / bytesPerKb, 0)} kB)`;
+  if (bytes >= bytesPerKB) {
+    return `${raw} (~${roundNumber(bytes / bytesPerKB, 0)} kB)`;
   }
   return raw;
 }
