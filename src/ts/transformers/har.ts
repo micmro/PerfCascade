@@ -1,52 +1,24 @@
-import { isInStatusCodeRange, roundNumber } from "../helpers/misc";
+import { roundNumber } from "../helpers/misc";
 import { toInt } from "../helpers/parse";
 import { Entry, Har, PageTimings } from "../typing/har";
 import {
-  Icon,
   Mark,
   TimingType,
   WaterfallData,
   WaterfallDocs,
-  WaterfallEntry,
   WaterfallEntryIndicator,
-  WaterfallEntryTab,
   WaterfallEntryTiming,
   WaterfallResponseDetails,
 } from "../typing/waterfall";
-import { makeIcon } from "../waterfall/row/svg-indicators";
 import { collectIndicators, documentIsSecure } from "./har-heuristics";
 import { makeTabs } from "./har-tabs";
-import { mimeToRequestType } from "./helpers";
-
-function createWaterfallEntry(url: string,
-                              start: number,
-                              end: number,
-                              segments: WaterfallEntryTiming[] = [],
-                              responseDetails: WaterfallResponseDetails,
-                              tabs: WaterfallEntryTab[]): WaterfallEntry {
-  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
-  return {
-    total,
-    url,
-    start,
-    end,
-    segments,
-    responseDetails,
-    tabs,
-  };
-}
-
-function createWaterfallEntryTiming(type: TimingType,
-                                    start: number,
-                                    end: number): WaterfallEntryTiming {
-  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
-  return {
-    total,
-    type,
-    start,
-    end,
-  };
-}
+import {
+  createWaterfallEntry,
+  createWaterfallEntryTiming,
+  makeMimeTypeIcon,
+  makeRowCssClasses,
+  mimeToRequestType,
+} from "./helpers";
 
 /**
  * Transforms the full HAR doc, including all pages
@@ -197,50 +169,20 @@ function getTimePair(key: string, harEntry: Entry, collect: WaterfallEntryTiming
   };
 }
 
+/**
+ * Helper to create a requests `WaterfallResponseDetails`
+ *
+ * @param  {Entry} entry
+ * @param  {WaterfallEntryIndicator[]} indicators
+ * @returns WaterfallResponseDetails
+ */
 function createResponseDetails(entry: Entry, indicators: WaterfallEntryIndicator[]): WaterfallResponseDetails {
   const requestType = mimeToRequestType(entry.response.content.mimeType);
-
   return {
-    icon: getMimeTypeIcon(entry, requestType),
-    rowClass: getRowCssClasses(entry),
+    icon: makeMimeTypeIcon(entry.response.status, entry.response.statusText, requestType, entry.response.redirectURL),
+    rowClass: makeRowCssClasses(entry.response.status),
     indicators,
     requestType,
     statusCode: entry.response.status,
   };
-}
-
-/**
- * Scan the request for errors or potential issues and highlight them
- * @param  {Entry} entry
- * @returns {Icon}
- */
-function getMimeTypeIcon(entry: Entry, requestType): Icon {
-  const status = entry.response.status;
-  // highlight redirects
-  if (!!entry.response.redirectURL) {
-    const url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
-    return makeIcon("err3xx", `${status} response status: Redirect to ${url}...`);
-  } else if (isInStatusCodeRange(status, 400, 499)) {
-    return makeIcon("err4xx", `${status} response status: ${entry.response.statusText}`);
-  } else if (isInStatusCodeRange(status, 500, 599)) {
-    return makeIcon("err5xx", `${status} response status: ${entry.response.statusText}`);
-  } else if (status === 204) {
-    return makeIcon("plain", "No content");
-  } else {
-    return makeIcon(requestType, requestType);
-  }
-}
-
-function getRowCssClasses(entry: Entry): string {
-  const classes = ["row-item"];
-  if (isInStatusCodeRange(entry.response.status, 500, 599)) {
-    classes.push("status5xx");
-  } else if (isInStatusCodeRange(entry.response.status, 400, 499)) {
-    classes.push("status4xx");
-  } else if (entry.response.status !== 304 &&
-    isInStatusCodeRange(entry.response.status, 300, 399)) {
-    // 304 == Not Modified, so not an issue
-    classes.push("status3xx");
-  }
-  return classes.join(" ");
 }
