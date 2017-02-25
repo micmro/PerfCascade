@@ -38,13 +38,6 @@ module.exports = function (grunt) {
     let logHeader = oldChangelog.slice(0, headerLineCount);
     /** previous changelog entries */
     let prevLogs = oldChangelog.slice(headerLineCount);
-
-    console.log(oldChangelog + "\n")
-
-    console.log(logHeader + "\n")
-
-    console.log(prevLogs + "\n")
-
     var s = new Readable;
     s.pipe(wStr);
     s.push(logHeader.join('\n') + '\n');

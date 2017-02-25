@@ -1,9 +1,9 @@
-import { roundNumber } from "../helpers/misc";
+import { isInStatusCodeRange, roundNumber } from "../helpers/misc";
 import { toInt } from "../helpers/parse";
 import { Entry, Har, PageTimings } from "../typing/har";
 import {
+  Icon,
   Mark,
-  RequestType,
   TimingType,
   WaterfallData,
   WaterfallDocs,
@@ -11,7 +11,9 @@ import {
   WaterfallEntryIndicator,
   WaterfallEntryTab,
   WaterfallEntryTiming,
+  WaterfallResponseDetails,
 } from "../typing/waterfall";
+import { makeIcon } from "../waterfall/row/svg-indicators";
 import { collectIndicators, documentIsSecure } from "./har-heuristics";
 import { makeTabs } from "./har-tabs";
 import { mimeToRequestType } from "./helpers";
@@ -20,9 +22,7 @@ function createWaterfallEntry(url: string,
                               start: number,
                               end: number,
                               segments: WaterfallEntryTiming[] = [],
-                              rawResource: Entry,
-                              requestType: RequestType,
-                              indicators: WaterfallEntryIndicator[],
+                              responseDetails: WaterfallResponseDetails,
                               tabs: WaterfallEntryTab[]): WaterfallEntry {
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   return {
@@ -31,9 +31,7 @@ function createWaterfallEntry(url: string,
     start,
     end,
     segments,
-    rawResource,
-    requestType,
-    indicators,
+    responseDetails,
     tabs,
   };
 }
@@ -77,13 +75,12 @@ function toWaterFallEntry(entry: Entry, index: number, startRelative: number, is
   const endRelative = toInt(entry._all_end) || (startRelative + entry.time);
   const requestType = mimeToRequestType(entry.response.content.mimeType);
   const indicators = collectIndicators(entry, isTLS, requestType);
+  const responseDetails = createResponseDetails(entry, indicators);
   return createWaterfallEntry(entry.request.url,
     startRelative,
     endRelative,
     buildDetailTimingBlocks(startRelative, entry),
-    entry,
-    requestType,
-    indicators,
+    responseDetails,
     makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators),
   );
 }
@@ -198,4 +195,52 @@ function getTimePair(key: string, harEntry: Entry, collect: WaterfallEntryTiming
     "end": end,
     "start": start,
   };
+}
+
+function createResponseDetails(entry: Entry, indicators: WaterfallEntryIndicator[]): WaterfallResponseDetails {
+  const requestType = mimeToRequestType(entry.response.content.mimeType);
+
+  return {
+    icon: getMimeTypeIcon(entry, requestType),
+    rowClass: getRowCssClasses(entry),
+    indicators,
+    requestType,
+    statusCode: entry.response.status,
+  };
+}
+
+/**
+ * Scan the request for errors or potential issues and highlight them
+ * @param  {Entry} entry
+ * @returns {Icon}
+ */
+function getMimeTypeIcon(entry: Entry, requestType): Icon {
+  const status = entry.response.status;
+  // highlight redirects
+  if (!!entry.response.redirectURL) {
+    const url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
+    return makeIcon("err3xx", `${status} response status: Redirect to ${url}...`);
+  } else if (isInStatusCodeRange(status, 400, 499)) {
+    return makeIcon("err4xx", `${status} response status: ${entry.response.statusText}`);
+  } else if (isInStatusCodeRange(status, 500, 599)) {
+    return makeIcon("err5xx", `${status} response status: ${entry.response.statusText}`);
+  } else if (status === 204) {
+    return makeIcon("plain", "No content");
+  } else {
+    return makeIcon(requestType, requestType);
+  }
+}
+
+function getRowCssClasses(entry: Entry): string {
+  const classes = ["row-item"];
+  if (isInStatusCodeRange(entry.response.status, 500, 599)) {
+    classes.push("status5xx");
+  } else if (isInStatusCodeRange(entry.response.status, 400, 499)) {
+    classes.push("status4xx");
+  } else if (entry.response.status !== 304 &&
+    isInStatusCodeRange(entry.response.status, 300, 399)) {
+    // 304 == Not Modified, so not an issue
+    classes.push("status3xx");
+  }
+  return classes.join(" ");
 }

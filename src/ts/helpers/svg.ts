@@ -22,7 +22,8 @@ function safeSetAttribute(el: SVGElement, key: string, s: string) {
   el.setAttributeNS(null, key, s);
 }
 
-interface StylableSVGElement extends SVGElement, SVGStylable {
+interface StylableSVGElement extends SVGElement {
+  readonly style: CSSStyleDeclaration;
 }
 
 function safeSetStyle(el: StylableSVGElement, key: string, s: string) {

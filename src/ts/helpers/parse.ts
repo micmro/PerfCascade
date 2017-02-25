@@ -125,10 +125,10 @@ const htmlCharMap = {
 const htmlChars = new RegExp(Object.keys(htmlCharMap).join("|"), "g");
 
 /**
- * Escapes unsafe characters is a string to render safely in HTML
+ * Escapes unsafe characters in a string to render safely in HTML
  * @param  {string} unsafe - string to be rendered in HTML
  */
-export function escapeHtml(unsafe: string | number | boolean = "") {
+export function escapeHtml(unsafe: string | number | boolean = ""): string {
   if (typeof unsafe !== "string") {
     if (typeof unsafe["toString"] === "function") {
       unsafe = unsafe.toString();

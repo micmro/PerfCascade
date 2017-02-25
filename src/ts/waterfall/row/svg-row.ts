@@ -1,12 +1,10 @@
-import { isInStatusCodeRange } from "../../helpers/heuristics";
 import * as icons from "../../helpers/icons";
 import * as misc from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
 import { Context } from "../../typing/context";
-import {Entry} from "../../typing/har";
 import { RectData } from "../../typing/rect-data";
-import {WaterfallEntry} from "../../typing/waterfall";
-import * as indicators from "./svg-indicators";
+import { WaterfallEntry } from "../../typing/waterfall";
+import { getIndicatorIcons } from "./svg-indicators";
 import * as rowSubComponents from "./svg-row-subcomponents";
 
 // initial clip path
@@ -15,20 +13,6 @@ clipPathElProto.appendChild(svg.newRect({
   "height": "100%",
   "width": "100%",
 }));
-
-function getRowCssClasses(harEntry: Entry): string {
-  const classes = ["row-item"];
-  if (isInStatusCodeRange(harEntry, 500, 599)) {
-    classes.push("status5xx");
-  } else if (isInStatusCodeRange(harEntry, 400, 499)) {
-    classes.push("status4xx");
-  } else if (harEntry.response.status !== 304 &&
-    isInStatusCodeRange(harEntry, 300, 399)) {
-    // 304 == Not Modified, so not an issue
-    classes.push("status3xx");
-  }
-  return classes.join(" ");
-}
 
 const ROW_LEFT_MARGIN = 3;
 
@@ -41,7 +25,7 @@ export function createRow(context: Context, index: number,
   const y = rectData.y;
   const rowHeight = rectData.height;
   const leftColumnWith = context.options.leftColumnWith;
-  let rowItem = svg.newG(getRowCssClasses(entry.rawResource));
+  let rowItem = svg.newG(entry.responseDetails.rowClass);
   let leftFixedHolder = svg.newSvg("left-fixed-holder", {
     "width": `${leftColumnWith}%`,
     "x": "0",
@@ -59,14 +43,14 @@ export function createRow(context: Context, index: number,
   let x = ROW_LEFT_MARGIN + maxIconsWidth;
 
   if (context.options.showMimeTypeIcon) {
-    const icon = indicators.getMimeTypeIcon(entry);
+    const icon = entry.responseDetails.icon;
     x -= icon.width;
     rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
   }
 
   if (context.options.showIndicatorIcons) {
-    // Create and add warnings for potential issues
-    indicators.getIndicatorIcons(entry).forEach((icon: indicators.Icon) => {
+    // Create and add warnings for potentia;l issues
+    getIndicatorIcons(entry).forEach((icon) => {
       x -= icon.width;
       rowName.appendChild(icons[icon.type](x, y + 3, icon.title));
     });

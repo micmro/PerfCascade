@@ -3,7 +3,6 @@
  */
 
 import { hasHeader } from "../helpers/har";
-import { isInStatusCodeRange } from "../helpers/heuristics";
 import * as misc from "../helpers/misc";
 import { Entry } from "../typing/har";
 import { WaterfallEntryIndicator } from "../typing/waterfall";
@@ -44,7 +43,7 @@ function hasCacheIssue(entry: Entry) {
   if (entry.request.method.toLowerCase() !== "get") {
     return false;
   }
-  if (entry.response.status === 204 || !isInStatusCodeRange(entry, 200, 299)) {
+  if (entry.response.status === 204 || !misc.isInStatusCodeRange(entry.response.status, 200, 299)) {
     return false;
   }
 
@@ -126,7 +125,7 @@ export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: 
   }
 
   if (!entry.response.content.mimeType &&
-    isInStatusCodeRange(entry, 200, 299) &&
+    misc.isInStatusCodeRange(entry.response.status, 200, 299) &&
     entry.response.status !== 204) {
     output.push({
       description: "Response doesn't contain a 'Content-Type' header.",

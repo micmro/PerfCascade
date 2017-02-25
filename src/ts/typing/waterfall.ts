@@ -1,5 +1,3 @@
-import {Entry} from "./har";
-
 export type TimingType = "blocked" | "dns" | "connect" | "send" | "wait" | "receive" | "ssl";
 export type RequestType = "other" | "image" | "video" | "audio" | "font" | "svg" |  "html" |
   "plain" | "css" | "javascript" | "flash";
@@ -28,12 +26,8 @@ export interface WaterfallEntry {
   end: number;
   /** time segments (dns, tls/ssl, connect...) */
   segments: WaterfallEntryTiming[];
-  /** raw e.g. HAR entry */
-  rawResource: Entry;
-  /** media type category */
-  requestType: RequestType;
-  /** Warnings, Errors and Info indicators  */
-  indicators: WaterfallEntryIndicator[];
+  /** Resource-type icon  */
+  responseDetails: WaterfallResponseDetails;
   /** Tabs to render in the details-overlay view */
   tabs: WaterfallEntryTab[];
 }
@@ -79,6 +73,19 @@ export interface WaterfallEntryTiming {
   end: number;
 }
 
+export interface WaterfallResponseDetails {
+  /** HTTP response status code */
+  statusCode: number;
+  /** Response Type Icon (e.g. Mime type) */
+  icon: Icon;
+  /** Warnings, Errors and Info indicators  */
+  indicators: WaterfallEntryIndicator[];
+  /** CSS class to use for row */
+  rowClass?: string;
+  /** media type category */
+  requestType: RequestType;
+}
+
 export interface WaterfallData {
   title: string;
   durationMs: number;
@@ -91,4 +98,17 @@ export interface WaterfallData {
 
 export interface WaterfallDocs {
   pages: WaterfallData[];
+}
+
+/**
+ * Interface for `Icon` metadata
+ * (e.g. warning and response type icons)
+ */
+export interface Icon {
+  /** Icon types (as in `helpers/icons.ts`) */
+  type: string;
+  /** title for icon */
+  title: string;
+  /** width of icon in px */
+  width: number;
 }
