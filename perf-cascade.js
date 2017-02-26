@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.6.2 (25/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.6.3 (26/02/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -344,15 +344,15 @@ function formatDateLocalized(date) {
     return date.toUTCString() + "</br>(local time: " + date.toLocaleString() + ")";
 }
 exports.formatDateLocalized = formatDateLocalized;
-var bytesPerKb = 1024;
-var bytesPerMb = 1024 * bytesPerKb;
+var bytesPerKB = 1024;
+var bytesPerMB = 1024 * bytesPerKB;
 function formatBytes(bytes) {
     var raw = bytes + " bytes";
-    if (bytes >= bytesPerMb) {
-        return raw + " (~" + misc_1.roundNumber(bytes / bytesPerKb, 1) + " MB)";
+    if (bytes >= bytesPerMB) {
+        return raw + " (~" + misc_1.roundNumber(bytes / bytesPerMB, 1) + " MB)";
     }
-    if (bytes >= bytesPerKb) {
-        return raw + " (~" + misc_1.roundNumber(bytes / bytesPerKb, 0) + " kB)";
+    if (bytes >= bytesPerKB) {
+        return raw + " (~" + misc_1.roundNumber(bytes / bytesPerKB, 0) + " kB)";
     }
     return raw;
 }
@@ -1109,32 +1109,9 @@ function makeImgTab(entry) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
-var svg_indicators_1 = require("../waterfall/row/svg-indicators");
 var har_heuristics_1 = require("./har-heuristics");
 var har_tabs_1 = require("./har-tabs");
 var helpers_1 = require("./helpers");
-function createWaterfallEntry(url, start, end, segments, responseDetails, tabs) {
-    if (segments === void 0) { segments = []; }
-    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
-    return {
-        total: total,
-        url: url,
-        start: start,
-        end: end,
-        segments: segments,
-        responseDetails: responseDetails,
-        tabs: tabs,
-    };
-}
-function createWaterfallEntryTiming(type, start, end) {
-    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
-    return {
-        total: total,
-        type: type,
-        start: start,
-        end: end,
-    };
-}
 /**
  * Transforms the full HAR doc, including all pages
  * @param  {Har} harData - raw hhar object
@@ -1144,9 +1121,10 @@ function transformDoc(harData) {
     var _this = this;
     // make sure it's the *.log base node
     var data = (harData["log"] !== undefined ? harData["log"] : harData);
-    console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length);
+    var pages = getPages(data);
+    console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, pages.length);
     return {
-        pages: data.pages.map(function (_page, i) { return _this.transformPage(data, i); }),
+        pages: pages.map(function (_page, i) { return _this.transformPage(data, i); }),
     };
 }
 exports.transformDoc = transformDoc;
@@ -1163,7 +1141,25 @@ function toWaterFallEntry(entry, index, startRelative, isTLS) {
     var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
     var indicators = har_heuristics_1.collectIndicators(entry, isTLS, requestType);
     var responseDetails = createResponseDetails(entry, indicators);
-    return createWaterfallEntry(entry.request.url, startRelative, endRelative, buildDetailTimingBlocks(startRelative, entry), responseDetails, har_tabs_1.makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators));
+    return helpers_1.createWaterfallEntry(entry.request.url, startRelative, endRelative, buildDetailTimingBlocks(startRelative, entry), responseDetails, har_tabs_1.makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators));
+}
+/** retuns the page or a mock page object */
+function getPages(data) {
+    if (data.pages && data.pages.length > 0) {
+        return data.pages;
+    }
+    var statedTime = data.entries.reduce(function (earliest, curr) {
+        var currDate = Date.parse(curr.startedDateTime);
+        var earliestDate = Date.parse(earliest);
+        return earliestDate < currDate ? earliest : curr.startedDateTime;
+    }, data.entries[0].startedDateTime);
+    console.log(statedTime);
+    return [{
+            id: "",
+            pageTimings: {},
+            startedDateTime: data.entries[0].startedDateTime,
+            title: "n/a",
+        }];
 }
 /**
  * Transforms a HAR object into the format needed to render the PerfCascade
@@ -1175,14 +1171,20 @@ function transformPage(harData, pageIndex) {
     if (pageIndex === void 0) { pageIndex = 0; }
     // make sure it's the *.log base node
     var data = (harData["log"] !== undefined ? harData["log"] : harData);
-    var currPage = data.pages[pageIndex];
+    var pages = getPages(data);
+    var currPage = pages[pageIndex];
     var pageStartTime = new Date(currPage.startedDateTime).getTime();
     var pageTimings = currPage.pageTimings;
-    console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
+    console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, pages.length);
     var doneTime = 0;
     var isTLS = har_heuristics_1.documentIsSecure(data.entries);
     var entries = data.entries
-        .filter(function (entry) { return entry.pageref === currPage.id; })
+        .filter(function (entry) {
+        if (pages.length === 1 && currPage.id === "") {
+            return true;
+        }
+        return entry.pageref === currPage.id;
+    })
         .map(function (entry, index) {
         var startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
         doneTime = Math.max(doneTime, startRelative + entry.time);
@@ -1232,10 +1234,10 @@ function buildDetailTimingBlocks(startRelative, harEntry) {
             var sslEnd = parseInt(harEntry["_ssl_end"], 10) || time.start + t.ssl;
             var connectStart = (!!parseInt(harEntry["_ssl_start"], 10)) ? time.start : sslEnd;
             return collect
-                .concat([createWaterfallEntryTiming("ssl", sslStart, sslEnd)])
-                .concat([createWaterfallEntryTiming(key, connectStart, time.end)]);
+                .concat([helpers_1.createWaterfallEntryTiming("ssl", sslStart, sslEnd)])
+                .concat([helpers_1.createWaterfallEntryTiming(key, connectStart, time.end)]);
         }
-        return collect.concat([createWaterfallEntryTiming(key, time.start, time.end)]);
+        return collect.concat([helpers_1.createWaterfallEntryTiming(key, time.start, time.end)]);
     }, []);
 }
 /**
@@ -1268,62 +1270,31 @@ function getTimePair(key, harEntry, collect, startRelative) {
         "start": start,
     };
 }
+/**
+ * Helper to create a requests `WaterfallResponseDetails`
+ *
+ * @param  {Entry} entry
+ * @param  {WaterfallEntryIndicator[]} indicators
+ * @returns WaterfallResponseDetails
+ */
 function createResponseDetails(entry, indicators) {
     var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
     return {
-        icon: getMimeTypeIcon(entry, requestType),
-        rowClass: getRowCssClasses(entry),
+        icon: helpers_1.makeMimeTypeIcon(entry.response.status, entry.response.statusText, requestType, entry.response.redirectURL),
+        rowClass: helpers_1.makeRowCssClasses(entry.response.status),
         indicators: indicators,
         requestType: requestType,
         statusCode: entry.response.status,
     };
 }
-/**
- * Scan the request for errors or potential issues and highlight them
- * @param  {Entry} entry
- * @returns {Icon}
- */
-function getMimeTypeIcon(entry, requestType) {
-    var status = entry.response.status;
-    // highlight redirects
-    if (!!entry.response.redirectURL) {
-        var url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
-        return svg_indicators_1.makeIcon("err3xx", status + " response status: Redirect to " + url + "...");
-    }
-    else if (misc_1.isInStatusCodeRange(status, 400, 499)) {
-        return svg_indicators_1.makeIcon("err4xx", status + " response status: " + entry.response.statusText);
-    }
-    else if (misc_1.isInStatusCodeRange(status, 500, 599)) {
-        return svg_indicators_1.makeIcon("err5xx", status + " response status: " + entry.response.statusText);
-    }
-    else if (status === 204) {
-        return svg_indicators_1.makeIcon("plain", "No content");
-    }
-    else {
-        return svg_indicators_1.makeIcon(requestType, requestType);
-    }
-}
-function getRowCssClasses(entry) {
-    var classes = ["row-item"];
-    if (misc_1.isInStatusCodeRange(entry.response.status, 500, 599)) {
-        classes.push("status5xx");
-    }
-    else if (misc_1.isInStatusCodeRange(entry.response.status, 400, 499)) {
-        classes.push("status4xx");
-    }
-    else if (entry.response.status !== 304 &&
-        misc_1.isInStatusCodeRange(entry.response.status, 300, 399)) {
-        // 304 == Not Modified, so not an issue
-        classes.push("status3xx");
-    }
-    return classes.join(" ");
-}
 
-},{"../helpers/misc":4,"../helpers/parse":5,"../waterfall/row/svg-indicators":20,"./har-heuristics":11,"./har-tabs":12,"./helpers":14}],14:[function(require,module,exports){
+},{"../helpers/misc":4,"../helpers/parse":5,"./har-heuristics":11,"./har-tabs":12,"./helpers":14}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /** Helpers that are not file-fromat specific */
+var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
+var svg_indicators_1 = require("../waterfall/row/svg-indicators");
 /** render a dl */
 function makeDefinitionList(dlKeyValues, addClass) {
     if (addClass === void 0) { addClass = false; }
@@ -1385,8 +1356,85 @@ function mimeToRequestType(mimeType) {
     }
 }
 exports.mimeToRequestType = mimeToRequestType;
+/** helper to create a `WaterfallEntry` */
+function createWaterfallEntry(url, start, end, segments, responseDetails, tabs) {
+    if (segments === void 0) { segments = []; }
+    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    return {
+        total: total,
+        url: url,
+        start: start,
+        end: end,
+        segments: segments,
+        responseDetails: responseDetails,
+        tabs: tabs,
+    };
+}
+exports.createWaterfallEntry = createWaterfallEntry;
+/** helper to create a `WaterfallEntryTiming` */
+function createWaterfallEntryTiming(type, start, end) {
+    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    return {
+        total: total,
+        type: type,
+        start: start,
+        end: end,
+    };
+}
+exports.createWaterfallEntryTiming = createWaterfallEntryTiming;
+/**
+ * Creates the css classes for a row based on it's status code
+ * @param  {number} status - HTTP status code
+ * @returns string - concatinated css class names
+ */
+function makeRowCssClasses(status) {
+    var classes = ["row-item"];
+    if (misc_1.isInStatusCodeRange(status, 500, 599)) {
+        classes.push("status5xx");
+    }
+    else if (misc_1.isInStatusCodeRange(status, 400, 499)) {
+        classes.push("status4xx");
+    }
+    else if (status !== 304 &&
+        misc_1.isInStatusCodeRange(status, 300, 399)) {
+        // 304 == Not Modified, so not an issue
+        classes.push("status3xx");
+    }
+    return classes.join(" ");
+}
+exports.makeRowCssClasses = makeRowCssClasses;
+/**
+ * Create icon that fits the response and highlights issues
+ *
+ * @param  {number} status - HTTP status code
+ * @param  {string} statusText - HTTP status text
+ * @param  {RequestType} requestType
+ * @param  {string=""} redirectURL - pass the URL for `301` or `302`
+ * @returns Icon
+ */
+function makeMimeTypeIcon(status, statusText, requestType, redirectURL) {
+    if (redirectURL === void 0) { redirectURL = ""; }
+    // highlight redirects
+    if (!!redirectURL) {
+        var url = encodeURI(redirectURL.split("?")[0] || "");
+        return svg_indicators_1.makeIcon("err3xx", status + " response status: Redirect to " + url + "...");
+    }
+    else if (misc_1.isInStatusCodeRange(status, 400, 499)) {
+        return svg_indicators_1.makeIcon("err4xx", status + " response status: " + statusText);
+    }
+    else if (misc_1.isInStatusCodeRange(status, 500, 599)) {
+        return svg_indicators_1.makeIcon("err5xx", status + " response status: " + statusText);
+    }
+    else if (status === 204) {
+        return svg_indicators_1.makeIcon("plain", "No content");
+    }
+    else {
+        return svg_indicators_1.makeIcon(requestType, requestType);
+    }
+}
+exports.makeMimeTypeIcon = makeMimeTypeIcon;
 
-},{"../helpers/parse":5}],15:[function(require,module,exports){
+},{"../helpers/misc":4,"../helpers/parse":5,"../waterfall/row/svg-indicators":20}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
