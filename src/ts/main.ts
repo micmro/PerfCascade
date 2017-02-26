@@ -3,7 +3,9 @@ import { makeLegend } from "./legend/legend";
 import Paging from "./paging/paging";
 import * as HarTransformer from "./transformers/har";
 import { Har } from "./typing/har";
+import * as typesHar from "./typing/har";
 import { ChartOptions } from "./typing/options";
+import * as typesWaterfall from "./typing/waterfall";
 import { WaterfallDocs } from "./typing/waterfall";
 import { createWaterfallSvg } from "./waterfall/svg-chart";
 
@@ -20,7 +22,7 @@ const defaultOptions: Readonly<ChartOptions> = {
 };
 
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {
-  const options: ChartOptions = validateOptions({...defaultOptions, ...chartOptions});
+  const options: ChartOptions = validateOptions({ ...defaultOptions, ...chartOptions });
 
   // setup paging helper
   let paging = new Paging(waterfallDocsData, options.selectedPage);
@@ -69,9 +71,11 @@ function fromPerfCascadeFormat(waterfallDocsData: WaterfallDocs, options: Partia
 let transformHarToPerfCascade = HarTransformer.transformDoc;
 
 // global members that get exported via UMD
-export { fromHar }
-export { fromPerfCascadeFormat }
-export { transformHarToPerfCascade }
-export { makeLegend }
+export { fromHar };
+export { fromPerfCascadeFormat };
+export { transformHarToPerfCascade };
+export { makeLegend };
 // export typings
-export * from "./typing/index"
+export { typesHar };
+export { typesWaterfall };
+export { ChartOptions };
