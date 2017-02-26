@@ -2,6 +2,17 @@
 
 
 
+<a name="v0.6.3"></a>
+## v0.6.3 (2017-02-26)
+
+* #155 generalize helpers ([c4097c3](https://github.com/micmro/PerfCascade/commit/c4097c3))
+* #162 add more test sample HARs ([41df3ce](https://github.com/micmro/PerfCascade/commit/41df3ce))
+* #162 handle HARs with no page property ([ed6b142](https://github.com/micmro/PerfCascade/commit/ed6b142))
+* Bytes as MB formatting were off by a factor 1024! ([4ed8a52](https://github.com/micmro/PerfCascade/commit/4ed8a52))
+* improve HAR type docs ([11200f0](https://github.com/micmro/PerfCascade/commit/11200f0))
+
+
+
 <a name="v0.6.2"></a>
 ## v0.6.2 (2017-02-25)
 
