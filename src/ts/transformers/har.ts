@@ -1,52 +1,29 @@
-import { isInStatusCodeRange, roundNumber } from "../helpers/misc";
+import { roundNumber } from "../helpers/misc";
 import { toInt } from "../helpers/parse";
-import { Entry, Har, PageTimings } from "../typing/har";
 import {
-  Icon,
+  Entry,
+  Har,
+  Page,
+  PageTimings,
+} from "../typing/har";
+import {
   Mark,
   TimingType,
   WaterfallData,
   WaterfallDocs,
-  WaterfallEntry,
   WaterfallEntryIndicator,
-  WaterfallEntryTab,
   WaterfallEntryTiming,
   WaterfallResponseDetails,
 } from "../typing/waterfall";
-import { makeIcon } from "../waterfall/row/svg-indicators";
 import { collectIndicators, documentIsSecure } from "./har-heuristics";
 import { makeTabs } from "./har-tabs";
-import { mimeToRequestType } from "./helpers";
-
-function createWaterfallEntry(url: string,
-                              start: number,
-                              end: number,
-                              segments: WaterfallEntryTiming[] = [],
-                              responseDetails: WaterfallResponseDetails,
-                              tabs: WaterfallEntryTab[]): WaterfallEntry {
-  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
-  return {
-    total,
-    url,
-    start,
-    end,
-    segments,
-    responseDetails,
-    tabs,
-  };
-}
-
-function createWaterfallEntryTiming(type: TimingType,
-                                    start: number,
-                                    end: number): WaterfallEntryTiming {
-  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
-  return {
-    total,
-    type,
-    start,
-    end,
-  };
-}
+import {
+  createWaterfallEntry,
+  createWaterfallEntryTiming,
+  makeMimeTypeIcon,
+  makeRowCssClasses,
+  mimeToRequestType,
+} from "./helpers";
 
 /**
  * Transforms the full HAR doc, including all pages
@@ -56,10 +33,11 @@ function createWaterfallEntryTiming(type: TimingType,
 export function transformDoc(harData: Har): WaterfallDocs {
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
-  console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, data.pages.length);
+  const pages = getPages(data);
+  console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, pages.length);
 
   return {
-    pages: data.pages.map((_page, i) => this.transformPage(data, i)),
+    pages: pages.map((_page, i) => this.transformPage(data, i)),
   };
 }
 
@@ -85,6 +63,25 @@ function toWaterFallEntry(entry: Entry, index: number, startRelative: number, is
   );
 }
 
+/** retuns the page or a mock page object */
+function getPages(data: Har) {
+  if (data.pages && data.pages.length > 0) {
+    return data.pages;
+  }
+  const statedTime = data.entries.reduce((earliest, curr) => {
+    const currDate = Date.parse(curr.startedDateTime);
+    const earliestDate = Date.parse(earliest);
+    return earliestDate < currDate ? earliest : curr.startedDateTime;
+  }, data.entries[0].startedDateTime);
+  console.log(statedTime);
+  return [{
+    id: "",
+    pageTimings: {},
+    startedDateTime: data.entries[0].startedDateTime,
+    title: "n/a",
+  } as Page];
+}
+
 /**
  * Transforms a HAR object into the format needed to render the PerfCascade
  * @param  {Har} harData - HAR document
@@ -95,16 +92,22 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
 
-  const currPage = data.pages[pageIndex];
+  const pages = getPages(data);
+  const currPage = pages[pageIndex];
   const pageStartTime = new Date(currPage.startedDateTime).getTime();
   const pageTimings = currPage.pageTimings;
 
-  console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, data.pages.length);
+  console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, pages.length);
 
   let doneTime = 0;
   const isTLS = documentIsSecure(data.entries);
   const entries = data.entries
-    .filter((entry) => entry.pageref === currPage.id)
+    .filter((entry) => {
+      if (pages.length === 1 && currPage.id === "") {
+        return true;
+      }
+      return entry.pageref === currPage.id;
+    })
     .map((entry, index) => {
       const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
       doneTime = Math.max(doneTime, startRelative + entry.time);
@@ -197,50 +200,20 @@ function getTimePair(key: string, harEntry: Entry, collect: WaterfallEntryTiming
   };
 }
 
+/**
+ * Helper to create a requests `WaterfallResponseDetails`
+ *
+ * @param  {Entry} entry
+ * @param  {WaterfallEntryIndicator[]} indicators
+ * @returns WaterfallResponseDetails
+ */
 function createResponseDetails(entry: Entry, indicators: WaterfallEntryIndicator[]): WaterfallResponseDetails {
   const requestType = mimeToRequestType(entry.response.content.mimeType);
-
   return {
-    icon: getMimeTypeIcon(entry, requestType),
-    rowClass: getRowCssClasses(entry),
+    icon: makeMimeTypeIcon(entry.response.status, entry.response.statusText, requestType, entry.response.redirectURL),
+    rowClass: makeRowCssClasses(entry.response.status),
     indicators,
     requestType,
     statusCode: entry.response.status,
   };
-}
-
-/**
- * Scan the request for errors or potential issues and highlight them
- * @param  {Entry} entry
- * @returns {Icon}
- */
-function getMimeTypeIcon(entry: Entry, requestType): Icon {
-  const status = entry.response.status;
-  // highlight redirects
-  if (!!entry.response.redirectURL) {
-    const url = encodeURI(entry.response.redirectURL.split("?")[0] || "");
-    return makeIcon("err3xx", `${status} response status: Redirect to ${url}...`);
-  } else if (isInStatusCodeRange(status, 400, 499)) {
-    return makeIcon("err4xx", `${status} response status: ${entry.response.statusText}`);
-  } else if (isInStatusCodeRange(status, 500, 599)) {
-    return makeIcon("err5xx", `${status} response status: ${entry.response.statusText}`);
-  } else if (status === 204) {
-    return makeIcon("plain", "No content");
-  } else {
-    return makeIcon(requestType, requestType);
-  }
-}
-
-function getRowCssClasses(entry: Entry): string {
-  const classes = ["row-item"];
-  if (isInStatusCodeRange(entry.response.status, 500, 599)) {
-    classes.push("status5xx");
-  } else if (isInStatusCodeRange(entry.response.status, 400, 499)) {
-    classes.push("status4xx");
-  } else if (entry.response.status !== 304 &&
-    isInStatusCodeRange(entry.response.status, 300, 399)) {
-    // 304 == Not Modified, so not an issue
-    classes.push("status3xx");
-  }
-  return classes.join(" ");
 }

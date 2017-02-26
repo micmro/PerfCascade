@@ -1,6 +1,16 @@
 /** Helpers that are not file-fromat specific */
+import { isInStatusCodeRange } from "../helpers/misc";
 import { escapeHtml } from "../helpers/parse";
 import { RequestType } from "../typing/waterfall";
+import {
+  Icon,
+  TimingType,
+  WaterfallEntry,
+  WaterfallEntryTab,
+  WaterfallEntryTiming,
+  WaterfallResponseDetails,
+} from "../typing/waterfall";
+import { makeIcon } from "../waterfall/row/svg-indicators";
 import { KvTuple } from "./extract-details-keys";
 
 /** render a dl */
@@ -63,5 +73,85 @@ export function mimeToRequestType(mimeType: string): RequestType {
     case "json": return "javascript";
     case "x-shockwave-flash": return "flash";
     default: return "other";
+  }
+}
+
+/** helper to create a `WaterfallEntry` */
+export function createWaterfallEntry(url: string,
+                                     start: number,
+                                     end: number,
+                                     segments: WaterfallEntryTiming[] = [],
+                                     responseDetails: WaterfallResponseDetails,
+                                     tabs: WaterfallEntryTab[]): WaterfallEntry {
+  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+  return {
+    total,
+    url,
+    start,
+    end,
+    segments,
+    responseDetails,
+    tabs,
+  };
+}
+
+/** helper to create a `WaterfallEntryTiming` */
+export function createWaterfallEntryTiming(type: TimingType,
+                                           start: number,
+                                           end: number): WaterfallEntryTiming {
+  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+  return {
+    total,
+    type,
+    start,
+    end,
+  };
+}
+
+/**
+ * Creates the css classes for a row based on it's status code
+ * @param  {number} status - HTTP status code
+ * @returns string - concatinated css class names
+ */
+export function makeRowCssClasses(status: number): string {
+  const classes = ["row-item"];
+  if (isInStatusCodeRange(status, 500, 599)) {
+    classes.push("status5xx");
+  } else if (isInStatusCodeRange(status, 400, 499)) {
+    classes.push("status4xx");
+  } else if (status !== 304 &&
+    isInStatusCodeRange(status, 300, 399)) {
+    // 304 == Not Modified, so not an issue
+    classes.push("status3xx");
+  }
+  return classes.join(" ");
+}
+
+/**
+ * Create icon that fits the response and highlights issues
+ *
+ * @param  {number} status - HTTP status code
+ * @param  {string} statusText - HTTP status text
+ * @param  {RequestType} requestType
+ * @param  {string=""} redirectURL - pass the URL for `301` or `302`
+ * @returns Icon
+ */
+export function makeMimeTypeIcon(status: number,
+                                 statusText: string,
+                                 requestType: RequestType,
+                                 redirectURL: string = "",
+                                 ): Icon {
+  // highlight redirects
+  if (!!redirectURL) {
+    const url = encodeURI(redirectURL.split("?")[0] || "");
+    return makeIcon("err3xx", `${status} response status: Redirect to ${url}...`);
+  } else if (isInStatusCodeRange(status, 400, 499)) {
+    return makeIcon("err4xx", `${status} response status: ${statusText}`);
+  } else if (isInStatusCodeRange(status, 500, 599)) {
+    return makeIcon("err5xx", `${status} response status: ${statusText}`);
+  } else if (status === 204) {
+    return makeIcon("plain", "No content");
+  } else {
+    return makeIcon(requestType, requestType);
   }
 }

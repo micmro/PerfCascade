@@ -6,13 +6,22 @@
  * http://www.softwareishard.com/blog/har-12-spec/#log
  */
 export interface Har {
+  /** Version number of the format. If empty, string "1.1" is assumed by default. */
   version: string;
+  /** Name and version info of the log creator application. */
   creator: Creator;
+  /** Name and version info of used browser. */
   browser?: Browser;
+  /**
+   * List of all exported (tracked) pages.
+   *
+   * _Leave out this field if the application does not support grouping by pages._
+   */
   pages?: Page[];
+  /** List of all exported (tracked) requests. */
   entries: Entry[];
+  /**  A comment provided by the user or the application. */
   comment?: string;
-  label?: string; // TODO: Verify if this does exist
 }
 
 /**
