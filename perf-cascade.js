@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.6.3 (26/02/2017) */
+/*! github.com/micmro/PerfCascade Version:0.7.0 (01/03/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -391,14 +391,37 @@ function escapeHtml(unsafe) {
 exports.escapeHtml = escapeHtml;
 /** Ensures `input` is casted to `number` */
 function toInt(input) {
-    if (typeof input === "string") {
+    if (typeof input === "number") {
+        return input;
+    }
+    else if (typeof input === "string") {
         return parseInt(input, 10);
     }
     else {
-        return input;
+        return undefined;
     }
 }
 exports.toInt = toInt;
+/** Validates the `ChartOptions` attributes types */
+function validateOptions(options) {
+    var validateInt = function (name) {
+        options[name] = toInt(options[name]);
+        if (options[name] === undefined) {
+            throw TypeError("option \"" + name + "\" needs to be a number");
+        }
+    };
+    var ensureBoolean = function (name) {
+        options[name] = !!options[name];
+    };
+    validateInt("leftColumnWith");
+    validateInt("rowHeight");
+    validateInt("selectedPage");
+    ensureBoolean("showAlignmentHelpers");
+    ensureBoolean("showIndicatorIcons");
+    ensureBoolean("showMimeTypeIcon");
+    return options;
+}
+exports.validateOptions = validateOptions;
 
 },{"./misc":4}],6:[function(require,module,exports){
 /**
@@ -576,6 +599,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var parse_1 = require("./helpers/parse");
 var legend_1 = require("./legend/legend");
 exports.makeLegend = legend_1.makeLegend;
 var paging_1 = require("./paging/paging");
@@ -587,15 +611,16 @@ var defaultOptions = {
     legendHolder: undefined,
     pageSelector: undefined,
     rowHeight: 23,
+    selectedPage: 0,
     showAlignmentHelpers: true,
     showIndicatorIcons: true,
     showMimeTypeIcon: true,
 };
 function PerfCascade(waterfallDocsData, chartOptions) {
     if (chartOptions === void 0) { chartOptions = {}; }
-    var options = __assign({}, defaultOptions, chartOptions);
+    var options = parse_1.validateOptions(__assign({}, defaultOptions, chartOptions));
     // setup paging helper
-    var paging = new paging_1.default(waterfallDocsData);
+    var paging = new paging_1.default(waterfallDocsData, options.selectedPage);
     var doc = svg_chart_1.createWaterfallSvg(paging.getSelectedPage(), options);
     // page update behaviour
     paging.onPageUpdate(function (_pageIndex, pageDoc) {
@@ -638,16 +663,21 @@ exports.fromPerfCascadeFormat = fromPerfCascadeFormat;
 var transformHarToPerfCascade = HarTransformer.transformDoc;
 exports.transformHarToPerfCascade = transformHarToPerfCascade;
 
-},{"./legend/legend":7,"./paging/paging":9,"./transformers/har":13,"./waterfall/svg-chart":26}],9:[function(require,module,exports){
+},{"./helpers/parse":5,"./legend/legend":7,"./paging/paging":9,"./transformers/har":13,"./waterfall/svg-chart":26}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../helpers/dom");
 /** Class to keep track of run of a multi-run har is beeing shown  */
 var Paging = (function () {
-    function Paging(doc) {
+    function Paging(doc, selectedPageIndex) {
+        if (selectedPageIndex === void 0) { selectedPageIndex = 0; }
         this.doc = doc;
-        this.selectedPageIndex = 0;
+        this.selectedPageIndex = selectedPageIndex;
         this.onPageUpdateCbs = [];
+        if (selectedPageIndex >= this.doc.pages.length) {
+            // fall back to last item if doc has too few pages.
+            this.selectedPageIndex = this.doc.pages.length - 1;
+        }
     }
     /**
      * Returns number of pages
@@ -714,7 +744,7 @@ var Paging = (function () {
         // remove all existing options, like placeholders
         dom_1.removeChildren(selectbox);
         this.doc.pages.forEach(function (p, i) {
-            var option = new Option(p.title, i.toString(), i === _this.selectedPageIndex);
+            var option = new Option(p.title, i.toString(), false, i === _this.selectedPageIndex);
             selectbox.add(option);
         });
         selectbox.style.display = "block";
@@ -1180,6 +1210,10 @@ function transformPage(harData, pageIndex) {
     var isTLS = har_heuristics_1.documentIsSecure(data.entries);
     var entries = data.entries
         .filter(function (entry) {
+        // filter inline data
+        if (entry.request.url.indexOf("data:") === 0) {
+            return false;
+        }
         if (pages.length === 1 && currPage.id === "") {
             return true;
         }
