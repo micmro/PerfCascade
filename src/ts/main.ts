@@ -1,3 +1,4 @@
+import { validateOptions } from "./helpers/parse";
 import { makeLegend } from "./legend/legend";
 import Paging from "./paging/paging";
 import * as HarTransformer from "./transformers/har";
@@ -12,16 +13,17 @@ const defaultOptions: Readonly<ChartOptions> = {
   legendHolder: undefined,
   pageSelector: undefined,
   rowHeight: 23,
+  selectedPage: 0,
   showAlignmentHelpers: true,
   showIndicatorIcons: true,
   showMimeTypeIcon: true,
 };
 
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {
-  const options: ChartOptions = {...defaultOptions, ...chartOptions};
+  const options: ChartOptions = validateOptions({...defaultOptions, ...chartOptions});
 
   // setup paging helper
-  let paging = new Paging(waterfallDocsData);
+  let paging = new Paging(waterfallDocsData, options.selectedPage);
 
   let doc = createWaterfallSvg(paging.getSelectedPage(), options);
 
