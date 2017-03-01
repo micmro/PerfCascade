@@ -103,6 +103,10 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
   const isTLS = documentIsSecure(data.entries);
   const entries = data.entries
     .filter((entry) => {
+      // filter inline data
+      if (entry.request.url.indexOf("data:") === 0) {
+        return false;
+      }
       if (pages.length === 1 && currPage.id === "") {
         return true;
       }
