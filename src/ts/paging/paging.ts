@@ -1,14 +1,16 @@
 import { removeChildren } from "../helpers/dom";
-import {OnPagingCb} from "../typing/paging";
-import {WaterfallData, WaterfallDocs} from "../typing/waterfall";
+import { OnPagingCb } from "../typing/paging";
+import { WaterfallData, WaterfallDocs } from "../typing/waterfall";
 
 /** Class to keep track of run of a multi-run har is beeing shown  */
 export default class Paging {
-  private selectedPageIndex = 0;
   private onPageUpdateCbs: OnPagingCb[] = [];
 
-  constructor(private doc: WaterfallDocs) {
-
+  constructor(private doc: WaterfallDocs, private selectedPageIndex = 0) {
+    if (selectedPageIndex >= this.doc.pages.length) {
+      // fall back to last item if doc has too few pages.
+      this.selectedPageIndex = this.doc.pages.length - 1;
+    }
   }
 
   /**
@@ -44,7 +46,7 @@ export default class Paging {
     if (this.selectedPageIndex === pageIndex) {
       return;
     }
-    if (pageIndex < 0 || pageIndex >=  this.getPageCount()) {
+    if (pageIndex < 0 || pageIndex >= this.getPageCount()) {
       throw new Error("Page does not exist - Invalid pageIndex selected");
     }
 
@@ -80,7 +82,7 @@ export default class Paging {
     // remove all existing options, like placeholders
     removeChildren(selectbox);
     this.doc.pages.forEach((p, i) => {
-      let option = new Option(p.title, i.toString(), i === this.selectedPageIndex);
+      let option = new Option(p.title, i.toString(), false, i === this.selectedPageIndex);
       selectbox.add(option);
     });
 

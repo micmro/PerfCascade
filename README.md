@@ -63,6 +63,11 @@ Relative width of the info column on the left (in percent)
 `HTMLSelectElement` default: `undefined`
 DOM `<select>` element to use to select a run if the HAR contains multiple runs.
 
+### `selectedPage`
+`number` default: `0`
+Zero-based index of the page to initially render.<br/>
+If `selectedPage` is larger than the number of pages the last page will be selected.
+
 ### `legendHolder`
 `HTMLElement` (DOM element) default: `undefined` (not shown)
 If set a legend explaining the waterfall colours is rendered in the `legendHolder` DOM element.

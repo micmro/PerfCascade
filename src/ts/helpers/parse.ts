@@ -1,3 +1,4 @@
+import { ChartOptions } from "../typing/options";
 import { roundNumber } from "./misc";
 
 /**
@@ -143,9 +144,33 @@ export function escapeHtml(unsafe: string | number | boolean = ""): string {
 
 /** Ensures `input` is casted to `number` */
 export function toInt(input: string | number): number {
-  if (typeof input === "string") {
+  if (typeof input === "number") {
+    return input;
+  } else if (typeof input === "string") {
     return parseInt(input, 10);
   } else {
-    return input;
+    return undefined;
   }
+}
+
+/** Validates the `ChartOptions` attributes types */
+export function validateOptions(options: ChartOptions): ChartOptions {
+  let validateInt = (name: keyof ChartOptions) => {
+    options[name] = toInt(options[name] as any);
+    if (options[name] === undefined) {
+      throw TypeError(`option "${name}" needs to be a number`);
+    }
+  };
+  let ensureBoolean = (name: keyof ChartOptions) => {
+    options[name] = !!options[name];
+  };
+
+  validateInt("leftColumnWith");
+  validateInt("rowHeight");
+  validateInt("selectedPage");
+  ensureBoolean("showAlignmentHelpers");
+  ensureBoolean("showIndicatorIcons");
+  ensureBoolean("showMimeTypeIcon");
+
+  return options;
 }
