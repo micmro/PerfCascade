@@ -2,6 +2,15 @@
 
 
 
+<a name="v0.7.0"></a>
+# v0.7.0 (2017-03-01)
+
+* #166 filter out inline data ([67036ad](https://github.com/micmro/PerfCascade/commit/67036ad))
+* #168 add option to choose first rendered page ([8f89997](https://github.com/micmro/PerfCascade/commit/8f89997))
+* update dev-examples to include more options ([5d39bd6](https://github.com/micmro/PerfCascade/commit/5d39bd6))
+
+
+
 <a name="v0.6.3"></a>
 ## v0.6.3 (2017-02-26)
 
