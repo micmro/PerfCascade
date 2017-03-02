@@ -2,6 +2,13 @@
 
 
 
+<a name="v0.8.0"></a>
+# v0.8.0 (2017-03-02)
+
+* #160 set timescale marker distance dynamically ([92b61e5](https://github.com/micmro/PerfCascade/commit/92b61e5))
+
+
+
 <a name="v0.7.0"></a>
 # v0.7.0 (2017-03-01)
 
