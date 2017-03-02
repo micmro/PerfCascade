@@ -68,10 +68,10 @@ let appendSecond = (context: Context, timeHolder: SVGGElement,
  * Renders the time-scale SVG elements (1sec, 2sec...)
  * @param  {Context} context  Execution context object
  * @param {number} durationMs    Full duration of the waterfall
- * @param {number} subSecondStepMs  Distant (time in ms) between sub-second time-scales
  */
-export function createTimeScale(context: Context, durationMs: number, subSecondStepMs = 200): SVGGElement {
+export function createTimeScale(context: Context, durationMs: number): SVGGElement {
   let timeHolder = svg.newG("time-scale full-width");
+  const subSecondStepMs = Math.ceil(durationMs / 10000) * 200;
   /** steps between each second marker */
   const subSecondSteps = 1000 / subSecondStepMs;
   const secs = durationMs / 1000;
