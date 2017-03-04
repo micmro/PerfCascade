@@ -71,17 +71,17 @@ let appendSecond = (context: Context, timeHolder: SVGGElement,
  */
 export function createTimeScale(context: Context, durationMs: number): SVGGElement {
   let timeHolder = svg.newG("time-scale full-width");
-  const subSecondStepMs = Math.ceil(durationMs / 10000) * 200;
-  /** steps between each second marker */
-  const subSecondSteps = 1000 / subSecondStepMs;
+  const subStepMs = Math.ceil(durationMs / 10000) * 200;
+  /** steps between each major second marker */
+  const subStep = 1000 / subStepMs;
   const secs = durationMs / 1000;
-  const steps = durationMs / subSecondStepMs;
+  const steps = durationMs / subStepMs;
 
   for (let i = 0; i <= steps; i++) {
-    const isFullSec = i % subSecondSteps === 0;
-    const secValue = i / subSecondSteps;
+    const isMarkerStep = i % subStep < 0.000000001; // to avoid rounding issues
+    const secValue = i / subStep;
 
-    appendSecond(context, timeHolder, secs, secValue, isFullSec);
+    appendSecond(context, timeHolder, secs, secValue, isMarkerStep);
   }
   return timeHolder;
 }
