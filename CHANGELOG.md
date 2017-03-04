@@ -2,6 +2,13 @@
 
 
 
+<a name="v0.8.1"></a>
+## v0.8.1 (2017-03-04)
+
+* #160 fix rounding issue with some hars ([324f80a](https://github.com/micmro/PerfCascade/commit/324f80a))
+
+
+
 <a name="v0.8.0"></a>
 # v0.8.0 (2017-03-02)
 
