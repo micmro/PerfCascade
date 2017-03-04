@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.8.0 (02/03/2017) */
+/*! github.com/micmro/PerfCascade Version:0.8.1 (04/03/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -2214,15 +2214,15 @@ var appendSecond = function (context, timeHolder, secsTotal, sec, addLabel) {
  */
 function createTimeScale(context, durationMs) {
     var timeHolder = svg.newG("time-scale full-width");
-    var subSecondStepMs = Math.ceil(durationMs / 10000) * 200;
-    /** steps between each second marker */
-    var subSecondSteps = 1000 / subSecondStepMs;
+    var subStepMs = Math.ceil(durationMs / 10000) * 200;
+    /** steps between each major second marker */
+    var subStep = 1000 / subStepMs;
     var secs = durationMs / 1000;
-    var steps = durationMs / subSecondStepMs;
+    var steps = durationMs / subStepMs;
     for (var i = 0; i <= steps; i++) {
-        var isFullSec = i % subSecondSteps === 0;
-        var secValue = i / subSecondSteps;
-        appendSecond(context, timeHolder, secs, secValue, isFullSec);
+        var isMarkerStep = i % subStep < 0.000000001; // to avoid rounding issues
+        var secValue = i / subStep;
+        appendSecond(context, timeHolder, secs, secValue, isMarkerStep);
     }
     return timeHolder;
 }
