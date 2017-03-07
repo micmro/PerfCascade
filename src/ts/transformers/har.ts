@@ -50,7 +50,8 @@ export function transformDoc(harData: Har): WaterfallDocs {
  * @param  {boolean} isTLS
  */
 function toWaterFallEntry(entry: Entry, index: number, startRelative: number, isTLS: boolean) {
-  const endRelative = toInt(entry._all_end) || (startRelative + entry.time);
+  startRelative = Math.round(startRelative);
+  const endRelative = Math.round(toInt(entry._all_end) || (startRelative + entry.time));
   const requestType = mimeToRequestType(entry.response.content.mimeType);
   const indicators = collectIndicators(entry, isTLS, requestType);
   const responseDetails = createResponseDetails(entry, indicators);
@@ -168,11 +169,11 @@ function buildDetailTimingBlocks(startRelative: number, harEntry: Entry): Waterf
       const sslEnd = parseInt(harEntry[`_ssl_end`], 10) || time.start + t.ssl;
       const connectStart = (!!parseInt(harEntry[`_ssl_start`], 10)) ? time.start : sslEnd;
       return collect
-        .concat([createWaterfallEntryTiming("ssl", sslStart, sslEnd)])
-        .concat([createWaterfallEntryTiming(key, connectStart, time.end)]);
+        .concat([createWaterfallEntryTiming("ssl", Math.round(sslStart), Math.round(sslEnd))])
+        .concat([createWaterfallEntryTiming(key, Math.round(connectStart), Math.round(time.end))]);
     }
 
-    return collect.concat([createWaterfallEntryTiming(key, time.start, time.end)]);
+    return collect.concat([createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end))]);
   }, []);
 }
 
@@ -199,8 +200,8 @@ function getTimePair(key: string, harEntry: Entry, collect: WaterfallEntryTiming
   const end = isNaN(preciseEnd) ? (start + harEntry.timings[key]) : preciseEnd;
 
   return {
-    "end": end,
-    "start": start,
+    "end": Math.round(end),
+    "start": Math.round(start),
   };
 }
 
