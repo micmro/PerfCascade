@@ -74,11 +74,10 @@ function getPages(data: Har) {
     const earliestDate = Date.parse(earliest);
     return earliestDate < currDate ? earliest : curr.startedDateTime;
   }, data.entries[0].startedDateTime);
-  console.log(statedTime);
   return [{
     id: "",
     pageTimings: {},
-    startedDateTime: data.entries[0].startedDateTime,
+    startedDateTime: statedTime,
     title: "n/a",
   } as Page];
 }
