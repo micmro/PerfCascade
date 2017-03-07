@@ -75,7 +75,7 @@ export function createMarks(context: Context, marks: Mark[]) {
     lineLabel.addEventListener("mouseleave", onLabelMouseLeave);
     lineLabelHolder.appendChild(lineLabel);
 
-    markHolder.appendChild(svg.newTitle(mark.name + " (" + Math.round(mark.startTime) + "ms)"));
+    markHolder.appendChild(svg.newTitle(mark.name));
     markHolder.appendChild(lineHolder);
     markHolder.appendChild(lineLabelHolder);
     marksHolder.appendChild(markHolder);
