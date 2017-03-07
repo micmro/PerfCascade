@@ -18,7 +18,7 @@ export function createMarks(context: Context, marks: Mark[]) {
 
   marks.forEach((mark, i) => {
     const x = roundNumber(mark.startTime / context.unit);
-    let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase());
+    let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase().replace(/([0-9]+[ ]?ms)|\W/g, ""));
     let lineHolder = svg.newG("line-holder");
     let lineLabelHolder = svg.newG("line-label-holder");
     let lineLabel = svg.newTextEl(mark.name, {x: x + "%", y: diagramHeight + 25});
