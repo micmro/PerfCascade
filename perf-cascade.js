@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.8.1 (04/03/2017) */
+/*! github.com/micmro/PerfCascade Version:0.9.0 (09/03/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -1167,7 +1167,8 @@ exports.transformDoc = transformDoc;
  * @param  {boolean} isTLS
  */
 function toWaterFallEntry(entry, index, startRelative, isTLS) {
-    var endRelative = parse_1.toInt(entry._all_end) || (startRelative + entry.time);
+    startRelative = Math.round(startRelative);
+    var endRelative = Math.round(parse_1.toInt(entry._all_end) || (startRelative + entry.time));
     var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
     var indicators = har_heuristics_1.collectIndicators(entry, isTLS, requestType);
     var responseDetails = createResponseDetails(entry, indicators);
@@ -1183,11 +1184,10 @@ function getPages(data) {
         var earliestDate = Date.parse(earliest);
         return earliestDate < currDate ? earliest : curr.startedDateTime;
     }, data.entries[0].startedDateTime);
-    console.log(statedTime);
     return [{
             id: "",
             pageTimings: {},
-            startedDateTime: data.entries[0].startedDateTime,
+            startedDateTime: statedTime,
             title: "n/a",
         }];
 }
@@ -1268,10 +1268,10 @@ function buildDetailTimingBlocks(startRelative, harEntry) {
             var sslEnd = parseInt(harEntry["_ssl_end"], 10) || time.start + t.ssl;
             var connectStart = (!!parseInt(harEntry["_ssl_start"], 10)) ? time.start : sslEnd;
             return collect
-                .concat([helpers_1.createWaterfallEntryTiming("ssl", sslStart, sslEnd)])
-                .concat([helpers_1.createWaterfallEntryTiming(key, connectStart, time.end)]);
+                .concat([helpers_1.createWaterfallEntryTiming("ssl", Math.round(sslStart), Math.round(sslEnd))])
+                .concat([helpers_1.createWaterfallEntryTiming(key, Math.round(connectStart), Math.round(time.end))]);
         }
-        return collect.concat([helpers_1.createWaterfallEntryTiming(key, time.start, time.end)]);
+        return collect.concat([helpers_1.createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end))]);
     }, []);
 }
 /**
@@ -1300,8 +1300,8 @@ function getTimePair(key, harEntry, collect, startRelative) {
         ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart;
     var end = isNaN(preciseEnd) ? (start + harEntry.timings[key]) : preciseEnd;
     return {
-        "end": end,
-        "start": start,
+        "end": Math.round(end),
+        "start": Math.round(start),
     };
 }
 /**
@@ -2258,7 +2258,7 @@ function createMarks(context, marks) {
     });
     marks.forEach(function (mark, i) {
         var x = misc_1.roundNumber(mark.startTime / context.unit);
-        var markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase());
+        var markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase().replace(/([0-9]+[ ]?ms)|\W/g, ""));
         var lineHolder = svg.newG("line-holder");
         var lineLabelHolder = svg.newG("line-label-holder");
         var lineLabel = svg.newTextEl(mark.name, { x: x + "%", y: diagramHeight + 25 });
@@ -2307,7 +2307,7 @@ function createMarks(context, marks) {
         lineLabel.addEventListener("mouseenter", onLabelMouseEnter);
         lineLabel.addEventListener("mouseleave", onLabelMouseLeave);
         lineLabelHolder.appendChild(lineLabel);
-        markHolder.appendChild(svg.newTitle(mark.name + " (" + Math.round(mark.startTime) + "ms)"));
+        markHolder.appendChild(svg.newTitle(mark.name));
         markHolder.appendChild(lineHolder);
         markHolder.appendChild(lineLabelHolder);
         marksHolder.appendChild(markHolder);
@@ -2450,7 +2450,8 @@ function createWaterfallSvg(data, options) {
             "cssClass": styling_converters_1.requestTypeToCssClass(entry.responseDetails.requestType),
             "height": options.rowHeight,
             "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-            "label": entry.url + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
+            "label": entry.url + " (" + Math.round(entry.start) + "ms - " +
+                (Math.round(entry.end) + "ms | total: " + Math.round(entry.total) + "ms)"),
             "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
             "unit": context.unit,
             "width": entryWidth,
