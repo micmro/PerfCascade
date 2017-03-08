@@ -161,7 +161,8 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
       "cssClass": requestTypeToCssClass(entry.responseDetails.requestType),
       "height": options.rowHeight,
       "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-      "label": entry.url + " (" + entry.start + "ms - " + entry.end + "ms | total: " + entry.total + "ms)",
+      "label": `${entry.url} (${Math.round(entry.start)}ms - ` +
+        `${Math.round(entry.end)}ms | total: ${Math.round(entry.total)}ms)`,
       "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
       "unit": context.unit,
       "width": entryWidth,
