@@ -2,6 +2,18 @@
 
 
 
+<a name="v0.9.0"></a>
+# v0.9.0 (2017-03-08)
+
+* #166 don't rely on fist entry being the first ([c7c8402](https://github.com/micmro/PerfCascade/commit/c7c8402))
+* #172 round block lable ([10406a4](https://github.com/micmro/PerfCascade/commit/10406a4))
+* #172 round entry data during conversion ([bced49c](https://github.com/micmro/PerfCascade/commit/bced49c))
+* #173 fix gzip to zip ([d1c0ec5](https://github.com/micmro/PerfCascade/commit/d1c0ec5))
+* #175 fix dubmicated time in mark ([eaf4927](https://github.com/micmro/PerfCascade/commit/eaf4927))
+* #175 remove time marker from mark css class ([1eabb34](https://github.com/micmro/PerfCascade/commit/1eabb34))
+
+
+
 <a name="v0.8.1"></a>
 ## v0.8.1 (2017-03-04)
 
