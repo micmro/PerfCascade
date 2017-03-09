@@ -1,6 +1,8 @@
 module.exports = {
   options: {
-    plugin: [['tsify']],
+    plugin: [['tsify', {
+      'target': 'es5' 
+    }]],
     banner: "<%= banner %>",
     browserifyOptions: {
       standalone: "perfCascade"
