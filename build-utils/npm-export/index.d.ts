@@ -1,2 +1,1 @@
-export * from "./types/main"
-export * from "./types/typing/index"
+export * from "./types/main";
