@@ -79,6 +79,10 @@ function isPush(entry: Entry): boolean {
  */
 export function documentIsSecure(data: Entry[]) {
   const rootDocument = data.filter((e) => !e.response.redirectURL)[0];
+  // check if request is a redirect chain
+  if (rootDocument === undefined) {
+    return (data.length > 0) ? isSecure(data[0]) : false;
+  }
   return isSecure(rootDocument);
 }
 
