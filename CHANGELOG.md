@@ -2,6 +2,16 @@
 
 
 
+<a name="v0.9.1"></a>
+## v0.9.1 (2017-03-10)
+
+* #177 handle unresolved redirect chains (#179) ([64f0399](https://github.com/micmro/PerfCascade/commit/64f0399)), closes [#179](https://github.com/micmro/PerfCascade/issues/179)
+* attach the HAR ([a9c452f](https://github.com/micmro/PerfCascade/commit/a9c452f))
+* first version ([9268f1a](https://github.com/micmro/PerfCascade/commit/9268f1a))
+* fix build for new node typings ([a4c1a78](https://github.com/micmro/PerfCascade/commit/a4c1a78))
+
+
+
 <a name="v0.9.0"></a>
 # v0.9.0 (2017-03-08)
 
