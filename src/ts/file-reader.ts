@@ -1,4 +1,4 @@
-import { Har } from "./typing/har";
+import { Har } from "har-format";
 
 declare const zip: any;
 

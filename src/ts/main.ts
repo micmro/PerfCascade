@@ -1,8 +1,8 @@
+import { Har } from "har-format";
 import { validateOptions } from "./helpers/parse";
 import { makeLegend } from "./legend/legend";
 import Paging from "./paging/paging";
 import * as HarTransformer from "./transformers/har";
-import { Har } from "./typing/har";
 import { ChartOptions } from "./typing/options";
 import { WaterfallDocs } from "./typing/waterfall";
 import { createWaterfallSvg } from "./waterfall/svg-chart";
@@ -69,9 +69,8 @@ function fromPerfCascadeFormat(waterfallDocsData: WaterfallDocs, options: Partia
 let transformHarToPerfCascade = HarTransformer.transformDoc;
 
 // global members that get exported via UMD
-export { fromHar }
-export { fromPerfCascadeFormat }
-export { transformHarToPerfCascade }
-export { makeLegend }
-// export typings
-export * from "./typing/index"
+export { fromHar };
+export { fromPerfCascadeFormat };
+export { transformHarToPerfCascade };
+export { makeLegend };
+export { ChartOptions };

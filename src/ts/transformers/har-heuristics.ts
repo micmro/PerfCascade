@@ -2,9 +2,9 @@
  * Heuristics used at parse-time for HAR data
  */
 
+import { Entry } from "har-format";
 import { hasHeader } from "../helpers/har";
 import * as misc from "../helpers/misc";
-import { Entry } from "../typing/har";
 import { WaterfallEntryIndicator } from "../typing/waterfall";
 import { RequestType } from "../typing/waterfall";
 

@@ -1,2 +1,3 @@
 export * from "./types/main"
-export * from "./types/typing/index"
+import * as typesHar from "har-format";
+export { typesHar }
