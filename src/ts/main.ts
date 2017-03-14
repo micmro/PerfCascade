@@ -11,6 +11,7 @@ import { createWaterfallSvg } from "./waterfall/svg-chart";
 const defaultOptions: Readonly<ChartOptions> = {
   leftColumnWith: 25,
   legendHolder: undefined,
+  onParsed: undefined,
   pageSelector: undefined,
   rowHeight: 23,
   selectedPage: 0,
@@ -20,7 +21,7 @@ const defaultOptions: Readonly<ChartOptions> = {
 };
 
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {
-  const options: ChartOptions = validateOptions({...defaultOptions, ...chartOptions});
+  const options: ChartOptions = validateOptions({ ...defaultOptions, ...chartOptions });
 
   // setup paging helper
   let paging = new Paging(waterfallDocsData, options.selectedPage);
@@ -53,24 +54,14 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<Cha
  * @returns {SVGSVGElement} - Chart SVG Element
  */
 function fromHar(harData: Har, options: Partial<ChartOptions> = {}): SVGSVGElement {
-  return PerfCascade(HarTransformer.transformDoc(harData), options);
+  const data = HarTransformer.transformDoc(harData);
+  if (typeof options.onParsed === "function") {
+    options.onParsed(data);
+  }
+  return PerfCascade(data, options);
 }
-
-/**
- * Create new PerfCascade from PerfCascade's internal WaterfallData format
- * @param {WaterfallDocs} waterfallDocsData Object containing data to render
- * @param  {ChartOptions} options - PerfCascade options object
- * @returns {SVGSVGElement} - Chart SVG Element
- */
-function fromPerfCascadeFormat(waterfallDocsData: WaterfallDocs, options: Partial<ChartOptions> = {}): SVGSVGElement {
-  return PerfCascade(waterfallDocsData, options);
-}
-
-let transformHarToPerfCascade = HarTransformer.transformDoc;
 
 // global members that get exported via UMD
 export { fromHar };
-export { fromPerfCascadeFormat };
-export { transformHarToPerfCascade };
 export { makeLegend };
 export { ChartOptions };
