@@ -81,6 +81,8 @@
                         } else {
                             renderPerfCascadeChart(data)
                         }
+                    }, function(progress) {
+                        console.log("unzip progress: ", progress / 100, "%");
                     })
                 }
 

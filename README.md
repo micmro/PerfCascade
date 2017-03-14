@@ -73,7 +73,7 @@ If `selectedPage` is larger than the number of pages the last page will be selec
 If set a legend explaining the waterfall colours is rendered in the `legendHolder` DOM element.
 
 ## `*.zhar` - zipped HAR files
-By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/master/src/index.html#L78-L84) you can use `perfCascadeFileReader.readFile` to read a zip file and convert it to a JSON HAR object.
+By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/master/src/index.html#L78-L86) you can use `perfCascadeFileReader.readFile` to read a zip file and convert it to a JSON HAR object.
 
 ```javascript
 perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(error, data){
@@ -86,6 +86,10 @@ perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(error, d
   }
 })
 ```
+
+Optionally `perfCascadeFileReader.readFile` also takes a callback (`(progress:number) => void`) as a forth argument
+that gets called whenever a new unzip progress status is available.
+
 
 ## Dev
 - Start live-reload server and Typescript compiler with watch: `npm run watch`
