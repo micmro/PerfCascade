@@ -35,7 +35,6 @@ export function transformDoc(harData: Har | Log): WaterfallDocs {
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
   const pages = getPages(data);
-  console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, pages.length);
 
   return {
     pages: pages.map((_page, i) => this.transformPage(data, i)),
@@ -97,8 +96,6 @@ export function transformPage(harData: Har | Log, pageIndex: number = 0): Waterf
   const currPage = pages[pageIndex];
   const pageStartTime = new Date(currPage.startedDateTime).getTime();
   const pageTimings = currPage.pageTimings;
-
-  console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, pages.length);
 
   let doneTime = 0;
   const isTLS = documentIsSecure(data.entries);
