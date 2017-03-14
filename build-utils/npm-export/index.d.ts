@@ -1,3 +1,3 @@
 export * from "./types/main"
-import * as typesHar from "har-format";
-export { typesHar }
+import * as harFormat from "har-format";
+export { harFormat }
