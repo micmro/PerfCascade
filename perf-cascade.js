@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:0.9.1 (10/03/2017) */
+/*! github.com/micmro/PerfCascade Version:1.0.0 (16/03/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -609,6 +609,7 @@ var svg_chart_1 = require("./waterfall/svg-chart");
 var defaultOptions = {
     leftColumnWith: 25,
     legendHolder: undefined,
+    onParsed: undefined,
     pageSelector: undefined,
     rowHeight: 23,
     selectedPage: 0,
@@ -646,22 +647,13 @@ function PerfCascade(waterfallDocsData, chartOptions) {
  */
 function fromHar(harData, options) {
     if (options === void 0) { options = {}; }
-    return PerfCascade(HarTransformer.transformDoc(harData), options);
+    var data = HarTransformer.transformDoc(harData);
+    if (typeof options.onParsed === "function") {
+        options.onParsed(data);
+    }
+    return PerfCascade(data, options);
 }
 exports.fromHar = fromHar;
-/**
- * Create new PerfCascade from PerfCascade's internal WaterfallData format
- * @param {WaterfallDocs} waterfallDocsData Object containing data to render
- * @param  {ChartOptions} options - PerfCascade options object
- * @returns {SVGSVGElement} - Chart SVG Element
- */
-function fromPerfCascadeFormat(waterfallDocsData, options) {
-    if (options === void 0) { options = {}; }
-    return PerfCascade(waterfallDocsData, options);
-}
-exports.fromPerfCascadeFormat = fromPerfCascadeFormat;
-var transformHarToPerfCascade = HarTransformer.transformDoc;
-exports.transformHarToPerfCascade = transformHarToPerfCascade;
 
 },{"./helpers/parse":5,"./legend/legend":7,"./paging/paging":9,"./transformers/har":13,"./waterfall/svg-chart":26}],9:[function(require,module,exports){
 "use strict";
@@ -1156,7 +1148,6 @@ function transformDoc(harData) {
     // make sure it's the *.log base node
     var data = (harData["log"] !== undefined ? harData["log"] : harData);
     var pages = getPages(data);
-    console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, pages.length);
     return {
         pages: pages.map(function (_page, i) { return _this.transformPage(data, i); }),
     };
@@ -1209,7 +1200,6 @@ function transformPage(harData, pageIndex) {
     var currPage = pages[pageIndex];
     var pageStartTime = new Date(currPage.startedDateTime).getTime();
     var pageTimings = currPage.pageTimings;
-    console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, pages.length);
     var doneTime = 0;
     var isTLS = har_heuristics_1.documentIsSecure(data.entries);
     var entries = data.entries
