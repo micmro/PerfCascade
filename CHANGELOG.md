@@ -2,6 +2,19 @@
 
 
 
+<a name="v1.0.0"></a>
+# v1.0.0 (2017-03-16)
+
+* #128 export har typings via `harFormat` namespace ([e70a236](https://github.com/micmro/PerfCascade/commit/e70a236))
+* #128 reduce exported types and use @types/har-format ([489ac54](https://github.com/micmro/PerfCascade/commit/489ac54))
+* #128 remove `fromPerfCascadeFormat` and add onParsed callback ([4b4aa44](https://github.com/micmro/PerfCascade/commit/4b4aa44))
+* #180 remove console logs ([50d4ef5](https://github.com/micmro/PerfCascade/commit/50d4ef5))
+* #182 add style field to package.json ([803ca88](https://github.com/micmro/PerfCascade/commit/803ca88))
+* add line break ([d849773](https://github.com/micmro/PerfCascade/commit/d849773))
+* make unzip-progress status available as callback ([f6cf5f7](https://github.com/micmro/PerfCascade/commit/f6cf5f7))
+
+
+
 <a name="v0.9.1"></a>
 ## v0.9.1 (2017-03-10)
 
