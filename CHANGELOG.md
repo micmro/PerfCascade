@@ -5,6 +5,7 @@
 <a name="v1.0.0"></a>
 # v1.0.0 (2017-03-16)
 
+Breaking changes in public api:
 * #128 export har typings via `harFormat` namespace ([e70a236](https://github.com/micmro/PerfCascade/commit/e70a236))
 * #128 reduce exported types and use @types/har-format ([489ac54](https://github.com/micmro/PerfCascade/commit/489ac54))
 * #128 remove `fromPerfCascadeFormat` and add onParsed callback ([4b4aa44](https://github.com/micmro/PerfCascade/commit/4b4aa44))
