@@ -1,9 +1,9 @@
+import { Entry, Header } from "har-format";
 import { getHeader } from "../helpers/har";
 import {
   formatBytes, formatDateLocalized, formatMilliseconds, formatSeconds, parseAndFormat, parseDate, parseNonEmpty,
   parseNonNegative, parsePositive,
 } from "../helpers/parse";
-import { Entry, Header } from "../typing/har";
 
 const byteSizeProperty = (title: string, input: string |  number): KvTuple => {
   return [title, parseAndFormat(input, parsePositive, formatBytes)];

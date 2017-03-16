@@ -1,4 +1,4 @@
-import {Header} from "../typing/har";
+import {Header} from "har-format";
 
 function matchHeaderFilter(lowercaseName: string): (header: Header) => boolean {
   return (header: Header) => header.name.toLowerCase() === lowercaseName;

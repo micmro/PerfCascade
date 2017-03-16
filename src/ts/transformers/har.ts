@@ -1,11 +1,12 @@
-import { roundNumber } from "../helpers/misc";
-import { toInt } from "../helpers/parse";
 import {
   Entry,
   Har,
+  Log,
   Page,
-  PageTimings,
-} from "../typing/har";
+  PageTiming,
+} from "har-format";
+import { roundNumber } from "../helpers/misc";
+import { toInt } from "../helpers/parse";
 import {
   Mark,
   TimingType,
@@ -30,11 +31,10 @@ import {
  * @param  {Har} harData - raw hhar object
  * @returns WaterfallDocs
  */
-export function transformDoc(harData: Har): WaterfallDocs {
+export function transformDoc(harData: Har | Log): WaterfallDocs {
   // make sure it's the *.log base node
-  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
+  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
   const pages = getPages(data);
-  console.log("HAR created by %s(%s) %s page(s)", data.creator.name, data.creator.version, pages.length);
 
   return {
     pages: pages.map((_page, i) => this.transformPage(data, i)),
@@ -65,7 +65,7 @@ function toWaterFallEntry(entry: Entry, index: number, startRelative: number, is
 }
 
 /** retuns the page or a mock page object */
-function getPages(data: Har) {
+function getPages(data: Log) {
   if (data.pages && data.pages.length > 0) {
     return data.pages;
   }
@@ -88,16 +88,14 @@ function getPages(data: Har) {
  * @param {number=0} pageIndex - page to parse (for multi-page HAR)
  * @returns WaterfallData
  */
-export function transformPage(harData: Har, pageIndex: number = 0): WaterfallData {
+export function transformPage(harData: Har | Log, pageIndex: number = 0): WaterfallData {
   // make sure it's the *.log base node
-  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Har;
+  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
 
   const pages = getPages(data);
   const currPage = pages[pageIndex];
   const pageStartTime = new Date(currPage.startedDateTime).getTime();
   const pageTimings = currPage.pageTimings;
-
-  console.log("%s: %s of %s page(s)", currPage.title, pageIndex + 1, pages.length);
 
   let doneTime = 0;
   const isTLS = documentIsSecure(data.entries);
@@ -119,7 +117,7 @@ export function transformPage(harData: Har, pageIndex: number = 0): WaterfallDat
     });
 
   const marks = Object.keys(pageTimings)
-    .filter((k: keyof PageTimings) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
+    .filter((k: keyof PageTiming) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
     .sort((a: string, b: string) => pageTimings[a] > pageTimings[b] ? 1 : -1)
     .map((k) => {
       const startRelative: number = pageTimings[k];

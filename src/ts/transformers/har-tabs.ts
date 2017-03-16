@@ -1,5 +1,5 @@
+import { Entry } from "har-format";
 import { escapeHtml } from "../helpers/parse";
-import { Entry } from "../typing/har";
 import {
   RequestType,
   TabRenderer,

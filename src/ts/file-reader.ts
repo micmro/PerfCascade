@@ -1,4 +1,4 @@
-import { Har } from "./typing/har";
+import { Har } from "har-format";
 
 declare const zip: any;
 
@@ -6,7 +6,10 @@ declare const zip: any;
 zip.useWebWorkers = false;
 
 /** handle client side file upload */
-export function readFile(file: File, fileName: string, callback: (e: Error, har?: Har) => void) {
+export function readFile(file: File,
+                         fileName: string,
+                         callback: (e: Error, har?: Har) => void,
+                         onProgress?: (progress: number) => void) {
   if (!file) {
     return callback(new Error("Failed to load HAR file"));
   }
@@ -30,9 +33,7 @@ export function readFile(file: File, fileName: string, callback: (e: Error, har?
           parseJson(txt);
           // close the zip reader
           zipReader.close();
-        }, (progress: number) => {
-          console.log(`unzip progress: ${progress / 100}%`);
-        });
+        }, onProgress);
       });
     });
   } else {

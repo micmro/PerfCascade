@@ -62,8 +62,6 @@ module.exports = function (grunt) {
       lines.shift(); //remove the html-ancor tag in the first line
       grunt.config.data.changelog = escapeForBash(lines.join('\n'));
 
-      console.log("lines:", lines, "\n")
-
       appendLogToFileStream(options.file, tmpBuffer, options.headerLines)
         .on('close', () => {
           grunt.log.ok(`${options.file} updated with latest changelog for ${options.version}`);

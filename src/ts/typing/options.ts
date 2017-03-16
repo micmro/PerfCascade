@@ -1,3 +1,5 @@
+import { WaterfallDocs } from "./waterfall";
+
 export interface ChartOptions {
   /** Height of every request bar block plus spacer pixel (in px) */
   rowHeight: number;
@@ -15,4 +17,6 @@ export interface ChartOptions {
   selectedPage: number;
   /** Element that holds the Legend (if not set no Legend is sendered) */
   legendHolder: HTMLElement;
+  /** Callback called when the HAR doc has been parsed into PerfCascases */
+  onParsed: (data: WaterfallDocs) => void;
 }

@@ -1,4 +1,3 @@
-export * from "./har"
 export * from "./open-overlay"
 export * from "./options"
 export * from "./paging"
