@@ -1,5 +1,5 @@
 /** Helpers that are not file-fromat specific */
-import { isInStatusCodeRange } from "../helpers/misc";
+import { isInStatusCodeRange, toCssClass } from "../helpers/misc";
 import { escapeHtml } from "../helpers/parse";
 import { RequestType } from "../typing/waterfall";
 import {
@@ -19,8 +19,8 @@ export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = f
     if (!addClass) {
       return "";
     }
-    let className = key.toLowerCase().replace(/[^a-z-]/g, "");
-    return `class="${className || "no-colour"}"`;
+    let className = toCssClass(key) || "no-colour";
+    return `class="${className}"`;
   };
   return dlKeyValues
     .filter((tuple: KvTuple) => tuple[1] !== undefined)

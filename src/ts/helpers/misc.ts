@@ -68,10 +68,21 @@ export function roundNumber(num: number, decimals: number = 2) {
 /**
  *
  * Checks if `status` code is `>= lowerBound` and `<= upperBound`
- * @param  {number} entry
- * @param  {number} lowerBound - inclusive lower bound
- * @param  {number} upperBound - inclusive upper bound
+ * @param  {number} status  HTTP status code
+ * @param  {number} lowerBound  inclusive lower bound
+ * @param  {number} upperBound  inclusive upper bound
  */
 export function isInStatusCodeRange(status: number, lowerBound: number, upperBound: number) {
   return status >= lowerBound && status <= upperBound;
+}
+
+/** precompiled regex */
+const cssClassRegEx = /[^a-z-]/g;
+
+/**
+ * Converts a seed string to a CSS class by stripping out invalid characters
+ * @param {string} seed string to base the CSS class off
+ */
+export function toCssClass(seed: string) {
+  return seed.toLowerCase().replace(cssClassRegEx, "");
 }

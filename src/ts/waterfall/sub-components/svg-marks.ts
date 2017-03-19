@@ -1,9 +1,9 @@
 import { addClass, removeClass } from "../../helpers/dom";
-import {roundNumber} from "../../helpers/misc";
+import { roundNumber, toCssClass } from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
-import {Context} from "../../typing/context";
-import {OverlayChangeEvent} from "../../typing/open-overlay";
-import {Mark} from "../../typing/waterfall";
+import { Context } from "../../typing/context";
+import { OverlayChangeEvent } from "../../typing/open-overlay";
+import { Mark } from "../../typing/waterfall";
 
 /**
  * Renders global marks for events like the onLoad event etc
@@ -21,7 +21,8 @@ export function createMarks(context: Context, marks: Mark[]) {
     let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase().replace(/([0-9]+[ ]?ms)|\W/g, ""));
     let lineHolder = svg.newG("line-holder");
     let lineLabelHolder = svg.newG("line-label-holder");
-    let lineLabel = svg.newTextEl(mark.name, {x: x + "%", y: diagramHeight + 25});
+    let lineLabel = svg.newTextEl(mark.name, { x: x + "%", y: diagramHeight + 25 });
+    let lineRect: SVGGElement;
     mark.x = x;
 
     let line = svg.newLine({
@@ -47,6 +48,11 @@ export function createMarks(context: Context, marks: Mark[]) {
     lineHolder.appendChild(line);
     lineHolder.appendChild(lineConnection);
 
+    if (mark.duration) {
+      lineRect = createLineRect(context, mark);
+      lineHolder.appendChild(lineRect);
+    }
+
     context.pubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
       let offset = change.combinedOverlayHeight;
       let scale = (diagramHeight + offset) / (diagramHeight);
@@ -56,7 +62,7 @@ export function createMarks(context: Context, marks: Mark[]) {
       lineConnection.setAttribute("transform", `translate(0, ${offset})`);
     });
 
-    let isActive = false;
+   let isActive = false;
     let onLabelMouseEnter = () => {
       if (!isActive) {
         isActive = true;
@@ -82,4 +88,23 @@ export function createMarks(context: Context, marks: Mark[]) {
   });
 
   return marksHolder;
+}
+
+
+/**
+ * Converts a `Mark` with a duration (e.g. a UserTiming with `startTimer` and `endTimer`) into a rect.
+ * @param {Context} context Execution context object
+ * @param {Mark} entry  Line entry
+ */
+export function createLineRect(context: Context, entry: Mark): SVGGElement {
+  let holder = svg.newG(`line-mark-holder line-marker-${toCssClass(entry.name)}`);
+  holder.appendChild(svg.newTitle(entry.name.replace(/^startTimer-/, "")));
+  holder.appendChild(svg.newRect({
+    "height": context.diagramHeight,
+    "width": ((entry.duration || 1) / context.unit) + "%",
+    "x": ((entry.startTime || 0.001) / context.unit) + "%",
+    "y": 0,
+  }, "line-mark"));
+
+  return holder;
 }

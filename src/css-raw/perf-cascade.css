@@ -19,6 +19,10 @@
 .water-fall-chart .line-end.active,
 .water-fall-chart .line-start.active {display: block;}
 
+.water-fall-chart .line-mark {fill: #0aa; opacity: 0.01; stroke-width: 0;}
+.water-fall-chart .line-holder.active .line-mark { opacity: 0.5;}
+.water-fall-chart .line-label-holder {cursor: pointer;}
+
 .water-fall-chart .mark-holder text {writing-mode:vertical-lr;}
 
 .left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9}

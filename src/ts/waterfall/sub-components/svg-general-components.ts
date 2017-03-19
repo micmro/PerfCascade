@@ -4,10 +4,8 @@
 
 import { roundNumber } from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
-import { requestTypeToCssClass } from "../../transformers/styling-converters";
 import { Context } from "../../typing/context";
 import { OverlayChangeEvent } from "../../typing/open-overlay";
-import { WaterfallEntry } from "../../typing/waterfall";
 
 /**
  * Renders a per-second marker line and appends it to `timeHolder`
@@ -84,18 +82,4 @@ export function createTimeScale(context: Context, durationMs: number): SVGGEleme
     appendSecond(context, timeHolder, secs, secValue, isMarkerStep);
   }
   return timeHolder;
-}
-
-// TODO: Implement - data for this not parsed yet
-export function createBgRect(context: Context, entry: WaterfallEntry): SVGRectElement {
-  let rect = svg.newRect({
-    "height": context.diagramHeight,
-    "width": ((entry.total || 1) / context.unit) + "%",
-    "x": ((entry.start || 0.001) / context.unit) + "%",
-    "y": 0,
-  }, requestTypeToCssClass(entry.responseDetails.requestType));
-
-  rect.appendChild(svg.newTitle(entry.url)); // Add tile to wedge path
-
-  return rect;
 }

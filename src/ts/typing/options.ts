@@ -20,3 +20,15 @@ export interface ChartOptions {
   /** Callback called when the HAR doc has been parsed into PerfCascases */
   onParsed: (data: WaterfallDocs) => void;
 }
+
+export interface HarTransformerOptions {
+  /** Should UserTimings in WPT be used and rendered as Mark (default: false) */
+  showUserTiming: boolean | string[];
+  /**
+   * If this is enabled, the `endTimer-*` marker are shown,
+   * and both start and end show the full `startTimer-*` and `endTimer-*` name. (default: false)
+   *
+   * _requires `showUserTiming` to be `true`_
+   */
+  showUserTimingEndMarker: boolean;
+}

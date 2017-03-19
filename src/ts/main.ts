@@ -3,7 +3,7 @@ import { validateOptions } from "./helpers/parse";
 import { makeLegend } from "./legend/legend";
 import Paging from "./paging/paging";
 import * as HarTransformer from "./transformers/har";
-import { ChartOptions } from "./typing/options";
+import { ChartOptions, HarTransformerOptions } from "./typing/options";
 import { WaterfallDocs } from "./typing/waterfall";
 import { createWaterfallSvg } from "./waterfall/svg-chart";
 
@@ -18,6 +18,12 @@ const defaultOptions: Readonly<ChartOptions> = {
   showAlignmentHelpers: true,
   showIndicatorIcons: true,
   showMimeTypeIcon: true,
+};
+
+/** default options to use if not set in `options` parameter */
+const defaultHarTransformerOptions: Readonly<HarTransformerOptions> = {
+  showUserTiming: false,
+  showUserTimingEndMarker: false,
 };
 
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartOptions> = {}): SVGSVGElement {
@@ -53,8 +59,12 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<Cha
  * @param  {ChartOptions} options - PerfCascade options object
  * @returns {SVGSVGElement} - Chart SVG Element
  */
-function fromHar(harData: Har, options: Partial<ChartOptions> = {}): SVGSVGElement {
-  const data = HarTransformer.transformDoc(harData);
+function fromHar(harData: Har, options: Partial<ChartOptions & HarTransformerOptions> = {}): SVGSVGElement {
+  const harTransformerOptions: HarTransformerOptions = {
+    ...defaultHarTransformerOptions,
+    ...options as Partial<HarTransformerOptions>
+  };
+  const data = HarTransformer.transformDoc(harData, harTransformerOptions);
   if (typeof options.onParsed === "function") {
     options.onParsed(data);
   }
