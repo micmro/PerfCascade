@@ -62,10 +62,12 @@ export function createMarks(context: Context, marks: Mark[]) {
       lineConnection.setAttribute("transform", `translate(0, ${offset})`);
     });
 
-   let isActive = false;
+    let isHoverActive = false;
+    /** click indicator - overwrites `isHoverActive` */
+    let isClickActive = false;
     let onLabelMouseEnter = () => {
-      if (!isActive) {
-        isActive = true;
+      if (!isHoverActive) {
+        isHoverActive = true;
         addClass(lineHolder, "active");
         // firefox has issues with this
         markHolder.parentNode.appendChild(markHolder);
@@ -73,12 +75,22 @@ export function createMarks(context: Context, marks: Mark[]) {
     };
 
     let onLabelMouseLeave = () => {
-      isActive = false;
-      removeClass(lineHolder, "active");
+      isHoverActive = false;
+      if (!isClickActive) {
+        removeClass(lineHolder, "active");
+      }
+    };
+
+    let onLabelClick = () => {
+      isClickActive = !isClickActive;
+      if (!isClickActive) {
+        removeClass(lineHolder, "active");
+      }
     };
 
     lineLabel.addEventListener("mouseenter", onLabelMouseEnter);
     lineLabel.addEventListener("mouseleave", onLabelMouseLeave);
+    lineLabel.addEventListener("click", onLabelClick);
     lineLabelHolder.appendChild(lineLabel);
 
     markHolder.appendChild(svg.newTitle(mark.name));
