@@ -60,6 +60,9 @@ export function createMarks(context: Context, marks: Mark[]) {
       line.setAttribute("transform", `scale(1, ${scale})`);
       lineLabelHolder.setAttribute("transform", `translate(0, ${offset})`);
       lineConnection.setAttribute("transform", `translate(0, ${offset})`);
+      if (lineRect) {
+        lineRect.setAttribute("transform", `translate(0, ${offset})`);
+      }
     });
 
     let isHoverActive = false;
