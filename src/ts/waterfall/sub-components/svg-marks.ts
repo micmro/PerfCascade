@@ -105,7 +105,6 @@ export function createMarks(context: Context, marks: Mark[]) {
   return marksHolder;
 }
 
-
 /**
  * Converts a `Mark` with a duration (e.g. a UserTiming with `startTimer` and `endTimer`) into a rect.
  * @param {Context} context Execution context object

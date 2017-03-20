@@ -249,7 +249,7 @@ const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): Waterf
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @returns {Object}
  */
-const getTimePair =(key: string, harEntry: Entry, collect: WaterfallEntryTiming[], startRelative: number) => {
+const getTimePair = (key: string, harEntry: Entry, collect: WaterfallEntryTiming[], startRelative: number) => {
   let wptKey;
   switch (key) {
     case "wait": wptKey = "ttfb"; break;
@@ -266,7 +266,7 @@ const getTimePair =(key: string, harEntry: Entry, collect: WaterfallEntryTiming[
     "end": Math.round(end),
     "start": Math.round(start),
   };
-}
+};
 
 /**
  * Helper to create a requests `WaterfallResponseDetails`
@@ -284,4 +284,4 @@ const createResponseDetails = (entry: Entry, indicators: WaterfallEntryIndicator
     requestType,
     statusCode: entry.response.status,
   };
-}
+};
