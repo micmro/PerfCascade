@@ -70,10 +70,15 @@ export function createMarks(context: Context, marks: Mark[]) {
     let isClickActive = false;
     let onLabelMouseEnter = () => {
       if (!isHoverActive) {
-        isHoverActive = true;
-        addClass(lineHolder, "active");
-        // firefox has issues with this
+        // move marker to top
         markHolder.parentNode.appendChild(markHolder);
+        isHoverActive = true;
+        // assign class later to not break animation with DOM re-order
+        if (typeof window.requestAnimationFrame === "function") {
+          window.requestAnimationFrame(() => addClass(lineHolder, "active"));
+        } else {
+          addClass(lineHolder, "active");
+        }
       }
     };
 
