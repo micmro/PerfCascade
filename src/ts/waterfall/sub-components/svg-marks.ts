@@ -90,10 +90,18 @@ export function createMarks(context: Context, marks: Mark[]) {
     };
 
     let onLabelClick = () => {
-      isClickActive = !isClickActive;
-      if (!isClickActive) {
+      if (isClickActive) {
+        // deselect
+        isHoverActive = false;
         removeClass(lineHolder, "active");
+      } else if (!isHoverActive) {
+        // for touch devices
+        addClass(lineHolder, "active");
+      } else {
+        isHoverActive = false;
       }
+      // set new state
+      isClickActive = !isClickActive;
     };
 
     lineLabel.addEventListener("mouseenter", onLabelMouseEnter);
