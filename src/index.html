@@ -100,7 +100,9 @@
             // window["fetch"]("test-data/www.bbc.com.har")
             setup({
                     pageSelector: pageSelectorEl,
-                    legendHolder: legendHolderEl
+                    legendHolder: legendHolderEl,
+                    showUserTiming: true,
+                    // showUserTimingEndMarker: true,
                 }, "fileinput", outputHolderEl, "test-data/chrome_enorm-magazin.de.har");
             setup({
                     pageSelector: pageSelector2El,

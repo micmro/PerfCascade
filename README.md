@@ -3,15 +3,40 @@ Extensible waterfall-viewer that works with [HAR](http://www.softwareishard.com/
 
 [![Build status][travis-image]][travis-url]
 
-Install via `npm install perf-cascade`
-Live example at: https://micmro.github.io/PerfCascade/
+Install via `npm install perf-cascade`<br/>
+See live example: https://micmro.github.io/PerfCascade/
 
 <img src="https://raw.githubusercontent.com/micmro/PerfCascade/gh-pages/img/PerfCascade-sample2.png" alt="example screenshot" width="704" height="707">
 
 ## How to use PerfCascade
 PerfCascade is exported with [UMD](https://github.com/umdjs/umd), so you can use it as global object, via AMD (e.g. requireJS) or commonJS (internally it uses ES6 modules).
 
-If using it without any module system it exports as a global object `perfCascade`, you can use as following:
+### With ES6 Compatible Module Loader (Webpack, Babel, Typescript...)
+Install the package
+```
+npm install perf-cascade --save
+````
+
+```javascript
+import {fromHar} from 'perf-cascade'
+
+// `myHarDoc` represents your HAR doc
+
+const perfCascadeSvg = fromHar(myHarDoc)
+document.appendChild(perfCascadeSvg)
+```
+
+_With TypeScript you can additionaly import TypeDefinitions for `ChartOptions` (PerfCascade Options) and `harFormat` (namespace for HAR Typings)_
+
+### As Global Object
+When using PerfCascade without any module system it just exports as a global object `perfCascade`, you can use as following:
+```javascript
+/** pass HAR `perfCascade.fromHar` to generate the SVG element*/
+var perfCascadeSvg =  perfCascade.fromHar(harData)
+document.appendChild(perfCascadeSvg)
+```
+
+Or with options:
 ```javascript
 /** override selected options for PerfCascade (all have defaults) */
 var options = {
@@ -19,8 +44,8 @@ var options = {
   leftColumnWith: 30 //default: 25
 }
 
-/** pass HAR and options to `perfCascade.fromHar` to generate the SVG element*/
-var perfCascadeSvg =  perfCascade.fromHar(harData.log, options)
+var perfCascadeSvg =  perfCascade.fromHar(harData, options)
+document.appendChild(perfCascadeSvg)
 ```
 
 You can find the compiled (and minified) JS in the [releases tab](https://github.com/micmro/PerfCascade/releases). For the basic version without zHAR support you need [`perf-cascade.min.js`](https://github.com/micmro/PerfCascade/blob/release/perf-cascade.min.js) and some basic CSS styles [`perf-cascade.css`](https://github.com/micmro/PerfCascade/blob/release/perf-cascade.css).
@@ -39,49 +64,18 @@ Directories:
 ## Options
 see [options.d.ts](https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/options.ts) for source
 
-### `rowHeight`
-`number`, default: `23`<br/>
-Height of every request bar block plus spacer pixel (in px) default: 23
-
-### `showAlignmentHelpers`
-`boolean`, default: `true`<br/>
-Show verticale lines to easier spot potential dependencies/blocking between requests
-
-### `showMimeTypeIcon`
-`boolean`, default: `true`<br/>
-Show mime type icon on the left
-
-### `showIndicatorIcons`
-`boolean`, default: `true`<br/>
-Show warning icons for potential issues on the left
-
-### `leftColumnWith`
-`number`, default: `25`<br/>
-Relative width of the info column on the left (in percent)
-
-### `pageSelector`
-`HTMLSelectElement`, default: `undefined`<br/>
-DOM `<select>` element to use to select a run if the HAR contains multiple runs.
-
-### `selectedPage`
-`number`, default: `0`<br/>
-Zero-based index of the page to initially render.<br/>
-If `selectedPage` is larger than the number of pages the last page will be selected.
-
-### `legendHolder`
-`HTMLElement` (DOM element), default: `undefined` (not shown)<br/>
-If set a legend explaining the waterfall colours is rendered in the `legendHolder` DOM element.
-
-### `showUserTiming`
-`boolean`, default: `false`<br/>
-If enabled the [UserTiming](https://developer.mozilla.org/en-US/docs/Web/API/User_Timing_API) data
-in WebPageTest's format `_userTime.*` get parsed and rendered as well.
-Matching `_userTime.startTimer-*` and `_userTime.endTimer-*` entries get combined into one block.
-
-### `showUserTimingEndMarker`
-`boolean`, default: `false` (requires `showUserTiming` to be `true`)<br/>
-If `showUserTiming` is enabled all `_userTime.endTimer-*` marker are hidden by default, only the UserTiming's
-start and duration is shown. This option also adds an `_userTime.endTimer-*` marker.
+| Option      | Type | Default Value | Description |
+| ----------- | ---- | ------- | ----------- |
+| `rowHeight` | `number` | `23` | Height of every request bar block plus spacer pixel (in px) default: 23 |
+| `showAlignmentHelpers` | `boolean` | `true` | Show verticale lines to easier spot potential dependencies/blocking between requests |
+| `showMimeTypeIcon` | `boolean` | `true` |  Show mime type icon on the left |
+| `showIndicatorIcons` | `boolean` | `true` |  Show warning icons for potential issues on the left |
+| `leftColumnWith` | `number` | `25` | Relative width of the info column on the left (in percent) |
+| `pageSelector` | `HTMLSelectElement` | `undefined` | DOM `<select>` element to use to select a run if the HAR contains multiple runs. |
+| `selectedPage` | `number` | `0` | Zero-based index of the page to initially render.<br/>If `selectedPage` is larger than the number of pages the last page will be selected. |
+| `legendHolder` | `HTMLElement`<br/>(DOM element) | `undefined` <br/>(not shown) | If set a legend explaining the waterfall colours is rendered in the `legendHolder` DOM element. |
+| `showUserTiming` | `boolean` | `false` | If enabled the [UserTiming](https://developer.mozilla.org/en-US/docs/Web/API/User_Timing_API) data in WebPageTest's format `_userTime.*` get parsed and rendered as well.<br/>Matching `_userTime.startTimer-*` and `_userTime.endTimer-*` entries get combined into one block. |
+| `showUserTimingEndMarker` | `boolean` | `false` (requires `showUserTiming` to be `true`) | If `showUserTiming` is enabled all `_userTime.endTimer-*` marker are hidden by default, only the UserTiming's start and duration is shown. This option also adds an `_userTime.endTimer-*` marker.
 
 ## `*.zhar` - zipped HAR files
 By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/master/src/index.html#L78-L86) you can use `perfCascadeFileReader.readFile` to read a zip file and convert it to a JSON HAR object.
@@ -104,9 +98,9 @@ that gets called whenever a new unzip progress status is available.
 
 ## Dev
 - Start live-reload server and Typescript compiler with watch: `npm run watch`
-- Create uglified version: `npm run build` (not tracked ITM)
+- Create uglified version: `npm run build`
 
-See `package.json` for other useful tasks like linting, release etc.
+_See `package.json` for other useful tasks like linting, release etc._
 
 ## Specs and resources
 

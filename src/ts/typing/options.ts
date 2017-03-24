@@ -1,6 +1,6 @@
 import { WaterfallDocs } from "./waterfall";
 
-export interface ChartOptions {
+export interface ChartRenderOption {
   /** Height of every request bar block plus spacer pixel (in px) */
   rowHeight: number;
   /** Show vertical lines to easier spot potential dependencies/blocking between requests */
@@ -32,3 +32,6 @@ export interface HarTransformerOptions {
    */
   showUserTimingEndMarker: boolean;
 }
+
+/** TypeDefinition for `fromHar`'s options */
+export type ChartOptions = Partial<ChartRenderOption & HarTransformerOptions>;

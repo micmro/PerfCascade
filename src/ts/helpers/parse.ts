@@ -1,4 +1,4 @@
-import { ChartOptions } from "../typing/options";
+import { ChartRenderOption } from "../typing/options";
 import { roundNumber } from "./misc";
 
 /**
@@ -154,14 +154,14 @@ export function toInt(input: string | number): number {
 }
 
 /** Validates the `ChartOptions` attributes types */
-export function validateOptions(options: ChartOptions): ChartOptions {
-  let validateInt = (name: keyof ChartOptions) => {
+export function validateOptions(options: ChartRenderOption): ChartRenderOption {
+  let validateInt = (name: keyof ChartRenderOption) => {
     options[name] = toInt(options[name] as any);
     if (options[name] === undefined) {
       throw TypeError(`option "${name}" needs to be a number`);
     }
   };
-  let ensureBoolean = (name: keyof ChartOptions) => {
+  let ensureBoolean = (name: keyof ChartRenderOption) => {
     options[name] = !!options[name];
   };
 

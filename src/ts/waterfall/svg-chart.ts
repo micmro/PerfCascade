@@ -1,7 +1,7 @@
 import * as svg from "../helpers/svg";
 import {requestTypeToCssClass} from "../transformers/styling-converters";
 import {Context} from "../typing/context";
-import {ChartOptions} from "../typing/options";
+import {ChartRenderOption} from "../typing/options";
 import {RectData} from "../typing/rect-data";
 import {HoverEvtListeners} from "../typing/svg-alignment-helpers";
 import {Mark} from "../typing/waterfall";
@@ -50,7 +50,7 @@ function getSvgHeight(marks: Mark[], diagramHeight: number): number {
  * @param {WaterfallEntry[]} entriesToShow - Filtered array of entries that will be rendered
  * @return {Context} Context object
  */
-function createContext(data: WaterfallData, options: ChartOptions,
+function createContext(data: WaterfallData, options: ChartRenderOption,
                        entriesToShow: WaterfallEntry[], overlayHolder: SVGGElement): Context {
   const unit = data.durationMs / 100;
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
@@ -74,7 +74,7 @@ function createContext(data: WaterfallData, options: ChartOptions,
  * @param {ChartOptions} options - Chart config/customization options
  * @return {SVGSVGElement} - SVG Element ready to render
  */
-export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): SVGSVGElement {
+export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOption): SVGSVGElement {
   // constants
   const entriesToShow = data.entries
     .filter((entry) => (typeof entry.start === "number" && typeof entry.total === "number"))

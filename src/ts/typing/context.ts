@@ -1,5 +1,5 @@
 import {OverlayChangeEvent, OverlayChangeSubscriber} from "./open-overlay";
-import {ChartOptions} from "./options";
+import {ChartRenderOption} from "./options";
 import {WaterfallEntry} from "./waterfall";
 
 /**
@@ -16,7 +16,7 @@ export interface Context {
   /** height of the requests part of the diagram in px */
   diagramHeight: number;
   /** Chart config/customization options */
-  options: ChartOptions;
+  options: ChartRenderOption;
 }
 
 export interface PubSubClass {
