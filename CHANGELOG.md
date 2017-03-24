@@ -2,6 +2,22 @@
 
 
 
+<a name="v1.1.0"></a>
+# v1.1.0 (2017-03-24)
+
+* #184 add duration time to mark-name ([f0241a3](https://github.com/micmro/PerfCascade/commit/f0241a3))
+* #184 add Marker click toggle ([a81b0fa](https://github.com/micmro/PerfCascade/commit/a81b0fa))
+* #184 add option to render userTiming Marker and durations ([e2ff9fc](https://github.com/micmro/PerfCascade/commit/e2ff9fc))
+* #184 handel overlay changes ([fdf8c93](https://github.com/micmro/PerfCascade/commit/fdf8c93))
+* #184 impove docs and exported types ([057e0c9](https://github.com/micmro/PerfCascade/commit/057e0c9))
+* #184 improve selection logic ([0dc24d8](https://github.com/micmro/PerfCascade/commit/0dc24d8))
+* #184 ui fixes ([47a5669](https://github.com/micmro/PerfCascade/commit/47a5669))
+* #184 update readme with new options ([94b2302](https://github.com/micmro/PerfCascade/commit/94b2302))
+* fix linting ([440ae8f](https://github.com/micmro/PerfCascade/commit/440ae8f))
+* mark breaking changes ([b0f7114](https://github.com/micmro/PerfCascade/commit/b0f7114))
+
+
+
 <a name="v1.0.0"></a>
 # v1.0.0 (2017-03-16)
 
