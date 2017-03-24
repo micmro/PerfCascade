@@ -20,7 +20,8 @@
     showIndicatorIcons: true, //default: true
     leftColumnWith: 25, //default: 25
     pageSelector: pageSelectorEl, //default: undefined
-    legendHolder: legendHolderEl //default: undefined (hide-legend)
+    legendHolder: legendHolderEl, //default: undefined (hide-legend)
+    showUserTiming: true //default: false
   };
 
   /** renders the har (passing in the har.log node) */
