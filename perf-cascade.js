@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:1.0.0 (16/03/2017) */
+/*! github.com/micmro/PerfCascade Version:1.1.0 (24/03/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -239,14 +239,24 @@ exports.roundNumber = roundNumber;
 /**
  *
  * Checks if `status` code is `>= lowerBound` and `<= upperBound`
- * @param  {number} entry
- * @param  {number} lowerBound - inclusive lower bound
- * @param  {number} upperBound - inclusive upper bound
+ * @param  {number} status  HTTP status code
+ * @param  {number} lowerBound  inclusive lower bound
+ * @param  {number} upperBound  inclusive upper bound
  */
 function isInStatusCodeRange(status, lowerBound, upperBound) {
     return status >= lowerBound && status <= upperBound;
 }
 exports.isInStatusCodeRange = isInStatusCodeRange;
+/** precompiled regex */
+var cssClassRegEx = /[^a-z-]/g;
+/**
+ * Converts a seed string to a CSS class by stripping out invalid characters
+ * @param {string} seed string to base the CSS class off
+ */
+function toCssClass(seed) {
+    return seed.toLowerCase().replace(cssClassRegEx, "");
+}
+exports.toCssClass = toCssClass;
 
 },{}],5:[function(require,module,exports){
 "use strict";
@@ -583,7 +593,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function makeLegend() {
     var ulNode = document.createElement("ul");
     ulNode.className = "resource-legend";
-    ulNode.innerHTML = "\n        <li class=\"legend-blocked\" title=\"Time spent in a queue waiting for a network connection.\">Blocked</li>\n        <li class=\"legend-dns\" title=\"DNS resolution time.\">DNS</li>\n        <li class=\"legend-connect\" title=\"Time required to create TCP connection.\">Connect</li>\n        <li class=\"legend-ssl\" title=\"Time required for SSL/TLS negotiation.\">SSL (TLS)</li>\n        <li class=\"legend-send\" title=\"Time required to send HTTP request to the server.\">Send</li>\n        <li class=\"legend-wait\" title=\"Waiting for a response from the server.\">Wait</li>\n        <li class=\"legend-receive\" \n        title=\"Time required to read entire response from the server (or cache).\">Receive</li>";
+    ulNode.innerHTML = "\n        <li class=\"legend-blocked\" title=\"Time spent in a queue waiting for a network connection.\">Blocked</li>\n        <li class=\"legend-dns\" title=\"DNS resolution time.\">DNS</li>\n        <li class=\"legend-connect\" title=\"Time required to create TCP connection.\">Connect</li>\n        <li class=\"legend-ssl\" title=\"Time required for SSL/TLS negotiation.\">SSL (TLS)</li>\n        <li class=\"legend-send\" title=\"Time required to send HTTP request to the server.\">Send</li>\n        <li class=\"legend-wait\" title=\"Waiting for a response from the server.\">Wait</li>\n        <li class=\"legend-receive\"\n        title=\"Time required to read entire response from the server (or cache).\">Receive</li>";
     return ulNode;
 }
 exports.makeLegend = makeLegend;
@@ -601,12 +611,11 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var parse_1 = require("./helpers/parse");
 var legend_1 = require("./legend/legend");
-exports.makeLegend = legend_1.makeLegend;
 var paging_1 = require("./paging/paging");
 var HarTransformer = require("./transformers/har");
 var svg_chart_1 = require("./waterfall/svg-chart");
 /** default options to use if not set in `options` parameter */
-var defaultOptions = {
+var defaultChartOptions = {
     leftColumnWith: 25,
     legendHolder: undefined,
     onParsed: undefined,
@@ -617,9 +626,22 @@ var defaultOptions = {
     showIndicatorIcons: true,
     showMimeTypeIcon: true,
 };
+/** default options to use if not set in `options` parameter */
+var defaultHarTransformerOptions = {
+    showUserTiming: false,
+    showUserTimingEndMarker: false,
+};
+/**
+ * Creates the html for diagrams legend
+ * @returns {HTMLUListElement} - Legend `<ul>` element
+ */
+function makeLegend() {
+    return legend_1.makeLegend();
+}
+exports.makeLegend = makeLegend;
 function PerfCascade(waterfallDocsData, chartOptions) {
     if (chartOptions === void 0) { chartOptions = {}; }
-    var options = parse_1.validateOptions(__assign({}, defaultOptions, chartOptions));
+    var options = parse_1.validateOptions(__assign({}, defaultChartOptions, chartOptions));
     // setup paging helper
     var paging = new paging_1.default(waterfallDocsData, options.selectedPage);
     var doc = svg_chart_1.createWaterfallSvg(paging.getSelectedPage(), options);
@@ -647,7 +669,8 @@ function PerfCascade(waterfallDocsData, chartOptions) {
  */
 function fromHar(harData, options) {
     if (options === void 0) { options = {}; }
-    var data = HarTransformer.transformDoc(harData);
+    var harTransformerOptions = __assign({}, defaultHarTransformerOptions, options);
+    var data = HarTransformer.transformDoc(harData, harTransformerOptions);
     if (typeof options.onParsed === "function") {
         options.onParsed(data);
     }
@@ -1140,16 +1163,17 @@ var har_tabs_1 = require("./har-tabs");
 var helpers_1 = require("./helpers");
 /**
  * Transforms the full HAR doc, including all pages
- * @param  {Har} harData - raw hhar object
+ * @param  {Har} harData - raw HAR object
+ * @param {HarTransformerOptions} options - HAR-parser-specific options
  * @returns WaterfallDocs
  */
-function transformDoc(harData) {
+function transformDoc(harData, options) {
     var _this = this;
     // make sure it's the *.log base node
     var data = (harData["log"] !== undefined ? harData["log"] : harData);
     var pages = getPages(data);
     return {
-        pages: pages.map(function (_page, i) { return _this.transformPage(data, i); }),
+        pages: pages.map(function (_page, i) { return _this.transformPage(data, i, options); }),
     };
 }
 exports.transformDoc = transformDoc;
@@ -1170,7 +1194,7 @@ function toWaterFallEntry(entry, index, startRelative, isTLS) {
     return helpers_1.createWaterfallEntry(entry.request.url, startRelative, endRelative, buildDetailTimingBlocks(startRelative, entry), responseDetails, har_tabs_1.makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators));
 }
 /** retuns the page or a mock page object */
-function getPages(data) {
+var getPages = function (data) {
     if (data.pages && data.pages.length > 0) {
         return data.pages;
     }
@@ -1185,14 +1209,15 @@ function getPages(data) {
             startedDateTime: statedTime,
             title: "n/a",
         }];
-}
+};
 /**
  * Transforms a HAR object into the format needed to render the PerfCascade
  * @param  {Har} harData - HAR document
  * @param {number=0} pageIndex - page to parse (for multi-page HAR)
+ * @param {HarTransformerOptions} options - HAR-parser-specific options
  * @returns WaterfallData
  */
-function transformPage(harData, pageIndex) {
+function transformPage(harData, pageIndex, options) {
     if (pageIndex === void 0) { pageIndex = 0; }
     // make sure it's the *.log base node
     var data = (harData["log"] !== undefined ? harData["log"] : harData);
@@ -1218,17 +1243,7 @@ function transformPage(harData, pageIndex) {
         doneTime = Math.max(doneTime, startRelative + entry.time);
         return toWaterFallEntry(entry, index, startRelative, isTLS);
     });
-    var marks = Object.keys(pageTimings)
-        .filter(function (k) { return (typeof pageTimings[k] === "number" && pageTimings[k] >= 0); })
-        .sort(function (a, b) { return pageTimings[a] > pageTimings[b] ? 1 : -1; })
-        .map(function (k) {
-        var startRelative = pageTimings[k];
-        doneTime = Math.max(doneTime, startRelative);
-        return {
-            "name": k.replace(/^[_]/, "") + " (" + misc_1.roundNumber(startRelative, 0) + " ms)",
-            "startTime": startRelative,
-        };
-    });
+    var marks = getMarks(pageTimings, currPage, options);
     // Add 100ms margin to make room for labels
     doneTime += 100;
     return {
@@ -1236,11 +1251,70 @@ function transformPage(harData, pageIndex) {
         durationMs: doneTime,
         entries: entries,
         marks: marks,
-        lines: [],
         title: currPage.title,
     };
 }
 exports.transformPage = transformPage;
+/**
+ * Extract all `Mark`s based on `PageTiming` and `UserTiming`
+ * @param {PageTiming} pageTimings - HARs `PageTiming` object
+ * @param {Page} currPage - active page
+ * @param {HarTransformerOptions} options - HAR-parser-specific options
+ */
+var getMarks = function (pageTimings, currPage, options) {
+    var sortFn = function (a, b) { return a.startTime - b.startTime; };
+    var marks = Object.keys(pageTimings)
+        .filter(function (k) { return (typeof pageTimings[k] === "number" && pageTimings[k] >= 0); })
+        .map(function (k) { return ({
+        name: k.replace(/^[_]/, "") + " (" + misc_1.roundNumber(pageTimings[k], 0) + " ms)",
+        startTime: pageTimings[k],
+    }); });
+    if (!options.showUserTiming) {
+        return marks.sort(sortFn);
+    }
+    return getUserTimimngs(currPage, options)
+        .concat(marks)
+        .sort(sortFn);
+};
+/**
+ * Extract all `Mark`s based on `UserTiming`
+ * @param {Page} currPage - active page
+ * @param {HarTransformerOptions} options - HAR-parser-specific options
+ */
+var getUserTimimngs = function (currPage, options) {
+    var baseFilter = options.showUserTimingEndMarker ?
+        function (k) { return k.indexOf("_userTime.") === 0; } :
+        function (k) { return k.indexOf("_userTime.") === 0 && k.indexOf("_userTime.endTimer-") !== 0; };
+    var filterFn = baseFilter;
+    if (Array.isArray(options.showUserTiming)) {
+        var findTimings_1 = options.showUserTiming;
+        filterFn = function (k) { return (baseFilter(k) &&
+            findTimings_1.indexOf(k.replace(/^_userTime\./, "")) >= 0); };
+    }
+    var findName = /^_userTime\.((?:startTimer-)?(.+))$/;
+    var extractUserTiming = function (k) {
+        var name;
+        var fullName;
+        var duration;
+        _a = findName.exec(k), fullName = _a[1], name = _a[2];
+        if (fullName !== name && currPage["_userTime.endTimer-" + name]) {
+            duration = currPage["_userTime.endTimer-" + name] - currPage[k];
+            return {
+                name: (options.showUserTimingEndMarker ? fullName : name) + " (" + currPage[k] + " - " + (currPage[k] + duration) + " ms)",
+                duration: duration,
+                startTime: currPage[k],
+            };
+        }
+        return {
+            name: fullName,
+            startTime: currPage[k],
+        };
+        var _a;
+    };
+    return Object.keys(currPage)
+        .filter(filterFn)
+        .map(extractUserTiming);
+};
 /**
  * Create `WaterfallEntry`s to represent the subtimings of a request
  * ("blocked", "dns", "connect", "send", "wait", "receive")
@@ -1248,7 +1322,7 @@ exports.transformPage = transformPage;
  * @param  {Entry} harEntry
  * @returns Array
  */
-function buildDetailTimingBlocks(startRelative, harEntry) {
+var buildDetailTimingBlocks = function (startRelative, harEntry) {
     var t = harEntry.timings;
     return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce(function (collect, key) {
         var time = getTimePair(key, harEntry, collect, startRelative);
@@ -1267,7 +1341,7 @@ function buildDetailTimingBlocks(startRelative, harEntry) {
         }
         return collect.concat([helpers_1.createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end))]);
     }, []);
-}
+};
 /**
  * Returns Object containing start and end time of `collect`
  *
@@ -1277,7 +1351,7 @@ function buildDetailTimingBlocks(startRelative, harEntry) {
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @returns {Object}
  */
-function getTimePair(key, harEntry, collect, startRelative) {
+var getTimePair = function (key, harEntry, collect, startRelative) {
     var wptKey;
     switch (key) {
         case "wait":
@@ -1297,7 +1371,7 @@ function getTimePair(key, harEntry, collect, startRelative) {
         "end": Math.round(end),
         "start": Math.round(start),
     };
-}
+};
 /**
  * Helper to create a requests `WaterfallResponseDetails`
  *
@@ -1305,7 +1379,7 @@ function getTimePair(key, harEntry, collect, startRelative) {
  * @param  {WaterfallEntryIndicator[]} indicators
  * @returns WaterfallResponseDetails
  */
-function createResponseDetails(entry, indicators) {
+var createResponseDetails = function (entry, indicators) {
     var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
     return {
         icon: helpers_1.makeMimeTypeIcon(entry.response.status, entry.response.statusText, requestType, entry.response.redirectURL),
@@ -1314,7 +1388,7 @@ function createResponseDetails(entry, indicators) {
         requestType: requestType,
         statusCode: entry.response.status,
     };
-}
+};
 
 },{"../helpers/misc":4,"../helpers/parse":5,"./har-heuristics":11,"./har-tabs":12,"./helpers":14}],14:[function(require,module,exports){
 "use strict";
@@ -1330,8 +1404,8 @@ function makeDefinitionList(dlKeyValues, addClass) {
         if (!addClass) {
             return "";
         }
-        var className = key.toLowerCase().replace(/[^a-z-]/g, "");
-        return "class=\"" + (className || "no-colour") + "\"";
+        var className = misc_1.toCssClass(key) || "no-colour";
+        return "class=\"" + className + "\"";
     };
     return dlKeyValues
         .filter(function (tuple) { return tuple[1] !== undefined; })
@@ -2152,7 +2226,6 @@ exports.makeHoverEvtListeners = makeHoverEvtListeners;
 Object.defineProperty(exports, "__esModule", { value: true });
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
-var styling_converters_1 = require("../../transformers/styling-converters");
 /**
  * Renders a per-second marker line and appends it to `timeHolder`
  *
@@ -2221,20 +2294,8 @@ function createTimeScale(context, durationMs) {
     return timeHolder;
 }
 exports.createTimeScale = createTimeScale;
-// TODO: Implement - data for this not parsed yet
-function createBgRect(context, entry) {
-    var rect = svg.newRect({
-        "height": context.diagramHeight,
-        "width": ((entry.total || 1) / context.unit) + "%",
-        "x": ((entry.start || 0.001) / context.unit) + "%",
-        "y": 0,
-    }, styling_converters_1.requestTypeToCssClass(entry.responseDetails.requestType));
-    rect.appendChild(svg.newTitle(entry.url)); // Add tile to wedge path
-    return rect;
-}
-exports.createBgRect = createBgRect;
 
-},{"../../helpers/misc":4,"../../helpers/svg":6,"../../transformers/styling-converters":15}],25:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":6}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../../helpers/dom");
@@ -2256,6 +2317,7 @@ function createMarks(context, marks) {
         var lineHolder = svg.newG("line-holder");
         var lineLabelHolder = svg.newG("line-label-holder");
         var lineLabel = svg.newTextEl(mark.name, { x: x + "%", y: diagramHeight + 25 });
+        var lineRect;
         mark.x = x;
         var line = svg.newLine({
             "x1": x + "%",
@@ -2278,28 +2340,62 @@ function createMarks(context, marks) {
         });
         lineHolder.appendChild(line);
         lineHolder.appendChild(lineConnection);
+        if (mark.duration) {
+            lineRect = createLineRect(context, mark);
+            lineHolder.appendChild(lineRect);
+        }
         context.pubSub.subscribeToOverlayChanges(function (change) {
             var offset = change.combinedOverlayHeight;
             var scale = (diagramHeight + offset) / (diagramHeight);
             line.setAttribute("transform", "scale(1, " + scale + ")");
             lineLabelHolder.setAttribute("transform", "translate(0, " + offset + ")");
             lineConnection.setAttribute("transform", "translate(0, " + offset + ")");
+            if (lineRect) {
+                lineRect.setAttribute("transform", "translate(0, " + offset + ")");
+            }
         });
-        var isActive = false;
+        var isHoverActive = false;
+        /** click indicator - overwrites `isHoverActive` */
+        var isClickActive = false;
         var onLabelMouseEnter = function () {
-            if (!isActive) {
-                isActive = true;
-                dom_1.addClass(lineHolder, "active");
-                // firefox has issues with this
+            if (!isHoverActive) {
+                // move marker to top
                 markHolder.parentNode.appendChild(markHolder);
+                isHoverActive = true;
+                // assign class later to not break animation with DOM re-order
+                if (typeof window.requestAnimationFrame === "function") {
+                    window.requestAnimationFrame(function () { return dom_1.addClass(lineHolder, "active"); });
+                }
+                else {
+                    dom_1.addClass(lineHolder, "active");
+                }
             }
         };
         var onLabelMouseLeave = function () {
-            isActive = false;
-            dom_1.removeClass(lineHolder, "active");
+            isHoverActive = false;
+            if (!isClickActive) {
+                dom_1.removeClass(lineHolder, "active");
+            }
+        };
+        var onLabelClick = function () {
+            if (isClickActive) {
+                // deselect
+                isHoverActive = false;
+                dom_1.removeClass(lineHolder, "active");
+            }
+            else if (!isHoverActive) {
+                // for touch devices
+                dom_1.addClass(lineHolder, "active");
+            }
+            else {
+                isHoverActive = false;
+            }
+            // set new state
+            isClickActive = !isClickActive;
         };
         lineLabel.addEventListener("mouseenter", onLabelMouseEnter);
         lineLabel.addEventListener("mouseleave", onLabelMouseLeave);
+        lineLabel.addEventListener("click", onLabelClick);
         lineLabelHolder.appendChild(lineLabel);
         markHolder.appendChild(svg.newTitle(mark.name));
         markHolder.appendChild(lineHolder);
@@ -2309,6 +2405,23 @@ function createMarks(context, marks) {
     return marksHolder;
 }
 exports.createMarks = createMarks;
+/**
+ * Converts a `Mark` with a duration (e.g. a UserTiming with `startTimer` and `endTimer`) into a rect.
+ * @param {Context} context Execution context object
+ * @param {Mark} entry  Line entry
+ */
+function createLineRect(context, entry) {
+    var holder = svg.newG("line-mark-holder line-marker-" + misc_1.toCssClass(entry.name));
+    holder.appendChild(svg.newTitle(entry.name.replace(/^startTimer-/, "")));
+    holder.appendChild(svg.newRect({
+        "height": context.diagramHeight,
+        "width": ((entry.duration || 1) / context.unit) + "%",
+        "x": ((entry.startTime || 0.001) / context.unit) + "%",
+        "y": 0,
+    }, "line-mark"));
+    return holder;
+}
+exports.createLineRect = createLineRect;
 
 },{"../../helpers/dom":1,"../../helpers/misc":4,"../../helpers/svg":6}],26:[function(require,module,exports){
 "use strict";
@@ -2409,9 +2522,6 @@ function createWaterfallSvg(data, options) {
     // Start appending SVG elements to the holder element (timeLineHolder)
     scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(context, data.durationMs));
     scaleAndMarksHolder.appendChild(marks.createMarks(context, data.marks));
-    data.lines.forEach(function (entry) {
-        timeLineHolder.appendChild(generalComponents.createBgRect(context, entry));
-    });
     // This assumes all icons (mime and indicators) have the same width
     var perIconWidth = entriesToShow[0].responseDetails.icon.width;
     var maxIcons = 0;
