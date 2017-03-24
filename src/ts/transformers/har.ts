@@ -7,9 +7,11 @@ import {
 } from "har-format";
 import { roundNumber } from "../helpers/misc";
 import { toInt } from "../helpers/parse";
+import { HarTransformerOptions } from "../typing/options";
 import {
   Mark,
   TimingType,
+  UserTiming,
   WaterfallData,
   WaterfallDocs,
   WaterfallEntryIndicator,
@@ -28,16 +30,17 @@ import {
 
 /**
  * Transforms the full HAR doc, including all pages
- * @param  {Har} harData - raw hhar object
+ * @param  {Har} harData - raw HAR object
+ * @param {HarTransformerOptions} options - HAR-parser-specific options
  * @returns WaterfallDocs
  */
-export function transformDoc(harData: Har | Log): WaterfallDocs {
+export function transformDoc(harData: Har | Log, options: HarTransformerOptions): WaterfallDocs {
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
   const pages = getPages(data);
 
   return {
-    pages: pages.map((_page, i) => this.transformPage(data, i)),
+    pages: pages.map((_page, i) => this.transformPage(data, i, options)),
   };
 }
 
@@ -65,7 +68,7 @@ function toWaterFallEntry(entry: Entry, index: number, startRelative: number, is
 }
 
 /** retuns the page or a mock page object */
-function getPages(data: Log) {
+const getPages = (data: Log) => {
   if (data.pages && data.pages.length > 0) {
     return data.pages;
   }
@@ -80,15 +83,18 @@ function getPages(data: Log) {
     startedDateTime: statedTime,
     title: "n/a",
   } as Page];
-}
+};
 
 /**
  * Transforms a HAR object into the format needed to render the PerfCascade
  * @param  {Har} harData - HAR document
  * @param {number=0} pageIndex - page to parse (for multi-page HAR)
+ * @param {HarTransformerOptions} options - HAR-parser-specific options
  * @returns WaterfallData
  */
-export function transformPage(harData: Har | Log, pageIndex: number = 0): WaterfallData {
+export function transformPage(harData: Har | Log,
+                              pageIndex: number = 0,
+                              options: HarTransformerOptions): WaterfallData {
   // make sure it's the *.log base node
   let data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
 
@@ -116,17 +122,7 @@ export function transformPage(harData: Har | Log, pageIndex: number = 0): Waterf
       return toWaterFallEntry(entry, index, startRelative, isTLS);
     });
 
-  const marks = Object.keys(pageTimings)
-    .filter((k: keyof PageTiming) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
-    .sort((a: string, b: string) => pageTimings[a] > pageTimings[b] ? 1 : -1)
-    .map((k) => {
-      const startRelative: number = pageTimings[k];
-      doneTime = Math.max(doneTime, startRelative);
-      return {
-        "name": `${k.replace(/^[_]/, "")} (${roundNumber(startRelative, 0)} ms)`,
-        "startTime": startRelative,
-      } as Mark;
-    });
+  const marks = getMarks(pageTimings, currPage, options);
 
   // Add 100ms margin to make room for labels
   doneTime += 100;
@@ -136,10 +132,80 @@ export function transformPage(harData: Har | Log, pageIndex: number = 0): Waterf
     durationMs: doneTime,
     entries,
     marks,
-    lines: [],
     title: currPage.title,
   };
 }
+
+/**
+ * Extract all `Mark`s based on `PageTiming` and `UserTiming`
+ * @param {PageTiming} pageTimings - HARs `PageTiming` object
+ * @param {Page} currPage - active page
+ * @param {HarTransformerOptions} options - HAR-parser-specific options
+ */
+const getMarks = (pageTimings: PageTiming, currPage: Page, options: HarTransformerOptions) => {
+  const sortFn = (a: Mark, b: Mark) => a.startTime - b.startTime;
+  const marks = Object.keys(pageTimings)
+    .filter((k: keyof PageTiming) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
+    .map((k) => ({
+      name: `${k.replace(/^[_]/, "")} (${roundNumber(pageTimings[k], 0)} ms)`,
+      startTime: pageTimings[k],
+    } as Mark));
+
+  if (!options.showUserTiming) {
+    return marks.sort(sortFn);
+  }
+
+  return getUserTimimngs(currPage, options)
+    .concat(marks)
+    .sort(sortFn);
+};
+
+/**
+ * Extract all `Mark`s based on `UserTiming`
+ * @param {Page} currPage - active page
+ * @param {HarTransformerOptions} options - HAR-parser-specific options
+ */
+const getUserTimimngs = (currPage: Page, options: HarTransformerOptions) => {
+  let baseFilter = options.showUserTimingEndMarker ?
+    (k: string) => k.indexOf("_userTime.") === 0 :
+    (k: string) => k.indexOf("_userTime.") === 0 && k.indexOf("_userTime.endTimer-") !== 0;
+  let filterFn = baseFilter;
+
+  if (Array.isArray(options.showUserTiming)) {
+    let findTimings = options.showUserTiming;
+    filterFn = (k: string) => (
+      baseFilter(k) &&
+      findTimings.indexOf(k.replace(/^_userTime\./, "")) >= 0
+    );
+  }
+
+  const findName = /^_userTime\.((?:startTimer-)?(.+))$/;
+
+  const extractUserTiming = (k: string) => {
+    let name: string;
+    let fullName: string;
+    let duration: number;
+    [, fullName, name] = findName.exec(k);
+
+    if (fullName !== name && currPage[`_userTime.endTimer-${name}`]) {
+      duration = currPage[`_userTime.endTimer-${name}`] - currPage[k];
+      return {
+        name: `${options.showUserTimingEndMarker ? fullName : name} (${currPage[k]} - ${currPage[k] + duration} ms)`,
+        duration,
+        startTime: currPage[k],
+        // x: currPage[k],
+      } as UserTiming;
+    }
+    return {
+      name: fullName,
+      startTime: currPage[k],
+    } as UserTiming;
+  };
+
+  return Object.keys(currPage)
+    .filter(filterFn)
+    .map(extractUserTiming);
+};
 
 /**
  * Create `WaterfallEntry`s to represent the subtimings of a request
@@ -148,7 +214,7 @@ export function transformPage(harData: Har | Log, pageIndex: number = 0): Waterf
  * @param  {Entry} harEntry
  * @returns Array
  */
-function buildDetailTimingBlocks(startRelative: number, harEntry: Entry): WaterfallEntryTiming[] {
+const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): WaterfallEntryTiming[] => {
   let t = harEntry.timings;
   return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[],
     key: TimingType) => {
@@ -172,7 +238,7 @@ function buildDetailTimingBlocks(startRelative: number, harEntry: Entry): Waterf
 
     return collect.concat([createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end))]);
   }, []);
-}
+};
 
 /**
  * Returns Object containing start and end time of `collect`
@@ -183,7 +249,7 @@ function buildDetailTimingBlocks(startRelative: number, harEntry: Entry): Waterf
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @returns {Object}
  */
-function getTimePair(key: string, harEntry: Entry, collect: WaterfallEntryTiming[], startRelative: number) {
+const getTimePair = (key: string, harEntry: Entry, collect: WaterfallEntryTiming[], startRelative: number) => {
   let wptKey;
   switch (key) {
     case "wait": wptKey = "ttfb"; break;
@@ -200,7 +266,7 @@ function getTimePair(key: string, harEntry: Entry, collect: WaterfallEntryTiming
     "end": Math.round(end),
     "start": Math.round(start),
   };
-}
+};
 
 /**
  * Helper to create a requests `WaterfallResponseDetails`
@@ -209,7 +275,7 @@ function getTimePair(key: string, harEntry: Entry, collect: WaterfallEntryTiming
  * @param  {WaterfallEntryIndicator[]} indicators
  * @returns WaterfallResponseDetails
  */
-function createResponseDetails(entry: Entry, indicators: WaterfallEntryIndicator[]): WaterfallResponseDetails {
+const createResponseDetails = (entry: Entry, indicators: WaterfallEntryIndicator[]): WaterfallResponseDetails => {
   const requestType = mimeToRequestType(entry.response.content.mimeType);
   return {
     icon: makeMimeTypeIcon(entry.response.status, entry.response.statusText, requestType, entry.response.redirectURL),
@@ -218,4 +284,4 @@ function createResponseDetails(entry: Entry, indicators: WaterfallEntryIndicator
     requestType,
     statusCode: entry.response.status,
   };
-}
+};

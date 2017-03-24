@@ -40,37 +40,48 @@ Directories:
 see [options.d.ts](https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/options.ts) for source
 
 ### `rowHeight`
-`number`, default: `23`
+`number`, default: `23`<br/>
 Height of every request bar block plus spacer pixel (in px) default: 23
 
 ### `showAlignmentHelpers`
-`boolean`, default: `true`
+`boolean`, default: `true`<br/>
 Show verticale lines to easier spot potential dependencies/blocking between requests
 
 ### `showMimeTypeIcon`
-`boolean`, default: `true`
+`boolean`, default: `true`<br/>
 Show mime type icon on the left
 
 ### `showIndicatorIcons`
-`boolean`, default: `true`
+`boolean`, default: `true`<br/>
 Show warning icons for potential issues on the left
 
 ### `leftColumnWith`
-`number` default: `25`
+`number`, default: `25`<br/>
 Relative width of the info column on the left (in percent)
 
 ### `pageSelector`
-`HTMLSelectElement` default: `undefined`
+`HTMLSelectElement`, default: `undefined`<br/>
 DOM `<select>` element to use to select a run if the HAR contains multiple runs.
 
 ### `selectedPage`
-`number` default: `0`
+`number`, default: `0`<br/>
 Zero-based index of the page to initially render.<br/>
 If `selectedPage` is larger than the number of pages the last page will be selected.
 
 ### `legendHolder`
-`HTMLElement` (DOM element) default: `undefined` (not shown)
+`HTMLElement` (DOM element), default: `undefined` (not shown)<br/>
 If set a legend explaining the waterfall colours is rendered in the `legendHolder` DOM element.
+
+### `showUserTiming`
+`boolean`, default: `false`<br/>
+If enabled the [UserTiming](https://developer.mozilla.org/en-US/docs/Web/API/User_Timing_API) data
+in WebPageTest's format `_userTime.*` get parsed and rendered as well.
+Matching `_userTime.startTimer-*` and `_userTime.endTimer-*` entries get combined into one block.
+
+### `showUserTimingEndMarker`
+`boolean`, default: `false` (requires `showUserTiming` to be `true`)<br/>
+If `showUserTiming` is enabled all `_userTime.endTimer-*` marker are hidden by default, only the UserTiming's
+start and duration is shown. This option also adds an `_userTime.endTimer-*` marker.
 
 ## `*.zhar` - zipped HAR files
 By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/master/src/index.html#L78-L86) you can use `perfCascadeFileReader.readFile` to read a zip file and convert it to a JSON HAR object.

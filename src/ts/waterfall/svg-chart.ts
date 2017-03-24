@@ -117,10 +117,6 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartOptions): 
   scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(context, data.durationMs));
   scaleAndMarksHolder.appendChild(marks.createMarks(context, data.marks));
 
-  data.lines.forEach((entry) => {
-    timeLineHolder.appendChild(generalComponents.createBgRect(context, entry));
-  });
-
   // This assumes all icons (mime and indicators) have the same width
   const perIconWidth = entriesToShow[0].responseDetails.icon.width;
 

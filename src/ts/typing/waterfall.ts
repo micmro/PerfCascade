@@ -4,12 +4,14 @@ export type RequestType = "other" | "image" | "video" | "audio" | "font" | "svg"
 
 export type IndicatorType = "error" | "warning" | "info";
 
+/** Typing for a event, e.g. UserTiming API performance mark from WPT */
 export interface UserTiming {
   duration?: number;
   name: string;
   startTime: number;
 }
 
+/** Type for a time-marker, e.g. the fireing of an event */
 export interface Mark extends UserTiming {
   /** custom data to store x position */
   x?: number;
@@ -86,17 +88,23 @@ export interface WaterfallResponseDetails {
   requestType: RequestType;
 }
 
+/** Type data used to rendering a single waterfall diagram */
 export interface WaterfallData {
+  /** Page title */
   title: string;
+  /** time to load all contained entries (in ms) */
   durationMs: number;
+  /** Array of requests */
   entries: WaterfallEntry[];
+  /** special time marker e.g. `onLoad` */
   marks: Mark[];
-  lines: WaterfallEntry[];
   /** indicates if the parent document is loaded with TLS or SSL */
   docIsTLS: boolean;
 }
 
+/** Type for a series of waterfall diagrams */
 export interface WaterfallDocs {
+  /** Series of waterfalls (e.g. multiple page-views) */
   pages: WaterfallData[];
 }
 

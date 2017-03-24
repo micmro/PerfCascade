@@ -1,9 +1,9 @@
 import { addClass, removeClass } from "../../helpers/dom";
-import {roundNumber} from "../../helpers/misc";
+import { roundNumber, toCssClass } from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
-import {Context} from "../../typing/context";
-import {OverlayChangeEvent} from "../../typing/open-overlay";
-import {Mark} from "../../typing/waterfall";
+import { Context } from "../../typing/context";
+import { OverlayChangeEvent } from "../../typing/open-overlay";
+import { Mark } from "../../typing/waterfall";
 
 /**
  * Renders global marks for events like the onLoad event etc
@@ -21,7 +21,8 @@ export function createMarks(context: Context, marks: Mark[]) {
     let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase().replace(/([0-9]+[ ]?ms)|\W/g, ""));
     let lineHolder = svg.newG("line-holder");
     let lineLabelHolder = svg.newG("line-label-holder");
-    let lineLabel = svg.newTextEl(mark.name, {x: x + "%", y: diagramHeight + 25});
+    let lineLabel = svg.newTextEl(mark.name, { x: x + "%", y: diagramHeight + 25 });
+    let lineRect: SVGGElement;
     mark.x = x;
 
     let line = svg.newLine({
@@ -47,6 +48,11 @@ export function createMarks(context: Context, marks: Mark[]) {
     lineHolder.appendChild(line);
     lineHolder.appendChild(lineConnection);
 
+    if (mark.duration) {
+      lineRect = createLineRect(context, mark);
+      lineHolder.appendChild(lineRect);
+    }
+
     context.pubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
       let offset = change.combinedOverlayHeight;
       let scale = (diagramHeight + offset) / (diagramHeight);
@@ -54,25 +60,53 @@ export function createMarks(context: Context, marks: Mark[]) {
       line.setAttribute("transform", `scale(1, ${scale})`);
       lineLabelHolder.setAttribute("transform", `translate(0, ${offset})`);
       lineConnection.setAttribute("transform", `translate(0, ${offset})`);
+      if (lineRect) {
+        lineRect.setAttribute("transform", `translate(0, ${offset})`);
+      }
     });
 
-    let isActive = false;
+    let isHoverActive = false;
+    /** click indicator - overwrites `isHoverActive` */
+    let isClickActive = false;
     let onLabelMouseEnter = () => {
-      if (!isActive) {
-        isActive = true;
-        addClass(lineHolder, "active");
-        // firefox has issues with this
+      if (!isHoverActive) {
+        // move marker to top
         markHolder.parentNode.appendChild(markHolder);
+        isHoverActive = true;
+        // assign class later to not break animation with DOM re-order
+        if (typeof window.requestAnimationFrame === "function") {
+          window.requestAnimationFrame(() => addClass(lineHolder, "active"));
+        } else {
+          addClass(lineHolder, "active");
+        }
       }
     };
 
     let onLabelMouseLeave = () => {
-      isActive = false;
-      removeClass(lineHolder, "active");
+      isHoverActive = false;
+      if (!isClickActive) {
+        removeClass(lineHolder, "active");
+      }
+    };
+
+    let onLabelClick = () => {
+      if (isClickActive) {
+        // deselect
+        isHoverActive = false;
+        removeClass(lineHolder, "active");
+      } else if (!isHoverActive) {
+        // for touch devices
+        addClass(lineHolder, "active");
+      } else {
+        isHoverActive = false;
+      }
+      // set new state
+      isClickActive = !isClickActive;
     };
 
     lineLabel.addEventListener("mouseenter", onLabelMouseEnter);
     lineLabel.addEventListener("mouseleave", onLabelMouseLeave);
+    lineLabel.addEventListener("click", onLabelClick);
     lineLabelHolder.appendChild(lineLabel);
 
     markHolder.appendChild(svg.newTitle(mark.name));
@@ -82,4 +116,22 @@ export function createMarks(context: Context, marks: Mark[]) {
   });
 
   return marksHolder;
+}
+
+/**
+ * Converts a `Mark` with a duration (e.g. a UserTiming with `startTimer` and `endTimer`) into a rect.
+ * @param {Context} context Execution context object
+ * @param {Mark} entry  Line entry
+ */
+export function createLineRect(context: Context, entry: Mark): SVGGElement {
+  let holder = svg.newG(`line-mark-holder line-marker-${toCssClass(entry.name)}`);
+  holder.appendChild(svg.newTitle(entry.name.replace(/^startTimer-/, "")));
+  holder.appendChild(svg.newRect({
+    "height": context.diagramHeight,
+    "width": ((entry.duration || 1) / context.unit) + "%",
+    "x": ((entry.startTime || 0.001) / context.unit) + "%",
+    "y": 0,
+  }, "line-mark"));
+
+  return holder;
 }
