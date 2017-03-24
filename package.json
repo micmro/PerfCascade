@@ -50,7 +50,8 @@
     "load-grunt-config": "^0.19.2",
     "tsify": "^3.0.1",
     "tslint": "^4.5.1",
-    "typescript": "^2.2.1"
+    "typescript": "^2.2.1",
+    "whatwg-fetch": "^2.0.3"
   },
   "dependencies": {
     "@types/har-format": "^1.2.0"

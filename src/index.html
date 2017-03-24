@@ -28,10 +28,12 @@
     <select id="page-selector2" class="page-selector"></select>
     <div id="output2" class="output"></div>
 
+    <!-- fetch polyfill for dev-page only -->
+    <script src="/node_modules/whatwg-fetch/fetch.js"></script>
+
     <!-- import PerfCascade JS /-->
     <script src="/build/stage/perf-cascade.js"></script>
     <script src="/build/stage/perf-cascade-file-reader.js"></script>
-    <script src="https://raw.githubusercontent.com/github/fetch/master/fetch.js"></script>
 
     <script>
         /**
