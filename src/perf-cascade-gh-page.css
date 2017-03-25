@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:1.2.0 (25/03/2017) */
+/*! github.com/micmro/PerfCascade Version:1.2.1 (25/03/2017) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -746,8 +746,6 @@ a:hover {
 .water-fall-chart .line-start {display: none; stroke-width:1; stroke-opacity:0.5; stroke: #000;}
 .water-fall-chart .line-end.active,
 .water-fall-chart .line-start.active {display: block;}
-
-.water-fall-chart .mark-holder text {writing-mode:vertical-lr;}
 
 .left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9;}
 
