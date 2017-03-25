@@ -1,5 +1,5 @@
 # PerfCascade
-Extensible waterfall-viewer that works with [HAR](http://www.softwareishard.com/blog/har-12-spec/) and other formats (in the future).
+Responsive, SVG based [HAR](http://www.softwareishard.com/blog/har-12-spec/) waterfall viewer .
 
 [![Build status][travis-image]][travis-url]
 
@@ -95,6 +95,10 @@ perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(error, d
 Optionally `perfCascadeFileReader.readFile` also takes a callback (`(progress:number) => void`) as a forth argument
 that gets called whenever a new unzip progress status is available.
 
+## Rendering other formats (than HAR)
+PerfCascade is composed of a parser (`src/ts/transformers/har.ts`) that parsed HAR into PerfCascade's agnostic `WaterfallDocs` format and the renderer (see `PerfCascade()` in `src/ts/main.ts`) that creats the chart SVG.
+
+If you want to render another format, you could clone the repo and create a new parser. It would also be possible to seperate the renderer into a seperate package, if there is enough interest to justify the effort (create an issue and we can discuss it).
 
 ## Dev
 - Start live-reload server and Typescript compiler with watch: `npm run watch`
