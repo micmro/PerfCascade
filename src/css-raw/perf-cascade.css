@@ -22,8 +22,6 @@
 .water-fall-chart .line-end.active,
 .water-fall-chart .line-start.active {display: block;}
 
-.water-fall-chart .mark-holder text {writing-mode:vertical-lr;}
-
 .left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9;}
 
 .time-scale line {stroke:#0cc; stroke-width:1;}
