@@ -85,7 +85,7 @@ export default class OverlayManager implements OverlayManagerClass {
   private realignBars(barEls: SVGGElement[]) {
     barEls.forEach((bar, j) => {
       let offset = this.getOverlayOffset(j);
-      bar.style.transform = `translate(0, ${offset}px)`;
+      bar.setAttribute("transform", `translate(0, ${offset})`);
     });
   }
 

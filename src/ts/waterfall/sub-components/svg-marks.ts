@@ -22,6 +22,7 @@ export function createMarks(context: Context, marks: Mark[]) {
     let lineHolder = svg.newG("line-holder");
     let lineLabelHolder = svg.newG("line-label-holder");
     let lineLabel = svg.newTextEl(mark.name, { x: x + "%", y: diagramHeight + 25 });
+    lineLabel.setAttribute("writing-mode", "tb");
     let lineRect: SVGGElement;
     mark.x = x;
 
