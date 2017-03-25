@@ -2,6 +2,14 @@
 
 
 
+<a name="v1.2.1"></a>
+## v1.2.1 (2017-03-25)
+
+* #167 fix marker lable in Safari and IE ([76c6248](https://github.com/micmro/PerfCascade/commit/76c6248))
+* #190 fix IE overlay (replace css transforms) ([522df99](https://github.com/micmro/PerfCascade/commit/522df99))
+
+
+
 <a name="v1.2.0"></a>
 # v1.2.0 (2017-03-25)
 
