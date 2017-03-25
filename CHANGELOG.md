@@ -2,6 +2,15 @@
 
 
 
+<a name="v1.2.0"></a>
+# v1.2.0 (2017-03-25)
+
+* #185 add overlay opening animation ([923ea83](https://github.com/micmro/PerfCascade/commit/923ea83))
+* Fix docs to reflect focus on HAR ([24d41f8](https://github.com/micmro/PerfCascade/commit/24d41f8))
+* fix fetch polyfill for dev-page ([b6a896c](https://github.com/micmro/PerfCascade/commit/b6a896c))
+
+
+
 <a name="v1.1.0"></a>
 # v1.1.0 (2017-03-24)
 
