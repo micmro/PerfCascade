@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:1.2.0 (25/03/2017) */
+/*! github.com/micmro/PerfCascade Version:1.2.1 (25/03/2017) */
 .water-fall-chart {width:100%; overflow: visible; font-size: 12px; line-height: 1em;}
 .water-fall-chart * {box-sizing: border-box;}
 .water-fall-chart button {cursor: pointer;}
@@ -22,8 +22,6 @@
 .water-fall-chart .line-start {display: none; stroke-width:1; stroke-opacity:0.5; stroke: #000;}
 .water-fall-chart .line-end.active,
 .water-fall-chart .line-start.active {display: block;}
-
-.water-fall-chart .mark-holder text {writing-mode:vertical-lr;}
 
 .left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9;}
 
