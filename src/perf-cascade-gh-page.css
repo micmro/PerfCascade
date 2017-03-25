@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:1.1.0 (24/03/2017) */
+/*! github.com/micmro/PerfCascade Version:1.2.0 (25/03/2017) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -749,13 +749,13 @@ a:hover {
 
 .water-fall-chart .mark-holder text {writing-mode:vertical-lr;}
 
-.left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9}
+.left-fixed-holder .label-full-bg {fill: #fff; opacity: 0.9;}
 
 .time-scale line {stroke:#0cc; stroke-width:1;}
 .time-scale line.sub-second-line {stroke: #ccc; opacity: 0.75; stroke-width:0.50;}
 .time-scale text {font-weight:bold;}
 
-.row-item {cursor: pointer}
+.row-item {cursor: pointer;}
 .row-item .even {fill: #ccc; opacity: 0.05;}
 .row-item .odd {fill: #000; opacity: 0.05;}
 .row-item:hover .odd,
@@ -773,14 +773,21 @@ a:hover {
 .row-item.status4xx .even,
 .row-item.status4xx .odd,
 .row-item.status3xx .even,
-.row-item.status3xx .odd {opacity: 0.3}
+.row-item.status3xx .odd {opacity: 0.3;}
 .row-item.status5xx:hover .even,
 .row-item.status5xx:hover .odd,
 .row-item.status4xx:hover .even,
 .row-item.status4xx:hover .odd,
 .row-item.status3xx:hover .even,
-.row-item.status3xx:hover .odd {opacity: 0.5}
+.row-item.status3xx:hover .odd {opacity: 0.5;}
 
+/** overlay animation settings **/
+.water-fall-chart .line-label-holder,
+.row-item,
+.water-fall-chart .line-holder line,
+.time-scale line,
+.time-scale text {transition:transform 60ms;}
+.water-fall-chart.closing {transition-delay: 60ms;}
 
 .labels { overflow: hidden;}
 
@@ -815,7 +822,7 @@ a:hover {
 .block-undefined {fill: #0f0;}
 
 /* Info overlay SVG - wrapper */
-.info-overlay {fill: #fff; stroke: #cdcdcd; }
+.info-overlay {fill: #fff; stroke: #cdcdcd;}
 .info-overlay-close-btn {fill: rgba(205, 205, 205, 0.8); transform: translate(-23px, -23px); cursor: pointer;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}
 .info-overlay-close-btn:focus {border: solid 1px #36c;}
