@@ -139,12 +139,14 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
 
   let barEls: SVGGElement[] = [];
 
-  function getChartHeight(): string {
-    return (chartHolderHeight + context.overlayManager.getCombinedOverlayHeight()).toString() + "px";
+  function getChartHeight(): number {
+    return chartHolderHeight + context.overlayManager.getCombinedOverlayHeight();
   }
 
   context.pubSub.subscribeToOverlayChanges(() => {
-    timeLineHolder.style.height = getChartHeight();
+    const newHeight = getChartHeight();
+    timeLineHolder.classList.toggle("closing", newHeight < timeLineHolder.clientHeight);
+    timeLineHolder.style.height = `${newHeight}px`;
   });
 
   /** Renders single row and hooks up behaviour */
