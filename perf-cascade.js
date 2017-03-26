@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:1.2.1 (25/03/2017) */
+/*! github.com/micmro/PerfCascade Version:1.2.2 (26/03/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -53,20 +53,48 @@ exports.removeChildren = removeChildren;
 },{}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function matchHeaderFilter(lowercaseName) {
+/** Partial function that buils a filter predicate function */
+var matchHeaderPartialFn = function (lowercaseName) {
     return function (header) { return header.name.toLowerCase() === lowercaseName; };
-}
+};
+/**
+ * @param headers List of `Header` to search in
+ * @param headerName Name of `Header` to find
+ */
 function hasHeader(headers, headerName) {
-    var headerFilter = matchHeaderFilter(headerName.toLowerCase());
+    var headerFilter = matchHeaderPartialFn(headerName.toLowerCase());
     return headers.some(headerFilter);
 }
 exports.hasHeader = hasHeader;
+/** feature detection if browser supports `find` for arrays */
+var browserHasFind = !!Array.prototype["find"];
+/**
+ * Returns the fist instances of `headerName` in `headers`
+ * @param headers List of `Header` to search in
+ * @param headerName Name of `Header` to find
+ */
 function getHeader(headers, headerName) {
-    var headerFilter = matchHeaderFilter(headerName.toLowerCase());
-    var firstMatch = headers.filter(headerFilter).pop();
-    return firstMatch ? firstMatch.value : undefined;
+    var headerFilter = matchHeaderPartialFn(headerName.toLowerCase());
+    var firstItem;
+    if (browserHasFind) {
+        firstItem = headers["find"](headerFilter);
+    }
+    else {
+        firstItem = headers.map(headerFilter).pop();
+    }
+    return firstItem ? firstItem.value : undefined;
 }
 exports.getHeader = getHeader;
+/**
+ * Returns all instances of `headerName` in `headers` as `KvTuple`
+ * @param headers List of `Header` to search in
+ * @param headerName Name of `Header` to find
+ */
+function getHeaders(headers, headerName) {
+    var headerFilter = matchHeaderPartialFn(headerName.toLowerCase());
+    return headers.filter(headerFilter).map(function (h) { return [headerName, h.value]; });
+}
+exports.getHeaders = getHeaders;
 
 },{}],3:[function(require,module,exports){
 /**
@@ -777,11 +805,16 @@ exports.default = Paging;
 Object.defineProperty(exports, "__esModule", { value: true });
 var har_1 = require("../helpers/har");
 var parse_1 = require("../helpers/parse");
+var helpers_1 = require("./helpers");
 var byteSizeProperty = function (title, input) {
     return [title, parse_1.parseAndFormat(input, parse_1.parsePositive, parse_1.formatBytes)];
 };
 var countProperty = function (title, input) {
     return [title, parse_1.parseAndFormat(input, parse_1.parsePositive)];
+};
+/** Predicate to filter out invalid or empty `KvTuple` */
+var notEmpty = function (kv) {
+    return kv.length > 1 && kv[1] !== undefined && kv[1] !== "";
 };
 function parseGeneralDetails(entry, startRelative, requestID) {
     return [
@@ -812,12 +845,12 @@ function parseGeneralDetails(entry, startRelative, requestID) {
         byteSizeProperty("Minify Save", entry._minify_save),
         byteSizeProperty("Image Total", entry._image_total),
         byteSizeProperty("Image Save", entry._image_save),
-    ].filter(function (k) { return k[1] !== undefined && k[1] !== ""; });
+    ].filter(notEmpty);
 }
 function parseRequestDetails(harEntry) {
     var request = harEntry.request;
-    var stringHeader = function (name) { return [name, har_1.getHeader(request.headers, name)]; };
-    return [
+    var stringHeader = function (name) { return har_1.getHeaders(request.headers, name); };
+    return helpers_1.flattenKvTuple([
         ["Method", request.method],
         ["HTTP Version", request.httpVersion],
         byteSizeProperty("Bytes Out (uploaded)", harEntry._bytesOut),
@@ -836,7 +869,7 @@ function parseRequestDetails(harEntry) {
         stringHeader("If-Unmodified-Since"),
         countProperty("Querystring parameters count", request.queryString.length),
         countProperty("Cookies count", request.cookies.length),
-    ].filter(function (k) { return k[1] !== undefined && k[1] !== ""; });
+    ]).filter(notEmpty);
 }
 function parseResponseDetails(entry) {
     var response = entry.response;
@@ -844,7 +877,7 @@ function parseResponseDetails(entry) {
     var headers = response.headers;
     var stringHeader = function (title, name) {
         if (name === void 0) { name = title; }
-        return [title, har_1.getHeader(headers, name)];
+        return har_1.getHeaders(headers, name);
     };
     var dateHeader = function (name) {
         var header = har_1.getHeader(headers, name);
@@ -859,7 +892,7 @@ function parseResponseDetails(entry) {
     if (entry._contentType && entry._contentType !== contentType) {
         contentType = contentType + " | " + entry._contentType;
     }
-    return [
+    return helpers_1.flattenKvTuple([
         ["Status", response.status + " " + response.statusText],
         ["HTTP Version", response.httpVersion],
         byteSizeProperty("Bytes In (downloaded)", entry._bytesIn),
@@ -889,7 +922,7 @@ function parseResponseDetails(entry) {
         stringHeader("Timing-Allow-Origin"),
         ["Redirect URL", parse_1.parseAndFormat(response.redirectURL, parse_1.parseNonEmpty)],
         ["Comment", parse_1.parseAndFormat(response.comment, parse_1.parseNonEmpty)],
-    ];
+    ]).filter(notEmpty);
 }
 function parseTimings(entry, start, end) {
     var timings = entry.timings;
@@ -926,7 +959,7 @@ function getKeys(entry, requestID, startRelative, endRelative) {
 }
 exports.getKeys = getKeys;
 
-},{"../helpers/har":2,"../helpers/parse":5}],11:[function(require,module,exports){
+},{"../helpers/har":2,"../helpers/parse":5,"./helpers":14}],11:[function(require,module,exports){
 /**
  * Heuristics used at parse-time for HAR data
  */
@@ -1150,7 +1183,7 @@ function makeRawData(entry) {
 }
 /** Image preview tab */
 function makeImgTab(entry) {
-    return makeLazyWaterfallEntryTab("Preview", function (detailsHeight) { return "<img class=\"preview\" style=\"max-height:" + (detailsHeight - 100) + "px\"\n data-src=\"" + entry.request.url + "\" />"; });
+    return makeLazyWaterfallEntryTab("Preview", function (detailsHeight) { return "<img class=\"preview\" style=\"max-height:" + (detailsHeight - 100) + "px\"\n data-src=\"" + entry.request.url.replace("\"", "&quot;") + "\" />"; });
 }
 
 },{"../helpers/parse":5,"./extract-details-keys":10,"./helpers":14}],13:[function(require,module,exports){
@@ -1409,7 +1442,7 @@ function makeDefinitionList(dlKeyValues, addClass) {
     };
     return dlKeyValues
         .filter(function (tuple) { return tuple[1] !== undefined; })
-        .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + tuple[0] + "</dt>\n      <dd>" + parse_1.escapeHtml(tuple[1]) + "</dd>\n    "; }).join("");
+        .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + parse_1.escapeHtml(tuple[0]) + "</dt>\n      <dd>" + parse_1.escapeHtml(tuple[1]) + "</dd>\n    "; }).join("");
 }
 exports.makeDefinitionList = makeDefinitionList;
 /**
@@ -1535,6 +1568,25 @@ function makeMimeTypeIcon(status, statusText, requestType, redirectURL) {
     }
 }
 exports.makeMimeTypeIcon = makeMimeTypeIcon;
+/**
+ * Flattens out a second level of `KvTuple` nesting (and removed empty and `undefined` entries)
+ *
+ * @param nestedKvPairs - nested `KvTuple`s (possibly sub-nested)
+ */
+exports.flattenKvTuple = function (nestedKvPairs) {
+    var returnKv = [];
+    nestedKvPairs.forEach(function (maybeKv) {
+        if (maybeKv === undefined || maybeKv.length === 0) {
+            return;
+        }
+        if (Array.isArray(maybeKv[0])) {
+            returnKv.push.apply(returnKv, maybeKv);
+            return;
+        }
+        returnKv.push(maybeKv);
+    });
+    return returnKv;
+};
 
 },{"../helpers/misc":4,"../helpers/parse":5,"../waterfall/row/svg-indicators":20}],15:[function(require,module,exports){
 "use strict";
