@@ -25,7 +25,7 @@ export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = f
   return dlKeyValues
     .filter((tuple: KvTuple) => tuple[1] !== undefined)
     .map((tuple) => `
-      <dt ${makeClass(tuple[0])}>${tuple[0]}</dt>
+      <dt ${makeClass(tuple[0])}>${escapeHtml(tuple[0])}</dt>
       <dd>${escapeHtml(tuple[1])}</dd>
     `).join("");
 }

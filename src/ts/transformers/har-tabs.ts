@@ -131,5 +131,5 @@ function makeImgTab(entry: Entry): WaterfallEntryTab {
   return makeLazyWaterfallEntryTab(
     "Preview",
     (detailsHeight: number) => `<img class="preview" style="max-height:${(detailsHeight - 100)}px"
- data-src="${entry.request.url}" />`);
+ data-src="${entry.request.url.replace("\"", "&quot;")}" />`);
 }
