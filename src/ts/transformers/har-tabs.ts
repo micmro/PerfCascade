@@ -1,12 +1,13 @@
 import { Entry } from "har-format";
 import { escapeHtml } from "../helpers/parse";
 import {
+  KvTuple,
   RequestType,
   TabRenderer,
   WaterfallEntryIndicator,
   WaterfallEntryTab,
 } from "../typing/waterfall";
-import { getKeys, KvTuple } from "./extract-details-keys";
+import { getKeys } from "./extract-details-keys";
 import { makeDefinitionList } from "./helpers";
 
 /**
@@ -130,5 +131,5 @@ function makeImgTab(entry: Entry): WaterfallEntryTab {
   return makeLazyWaterfallEntryTab(
     "Preview",
     (detailsHeight: number) => `<img class="preview" style="max-height:${(detailsHeight - 100)}px"
- data-src="${entry.request.url}" />`);
+ data-src="${entry.request.url.replace("\"", "&quot;")}" />`);
 }

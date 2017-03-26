@@ -4,6 +4,7 @@ import { escapeHtml } from "../helpers/parse";
 import { RequestType } from "../typing/waterfall";
 import {
   Icon,
+  KvTuple,
   TimingType,
   WaterfallEntry,
   WaterfallEntryTab,
@@ -11,7 +12,6 @@ import {
   WaterfallResponseDetails,
 } from "../typing/waterfall";
 import { makeIcon } from "../waterfall/row/svg-indicators";
-import { KvTuple } from "./extract-details-keys";
 
 /** render a dl */
 export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
@@ -25,7 +25,7 @@ export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = f
   return dlKeyValues
     .filter((tuple: KvTuple) => tuple[1] !== undefined)
     .map((tuple) => `
-      <dt ${makeClass(tuple[0])}>${tuple[0]}</dt>
+      <dt ${makeClass(tuple[0])}>${escapeHtml(tuple[0])}</dt>
       <dd>${escapeHtml(tuple[1])}</dd>
     `).join("");
 }
@@ -155,3 +155,23 @@ export function makeMimeTypeIcon(status: number,
     return makeIcon(requestType, requestType);
   }
 }
+
+/**
+ * Flattens out a second level of `KvTuple` nesting (and removed empty and `undefined` entries)
+ *
+ * @param nestedKvPairs - nested `KvTuple`s (possibly sub-nested)
+ */
+export const flattenKvTuple = (nestedKvPairs: Array<(KvTuple | KvTuple[])>): KvTuple[] => {
+  let returnKv: KvTuple[] = [];
+  nestedKvPairs.forEach((maybeKv) => {
+    if (maybeKv === undefined || maybeKv.length === 0) {
+      return;
+    }
+    if (Array.isArray(maybeKv[0])) {
+      returnKv.push(...(maybeKv as KvTuple[]));
+      return;
+    }
+    returnKv.push(maybeKv as KvTuple);
+  });
+  return returnKv;
+};

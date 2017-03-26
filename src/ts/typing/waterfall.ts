@@ -120,3 +120,6 @@ export interface Icon {
   /** width of icon in px */
   width: number;
 }
+
+/** Key/Value pair in array `["key", "value"]` */
+export type KvTuple = [string, string];
