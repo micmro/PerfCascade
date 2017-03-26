@@ -2,6 +2,15 @@
 
 
 
+<a name="v1.2.2"></a>
+## v1.2.2 (2017-03-26)
+
+* #153 XSS safty improvements ([0a98ffb](https://github.com/micmro/PerfCascade/commit/0a98ffb))
+* #156 add fallback for older browser ([1d8f487](https://github.com/micmro/PerfCascade/commit/1d8f487))
+* #156 allow headers in overlay to occure multiple times. ([5630516](https://github.com/micmro/PerfCascade/commit/5630516))
+
+
+
 <a name="v1.2.1"></a>
 ## v1.2.1 (2017-03-25)
 
