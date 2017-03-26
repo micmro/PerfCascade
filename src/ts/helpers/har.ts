@@ -15,6 +15,8 @@ export function hasHeader(headers: Header[], headerName: string): boolean {
   return headers.some(headerFilter);
 }
 
+/** feature detection if browser supports `find` for arrays */
+const browserHasFind = !!Array.prototype["find"];
 /**
  * Returns the fist instances of `headerName` in `headers`
  * @param headers List of `Header` to search in
@@ -22,7 +24,12 @@ export function hasHeader(headers: Header[], headerName: string): boolean {
  */
 export function getHeader(headers: Header[], headerName: string): string {
   const headerFilter = matchHeaderPartialFn(headerName.toLowerCase());
-  const firstItem = headers.find(headerFilter);
+  let firstItem;
+  if (browserHasFind) {
+    firstItem = headers["find"](headerFilter);
+  } else {
+    firstItem = headers.map(headerFilter).pop();
+  }
   return firstItem ? firstItem.value : undefined;
 }
 

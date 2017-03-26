@@ -158,7 +158,6 @@ function parseTimings(entry: Entry, start: number, end: number): KvTuple[] {
   ];
 }
 
-
 /**
  * Data to show in overlay tabs
  * @param  {number} requestID - request number
