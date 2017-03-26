@@ -1,12 +1,13 @@
 import { Entry } from "har-format";
 import { escapeHtml } from "../helpers/parse";
 import {
+  KvTuple,
   RequestType,
   TabRenderer,
   WaterfallEntryIndicator,
   WaterfallEntryTab,
 } from "../typing/waterfall";
-import { getKeys, KvTuple } from "./extract-details-keys";
+import { getKeys } from "./extract-details-keys";
 import { makeDefinitionList } from "./helpers";
 
 /**

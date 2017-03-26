@@ -1,9 +1,18 @@
 import { Entry, Header } from "har-format";
-import { getHeader } from "../helpers/har";
+import { getHeader, getHeaders } from "../helpers/har";
 import {
-  formatBytes, formatDateLocalized, formatMilliseconds, formatSeconds, parseAndFormat, parseDate, parseNonEmpty,
-  parseNonNegative, parsePositive,
+  formatBytes,
+  formatDateLocalized,
+  formatMilliseconds,
+  formatSeconds,
+  parseAndFormat,
+  parseDate,
+  parseNonEmpty,
+  parseNonNegative,
+  parsePositive,
 } from "../helpers/parse";
+import { KvTuple } from "../typing/waterfall";
+import { flattenKvTuple } from "./helpers";
 
 const byteSizeProperty = (title: string, input: string |  number): KvTuple => {
   return [title, parseAndFormat(input, parsePositive, formatBytes)];
@@ -12,8 +21,13 @@ const countProperty = (title: string, input: string |  number): KvTuple => {
   return [title, parseAndFormat(input, parsePositive)];
 };
 
+/** Predicate to filter out invalid or empty `KvTuple` */
+const notEmpty = (kv: KvTuple) => {
+  return kv.length > 1 && kv[1] !== undefined && kv[1] !== "";
+};
+
 function parseGeneralDetails(entry: Entry, startRelative: number, requestID: number): KvTuple[] {
-  return [
+  return ([
     ["Request Number", `#${requestID}`],
     ["Started", new Date(entry.startedDateTime).toLocaleString() + ((startRelative > 0) ?
       " (" + formatMilliseconds(startRelative) + " after page request started)" : "")],
@@ -41,15 +55,14 @@ function parseGeneralDetails(entry: Entry, startRelative: number, requestID: num
     byteSizeProperty("Minify Save", entry._minify_save),
     byteSizeProperty("Image Total", entry._image_total),
     byteSizeProperty("Image Save", entry._image_save),
-  ].filter((k) => k[1] !== undefined && k[1] !== "") as KvTuple[];
+  ] as KvTuple[]).filter(notEmpty);
 }
 
 function parseRequestDetails(harEntry: Entry): KvTuple[] {
   const request = harEntry.request;
+  const stringHeader = (name: string): KvTuple[] => getHeaders(request.headers, name);
 
-  const stringHeader = (name: string): KvTuple => [name, getHeader(request.headers, name)];
-
-  return [
+  return flattenKvTuple([
     ["Method", request.method],
     ["HTTP Version", request.httpVersion],
     byteSizeProperty("Bytes Out (uploaded)", harEntry._bytesOut),
@@ -68,7 +81,7 @@ function parseRequestDetails(harEntry: Entry): KvTuple[] {
     stringHeader("If-Unmodified-Since"),
     countProperty("Querystring parameters count", request.queryString.length),
     countProperty("Cookies count", request.cookies.length),
-  ].filter((k) => k[1] !== undefined && k[1] !== "") as KvTuple[];
+  ]).filter(notEmpty);
 }
 
 function parseResponseDetails(entry: Entry): KvTuple[] {
@@ -76,7 +89,9 @@ function parseResponseDetails(entry: Entry): KvTuple[] {
   const content = response.content;
   const headers = response.headers;
 
-  const stringHeader = (title: string, name: string = title): KvTuple => [title, getHeader(headers, name)];
+  const stringHeader = (title: string, name: string = title): KvTuple[] => {
+    return getHeaders(headers, name);
+  };
   const dateHeader = (name: string): KvTuple => {
     const header = getHeader(headers, name);
     return [name, parseAndFormat(header, parseDate, formatDateLocalized)];
@@ -93,7 +108,7 @@ function parseResponseDetails(entry: Entry): KvTuple[] {
     contentType = contentType + " | " + entry._contentType;
   }
 
-  return [
+  return flattenKvTuple([
     ["Status", response.status + " " + response.statusText],
     ["HTTP Version", response.httpVersion],
     byteSizeProperty("Bytes In (downloaded)", entry._bytesIn),
@@ -123,12 +138,11 @@ function parseResponseDetails(entry: Entry): KvTuple[] {
     stringHeader("Timing-Allow-Origin"),
     ["Redirect URL", parseAndFormat(response.redirectURL, parseNonEmpty)],
     ["Comment", parseAndFormat(response.comment, parseNonEmpty)],
-  ];
+  ]).filter(notEmpty);
 }
 
 function parseTimings(entry: Entry, start: number, end: number): KvTuple[] {
   const timings = entry.timings;
-
   const optionalTiming = (timing?: number) => parseAndFormat(timing, parseNonNegative, formatMilliseconds);
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
 
@@ -144,8 +158,6 @@ function parseTimings(entry: Entry, start: number, end: number): KvTuple[] {
   ];
 }
 
-/** Key/Value pair in array `["key", "value"]` */
-export type KvTuple = [string, string];
 
 /**
  * Data to show in overlay tabs
@@ -155,8 +167,7 @@ export type KvTuple = [string, string];
 export function getKeys(entry: Entry, requestID: number, startRelative: number, endRelative: number) {
   const requestHeaders = entry.request.headers;
   const responseHeaders = entry.response.headers;
-
-  let headerToKvTuple = (header: Header): KvTuple => [header.name, header.value];
+  const headerToKvTuple = (header: Header): KvTuple => [header.name, header.value];
 
   return {
     "general": parseGeneralDetails(entry, startRelative, requestID),
