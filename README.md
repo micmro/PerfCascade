@@ -1,6 +1,8 @@
 # PerfCascade
 Responsive, SVG based [HAR](http://www.softwareishard.com/blog/har-12-spec/) waterfall viewer .
 
+[![npm version](https://img.shields.io/npm/v/perf-cascade.svg?style=flat-square)](https://www.npmjs.com/package/perf-cascade) 
+[![npm downloads](https://img.shields.io/npm/dt/perf-cascade.svg?style=flat-square)](https://www.npmjs.com/packageperf-cascade)
 [![Build status][travis-image]][travis-url]
 
 Install via `npm install perf-cascade`<br/>
