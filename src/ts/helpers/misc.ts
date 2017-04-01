@@ -86,3 +86,12 @@ const cssClassRegEx = /[^a-z-]/g;
 export function toCssClass(seed: string) {
   return seed.toLowerCase().replace(cssClassRegEx, "");
 }
+
+/**
+ * Conditionally pluralizes (adding 's') `word` based on `count`
+ * @param {string} word word to pluralize
+ * @param {number} count counter to deceide weather or not `word` should be pluralized
+ */
+export function pluralize(word: string, count: number) {
+  return word + (count > 1 ? "s" : "");
+}

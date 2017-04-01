@@ -1,6 +1,6 @@
 /** Helpers that are not file-fromat specific */
 import { isInStatusCodeRange, toCssClass } from "../helpers/misc";
-import { escapeHtml } from "../helpers/parse";
+import { escapeHtml, sanitizeAlphaNumeric } from "../helpers/parse";
 import { RequestType } from "../typing/waterfall";
 import {
   Icon,
@@ -13,7 +13,13 @@ import {
 } from "../typing/waterfall";
 import { makeIcon } from "../waterfall/row/svg-indicators";
 
-/** render a dl */
+/**
+ * Converts `dlKeyValues` to the contennd a definition list, without the outer `<dl>` tags
+ * @param {KvTuple[]} dlKeyValues array of Key/Value pair
+ * @param {boolean} [addClass=false] if `true` the key in `dlKeyValues`
+ * is converted to a class name andd added to the `<dt>`
+ * @returns {string} stringified HTML definition list
+ */
 export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
   let makeClass = (key: string) => {
     if (!addClass) {
@@ -100,9 +106,10 @@ export function createWaterfallEntryTiming(type: TimingType,
                                            start: number,
                                            end: number): WaterfallEntryTiming {
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+  const typeClean = sanitizeAlphaNumeric(type) as TimingType;
   return {
     total,
-    type,
+    type : typeClean,
     start,
     end,
   };
@@ -144,15 +151,15 @@ export function makeMimeTypeIcon(status: number,
   // highlight redirects
   if (!!redirectURL) {
     const url = encodeURI(redirectURL.split("?")[0] || "");
-    return makeIcon("err3xx", `${status} response status: Redirect to ${url}...`);
+    return makeIcon("err3xx", `${status} response status: Redirect to ${escapeHtml(url)}...`);
   } else if (isInStatusCodeRange(status, 400, 499)) {
-    return makeIcon("err4xx", `${status} response status: ${statusText}`);
+    return makeIcon("err4xx", `${status} response status: ${escapeHtml(statusText)}`);
   } else if (isInStatusCodeRange(status, 500, 599)) {
-    return makeIcon("err5xx", `${status} response status: ${statusText}`);
+    return makeIcon("err5xx", `${status} response status: ${escapeHtml(statusText)}`);
   } else if (status === 204) {
     return makeIcon("plain", "No content");
   } else {
-    return makeIcon(requestType, requestType);
+    return makeIcon(sanitizeAlphaNumeric(requestType), escapeHtml(requestType));
   }
 }
 
