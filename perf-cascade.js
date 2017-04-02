@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:1.2.2 (26/03/2017) */
+/*! github.com/micmro/PerfCascade Version:1.3.0 (02/04/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -285,6 +285,15 @@ function toCssClass(seed) {
     return seed.toLowerCase().replace(cssClassRegEx, "");
 }
 exports.toCssClass = toCssClass;
+/**
+ * Conditionally pluralizes (adding 's') `word` based on `count`
+ * @param {string} word word to pluralize
+ * @param {number} count counter to deceide weather or not `word` should be pluralized
+ */
+function pluralize(word, count) {
+    return word + (count > 1 ? "s" : "");
+}
+exports.pluralize = pluralize;
 
 },{}],5:[function(require,module,exports){
 "use strict";
@@ -427,6 +436,25 @@ function escapeHtml(unsafe) {
     });
 }
 exports.escapeHtml = escapeHtml;
+/** Whitelist of save-ish URL chars */
+var unSafeUrlChars = new RegExp("[^-A-Za-z0-9+&@#/%?=~_|!:,.;\(\)]", "g");
+/** returns a cleaned http:// or https:// based URL  */
+function sanitizeUrlForLink(unsafeUrl) {
+    var cleaned = unsafeUrl.replace(unSafeUrlChars, "_");
+    if (cleaned.indexOf("http://") === 0 || cleaned.indexOf("https://") === 0) {
+        return cleaned;
+    }
+    console.warn("skipped link, due to potentially unsafe url", unsafeUrl);
+    return "";
+}
+exports.sanitizeUrlForLink = sanitizeUrlForLink;
+/** whitelist basic chars */
+var requestTypeTypeRegEx = new RegExp("[^a-zA-Z0-9]", "g");
+/**  returns cleaned sting - stipps out not a-zA-Z0-9 */
+function sanitizeAlphaNumeric(unsafe) {
+    return unsafe.toString().replace(requestTypeTypeRegEx, "");
+}
+exports.sanitizeAlphaNumeric = sanitizeAlphaNumeric;
 /** Ensures `input` is casted to `number` */
 function toInt(input) {
     if (typeof input === "number") {
@@ -1093,6 +1121,7 @@ exports.collectIndicators = collectIndicators;
 },{"../helpers/har":2,"../helpers/misc":4}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
 var extract_details_keys_1 = require("./extract-details-keys");
 var helpers_1 = require("./helpers");
@@ -1141,12 +1170,12 @@ function makeLazyWaterfallEntryTab(title, renderContent, tabClass) {
 }
 /** General tab with warnings etc. */
 function makeGeneralTab(generalData, indicators) {
-    var content = helpers_1.makeDefinitionList(generalData);
+    var mainContent = helpers_1.makeDefinitionList(generalData);
     if (indicators.length === 0) {
-        return makeWaterfallEntryTab("General", content);
+        return makeWaterfallEntryTab("General", mainContent);
     }
-    var general = "<h2>General</h2>\n    <dl>" + content + "<dl>";
-    content = "";
+    var general = "<h2>General</h2>\n<dl>" + mainContent + "<dl>";
+    var content = "";
     // Make indicator sections
     var errors = indicators
         .filter(function (i) { return i.type === "error"; })
@@ -1159,10 +1188,10 @@ function makeGeneralTab(generalData, indicators) {
         .filter(function (i) { return i.type !== "error" && i.type !== "warning"; })
         .map(function (i) { return [i.title, i.description]; });
     if (errors.length > 0) {
-        content += "<h2 class=\"no-boder\">Error" + (errors.length > 1 ? "s" : "") + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(errors) + "</dl>";
+        content += "<h2 class=\"no-boder\">" + misc_1.pluralize("Error", errors.length) + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(errors) + "</dl>";
     }
     if (warnings.length > 0) {
-        content += "<h2 class=\"no-boder\">Warning" + (warnings.length > 1 ? "s" : "") + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(warnings) + "</dl>";
+        content += "<h2 class=\"no-boder\">" + misc_1.pluralize("Warning", warnings.length) + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(warnings) + "</dl>";
     }
     if (info.length > 0) {
         content += "<h2 class=\"no-boder\">Info</h2>\n    <dl>" + helpers_1.makeDefinitionList(info) + "</dl>";
@@ -1178,15 +1207,14 @@ function makeResponseTab(respose, responseHeaders) {
     return makeWaterfallEntryTab("Response", content);
 }
 function makeRawData(entry) {
-    // const content = `<pre><code>${escapeHtml(JSON.stringify(entry, null, 2))}</code></pre>`;
     return makeLazyWaterfallEntryTab("Raw Data", function () { return "<pre><code>" + parse_1.escapeHtml(JSON.stringify(entry, null, 2)) + "</code></pre>"; }, "raw-data");
 }
 /** Image preview tab */
 function makeImgTab(entry) {
-    return makeLazyWaterfallEntryTab("Preview", function (detailsHeight) { return "<img class=\"preview\" style=\"max-height:" + (detailsHeight - 100) + "px\"\n data-src=\"" + entry.request.url.replace("\"", "&quot;") + "\" />"; });
+    return makeLazyWaterfallEntryTab("Preview", function (detailsHeight) { return "<img class=\"preview\" style=\"max-height:" + (detailsHeight - 100) + "px\"\n data-src=\"" + parse_1.sanitizeUrlForLink(entry.request.url) + "\" />"; });
 }
 
-},{"../helpers/parse":5,"./extract-details-keys":10,"./helpers":14}],13:[function(require,module,exports){
+},{"../helpers/misc":4,"../helpers/parse":5,"./extract-details-keys":10,"./helpers":14}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var misc_1 = require("../helpers/misc");
@@ -1263,7 +1291,7 @@ function transformPage(harData, pageIndex, options) {
     var entries = data.entries
         .filter(function (entry) {
         // filter inline data
-        if (entry.request.url.indexOf("data:") === 0) {
+        if (entry.request.url.indexOf("data:") === 0 || entry.request.url.indexOf("javascript:") === 0) {
             return false;
         }
         if (pages.length === 1 && currPage.id === "") {
@@ -1299,7 +1327,7 @@ var getMarks = function (pageTimings, currPage, options) {
     var marks = Object.keys(pageTimings)
         .filter(function (k) { return (typeof pageTimings[k] === "number" && pageTimings[k] >= 0); })
         .map(function (k) { return ({
-        name: k.replace(/^[_]/, "") + " (" + misc_1.roundNumber(pageTimings[k], 0) + " ms)",
+        name: parse_1.escapeHtml(k.replace(/^[_]/, "")) + " (" + misc_1.roundNumber(pageTimings[k], 0) + " ms)",
         startTime: pageTimings[k],
     }); });
     if (!options.showUserTiming) {
@@ -1330,6 +1358,8 @@ var getUserTimimngs = function (currPage, options) {
         var fullName;
         var duration;
         _a = findName.exec(k), fullName = _a[1], name = _a[2];
+        fullName = parse_1.escapeHtml(fullName);
+        name = parse_1.escapeHtml(name);
         if (fullName !== name && currPage["_userTime.endTimer-" + name]) {
             duration = currPage["_userTime.endTimer-" + name] - currPage[k];
             return {
@@ -1414,12 +1444,13 @@ var getTimePair = function (key, harEntry, collect, startRelative) {
  */
 var createResponseDetails = function (entry, indicators) {
     var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
+    var statusClean = parse_1.toInt(entry.response.status);
     return {
-        icon: helpers_1.makeMimeTypeIcon(entry.response.status, entry.response.statusText, requestType, entry.response.redirectURL),
-        rowClass: helpers_1.makeRowCssClasses(entry.response.status),
+        icon: helpers_1.makeMimeTypeIcon(statusClean, entry.response.statusText, requestType, entry.response.redirectURL),
+        rowClass: helpers_1.makeRowCssClasses(statusClean),
         indicators: indicators,
         requestType: requestType,
-        statusCode: entry.response.status,
+        statusCode: statusClean,
     };
 };
 
@@ -1430,7 +1461,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
 var svg_indicators_1 = require("../waterfall/row/svg-indicators");
-/** render a dl */
+/**
+ * Converts `dlKeyValues` to the contennd a definition list, without the outer `<dl>` tags
+ * @param {KvTuple[]} dlKeyValues array of Key/Value pair
+ * @param {boolean} [addClass=false] if `true` the key in `dlKeyValues`
+ * is converted to a class name andd added to the `<dt>`
+ * @returns {string} stringified HTML definition list
+ */
 function makeDefinitionList(dlKeyValues, addClass) {
     if (addClass === void 0) { addClass = false; }
     var makeClass = function (key) {
@@ -1509,9 +1546,10 @@ exports.createWaterfallEntry = createWaterfallEntry;
 /** helper to create a `WaterfallEntryTiming` */
 function createWaterfallEntryTiming(type, start, end) {
     var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    var typeClean = parse_1.sanitizeAlphaNumeric(type);
     return {
         total: total,
-        type: type,
+        type: typeClean,
         start: start,
         end: end,
     };
@@ -1552,19 +1590,19 @@ function makeMimeTypeIcon(status, statusText, requestType, redirectURL) {
     // highlight redirects
     if (!!redirectURL) {
         var url = encodeURI(redirectURL.split("?")[0] || "");
-        return svg_indicators_1.makeIcon("err3xx", status + " response status: Redirect to " + url + "...");
+        return svg_indicators_1.makeIcon("err3xx", status + " response status: Redirect to " + parse_1.escapeHtml(url) + "...");
     }
     else if (misc_1.isInStatusCodeRange(status, 400, 499)) {
-        return svg_indicators_1.makeIcon("err4xx", status + " response status: " + statusText);
+        return svg_indicators_1.makeIcon("err4xx", status + " response status: " + parse_1.escapeHtml(statusText));
     }
     else if (misc_1.isInStatusCodeRange(status, 500, 599)) {
-        return svg_indicators_1.makeIcon("err5xx", status + " response status: " + statusText);
+        return svg_indicators_1.makeIcon("err5xx", status + " response status: " + parse_1.escapeHtml(statusText));
     }
     else if (status === 204) {
         return svg_indicators_1.makeIcon("plain", "No content");
     }
     else {
-        return svg_indicators_1.makeIcon(requestType, requestType);
+        return svg_indicators_1.makeIcon(parse_1.sanitizeAlphaNumeric(requestType), parse_1.escapeHtml(requestType));
     }
 }
 exports.makeMimeTypeIcon = makeMimeTypeIcon;
@@ -1611,6 +1649,7 @@ exports.timingTypeToCssClass = timingTypeToCssClass;
 },{}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var parse_1 = require("../../helpers/parse");
 function createDetailsBody(requestID, detailsHeight, entry) {
     var html = document.createElement("html");
     var body = document.createElement("body");
@@ -1638,13 +1677,13 @@ function createDetailsBody(requestID, detailsHeight, entry) {
         }
         return "<div class=\"tab " + cssClasses + "\">" + content + "</div>";
     }).join("\n");
-    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.responseDetails.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> <a href=\"" + entry.url + "\">" + entry.url + "</a></h3>\n        <nav class=\"tab-nav\">\n        <ul>\n          " + tabMenu + "\n        </ul>\n        </nav>\n      </header>\n      " + tabBody + "\n    </div>\n    ";
+    body.innerHTML = "\n    <div class=\"wrapper\">\n      <header class=\"type-" + entry.responseDetails.requestType + "\">\n        <h3><strong>#" + requestID + "</strong> <a href=\"" + parse_1.sanitizeUrlForLink(entry.url) + "\">" + parse_1.escapeHtml(entry.url) + "</a></h3>\n        <nav class=\"tab-nav\">\n          <ul>\n            " + tabMenu + "\n          </ul>\n        </nav>\n      </header>\n      " + tabBody + "\n    </div>\n    ";
     html.appendChild(body);
     return html;
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{}],17:[function(require,module,exports){
+},{"../../helpers/parse":5}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../../helpers/dom");
@@ -1863,6 +1902,7 @@ exports.createRowInfoOverlay = createRowInfoOverlay;
 },{"../../helpers/svg":6,"./html-details-body":16}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var misc_1 = require("../../helpers/misc");
 /**
  * Convinience helper to create a new `Icon`
  *
@@ -1888,11 +1928,11 @@ function getIndicatorIcons(entry) {
     var warnings = indicators.filter(function (i) { return i.type === "warning"; });
     var info = indicators.filter(function (i) { return i.type !== "error" && i.type !== "warning"; });
     if (errors.length > 0) {
-        combinedTitle.push("Error" + (errors.length > 1 ? "s" : "") + ":\n" + errors.map(function (e) { return e.title; }).join("\n"));
+        combinedTitle.push(misc_1.pluralize("Error", errors.length) + ":\n " + errors.map(function (e) { return e.title; }).join("\n"));
         icon = "error";
     }
     if (warnings.length > 0) {
-        combinedTitle.push("Warning" + (warnings.length > 1 ? "s" : "") + ":\n" + warnings.map(function (w) { return w.title; }).join("\n"));
+        combinedTitle.push(misc_1.pluralize("Warning", warnings.length) + ":\n" + warnings.map(function (w) { return w.title; }).join("\n"));
         icon = icon || "warning";
     }
     if (info.length > 0) {
@@ -1908,7 +1948,7 @@ function getIndicatorIcons(entry) {
 }
 exports.getIndicatorIcons = getIndicatorIcons;
 
-},{}],21:[function(require,module,exports){
+},{"../../helpers/misc":4}],21:[function(require,module,exports){
 /**
  * Creation of sub-components used in a ressource request row
  */
