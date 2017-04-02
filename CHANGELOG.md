@@ -2,6 +2,15 @@
 
 
 
+<a name="v1.3.0"></a>
+# v1.3.0 (2017-04-02)
+
+* #153 clean rendered data ([5274a3c](https://github.com/micmro/PerfCascade/commit/5274a3c))
+* add npm badges ([dd58711](https://github.com/micmro/PerfCascade/commit/dd58711))
+* fix link ([111ddba](https://github.com/micmro/PerfCascade/commit/111ddba))
+
+
+
 <a name="v1.2.2"></a>
 ## v1.2.2 (2017-03-26)
 
