@@ -6,7 +6,7 @@ import {
   PageTiming,
 } from "har-format";
 import { roundNumber } from "../helpers/misc";
-import { toInt } from "../helpers/parse";
+import { escapeHtml, toInt } from "../helpers/parse";
 import { HarTransformerOptions } from "../typing/options";
 import {
   Mark,
@@ -108,7 +108,7 @@ export function transformPage(harData: Har | Log,
   const entries = data.entries
     .filter((entry) => {
       // filter inline data
-      if (entry.request.url.indexOf("data:") === 0) {
+      if (entry.request.url.indexOf("data:") === 0 || entry.request.url.indexOf("javascript:") === 0) {
         return false;
       }
       if (pages.length === 1 && currPage.id === "") {
@@ -147,7 +147,7 @@ const getMarks = (pageTimings: PageTiming, currPage: Page, options: HarTransform
   const marks = Object.keys(pageTimings)
     .filter((k: keyof PageTiming) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
     .map((k) => ({
-      name: `${k.replace(/^[_]/, "")} (${roundNumber(pageTimings[k], 0)} ms)`,
+      name: `${escapeHtml(k.replace(/^[_]/, ""))} (${roundNumber(pageTimings[k], 0)} ms)`,
       startTime: pageTimings[k],
     } as Mark));
 
@@ -186,6 +186,9 @@ const getUserTimimngs = (currPage: Page, options: HarTransformerOptions) => {
     let fullName: string;
     let duration: number;
     [, fullName, name] = findName.exec(k);
+
+    fullName = escapeHtml(fullName);
+    name = escapeHtml(name);
 
     if (fullName !== name && currPage[`_userTime.endTimer-${name}`]) {
       duration = currPage[`_userTime.endTimer-${name}`] - currPage[k];
@@ -277,11 +280,12 @@ const getTimePair = (key: string, harEntry: Entry, collect: WaterfallEntryTiming
  */
 const createResponseDetails = (entry: Entry, indicators: WaterfallEntryIndicator[]): WaterfallResponseDetails => {
   const requestType = mimeToRequestType(entry.response.content.mimeType);
+  const statusClean = toInt(entry.response.status);
   return {
-    icon: makeMimeTypeIcon(entry.response.status, entry.response.statusText, requestType, entry.response.redirectURL),
-    rowClass: makeRowCssClasses(entry.response.status),
+    icon: makeMimeTypeIcon(statusClean, entry.response.statusText, requestType, entry.response.redirectURL),
+    rowClass: makeRowCssClasses(statusClean),
     indicators,
     requestType,
-    statusCode: entry.response.status,
+    statusCode: statusClean,
   };
 };

@@ -1,3 +1,4 @@
+import { pluralize } from "../../helpers/misc";
 import {
   Icon,
   WaterfallEntry,
@@ -30,11 +31,11 @@ export function getIndicatorIcons(entry: WaterfallEntry): Icon[] {
   const info = indicators.filter((i) => i.type !== "error" && i.type !== "warning");
 
   if (errors.length > 0) {
-    combinedTitle.push(`Error${errors.length > 1 ? "s" : ""}:\n${errors.map((e) => e.title).join("\n")}`);
+    combinedTitle.push(pluralize("Error", errors.length) + ":\n " + errors.map((e) => e.title).join("\n"));
     icon = "error";
   }
   if (warnings.length > 0) {
-    combinedTitle.push(`Warning${warnings.length > 1 ? "s" : ""}:\n${warnings.map((w) => w.title).join("\n")}`);
+    combinedTitle.push(pluralize("Warning", warnings.length) + ":\n" + warnings.map((w) => w.title).join("\n"));
     icon = icon || "warning";
   }
   if (info.length > 0) {

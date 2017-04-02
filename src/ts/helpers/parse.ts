@@ -142,6 +142,27 @@ export function escapeHtml(unsafe: string | number | boolean = ""): string {
   });
 }
 
+/** Whitelist of save-ish URL chars */
+const unSafeUrlChars = new RegExp("[^-A-Za-z0-9+&@#/%?=~_|!:,.;\(\)]", "g");
+
+/** returns a cleaned http:// or https:// based URL  */
+export function sanitizeUrlForLink(unsafeUrl: string) {
+  const cleaned = unsafeUrl.replace(unSafeUrlChars, "_");
+  if (cleaned.indexOf("http://") === 0 || cleaned.indexOf("https://") === 0) {
+    return cleaned;
+  }
+  console.warn("skipped link, due to potentially unsafe url", unsafeUrl);
+  return "";
+}
+
+/** whitelist basic chars */
+const requestTypeTypeRegEx = new RegExp("[^a-zA-Z0-9]", "g");
+
+/**  returns cleaned sting - stipps out not a-zA-Z0-9 */
+export function sanitizeAlphaNumeric(unsafe: string | number) {
+  return unsafe.toString().replace(requestTypeTypeRegEx, "");
+}
+
 /** Ensures `input` is casted to `number` */
 export function toInt(input: string | number): number {
   if (typeof input === "number") {

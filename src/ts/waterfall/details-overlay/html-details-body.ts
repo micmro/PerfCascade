@@ -1,3 +1,4 @@
+import { escapeHtml, sanitizeUrlForLink } from "../../helpers/parse";
 import { WaterfallEntry } from "../../typing/waterfall";
 
 export function createDetailsBody(requestID: number, detailsHeight: number, entry: WaterfallEntry) {
@@ -32,11 +33,11 @@ export function createDetailsBody(requestID: number, detailsHeight: number, entr
   body.innerHTML = `
     <div class="wrapper">
       <header class="type-${entry.responseDetails.requestType}">
-        <h3><strong>#${requestID}</strong> <a href="${entry.url}">${entry.url}</a></h3>
+        <h3><strong>#${requestID}</strong> <a href="${sanitizeUrlForLink(entry.url)}">${escapeHtml(entry.url)}</a></h3>
         <nav class="tab-nav">
-        <ul>
-          ${tabMenu}
-        </ul>
+          <ul>
+            ${tabMenu}
+          </ul>
         </nav>
       </header>
       ${tabBody}

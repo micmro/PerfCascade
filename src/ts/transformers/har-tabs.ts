@@ -1,5 +1,6 @@
 import { Entry } from "har-format";
-import { escapeHtml } from "../helpers/parse";
+import { pluralize } from "../helpers/misc";
+import { escapeHtml, sanitizeUrlForLink } from "../helpers/parse";
 import {
   KvTuple,
   RequestType,
@@ -59,13 +60,12 @@ function makeLazyWaterfallEntryTab(title: string, renderContent: TabRenderer,
 
 /** General tab with warnings etc. */
 function makeGeneralTab(generalData: KvTuple[], indicators: WaterfallEntryIndicator[]): WaterfallEntryTab {
-  let content = makeDefinitionList(generalData);
+  const mainContent = makeDefinitionList(generalData);
   if (indicators.length === 0) {
-    return makeWaterfallEntryTab("General", content);
+    return makeWaterfallEntryTab("General", mainContent);
   }
-  let general = `<h2>General</h2>
-    <dl>${content}<dl>`;
-  content = "";
+  const general = `<h2>General</h2>\n<dl>${mainContent}<dl>`;
+  let content = "";
 
   // Make indicator sections
   let errors = indicators
@@ -80,11 +80,11 @@ function makeGeneralTab(generalData: KvTuple[], indicators: WaterfallEntryIndica
     .map((i) => [i.title, i.description] as KvTuple);
 
   if (errors.length > 0) {
-    content += `<h2 class="no-boder">Error${errors.length > 1 ? "s" : ""}</h2>
+    content += `<h2 class="no-boder">${pluralize("Error", errors.length)}</h2>
     <dl>${makeDefinitionList(errors)}</dl>`;
   }
   if (warnings.length > 0) {
-    content += `<h2 class="no-boder">Warning${warnings.length > 1 ? "s" : ""}</h2>
+    content += `<h2 class="no-boder">${pluralize("Warning", warnings.length)}</h2>
     <dl>${makeDefinitionList(warnings)}</dl>`;
   }
   if (info.length > 0) {
@@ -118,7 +118,6 @@ function makeResponseTab(respose: KvTuple[], responseHeaders: KvTuple[]): Waterf
 }
 
 function makeRawData(entry: Entry) {
-  // const content = `<pre><code>${escapeHtml(JSON.stringify(entry, null, 2))}</code></pre>`;
   return makeLazyWaterfallEntryTab(
     "Raw Data",
     () => `<pre><code>${escapeHtml(JSON.stringify(entry, null, 2))}</code></pre>`,
@@ -131,5 +130,5 @@ function makeImgTab(entry: Entry): WaterfallEntryTab {
   return makeLazyWaterfallEntryTab(
     "Preview",
     (detailsHeight: number) => `<img class="preview" style="max-height:${(detailsHeight - 100)}px"
- data-src="${entry.request.url.replace("\"", "&quot;")}" />`);
+ data-src="${sanitizeUrlForLink(entry.request.url)}" />`);
 }
