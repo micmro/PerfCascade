@@ -2,6 +2,13 @@
 
 
 
+<a name="v1.4.0"></a>
+# v1.4.0 (2017-04-06)
+
+* Include marks when calculating largest time for the waterfall graph ([49ae356](https://github.com/micmro/PerfCascade/commit/49ae356))
+
+
+
 <a name="v1.3.0"></a>
 # v1.3.0 (2017-04-02)
 
