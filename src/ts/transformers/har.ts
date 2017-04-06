@@ -123,6 +123,12 @@ export function transformPage(harData: Har | Log,
     });
 
   const marks = getMarks(pageTimings, currPage, options);
+  // if marks happens later than doneTime, increase the doneTime
+  marks.forEach((mark) => {
+    if (mark.startTime > doneTime) {
+      doneTime = mark.startTime;
+    }
+  });
 
   // Add 100ms margin to make room for labels
   doneTime += 100;
