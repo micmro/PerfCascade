@@ -223,8 +223,7 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
   }, className);
 }
 
-export function createNameRowBg(y: number, rowHeight: number,
-                                onClick: EventListener): SVGGElement {
+export function createNameRowBg(y: number, rowHeight: number): SVGGElement {
   let rowFixed = svg.newG("row row-fixed");
 
   rowFixed.appendChild(svg.newRect({
@@ -237,12 +236,10 @@ export function createNameRowBg(y: number, rowHeight: number,
       "opacity": 0,
     }));
 
-  rowFixed.addEventListener("click", onClick);
-
   return rowFixed;
 }
 
-export function createRowBg(y: number, rowHeight: number, onClick: EventListener): SVGGElement {
+export function createRowBg(y: number, rowHeight: number): SVGGElement {
   let rowFixed = svg.newG("row row-flex");
 
   rowFixed.appendChild(svg.newRect({
@@ -254,8 +251,6 @@ export function createRowBg(y: number, rowHeight: number, onClick: EventListener
     {
       "opacity": 0,
     }));
-
-  rowFixed.addEventListener("click", onClick);
 
   return rowFixed;
 }

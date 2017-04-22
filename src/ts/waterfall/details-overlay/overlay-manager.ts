@@ -5,7 +5,7 @@ import { WaterfallEntry } from "../../typing/waterfall";
 import { createRowInfoOverlay } from "./svg-details-overlay";
 
 /** Overlay (popup) instance manager */
-export default class OverlayManager implements OverlayManagerClass {
+class OverlayManager implements OverlayManagerClass {
   /** Collection of currely open overlays */
   private openOverlays: OpenOverlay[] = [];
 
@@ -19,6 +19,10 @@ export default class OverlayManager implements OverlayManagerClass {
     return this.openOverlays.reduce((pre, curr) => pre + curr.height, 0);
   }
 
+  public getOpenOverlays() {
+    return this.openOverlays;
+  }
+
   /**
    * Opens an overlay - rerenders others internaly
    */
@@ -28,8 +32,7 @@ export default class OverlayManager implements OverlayManagerClass {
       return;
     }
     const self = this;
-
-    this.openOverlays.push({
+    const newOverlay: OpenOverlay = {
       "defaultY": y,
       "entry": entry,
       "index": index,
@@ -37,10 +40,13 @@ export default class OverlayManager implements OverlayManagerClass {
         self.closeOverlay(index, detailsHeight, barEls);
       },
       "openTabIndex": 0,
-    });
+    };
+    this.openOverlays.push(newOverlay);
 
     this.renderOverlays(detailsHeight);
     this.context.pubSub.publishToOverlayChanges({
+      "changedIndex": index,
+      "changedOverlay": newOverlay,
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
       "openOverlays": self.openOverlays,
       "type": "open",
@@ -71,6 +77,7 @@ export default class OverlayManager implements OverlayManagerClass {
 
     this.renderOverlays(detailsHeight);
     this.context.pubSub.publishToOverlayChanges({
+      "changedIndex": index,
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
       "openOverlays": self.openOverlays,
       "type": "closed",
@@ -131,3 +138,7 @@ export default class OverlayManager implements OverlayManagerClass {
       });
   }
 };
+export {
+  OverlayManager
+};
+export default OverlayManager;

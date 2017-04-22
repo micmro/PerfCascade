@@ -1,6 +1,7 @@
-import {OverlayChangeEvent, OverlayChangeSubscriber} from "./open-overlay";
-import {ChartRenderOption} from "./options";
-import {WaterfallEntry} from "./waterfall";
+import { OverlayManager } from "../waterfall/details-overlay/overlay-manager";
+import { OverlayChangeEvent, OverlayChangeSubscriber } from "./open-overlay";
+import { ChartRenderOption } from "./options";
+import { WaterfallEntry } from "./waterfall";
 
 /**
  * Context object that is passed to (usually stateless) child-functions
@@ -10,7 +11,7 @@ export interface Context {
   /** Publish and Subscribe instance for overlay updates */
   pubSub: PubSubClass;
   /** Overlay (popup) instance manager */
-  overlayManager: OverlayManagerClass;
+  overlayManager: OverlayManager;
   /** horizontal unit (duration in ms of 1%) */
   unit: number;
   /** height of the requests part of the diagram in px */
@@ -21,6 +22,7 @@ export interface Context {
 
 export interface PubSubClass {
   subscribeToOverlayChanges: (fn: OverlayChangeSubscriber) => void;
+  subscribeToSpecificOverlayChanges: (index: number, fn: OverlayChangeSubscriber) => void;
   publishToOverlayChanges: (change: OverlayChangeEvent) => void;
 }
 
@@ -30,10 +32,10 @@ export interface OverlayManagerClass {
 
   /** Opens an overlay - rerenders others  */
   openOverlay: (index: number, y: number, detailsHeight: number, entry: WaterfallEntry,
-                              barEls: SVGGElement[]) => void;
+    barEls: SVGGElement[]) => void;
   /** toggles an overlay - rerenders others  */
   toggleOverlay: (index: number, y: number, detailsHeight: number, entry: WaterfallEntry,
-                              barEls: SVGGElement[]) => void;
+    barEls: SVGGElement[]) => void;
 
   /** closes on overlay - rerenders others internally */
   closeOverlay: (index: number, detailsHeight: number, barEls: SVGGElement[]) => void;
