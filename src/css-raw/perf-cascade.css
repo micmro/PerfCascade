@@ -149,8 +149,11 @@
 .info-overlay-holder .tab-nav li {margin: 0; padding: 0; display: inline-block;}
 .info-overlay-holder button { background: transparent; outline:0; border:0; border-bottom: solid 2px transparent; padding: 0.5em 1em; margin:0 0.25em;}
 .info-overlay-holder li:first-child  button {margin-left: 1em;}
-.info-overlay-holder button:focus,.info-overlay-holder button:hover {border-color: rgba(255,255,255, 0.6);}
+.info-overlay-holder button:focus,
+.info-overlay-holder button.active:focus,
+.info-overlay-holder button:hover {border-color: rgba(255,255,255, 0.6);}
 .info-overlay-holder button.active {border-color: #fff; cursor: default;}
+.info-overlay-holder button.active:focus {border-color: rgba(255,255,255, 0.8);}
 
 /* Info overlay HTML - content */
 .info-overlay-holder dt {float: left; clear: both; margin-top: 0.5em; width: 25%; text-align: right; font-weight: bold; }

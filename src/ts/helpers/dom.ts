@@ -41,3 +41,28 @@ export function removeChildren<T extends Element>(el: T): T {
   }
   return el;
 }
+
+/**
+ * Get last element of `NodeList`
+ * @param list NodeListOf e.g. return value of `getElementsByClassName`
+ */
+export function getLastItemOfNodeList<T extends Node>(list: NodeListOf<T>) {
+  if (!list || list.length === 0) {
+    return undefined;
+  }
+  return list.item(list.length - 1);
+}
+
+/**
+ * Helper to make `NodeListOf` iterable
+ * @param list NodeListOf e.g. return value of `getElementsByClassName`
+ * @param fn Function called for
+ */
+export function forEachNodeList<T extends Node>(list: NodeListOf<T>, fn: {(el: T, index: number): void}): void {
+  if (!list || list.length === 0) {
+    return undefined;
+  }
+  for (let i = 0, len = list.length; i < len; i ++) {
+    fn(list.item(i), i);
+  }
+}

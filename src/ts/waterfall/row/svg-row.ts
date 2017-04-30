@@ -1,5 +1,10 @@
+// import { getLastItemOfNodeList } from "../../helpers/dom";
 import * as icons from "../../helpers/icons";
-import * as misc from "../../helpers/misc";
+import {
+  isTabDown,
+  isTabUp,
+  resourceUrlFormatter,
+} from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
 import { Context } from "../../typing/context";
 import { OpenOverlay } from "../../typing/open-overlay";
@@ -66,7 +71,7 @@ export function createRow(context: Context, index: number,
   const requestNumberLabel = rowSubComponents.createRequestNumberLabel(x, y, requestNumber, rowHeight, maxNumberWidth);
   // 4 is slightly bigger than the hover "glow" around the url
   x += maxNumberWidth + 4;
-  let shortLabel = rowSubComponents.createRequestLabelClipped(x, y, misc.resourceUrlFormatter(entry.url, 40),
+  let shortLabel = rowSubComponents.createRequestLabelClipped(x, y, resourceUrlFormatter(entry.url, 40),
     rowHeight);
   let fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.url, rowHeight);
 
@@ -86,17 +91,57 @@ export function createRow(context: Context, index: number,
   // accordeon a11y guide
   // https://www.w3.org/TR/wai-aria-practices-1.1/#accordion
   context.pubSub.subscribeToSpecificOverlayChanges(index, (change) => {
-    console.log("onOverlayChange", change.type);
-    if (change.type === "open") {
-      openOverlay = change.changedOverlay;
-    } else {
-      openOverlay = undefined;
-    }
+    openOverlay = (change.type === "open") ? change.changedOverlay : undefined;
   });
+  if (index > 0) {
+    context.pubSub.subscribeToSpecificOverlayChanges(index - 1, (change) => {
+      prevOpenOverlay = (change.type === "open") ? change.changedOverlay : undefined;
+    });
+  }
 
   let isPoinerClick = false;
   let openOverlay: OpenOverlay;
+  /** Poiter to the previous open Oberlay (if exist) */
+  let prevOpenOverlay: OpenOverlay;
   // let showDetailsTimeout: number;
+
+
+
+  // const enterOverlaySetup = (isDownwards: boolean, openOverlay: OpenOverlay) => {
+  //   const overlayEl = context.overlayManager.getOpenOverlayDomEl(openOverlay);
+  //   /** Top header el */
+  //   const firstFocusEl = overlayEl.getElementsByTagName("a")[0];
+  //   /** All focusable elements */
+  //   const allFocusEl = overlayEl.querySelectorAll(":scope a, :scope button");
+  //   const lastTab = getLastItemOfNodeList(allFocusEl);
+  //   for (let i = allFocusEl.length - 1; i <= 0 i--) {
+  //     const el = allFocusEl.item(i);
+  //     el.setAttribute("tabindex", "0");
+  //   }
+  //   console.log(allFocusEl)
+
+  //   const onOverlayExit = () => {
+  //     console.log("Implement me");
+  //     for (let i = allFocusEl.length - 1; i <= 0 i--) {
+  //       const el = allFocusEl.item(i);
+  //       el.setAttribute("tabindex", "-1");
+  //     }
+  //     lastTab.removeEventListener("keypress", onLastElKeypress);
+  //   };
+
+  //   const onLastElKeypress = (evt: KeyboardEvent) => {
+  //     if (isTabDown(evt)) {
+  //       evt.preventDefault();
+  //       onOverlayExit();
+  //     }
+  //   };
+  //   lastTab.addEventListener("keypress", onLastElKeypress)
+  //   firstFocusEl.focus();
+  // };
+
+
+
+
   // triggered before click by touch and mouse devices
   rowItem.addEventListener("mouseup", () => {
     isPoinerClick = true;
@@ -106,22 +151,95 @@ export function createRow(context: Context, index: number,
     onDetailsOverlayShow(evt);
   });
   rowItem.addEventListener("keydown", (evt: KeyboardEvent) => {
+    // on enter
     if (evt.which === 32) {
       evt.preventDefault();
       onDetailsOverlayShow(evt);
+      return;
     }
-    if (evt.which === 9) {
-      if (openOverlay) {
-        // const overlayCount = context.overlayManager.getOpenOverlays().length;
-        // if(openOverlay.index){
 
-        // }
-        // openOverlay.
-      } else {
-        let nextRowItem = evt.shiftKey ? rowItem.previousSibling : rowItem.nextSibling;
-        nextRowItem.lastChild.lastChild.dispatchEvent(new MouseEvent("mouseenter"));
-      }
+    // // moving down into overlay
+    // if (isTabDown(evt) && openOverlay) {
+    //   console.log("moving down into overlay");
+    //   evt.preventDefault();
+    //   const overlayEl = context.overlayManager.getOpenOverlayDomEl(openOverlay);
+    //   /** Top header el */
+    //   const firstFocusEl = overlayEl.getElementsByTagName("a")[0];
+    //   const lastTab = getLastItemOfNodeList(overlayEl.getElementsByClassName("tab-button") as
+    //     NodeListOf<HTMLButtonElement>);
+
+    //   // Move out up the the top, to the node el
+    //   firstFocusEl.addEventListener("keydown", (inOverlayEvt: KeyboardEvent) => {
+    //     // IE & Edge do not support `focus()` in SVG
+    //     if (isTabUp(inOverlayEvt) && typeof (rowItem as any).focus === "function") {
+    //       console.log("Move out up the the top, to the node el");
+    //       inOverlayEvt.preventDefault();
+    //       console.log("rowItem in `nextFocusEl.on keydown with tab+shift`", rowItem);
+    //       (rowItem as any).focus();
+    //     }
+    //   });
+
+    //   console.log("lastTab", lastTab);
+    //   // Move out down at the end
+    //   lastTab.addEventListener("keydown", (inOverlayEvt: KeyboardEvent) => {
+    //     // IE & Edge do not support `focus()` in SVG
+    //     if (isTabDown(inOverlayEvt) && typeof (rowItem as any).focus === "function") {
+    //       console.log("Move out down at the end");
+    //       if (rowItem.nextSibling) {
+    //         inOverlayEvt.preventDefault();
+    //         // not last in chart
+    //         (rowItem.nextSibling as any).focus();
+    //       } else {
+    //         //last in chart
+    //         console.log("last in chart")
+    //         inOverlayEvt.preventDefault();
+    //       }
+    //     } else if (isTabDown(inOverlayEvt)) {
+    //       console.log(">>>");
+    //     }
+    //   });
+    //   firstFocusEl.focus();
+    //   return;
+    //   // evt.cancelBubble = true;
+    // }
+
+    // // moving up into overlay
+    // if (isTabUp(evt) && prevOpenOverlay) {
+    //   console.log("moving up into overlay");
+    //   evt.preventDefault();
+    //   const prevOverlayEl = context.overlayManager.getOpenOverlayDomEl(prevOpenOverlay);
+    //   const lastTab = getLastItemOfNodeList(prevOverlayEl.getElementsByClassName("tab-button") as
+    //     NodeListOf<HTMLButtonElement>);
+    //   lastTab.focus();
+    //   return;
+    // }
+
+    // // tab without open overlays around
+    if (isTabUp(evt) && !prevOpenOverlay && index > 0) {
+      rowItem.previousSibling.previousSibling.lastChild.lastChild.dispatchEvent(new MouseEvent("mouseenter"));
+      return;
     }
+    if (isTabDown(evt) && !openOverlay) {
+      if (rowItem.nextSibling && rowItem.nextSibling.nextSibling) {
+        rowItem.nextSibling.nextSibling.lastChild.lastChild.dispatchEvent(new MouseEvent("mouseenter"));
+      }
+    // else {
+    //     console.log("Sort this out > tab without open overlays around");
+    //     if (context.overlayManager.hasOpenOverlays()) {
+    //       const lastTab = getLastItemOfNodeList(context.overlayManager.getLastOpenOverlayDomEl()
+    //         .getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>);
+    //       console.log("END", lastTab);
+    //       lastTab.focus();
+    //     }
+    //     // prev
+    //     // do not prevent default, so the focus moves on
+    // }
+      return;
+    }
+    // // Not handled
+    // if (evt.which === 9) {
+    //   console.log("go to next/prev thing");
+    // }
   });
 
   // rowItem.addEventListener("keyup", (evt: KeyboardEvent) => {
@@ -135,15 +253,14 @@ export function createRow(context: Context, index: number,
 
 
   // rowItem.addEventListener("focusin", (evt: FocusEvent) => {
-    //   console.log("in", isPoinerClick);
-    //   // const test = new MouseEvent("mouseenter");
-    //   rowName.dispatchEvent(new MouseEvent("mouseenter"));
-    //   window["eventsStore"]["mouse"].push(evt);
+  //   console.log("in", isPoinerClick);
+  //   // const test = new MouseEvent("mouseenter");
+  //   rowName.dispatchEvent(new MouseEvent("mouseenter"));
+  //   window["eventsStore"]["mouse"].push(evt);
   // });
 
 
   rowItem.addEventListener("focusout", () => {
-    console.log("out");
     rowName.dispatchEvent(new MouseEvent("mouseleave"));
   });
 

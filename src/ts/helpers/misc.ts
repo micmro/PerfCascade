@@ -27,6 +27,42 @@ export function contains<T>(arr: T[], item: T): boolean {
   return arr.some((x) => x === item);
 }
 
+
+/**
+ * Returns Index of first match to `predicate` in `arr`
+ * @param arr Array to search
+ * @param predicate Function that returns true for a match
+ */
+export function findIndex<T>(arr: T[], predicate: {(el: T, index: number): Boolean}) {
+  let i = 0;
+  if (!arr || arr.length < 1) {
+    return undefined;
+  }
+  const len = arr.length;
+  while (i < len) {
+    if (predicate(arr[i], i)) {
+      return i;
+    }
+    i++;
+  }
+
+  // 7. Return undefined.
+  return undefined;
+}
+
+/**
+ * Returns first match to `predicate` in `arr`
+ * @param arr Array to search
+ * @param predicate Function that returns true for a match
+ */
+export function find<T>(arr: T[], predicate: {(el: T, index: number): Boolean}) {
+  const index = findIndex(arr, predicate);
+  if (index === undefined) {
+    return undefined;
+  }
+  return arr[index];
+}
+
 /**
  * Formats and shortens a url for ui
  * @param  {string} url
@@ -94,4 +130,20 @@ export function toCssClass(seed: string) {
  */
 export function pluralize(word: string, count: number) {
   return word + (count > 1 ? "s" : "");
+}
+
+/**
+ * Check if event is `tab` + `shift` key, to move to previous input element
+ * @param {KeyboardEvent} evt Keyboard event
+ */
+export function isTabUp(evt: KeyboardEvent) {
+  return evt.which === 9 && evt.shiftKey;
+}
+
+/**
+ * Check if event is only `tab` key, to move to next input element
+ * @param {KeyboardEvent} evt Keyboard event
+ */
+export function isTabDown(evt: KeyboardEvent) {
+  return evt.which === 9 && !evt.shiftKey;
 }

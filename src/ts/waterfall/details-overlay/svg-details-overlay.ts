@@ -47,7 +47,7 @@ function createHolder(y: number, detailsHeight: number) {
 
 export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHeight: number): SVGGElement {
   const requestID = overlay.index + 1;
-  let wrapper = svg.newG("outer-info-overlay-holder");
+  let wrapper = svg.newG(`outer-info-overlay-holder overlay-index-${overlay.index}`);
   let holder = createHolder(y, detailsHeight);
 
   let foreignObject = svg.newForeignObject({

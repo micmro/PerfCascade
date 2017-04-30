@@ -51,10 +51,9 @@ function getSvgHeight(marks: Mark[], diagramHeight: number): number {
  * @return {Context} Context object
  */
 function createContext(data: WaterfallData, options: ChartRenderOption,
-                       entriesToShow: WaterfallEntry[], overlayHolder: SVGGElement): Context {
+                       entriesToShow: WaterfallEntry[], rowHolder: SVGGElement): Context {
   const unit = data.durationMs / 100;
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
-
   let context = {
     diagramHeight,
     overlayManager: undefined,
@@ -63,7 +62,7 @@ function createContext(data: WaterfallData, options: ChartRenderOption,
     options,
   };
   // `overlayManager` needs the `context` reference, so it's attached later
-  context.overlayManager = new OverlayManager(context, overlayHolder);
+  context.overlayManager = new OverlayManager(context, rowHolder);
 
   return context;
 }
@@ -83,7 +82,10 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   /** Holder of request-details overlay */
   let overlayHolder = svg.newG("overlays");
 
-  const context = createContext(data, options, entriesToShow, overlayHolder);
+  /** Holds all rows */
+  let rowHolder = svg.newG("rows-holder");
+
+  const context = createContext(data, options, entriesToShow, rowHolder);
 
   /** full height of the SVG chart in px */
   const chartHolderHeight = getSvgHeight(data.marks, context.diagramHeight);
@@ -98,8 +100,6 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
     "width": `${100 - options.leftColumnWith}%`,
     "x": `${options.leftColumnWith}%`,
   });
-  /** Holds all rows */
-  let rowHolder = svg.newG("rows-holder");
 
   /** Holder for on-hover vertical comparison bars */
   let hoverOverlayHolder: SVGGElement;
@@ -176,6 +176,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
 
     barEls.push(rowItem);
     rowHolder.appendChild(rowItem);
+    rowHolder.appendChild(svg.newG("row-overlay-holder"));
   }
 
   // Main loop to render rows with blocks
