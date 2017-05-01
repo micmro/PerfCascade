@@ -66,3 +66,18 @@ export function forEachNodeList<T extends Node>(list: NodeListOf<T>, fn: {(el: T
     fn(list.item(i), i);
   }
 }
+
+/**
+ * Helper to recousivly find parent with `className`
+ * @param base `Element` to start from
+ * @param className class that the parent should have
+ */
+export function findParentByClassName(base: Element, className: string) {
+  if (base.parentElement === undefined) {
+    return undefined;
+  }
+  if (base.parentElement.classList.contains(className)) {
+    return base.parentElement;
+  }
+  return findParentByClassName(base.parentElement, className);
+};
