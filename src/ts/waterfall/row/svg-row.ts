@@ -31,7 +31,8 @@ export function createRow(context: Context, index: number,
   const rowHeight = rectData.height;
   const leftColumnWith = context.options.leftColumnWith;
   let rowItem = svg.newA(entry.responseDetails.rowClass);
-  rowItem.setAttribute("href", "javascript:void(0)");
+  rowItem.setAttribute("tabindex", "0");
+  rowItem.setAttribute("xlink:href", "javascript:void(0)");
   let leftFixedHolder = svg.newSvg("left-fixed-holder", {
     "width": `${leftColumnWith}%`,
     "x": "0",
@@ -95,8 +96,9 @@ export function createRow(context: Context, index: number,
     onDetailsOverlayShow(evt);
   });
   rowItem.addEventListener("keydown", (evt: KeyboardEvent) => {
-    // on enter
-    if (evt.which === 32) {
+    // space on enter
+    if (evt.which === 32 || evt.which === 13) {
+      evt.preventDefault();
       return onDetailsOverlayShow(evt);
     }
 

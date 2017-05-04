@@ -138,7 +138,6 @@ class OverlayManager implements OverlayManagerClass {
     /** shared variable to keep track of heigth */
     let currY = 0;
     let updateHeight = (overlay, y, currHeight) => {
-      // console.log(currY, currHeight);
       currY += currHeight;
       overlay.actualY = y;
       overlay.height = currHeight;
@@ -159,7 +158,7 @@ class OverlayManager implements OverlayManagerClass {
       overlayHolder.appendChild(infoOverlay);
       updateHeight(overlay, y, infoOverlay.getBoundingClientRect().height);
     };
-    rowItems.forEach((rowItem, index) => {
+    let updateRow = (rowItem, index) => {
       const overlay = find(this.openOverlays, (o) => o.index === index);
       const overlayEl = rowItem.nextElementSibling.firstElementChild as SVGGElement;
       this.realignRow(rowItem, currY);
@@ -176,15 +175,24 @@ class OverlayManager implements OverlayManagerClass {
         return; // not open
       }
       if (overlayEl) {
-        updateHeight(overlay, overlay.defaultY + currY, overlay.height);
-        const fo = overlayEl.querySelector("foreignObject");
         const bg = overlayEl.querySelector(".info-overlay-bg");
-        fo.setAttribute("y", overlay.actualY.toString());
+        const fo = overlayEl.querySelector("foreignObject");
+        const btnRect = overlayEl.querySelector(".info-overlay-close-btn rect");
+        const btnText = overlayEl.querySelector(".info-overlay-close-btn text");
+        // bg.setAttribute("transform", `translate(0, ${currY})`);
+        // btnText.setAttribute("transform", `translate(0, ${currY})`);
+        // btnRect.setAttribute("transform", `translate(0, ${currY})`);
+        updateHeight(overlay, overlay.defaultY + currY, overlay.height);
+        // needs updateHeight
         bg.setAttribute("y", overlay.actualY.toString());
+        fo.setAttribute("y", overlay.actualY.toString());
+        btnText.setAttribute("y", overlay.actualY.toString());
+        btnRect.setAttribute("y", overlay.actualY.toString());
         return;
       }
       addNewOverlay(rowItem.nextElementSibling as SVGGElement, overlay);
-    });
+    };
+    rowItems.forEach(updateRow);
   }
 };
 export {
