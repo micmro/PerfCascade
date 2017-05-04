@@ -95,7 +95,7 @@
 .block-undefined {fill: #0f0;}
 
 /* Info overlay SVG - wrapper */
-.info-overlay {fill: #fff; stroke: #cdcdcd;}
+.info-overlay-bg {fill: #fff; stroke: #cdcdcd;}
 .info-overlay-close-btn {fill: rgba(205, 205, 205, 0.8); transform: translate(-23px, -23px); cursor: pointer;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}
 .info-overlay-close-btn:focus {border: solid 1px #36c;}

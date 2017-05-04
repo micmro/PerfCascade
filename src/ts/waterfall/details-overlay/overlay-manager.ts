@@ -48,38 +48,12 @@ class OverlayManager implements OverlayManagerClass {
   /** Collection of currely open overlays */
   private openOverlays: OpenOverlay[] = [];
 
-  constructor(private context: Context, private rowHolder: SVGGElement) {
+  constructor(private context: Context) {
   }
 
   /** all open overlays height combined */
   public getCombinedOverlayHeight(): number {
     return this.openOverlays.reduce((pre, curr) => pre + curr.height, 0);
-  }
-
-  /**
-   * Get ref to Overlay SVG Element in DOM.
-   *
-   * _Item might be re-drawn, when another Overlay is changed_
-   */
-  public getOpenOverlayDomEl(overlay: OpenOverlay) {
-    return this.rowHolder.querySelector(`.overlay-index-${overlay.index}`) as SVGGElement;
-  }
-
-  /**
-   * Get ref to the last (DOM element wise) Overlay SVG Element in DOM.
-   *
-   * _Item might be re-drawn, when another Overlay is changed_
-   */
-  public getLastOpenOverlayDomEl() {
-    const overlays = this.rowHolder.querySelectorAll(".info-overlay-holder");
-    return overlays.item(overlays.length - 1) as SVGGElement;
-  }
-
-  /**
-   * Are any overlays currently open?
-   */
-  public hasOpenOverlays() {
-    return this.openOverlays.length > 0;
   }
 
   /**
@@ -111,7 +85,6 @@ class OverlayManager implements OverlayManagerClass {
       "openOverlays": self.openOverlays,
       "type": "open",
     } as OverlayChangeEvent);
-    this.realignBars(rowItems);
   }
 
   /**
@@ -142,32 +115,19 @@ class OverlayManager implements OverlayManagerClass {
       "openOverlays": self.openOverlays,
       "type": "closed",
     } as OverlayChangeEvent);
-    this.realignBars(rowItems);
   }
 
   /**
-   * sets the offset for request-bars
-   * @param  {SVGAElement[]} rowItems
+   * Sets the offset for a request-bar
+   * @param {SVGAElement[]} rowItems
+   * @param {number} offset
    */
-  private realignBars(rowItems: SVGAElement[]) {
-    rowItems.forEach((bar, j) => {
-      let offset = this.getOverlayOffset(j);
-      bar.setAttribute("transform", `translate(0, ${offset})`);
-    });
-  }
-
-  /** y offset to it's default y position */
-  private getOverlayOffset(rowIndex: number): number {
-    return this.openOverlays.reduce((col, overlay) => {
-      if (overlay.index < rowIndex) {
-        return col + overlay.height;
-      }
-      return col;
-    }, 0);
+  private realignRow = (rowItem: SVGAElement, offset: number) => {
+    rowItem.setAttribute("transform", `translate(0, ${offset})`);
   }
 
   /**
-   * removes all overlays and renders them again
+   * Renders / Adjusts Overlays
    *
    * @summary this is to re-set the "y" position since there is a bug in chrome with
    * tranform of an SVG and positioning/scoll of a foreignObjects
@@ -178,6 +138,7 @@ class OverlayManager implements OverlayManagerClass {
     /** shared variable to keep track of heigth */
     let currY = 0;
     let updateHeight = (overlay, y, currHeight) => {
+      // console.log(currY, currHeight);
       currY += currHeight;
       overlay.actualY = y;
       overlay.height = currHeight;
@@ -198,11 +159,11 @@ class OverlayManager implements OverlayManagerClass {
       overlayHolder.appendChild(infoOverlay);
       updateHeight(overlay, y, infoOverlay.getBoundingClientRect().height);
     };
-
-    // const rowItems = this.rowHolder.getElementsByClassName("row-item") as NodeListOf<SVGAElement>;
     rowItems.forEach((rowItem, index) => {
       const overlay = find(this.openOverlays, (o) => o.index === index);
       const overlayEl = rowItem.nextElementSibling.firstElementChild as SVGGElement;
+      this.realignRow(rowItem, currY);
+
       if (overlay === undefined) {
         if (overlayEl) {
           // remove closed overlay
@@ -216,8 +177,10 @@ class OverlayManager implements OverlayManagerClass {
       }
       if (overlayEl) {
         updateHeight(overlay, overlay.defaultY + currY, overlay.height);
-        const fo = overlayEl.getElementsByTagName("foreignObject").item(0) as SVGForeignObjectElement;
+        const fo = overlayEl.querySelector("foreignObject");
+        const bg = overlayEl.querySelector(".info-overlay-bg");
         fo.setAttribute("y", overlay.actualY.toString());
+        bg.setAttribute("y", overlay.actualY.toString());
         return;
       }
       addNewOverlay(rowItem.nextElementSibling as SVGGElement, overlay);

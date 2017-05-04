@@ -29,9 +29,7 @@ function createCloseButtonSvg(y: number): SVGGElement {
 }
 
 function createHolder(y: number, detailsHeight: number) {
-
-  let innerHolder = svg.newG("info-overlay-holder");
-
+  let holder = svg.newG("info-overlay-holder");
   let bg = svg.newRect({
     "height": detailsHeight,
     "rx": 2,
@@ -39,15 +37,14 @@ function createHolder(y: number, detailsHeight: number) {
     "width": "100%",
     "x": "0",
     "y": y,
-  }, "info-overlay");
+  }, "info-overlay-bg");
 
-  innerHolder.appendChild(bg);
-  return innerHolder;
+  holder.appendChild(bg);
+  return holder;
 }
 
 export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHeight: number): SVGGElement {
   const requestID = overlay.index + 1;
-  let wrapper = svg.newG(`outer-info-overlay-holder overlay-index-${overlay.index}`);
   let holder = createHolder(y, detailsHeight);
 
   let foreignObject = svg.newForeignObject({
@@ -82,7 +79,5 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
   holder.appendChild(foreignObject);
   holder.appendChild(closeBtn);
 
-  wrapper.appendChild(holder);
-
-  return wrapper;
+  return holder;
 }

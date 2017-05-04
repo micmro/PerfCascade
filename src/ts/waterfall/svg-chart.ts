@@ -51,7 +51,7 @@ function getSvgHeight(marks: Mark[], diagramHeight: number): number {
  * @return {Context} Context object
  */
 function createContext(data: WaterfallData, options: ChartRenderOption,
-                       entriesToShow: WaterfallEntry[], rowHolder: SVGGElement): Context {
+                       entriesToShow: WaterfallEntry[]): Context {
   const unit = data.durationMs / 100;
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
   let context = {
@@ -62,7 +62,7 @@ function createContext(data: WaterfallData, options: ChartRenderOption,
     options,
   };
   // `overlayManager` needs the `context` reference, so it's attached later
-  context.overlayManager = new OverlayManager(context, rowHolder);
+  context.overlayManager = new OverlayManager(context);
 
   return context;
 }
@@ -85,7 +85,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   /** Holds all rows */
   let rowHolder = svg.newG("rows-holder");
 
-  const context = createContext(data, options, entriesToShow, rowHolder);
+  const context = createContext(data, options, entriesToShow);
 
   /** full height of the SVG chart in px */
   const chartHolderHeight = getSvgHeight(data.marks, context.diagramHeight);
