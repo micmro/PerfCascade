@@ -32,13 +32,13 @@ export interface OverlayManagerClass {
 
   /** Opens an overlay - rerenders others  */
   openOverlay: (index: number, y: number, detailsHeight: number, entry: WaterfallEntry,
-    barEls: SVGGElement[]) => void;
+    rowItems: SVGAElement[]) => void;
   /** toggles an overlay - rerenders others  */
   toggleOverlay: (index: number, y: number, detailsHeight: number, entry: WaterfallEntry,
-    barEls: SVGGElement[]) => void;
+    rowItems: SVGAElement[]) => void;
 
   /** closes on overlay - rerenders others internally */
-  closeOverlay: (index: number, detailsHeight: number, barEls: SVGGElement[]) => void;
+  closeOverlay: (index: number, detailsHeight: number, rowItems: SVGAElement[]) => void;
 
   // constructor(context: Context, overlayHolder: SVGGElement);
 }

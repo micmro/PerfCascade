@@ -1,5 +1,4 @@
 import {
-  forEachNodeList,
   getLastItemOfNodeList,
   getParentByClassName,
   removeChildren,
@@ -87,7 +86,7 @@ class OverlayManager implements OverlayManagerClass {
    * Opens an overlay - rerenders others internaly
    */
   public openOverlay(index: number, y: number, detailsHeight: number,
-                     entry: WaterfallEntry, barEls: SVGGElement[]) {
+                     entry: WaterfallEntry, rowItems: SVGAElement[]) {
     if (this.openOverlays.some((o) => o.index === index)) {
       return;
     }
@@ -97,14 +96,14 @@ class OverlayManager implements OverlayManagerClass {
       "entry": entry,
       "index": index,
       "onClose": () => {
-        self.closeOverlay(index, detailsHeight, barEls);
+        self.closeOverlay(index, detailsHeight, rowItems);
       },
       "openTabIndex": 0,
     };
     this.openOverlays.push(newOverlay);
     this.openOverlays = this.openOverlays.sort((a, b) => a.index > b.index ? 1 : -1);
 
-    this.renderOverlays(detailsHeight);
+    this.renderOverlays(detailsHeight, rowItems);
     this.context.pubSub.publishToOverlayChanges({
       "changedIndex": index,
       "changedOverlay": newOverlay,
@@ -112,46 +111,46 @@ class OverlayManager implements OverlayManagerClass {
       "openOverlays": self.openOverlays,
       "type": "open",
     } as OverlayChangeEvent);
-    this.realignBars(barEls);
+    this.realignBars(rowItems);
   }
 
   /**
    * Toggles an overlay - rerenders others
    */
   public toggleOverlay(index: number, y: number, detailsHeight: number,
-                       entry: WaterfallEntry, barEls: SVGGElement[]) {
+                       entry: WaterfallEntry, rowItems: SVGAElement[]) {
     if (this.openOverlays.some((o) => o.index === index)) {
-      this.closeOverlay(index, detailsHeight, barEls);
+      this.closeOverlay(index, detailsHeight, rowItems);
     } else {
-      this.openOverlay(index, y, detailsHeight, entry, barEls);
+      this.openOverlay(index, y, detailsHeight, entry, rowItems);
     }
   }
 
   /**
    * closes on overlay - rerenders others internally
    */
-  public closeOverlay(index: number, detailsHeight: number, barEls: SVGGElement[]) {
+  public closeOverlay(index: number, detailsHeight: number, rowItems: SVGAElement[]) {
     const self = this;
     this.openOverlays.splice(this.openOverlays.reduce((prev: number, curr, i) => {
       return (curr.index === index) ? i : prev;
     }, -1), 1);
 
-    this.renderOverlays(detailsHeight);
+    this.renderOverlays(detailsHeight, rowItems);
     this.context.pubSub.publishToOverlayChanges({
       "changedIndex": index,
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
       "openOverlays": self.openOverlays,
       "type": "closed",
     } as OverlayChangeEvent);
-    this.realignBars(barEls);
+    this.realignBars(rowItems);
   }
 
   /**
    * sets the offset for request-bars
-   * @param  {SVGGElement[]} barEls
+   * @param  {SVGAElement[]} rowItems
    */
-  private realignBars(barEls: SVGGElement[]) {
-    barEls.forEach((bar, j) => {
+  private realignBars(rowItems: SVGAElement[]) {
+    rowItems.forEach((bar, j) => {
       let offset = this.getOverlayOffset(j);
       bar.setAttribute("transform", `translate(0, ${offset})`);
     });
@@ -173,9 +172,9 @@ class OverlayManager implements OverlayManagerClass {
    * @summary this is to re-set the "y" position since there is a bug in chrome with
    * tranform of an SVG and positioning/scoll of a foreignObjects
    * @param  {number} detailsHeight
-   * @param  {SVGGElement} overlayHolder
+   * @param  {SVGAElement[]} rowItems
    */
-  private renderOverlays(detailsHeight: number) {
+  private renderOverlays(detailsHeight: number, rowItems: SVGAElement[]) {
     /** shared variable to keep track of heigth */
     let currY = 0;
     let updateHeight = (overlay, y, currHeight) => {
@@ -200,8 +199,8 @@ class OverlayManager implements OverlayManagerClass {
       updateHeight(overlay, y, infoOverlay.getBoundingClientRect().height);
     };
 
-    const rowItems = this.rowHolder.getElementsByClassName("row-item") as NodeListOf<SVGAElement>;
-    forEachNodeList(rowItems, (rowItem, index) => {
+    // const rowItems = this.rowHolder.getElementsByClassName("row-item") as NodeListOf<SVGAElement>;
+    rowItems.forEach((rowItem, index) => {
       const overlay = find(this.openOverlays, (o) => o.index === index);
       const overlayEl = rowItem.nextElementSibling.firstElementChild as SVGGElement;
       if (overlay === undefined) {

@@ -137,7 +137,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   const widestRequestNumber = getWidestDigitString(entriesToShow.length);
   const maxNumberWidth = svg.getNodeTextWidth(svg.newTextEl(`${widestRequestNumber}`), true);
 
-  let barEls: SVGGElement[] = [];
+  let rowItems: SVGAElement[] = [];
 
   function getChartHeight(): number {
     return chartHolderHeight + context.overlayManager.getCombinedOverlayHeight();
@@ -169,12 +169,12 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
     } as RectData;
 
     let showDetailsOverlay = () => {
-      context.overlayManager.toggleOverlay(i, y + options.rowHeight, detailsHeight, entry, barEls);
+      context.overlayManager.toggleOverlay(i, y + options.rowHeight, detailsHeight, entry, rowItems);
     };
 
     let rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);
 
-    barEls.push(rowItem);
+    rowItems.push(rowItem);
     rowHolder.appendChild(rowItem);
     rowHolder.appendChild(svg.newG("row-overlay-holder"));
   }
