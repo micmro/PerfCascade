@@ -1,5 +1,14 @@
-import { forEachNodeList, removeChildren } from "../../helpers/dom";
-import { find } from "../../helpers/misc";
+import {
+  forEachNodeList,
+  getLastItemOfNodeList,
+  getParentByClassName,
+  removeChildren,
+} from "../../helpers/dom";
+import {
+  find,
+  isTabDown,
+  isTabUp,
+} from "../../helpers/misc";
 import { Context, OverlayManagerClass } from "../../typing/context";
 import { OpenOverlay, OverlayChangeEvent } from "../../typing/open-overlay";
 import { WaterfallEntry } from "../../typing/waterfall";
@@ -7,11 +16,40 @@ import { createRowInfoOverlay } from "./svg-details-overlay";
 
 /** Overlay (popup) instance manager */
 class OverlayManager implements OverlayManagerClass {
+  private static showFullName = (el: Element) => {
+    el.getElementsByClassName("row-fixed").item(0)
+      .dispatchEvent(new MouseEvent("mouseenter"));
+  }
+  /**
+   * Keypress Event handler for fist el in Overlay,
+   * to manage highlighting of the element above
+   */
+  private static firstElKeypress = (evt: KeyboardEvent) => {
+    if (isTabUp(evt)) {
+      const par = getParentByClassName(evt.target as Element, "row-overlay-holder") as SVGGElement;
+      if (par && par.previousElementSibling) {
+        OverlayManager.showFullName(par.previousElementSibling);
+      }
+    }
+  }
+
+  /**
+   * Keypress Event handler for last el in Overlay,
+   * to manage highlighting of the element below
+   */
+  private static lastElKeypress = (evt: KeyboardEvent) => {
+    if (isTabDown(evt)) {
+      const par = getParentByClassName(evt.target as Element, "row-overlay-holder") as SVGGElement;
+      if (par && par.nextElementSibling) {
+        OverlayManager.showFullName(par.nextElementSibling);
+      }
+    }
+  }
+
   /** Collection of currely open overlays */
   private openOverlays: OpenOverlay[] = [];
 
   constructor(private context: Context, private rowHolder: SVGGElement) {
-
   }
 
   /** all open overlays height combined */
@@ -138,10 +176,8 @@ class OverlayManager implements OverlayManagerClass {
    * @param  {SVGGElement} overlayHolder
    */
   private renderOverlays(detailsHeight: number) {
-    // removeChildren(this.rowHolder);
-
+    /** shared variable to keep track of heigth */
     let currY = 0;
-
     let updateHeight = (overlay, y, currHeight) => {
       currY += currHeight;
       overlay.actualY = y;
@@ -156,6 +192,10 @@ class OverlayManager implements OverlayManagerClass {
       if (previewImg && !previewImg.src) {
         previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
       }
+      infoOverlay.querySelector("a")
+        .addEventListener("keydown", OverlayManager.firstElKeypress);
+      getLastItemOfNodeList(infoOverlay.querySelectorAll("button"))
+        .addEventListener("keydown", OverlayManager.lastElKeypress);
       overlayHolder.appendChild(infoOverlay);
       updateHeight(overlay, y, infoOverlay.getBoundingClientRect().height);
     };
@@ -163,10 +203,14 @@ class OverlayManager implements OverlayManagerClass {
     const rowItems = this.rowHolder.getElementsByClassName("row-item") as NodeListOf<SVGAElement>;
     forEachNodeList(rowItems, (rowItem, index) => {
       const overlay = find(this.openOverlays, (o) => o.index === index);
-      let overlayEl = rowItem.nextElementSibling.firstElementChild as SVGGElement;
+      const overlayEl = rowItem.nextElementSibling.firstElementChild as SVGGElement;
       if (overlay === undefined) {
         if (overlayEl) {
           // remove closed overlay
+          rowItem.nextElementSibling.querySelector("a")
+            .removeEventListener("keydown", OverlayManager.firstElKeypress);
+          getLastItemOfNodeList(rowItem.nextElementSibling.querySelectorAll("button"))
+            .removeEventListener("keydown", OverlayManager.lastElKeypress);
           removeChildren(rowItem.nextElementSibling);
         }
         return; // not open

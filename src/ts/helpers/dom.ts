@@ -32,6 +32,21 @@ export function removeClass<T extends Element>(el: T, className: string): T {
 }
 
 /**
+ * Helper to recursively find parent with the `className` class
+ * @param base `Element` to start from
+ * @param className class that the parent should have
+ */
+export function getParentByClassName(base: Element, className: string) {
+  if (base.parentElement === undefined) {
+    return undefined;
+  }
+  if (base.parentElement.classList.contains(className)) {
+    return base.parentElement;
+  }
+  return getParentByClassName(base.parentElement, className);
+};
+
+/**
  * Removes all child DOM nodes from `el`
  * @param  {Element} el
  */
@@ -66,18 +81,3 @@ export function forEachNodeList<T extends Node>(list: NodeListOf<T>, fn: {(el: T
     fn(list.item(i), i);
   }
 }
-
-/**
- * Helper to recousivly find parent with `className`
- * @param base `Element` to start from
- * @param className class that the parent should have
- */
-export function findParentByClassName(base: Element, className: string) {
-  if (base.parentElement === undefined) {
-    return undefined;
-  }
-  if (base.parentElement.classList.contains(className)) {
-    return base.parentElement;
-  }
-  return findParentByClassName(base.parentElement, className);
-};

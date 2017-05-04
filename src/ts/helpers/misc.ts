@@ -45,8 +45,6 @@ export function findIndex<T>(arr: T[], predicate: {(el: T, index: number): Boole
     }
     i++;
   }
-
-  // 7. Return undefined.
   return undefined;
 }
 
