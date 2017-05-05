@@ -179,9 +179,6 @@ class OverlayManager implements OverlayManagerClass {
         const fo = overlayEl.querySelector("foreignObject");
         const btnRect = overlayEl.querySelector(".info-overlay-close-btn rect");
         const btnText = overlayEl.querySelector(".info-overlay-close-btn text");
-        // bg.setAttribute("transform", `translate(0, ${currY})`);
-        // btnText.setAttribute("transform", `translate(0, ${currY})`);
-        // btnRect.setAttribute("transform", `translate(0, ${currY})`);
         updateHeight(overlay, overlay.defaultY + currY, overlay.height);
         // needs updateHeight
         bg.setAttribute("y", overlay.actualY.toString());

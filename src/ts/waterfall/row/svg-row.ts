@@ -19,6 +19,12 @@ clipPathElProto.appendChild(svg.newRect({
   "width": "100%",
 }));
 
+const clipPathElFullProto = svg.newClipPath("titleFullClipPath");
+clipPathElFullProto.appendChild(svg.newRect({
+  "height": "100%",
+  "width": "100%",
+}));
+
 const ROW_LEFT_MARGIN = 3;
 
 // Create row for a single request
@@ -93,6 +99,7 @@ export function createRow(context: Context, index: number,
   let hasPrevOpenOverlay: boolean;
 
   rowItem.addEventListener("click", (evt: MouseEvent) => {
+    evt.preventDefault();
     onDetailsOverlayShow(evt);
   });
   rowItem.addEventListener("keydown", (evt: KeyboardEvent) => {
@@ -123,6 +130,7 @@ export function createRow(context: Context, index: number,
   leftFixedHolder.appendChild(clipPathElProto.cloneNode(true));
   leftFixedHolder.appendChild(rowName);
 
+  rowItem.appendChild(clipPathElFullProto.cloneNode(true));
   rowItem.appendChild(bgStripe);
   rowItem.appendChild(flexScaleHolder);
   rowItem.appendChild(leftFixedHolder);

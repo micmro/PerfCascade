@@ -132,7 +132,7 @@ let getTestSVGEl = (() => {
     clearTimeout(removeSvgTestElTimeout);
     removeSvgTestElTimeout = setTimeout(() => {
       svgTestEl.parentNode.removeChild(svgTestEl);
-    }, 1000);
+    }, 500);
 
     return svgTestEl;
   };
@@ -146,15 +146,17 @@ let getTestSVGEl = (() => {
  */
 export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = false): number {
   let tmp = getTestSVGEl();
-  let tmpTextNode;
+  let tmpTextNode: SVGTextElement;
   if (skipClone) {
     tmpTextNode = textNode;
   } else {
-    tmpTextNode = textNode.cloneNode(false) as SVGTextElement;
+    tmpTextNode = textNode.cloneNode(true) as SVGTextElement;
+    tmpTextNode.setAttribute("x", "0");
+    tmpTextNode.setAttribute("y", "0");
   }
-  tmp.appendChild(tmpTextNode);
   // make sure to turn of shadow for performance
   tmpTextNode.style.textShadow = "0";
+  tmp.appendChild(tmpTextNode);
   window.document.body.appendChild(tmp);
   return tmpTextNode.getBBox().width;
 }
