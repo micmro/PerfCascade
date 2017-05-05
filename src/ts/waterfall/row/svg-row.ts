@@ -1,4 +1,3 @@
-// import { getLastItemOfNodeList } from "../../helpers/dom";
 import * as icons from "../../helpers/icons";
 import {
   isTabDown,

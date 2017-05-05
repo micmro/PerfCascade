@@ -27,7 +27,6 @@ export function contains<T>(arr: T[], item: T): boolean {
   return arr.some((x) => x === item);
 }
 
-
 /**
  * Returns Index of first match to `predicate` in `arr`
  * @param arr Array to search
