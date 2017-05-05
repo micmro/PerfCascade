@@ -147,7 +147,9 @@ let getTestSVGEl = (() => {
 export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = false): number {
   let tmp = getTestSVGEl();
   let tmpTextNode: SVGTextElement;
+  let shadow;
   if (skipClone) {
+    shadow = textNode.style.textShadow;
     tmpTextNode = textNode;
   } else {
     tmpTextNode = textNode.cloneNode(true) as SVGTextElement;
@@ -158,5 +160,9 @@ export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = 
   tmpTextNode.style.textShadow = "0";
   tmp.appendChild(tmpTextNode);
   window.document.body.appendChild(tmp);
-  return tmpTextNode.getBBox().width;
+  const width = tmpTextNode.getBBox().width;
+  if (skipClone && shadow !== undefined) {
+    textNode.style.textShadow = shadow;
+  }
+  return width;
 }
