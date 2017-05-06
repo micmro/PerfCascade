@@ -3,9 +3,13 @@
  */
 
 import { addClass } from "./dom";
+
 export interface StringToStringOrNumberMap { [key: string]: string|number; }
 export type DomAttributeMap = StringToStringOrNumberMap;
 export type CssStyleMap = StringToStringOrNumberMap;
+
+/** Namespace for SVG Elements */
+const svgNamespaceUri = "http://www.w3.org/2000/svg";
 
 function entries(obj: StringToStringOrNumberMap): Array<[string, string]> {
   const entries: Array<[string, string]> = [];
@@ -48,7 +52,7 @@ function newElement<T extends StylableSVGElement>(tagName: string,
                                                     text = "",
                                                     className = "",
                                                   }: SvgElementOptions = {}): T {
-  const element = document.createElementNS("http://www.w3.org/2000/svg", tagName) as T;
+  const element = document.createElementNS(svgNamespaceUri, tagName) as T;
   if (className) {
     addClass(element, className);
   }
@@ -74,7 +78,7 @@ export function newClipPath(id: string): SVGClipPathElement {
   return newElement<SVGClipPathElement>("clipPath", {attributes});
 }
 
-export function newForeignObject(attributes: DomAttributeMap): SVGForeignObjectElement {
+export function newForeignObject(attributes: DomAttributeMap) {
   return newElement<SVGForeignObjectElement>("foreignObject", {attributes});
 }
 
@@ -82,21 +86,33 @@ export function newA(className: string): SVGAElement {
   return newElement<SVGAElement>("a", {className});
 }
 
-export function newRect(attributes: DomAttributeMap, className: string = "", css: CssStyleMap = {}): SVGRectElement {
+export function newRect(attributes: DomAttributeMap,
+                        className: string = "",
+                        css: CssStyleMap = {}) {
   return newElement<SVGRectElement>("rect", {attributes, className, css});
 }
 
-export function newLine(attributes: DomAttributeMap, className: string = ""): SVGLineElement {
+export function newLine(attributes: DomAttributeMap,
+                        className: string = "") {
   return newElement<SVGLineElement>("line", {className, attributes});
 }
 
-export function newTitle(text: string): SVGTitleElement {
-  return newElement<SVGTitleElement>("title", {text});
+export function newTitle(text: string) {
+  const title = document.createElementNS(svgNamespaceUri, "title");
+  title.setAttribute("text", text);
+  return title;
 }
 
-export function newTextEl(text: string, attributes: DomAttributeMap = {},
-                          css: CssStyleMap = {}): SVGTextElement {
+export function newTextEl(text: string,
+                          attributes: DomAttributeMap = {},
+                          css: CssStyleMap = {}) {
   return newElement<SVGTextElement>("text", {text, attributes, css});
+}
+
+export function newPath(d: string) {
+  const path = document.createElementNS(svgNamespaceUri, "path");
+  path.setAttribute("d", d);
+  return path;
 }
 
 /** temp SVG element for size measurements  */
