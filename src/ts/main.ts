@@ -38,14 +38,14 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<Cha
   const options: ChartRenderOption = validateOptions({ ...defaultChartOptions, ...chartOptions } as ChartRenderOption);
 
   // setup paging helper
-  let paging = new Paging(waterfallDocsData, options.selectedPage);
+  const paging = new Paging(waterfallDocsData, options.selectedPage);
 
   let doc = createWaterfallSvg(paging.getSelectedPage(), options);
 
   // page update behaviour
   paging.onPageUpdate((_pageIndex, pageDoc) => {
-    let el = doc.parentElement;
-    let newDoc = createWaterfallSvg(pageDoc, options);
+    const el = doc.parentElement;
+    const newDoc = createWaterfallSvg(pageDoc, options);
     el.replaceChild(newDoc, doc);
     doc = newDoc;
   });
@@ -81,5 +81,5 @@ export function fromHar(harData: Har, options: ChartOptions = {}): SVGSVGElement
 
 // aditional imported members that get exported via UMD
 export {
-  ChartOptions
+  ChartOptions,
 };

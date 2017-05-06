@@ -134,17 +134,17 @@ class OverlayManager {
   private renderOverlays(detailsHeight: number, rowItems: SVGAElement[]) {
     /** shared variable to keep track of heigth */
     let currY = 0;
-    let updateHeight = (overlay, y, currHeight) => {
+    const updateHeight = (overlay, y, currHeight) => {
       currY += currHeight;
       overlay.actualY = y;
       overlay.height = currHeight;
     };
 
-    let addNewOverlay = (overlayHolder: SVGGElement, overlay: OpenOverlay) => {
-      let y = overlay.defaultY + currY;
-      let infoOverlay = createRowInfoOverlay(overlay, y, detailsHeight);
+    const addNewOverlay = (overlayHolder: SVGGElement, overlay: OpenOverlay) => {
+      const y = overlay.defaultY + currY;
+      const infoOverlay = createRowInfoOverlay(overlay, y, detailsHeight);
       // if overlay has a preview image show it
-      let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement;
+      const previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement;
       if (previewImg && !previewImg.src) {
         previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
       }
@@ -155,7 +155,7 @@ class OverlayManager {
       overlayHolder.appendChild(infoOverlay);
       updateHeight(overlay, y, infoOverlay.getBoundingClientRect().height);
     };
-    let updateRow = (rowItem: SVGAElement, index: number) => {
+    const updateRow = (rowItem: SVGAElement, index: number) => {
       const overlay = find(this.openOverlays, (o) => o.index === index);
       const overlayEl = rowItem.nextElementSibling.firstElementChild as SVGGElement;
       this.realignRow(rowItem, currY);
@@ -188,9 +188,9 @@ class OverlayManager {
     };
     rowItems.forEach(updateRow);
   }
-};
+}
 
 export {
-  OverlayManager
+  OverlayManager,
 };
 export default OverlayManager;

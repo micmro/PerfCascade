@@ -44,7 +44,7 @@ export function getParentByClassName(base: Element, className: string) {
     return base.parentElement;
   }
   return getParentByClassName(base.parentElement, className);
-};
+}
 
 /**
  * Removes all child DOM nodes from `el`

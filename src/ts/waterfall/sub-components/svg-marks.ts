@@ -12,21 +12,21 @@ import { Mark } from "../../typing/waterfall";
  */
 export function createMarks(context: Context, marks: Mark[]) {
   const diagramHeight = context.diagramHeight;
-  let marksHolder = svg.newG("marker-holder", {
+  const marksHolder = svg.newG("marker-holder", {
     "transform": "scale(1, 1)",
   });
 
   marks.forEach((mark, i) => {
     const x = roundNumber(mark.startTime / context.unit);
-    let markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase().replace(/([0-9]+[ ]?ms)|\W/g, ""));
-    let lineHolder = svg.newG("line-holder");
-    let lineLabelHolder = svg.newG("line-label-holder");
-    let lineLabel = svg.newTextEl(mark.name, { x: x + "%", y: diagramHeight + 25 });
+    const markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase().replace(/([0-9]+[ ]?ms)|\W/g, ""));
+    const lineHolder = svg.newG("line-holder");
+    const lineLabelHolder = svg.newG("line-label-holder");
+    const lineLabel = svg.newTextEl(mark.name, { x: x + "%", y: diagramHeight + 25 });
     lineLabel.setAttribute("writing-mode", "tb");
     let lineRect: SVGGElement;
     mark.x = x;
 
-    let line = svg.newLine({
+    const line = svg.newLine({
       "x1": x + "%",
       "x2": x + "%",
       "y1": 0,
@@ -40,7 +40,7 @@ export function createMarks(context: Context, marks: Mark[]) {
       mark.x = lastMark.x + minDistance;
     }
     // would use polyline but can't use percentage for points
-    let lineConnection = svg.newLine({
+    const lineConnection = svg.newLine({
       "x1": x + "%",
       "x2": mark.x + "%",
       "y1": diagramHeight,
@@ -55,8 +55,8 @@ export function createMarks(context: Context, marks: Mark[]) {
     }
 
     context.pubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
-      let offset = change.combinedOverlayHeight;
-      let scale = (diagramHeight + offset) / (diagramHeight);
+      const offset = change.combinedOverlayHeight;
+      const scale = (diagramHeight + offset) / (diagramHeight);
 
       line.setAttribute("transform", `scale(1, ${scale})`);
       lineLabelHolder.setAttribute("transform", `translate(0, ${offset})`);
@@ -69,7 +69,7 @@ export function createMarks(context: Context, marks: Mark[]) {
     let isHoverActive = false;
     /** click indicator - overwrites `isHoverActive` */
     let isClickActive = false;
-    let onLabelMouseEnter = () => {
+    const onLabelMouseEnter = () => {
       if (!isHoverActive) {
         // move marker to top
         markHolder.parentNode.appendChild(markHolder);
@@ -83,14 +83,14 @@ export function createMarks(context: Context, marks: Mark[]) {
       }
     };
 
-    let onLabelMouseLeave = () => {
+    const onLabelMouseLeave = () => {
       isHoverActive = false;
       if (!isClickActive) {
         removeClass(lineHolder, "active");
       }
     };
 
-    let onLabelClick = () => {
+    const onLabelClick = () => {
       if (isClickActive) {
         // deselect
         isHoverActive = false;
@@ -125,7 +125,7 @@ export function createMarks(context: Context, marks: Mark[]) {
  * @param {Mark} entry  Line entry
  */
 export function createLineRect(context: Context, entry: Mark): SVGGElement {
-  let holder = svg.newG(`line-mark-holder line-marker-${toCssClass(entry.name)}`);
+  const holder = svg.newG(`line-mark-holder line-marker-${toCssClass(entry.name)}`);
   holder.appendChild(svg.newTitle(entry.name.replace(/^startTimer-/, "")));
   holder.appendChild(svg.newRect({
     "height": context.diagramHeight,

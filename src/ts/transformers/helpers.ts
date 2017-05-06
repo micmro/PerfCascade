@@ -21,11 +21,11 @@ import { makeIcon } from "../waterfall/row/svg-indicators";
  * @returns {string} stringified HTML definition list
  */
 export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
-  let makeClass = (key: string) => {
+  const makeClass = (key: string) => {
     if (!addClass) {
       return "";
     }
-    let className = toCssClass(key) || "no-colour";
+    const className = toCssClass(key) || "no-colour";
     return `class="${className}"`;
   };
   return dlKeyValues
@@ -44,7 +44,7 @@ export function mimeToRequestType(mimeType: string): RequestType {
   if (mimeType === undefined) {
     return "other";
   }
-  let types = mimeType.split("/");
+  const types = mimeType.split("/");
   let part2 = types[1];
   // take care of text/css; charset=UTF-8 etc
   if (part2 !== undefined) {
@@ -169,7 +169,7 @@ export function makeMimeTypeIcon(status: number,
  * @param nestedKvPairs - nested `KvTuple`s (possibly sub-nested)
  */
 export const flattenKvTuple = (nestedKvPairs: Array<(KvTuple | KvTuple[])>): KvTuple[] => {
-  let returnKv: KvTuple[] = [];
+  const returnKv: KvTuple[] = [];
   nestedKvPairs.forEach((maybeKv) => {
     if (maybeKv === undefined || maybeKv.length === 0) {
       return;

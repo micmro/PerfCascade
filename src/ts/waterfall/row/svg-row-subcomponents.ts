@@ -15,7 +15,7 @@ import { WaterfallEntryTiming } from "../../typing/waterfall";
  */
 function makeBlock(rectData: RectData, className: string) {
   const blockHeight = rectData.height - 1;
-  let rect = svg.newRect({
+  const rect = svg.newRect({
     "height": blockHeight,
     "width": misc.roundNumber(rectData.width / rectData.unit) + "%",
     "x": misc.roundNumber(rectData.x / rectData.unit) + "%",
@@ -69,7 +69,7 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
   let txtEl = svg.newTextEl(totalLabel, {x: `${misc.roundNumber(percStart)}%`, y});
 
   // (pessimistic) estimation of text with to avoid performance penalty of `getBBox`
-  let roughTxtWidth = totalLabel.length * 8;
+  const roughTxtWidth = totalLabel.length * 8;
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
     percStart = firstX / rectData.unit - spacingPerc;
@@ -87,8 +87,8 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
  * @return {SVGElement}                Renerated SVG (rect or g element)
  */
 export function createRect(rectData: RectData, segments: WaterfallEntryTiming[], timeTotal: number): SVGElement {
-  let rect = makeBlock(rectData, `time-block ${rectData.cssClass}`);
-  let rectHolder = svg.newG("rect-holder");
+  const rect = makeBlock(rectData, `time-block ${rectData.cssClass}`);
+  const rectHolder = svg.newG("rect-holder");
   let firstX = rectData.x;
 
   rectHolder.appendChild(rect);
@@ -96,8 +96,8 @@ export function createRect(rectData: RectData, segments: WaterfallEntryTiming[],
   if (segments && segments.length > 0) {
     segments.forEach((segment) => {
       if (segment.total > 0 && typeof segment.start === "number") {
-        let childRectData = segmentToRectData(segment, rectData);
-        let childRect = makeBlock(childRectData, `segment ${childRectData.cssClass}`);
+        const childRectData = segmentToRectData(segment, rectData);
+        const childRect = makeBlock(childRectData, `segment ${childRectData.cssClass}`);
         firstX = Math.min(firstX, childRectData.x);
         rectHolder.appendChild(childRect);
       }
@@ -134,7 +134,7 @@ export function createRequestNumberLabel(x: number, y: number, requestNumber: st
  */
 export function createRequestLabelClipped(x: number, y: number, name: string, height: number) {
 
-  let blockLabel = createRequestLabel(x, y, name, height);
+  const blockLabel = createRequestLabel(x, y, name, height);
   blockLabel.style.clipPath = `url(#titleClipPath)`;
   return blockLabel;
 }
@@ -147,8 +147,8 @@ export function createRequestLabelClipped(x: number, y: number, name: string, he
  * @param  {number}         height           height of row
  */
 export function createRequestLabelFull(x: number, y: number, name: string, height: number) {
-  let blockLabel = createRequestLabel(x, y, name, height);
-  let labelHolder = svg.newG("full-label", {}, {
+  const blockLabel = createRequestLabel(x, y, name, height);
+  const labelHolder = svg.newG("full-label", {}, {
     clipPath: `url(#titleFullClipPath)`,
   });
   labelHolder.appendChild(svg.newRect({
@@ -169,7 +169,7 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
   const blockName = misc.resourceUrlFormatter(name, 125);
   y = y + Math.round(height / 2) + 5;
-  let blockLabel = svg.newTextEl(blockName, {x, y});
+  const blockLabel = svg.newTextEl(blockName, {x, y});
 
   blockLabel.appendChild(svg.newTitle(name));
   blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1";
@@ -189,8 +189,8 @@ const supportsAnimationFrame = (typeof window.requestAnimationFrame === "functio
  */
 export function appendRequestLabels(rowFixed: SVGGElement, requestNumberLabel: SVGTextElement,
                                     shortLabel: SVGTextElement, fullLabel: SVGGElement) {
-  let labelFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement;
-  let fullLabelText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement;
+  const labelFullBg = fullLabel.getElementsByTagName("rect")[0] as SVGRectElement;
+  const fullLabelText = fullLabel.getElementsByTagName("text")[0] as SVGTextElement;
 
   // use display: none to not render it and visibility to remove it from search results (crt+f in chrome at least)
   fullLabel.style.display = "none";
@@ -251,7 +251,7 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
 }
 
 export function createNameRowBg(y: number, rowHeight: number): SVGGElement {
-  let rowFixed = svg.newG("row row-fixed");
+  const rowFixed = svg.newG("row row-fixed");
 
   rowFixed.appendChild(svg.newRect({
       "height": rowHeight,
@@ -267,7 +267,7 @@ export function createNameRowBg(y: number, rowHeight: number): SVGGElement {
 }
 
 export function createRowBg(y: number, rowHeight: number): SVGGElement {
-  let rowFixed = svg.newG("row row-flex");
+  const rowFixed = svg.newG("row row-flex");
 
   rowFixed.appendChild(svg.newRect({
       "height": rowHeight,

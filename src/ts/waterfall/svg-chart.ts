@@ -9,9 +9,9 @@ import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
 import OverlayManager from "./details-overlay/overlay-manager";
 import { PubSub } from "./details-overlay/pub-sub";
 import * as row from "./row/svg-row";
-import * as alignmentHelper from  "./sub-components/svg-alignment-helper";
+import * as alignmentHelper from "./sub-components/svg-alignment-helper";
 import * as generalComponents from "./sub-components/svg-general-components";
-import * as marks from  "./sub-components/svg-marks";
+import * as marks from "./sub-components/svg-marks";
 
 /**
  * Get a string that's as wide, or wider than any number from 0-n.
@@ -54,7 +54,7 @@ function createContext(data: WaterfallData, options: ChartRenderOption,
                        entriesToShow: WaterfallEntry[]): Context {
   const unit = data.durationMs / 100;
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
-  let context = {
+  const context = {
     diagramHeight,
     overlayManager: undefined,
     pubSub : new PubSub(),
@@ -80,10 +80,10 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
     .sort((a, b) => (a.start || 0) - (b.start || 0));
 
   /** Holder of request-details overlay */
-  let overlayHolder = svg.newG("overlays");
+  const overlayHolder = svg.newG("overlays");
 
   /** Holds all rows */
-  let rowHolder = svg.newG("rows-holder");
+  const rowHolder = svg.newG("rows-holder");
 
   const context = createContext(data, options, entriesToShow);
 
@@ -91,12 +91,12 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   const chartHolderHeight = getSvgHeight(data.marks, context.diagramHeight);
 
   /** Main SVG Element that holds all data */
-  let timeLineHolder = svg.newSvg("water-fall-chart", {
+  const timeLineHolder = svg.newSvg("water-fall-chart", {
     "height": chartHolderHeight,
   });
 
   /** Holder for scale, event and marks */
-  let scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
+  const scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
     "width": `${100 - options.leftColumnWith}%`,
     "x": `${options.leftColumnWith}%`,
   });
@@ -106,7 +106,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   let mouseListeners: HoverEvtListeners;
   if (options.showAlignmentHelpers) {
     hoverOverlayHolder = svg.newG("hover-overlays");
-    let hoverEl = alignmentHelper.createAlignmentLines(context.diagramHeight);
+    const hoverEl = alignmentHelper.createAlignmentLines(context.diagramHeight);
     hoverOverlayHolder.appendChild(hoverEl.startline);
     hoverOverlayHolder.appendChild(hoverEl.endline);
     mouseListeners = alignmentHelper.makeHoverEvtListeners(hoverEl);
@@ -137,7 +137,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   const widestRequestNumber = getWidestDigitString(entriesToShow.length);
   const maxNumberWidth = svg.getNodeTextWidth(svg.newTextEl(`${widestRequestNumber}`), true);
 
-  let rowItems: SVGAElement[] = [];
+  const rowItems: SVGAElement[] = [];
 
   function getChartHeight(): number {
     return chartHolderHeight + context.overlayManager.getCombinedOverlayHeight();
@@ -168,11 +168,11 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
       "y": y,
     } as RectData;
 
-    let showDetailsOverlay = () => {
+    const showDetailsOverlay = () => {
       context.overlayManager.toggleOverlay(i, y + options.rowHeight, detailsHeight, entry, rowItems);
     };
 
-    let rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);
+    const rowItem = row.createRow(context, i, maxIconsWidth, maxNumberWidth, rectData, entry, showDetailsOverlay);
 
     rowItems.push(rowItem);
     rowHolder.appendChild(rowItem);

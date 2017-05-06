@@ -24,7 +24,7 @@ export function getIndicatorIcons(entry: WaterfallEntry): Icon[] {
     return [];
   }
 
-  let combinedTitle = [];
+  const combinedTitle = [];
   let icon = "";
   const errors = indicators.filter((i) => i.type === "error");
   const warnings = indicators.filter((i) => i.type === "warning");

@@ -25,7 +25,7 @@ import { makeDefinitionList } from "./helpers";
 export function makeTabs(entry: Entry, requestID: number, requestType: RequestType,
                          startRelative: number, endRelative: number,
                          indicators: WaterfallEntryIndicator[]): WaterfallEntryTab[] {
-  let tabs = [] as WaterfallEntryTab[];
+  const tabs = [] as WaterfallEntryTab[];
 
   const tabsData = getKeys(entry, requestID, startRelative, endRelative);
   tabs.push(makeGeneralTab(tabsData.general, indicators));
@@ -68,14 +68,14 @@ function makeGeneralTab(generalData: KvTuple[], indicators: WaterfallEntryIndica
   let content = "";
 
   // Make indicator sections
-  let errors = indicators
+  const errors = indicators
     .filter((i) => i.type === "error")
     .map((i) => [i.title, i.description] as KvTuple);
-  let warnings = indicators
+  const warnings = indicators
     .filter((i) => i.type === "warning")
     .map((i) => [i.title, i.description] as KvTuple);
   // all others
-  let info = indicators
+  const info = indicators
     .filter((i) => i.type !== "error" && i.type !== "warning")
     .map((i) => [i.title, i.description] as KvTuple);
 

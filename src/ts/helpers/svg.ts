@@ -3,13 +3,13 @@
  */
 
 import { addClass } from "./dom";
-export type StringToStringOrNumberMap = {[key: string]: string|number};
+export interface StringToStringOrNumberMap { [key: string]: string|number; }
 export type DomAttributeMap = StringToStringOrNumberMap;
 export type CssStyleMap = StringToStringOrNumberMap;
 
 function entries(obj: StringToStringOrNumberMap): Array<[string, string]> {
   const entries: Array<[string, string]> = [];
-  for (let k of Object.keys(obj)) {
+  for (const k of Object.keys(obj)) {
     entries.push([k, String((obj[k]))]);
   }
   return entries;
@@ -100,7 +100,7 @@ export function newTextEl(text: string, attributes: DomAttributeMap = {},
 }
 
 /** temp SVG element for size measurements  */
-let getTestSVGEl = (() => {
+const getTestSVGEl = (() => {
   /** Reference to Temp SVG element for size measurements */
   let svgTestEl: SVGSVGElement;
   let removeSvgTestElTimeout;
@@ -145,7 +145,7 @@ let getTestSVGEl = (() => {
  * @returns number
  */
 export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = false): number {
-  let tmp = getTestSVGEl();
+  const tmp = getTestSVGEl();
   let tmpTextNode: SVGTextElement;
   let shadow;
   if (skipClone) {

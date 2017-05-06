@@ -123,7 +123,7 @@ export function svg(x: number, y: number, title: string, scale: number = 1): SVG
   return image(x, y, title, scale);
 }
 
-  export function html(x: number, y: number, title: string, scale: number = 1): SVGElement {
+export function html(x: number, y: number, title: string, scale: number = 1): SVGElement {
   return toSvg(x, y, title, "icon-html", scale, `<path d="m 5.62623,13.310467 -0.491804,0.4919 q -0.09836,0.098
     -0.226229,0.098 -0.127869,0 -0.22623,-0.098 L 0.098361,9.218667 Q 0,9.120367 0,8.992467 q 0,-0.1279 0.09836,-0.2262
     l 4.583606,-4.5836 q 0.09836,-0.098 0.22623,-0.098 0.127869,0 0.226229,0.098 l 0.491804,0.4918 q 0.09836,0.098

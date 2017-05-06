@@ -11,8 +11,8 @@ import { WaterfallEntry } from "../../typing/waterfall";
  */
 export function createDetailsBody(requestID: number, detailsHeight: number, entry: WaterfallEntry) {
 
-  let html = document.createElement("html") as HTMLHtmlElement;
-  let body = document.createElement("body");
+  const html = document.createElement("html") as HTMLHtmlElement;
+  const body = document.createElement("body");
   body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
   html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
 
