@@ -16,8 +16,8 @@ import { OverlayChangeEvent } from "../../typing/open-overlay";
  * @param  {number} sec second of the time marker to render
  * @param  {boolean} addLabel  if true a time label is added to the marker-line
  */
-let appendSecond = (context: Context, timeHolder: SVGGElement,
-                    secsTotal: number, sec: number, addLabel: boolean = false) => {
+const appendSecond = (context: Context, timeHolder: SVGGElement,
+                      secsTotal: number, sec: number, addLabel: boolean = false) => {
 
   const diagramHeight = context.diagramHeight;
   const secPerc = 100 / secsTotal;
@@ -29,7 +29,7 @@ let appendSecond = (context: Context, timeHolder: SVGGElement,
     const showTextBefore = (sec > secsTotal - 0.2);
     lineClass = "second-line";
     let x = roundNumber(secPerc * sec) + 0.5 + "%";
-    let css = {};
+    const css = {};
     if (showTextBefore) {
       x = roundNumber(secPerc * sec) - 0.5 + "%";
       css["text-anchor"] = "end";
@@ -46,9 +46,9 @@ let appendSecond = (context: Context, timeHolder: SVGGElement,
   }, lineClass);
 
   context.pubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
-    let offset = change.combinedOverlayHeight;
+    const offset = change.combinedOverlayHeight;
     // figure out why there is an offset
-    let scale = (diagramHeight + offset) / (diagramHeight);
+    const scale = (diagramHeight + offset) / (diagramHeight);
 
     lineEl.setAttribute("transform", `scale(1, ${scale})`);
     if (addLabel) {
@@ -68,7 +68,7 @@ let appendSecond = (context: Context, timeHolder: SVGGElement,
  * @param {number} durationMs    Full duration of the waterfall
  */
 export function createTimeScale(context: Context, durationMs: number): SVGGElement {
-  let timeHolder = svg.newG("time-scale full-width");
+  const timeHolder = svg.newG("time-scale full-width");
   const subStepMs = Math.ceil(durationMs / 10000) * 200;
   /** steps between each major second marker */
   const subStep = 1000 / subStepMs;

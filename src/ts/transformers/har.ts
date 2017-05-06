@@ -36,7 +36,7 @@ import {
  */
 export function transformDoc(harData: Har | Log, options: HarTransformerOptions): WaterfallDocs {
   // make sure it's the *.log base node
-  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
+  const data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
   const pages = getPages(data);
 
   return {
@@ -96,7 +96,7 @@ export function transformPage(harData: Har | Log,
                               pageIndex: number = 0,
                               options: HarTransformerOptions): WaterfallData {
   // make sure it's the *.log base node
-  let data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
+  const data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
 
   const pages = getPages(data);
   const currPage = pages[pageIndex];
@@ -172,13 +172,13 @@ const getMarks = (pageTimings: PageTiming, currPage: Page, options: HarTransform
  * @param {HarTransformerOptions} options - HAR-parser-specific options
  */
 const getUserTimimngs = (currPage: Page, options: HarTransformerOptions) => {
-  let baseFilter = options.showUserTimingEndMarker ?
+  const baseFilter = options.showUserTimingEndMarker ?
     (k: string) => k.indexOf("_userTime.") === 0 :
     (k: string) => k.indexOf("_userTime.") === 0 && k.indexOf("_userTime.endTimer-") !== 0;
   let filterFn = baseFilter;
 
   if (Array.isArray(options.showUserTiming)) {
-    let findTimings = options.showUserTiming;
+    const findTimings = options.showUserTiming;
     filterFn = (k: string) => (
       baseFilter(k) &&
       findTimings.indexOf(k.replace(/^_userTime\./, "")) >= 0
@@ -224,9 +224,9 @@ const getUserTimimngs = (currPage: Page, options: HarTransformerOptions) => {
  * @returns Array
  */
 const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): WaterfallEntryTiming[] => {
-  let t = harEntry.timings;
+  const t = harEntry.timings;
   return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[],
-    key: TimingType) => {
+                                                                          key: TimingType) => {
 
     const time = getTimePair(key, harEntry, collect, startRelative);
 

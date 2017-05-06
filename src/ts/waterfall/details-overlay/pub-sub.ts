@@ -25,9 +25,9 @@ class PubSub {
   public publishToOverlayChanges(change: OverlayChangeEvent) {
     this.subscribers.forEach((fn) => fn(change));
   }
-};
+}
 
 export {
-  PubSub
-}
+  PubSub,
+};
 export default PubSub;

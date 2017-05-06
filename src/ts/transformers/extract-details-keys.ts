@@ -98,7 +98,7 @@ function parseResponseDetails(entry: Entry): KvTuple[] {
   };
 
   const contentLength = getHeader(headers, "Content-Length");
-  let contentSize = undefined;
+  let contentSize;
   if (content.size !== -1 && contentLength !== content.size.toString()) {
     contentSize = content.size;
   }

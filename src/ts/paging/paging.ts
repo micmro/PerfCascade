@@ -51,7 +51,7 @@ export default class Paging {
     }
 
     this.selectedPageIndex = pageIndex;
-    let selectedPage = this.doc.pages[this.selectedPageIndex];
+    const selectedPage = this.doc.pages[this.selectedPageIndex];
     this.onPageUpdateCbs.forEach((cb) => {
       cb(this.selectedPageIndex, selectedPage);
     });
@@ -82,13 +82,13 @@ export default class Paging {
     // remove all existing options, like placeholders
     removeChildren(selectbox);
     this.doc.pages.forEach((p, i) => {
-      let option = new Option(p.title, i.toString(), false, i === this.selectedPageIndex);
+      const option = new Option(p.title, i.toString(), false, i === this.selectedPageIndex);
       selectbox.add(option);
     });
 
     selectbox.style.display = "block";
     selectbox.addEventListener("change", (evt) => {
-      let val = parseInt((evt.target as HTMLOptionElement).value, 10);
+      const val = parseInt((evt.target as HTMLOptionElement).value, 10);
       self.setSelectedPageIndex(val);
     });
   }

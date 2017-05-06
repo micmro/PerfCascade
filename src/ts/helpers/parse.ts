@@ -176,13 +176,13 @@ export function toInt(input: string | number): number {
 
 /** Validates the `ChartOptions` attributes types */
 export function validateOptions(options: ChartRenderOption): ChartRenderOption {
-  let validateInt = (name: keyof ChartRenderOption) => {
+  const validateInt = (name: keyof ChartRenderOption) => {
     options[name] = toInt(options[name] as any);
     if (options[name] === undefined) {
       throw TypeError(`option "${name}" needs to be a number`);
     }
   };
-  let ensureBoolean = (name: keyof ChartRenderOption) => {
+  const ensureBoolean = (name: keyof ChartRenderOption) => {
     options[name] = !!options[name];
   };
 

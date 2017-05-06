@@ -89,7 +89,7 @@ export function documentIsSecure(data: Entry[]) {
 /** Scans `entry` for noteworthy issues or infos and highlights them */
 export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: RequestType) {
   // const harEntry = entry;
-  let output: WaterfallEntryIndicator[] = [];
+  const output: WaterfallEntryIndicator[] = [];
 
   if (isPush(entry)) {
     output.push({

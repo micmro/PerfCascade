@@ -4,7 +4,7 @@ import { OpenOverlay } from "../../typing/open-overlay";
 import { createDetailsBody } from "./html-details-body";
 
 function createCloseButtonSvg(y: number): SVGGElement {
-  let closeBtn = svg.newA("info-overlay-close-btn");
+  const closeBtn = svg.newA("info-overlay-close-btn");
 
   closeBtn.appendChild(svg.newRect({
     "height": 23,
@@ -26,8 +26,8 @@ function createCloseButtonSvg(y: number): SVGGElement {
 }
 
 function createHolder(y: number, detailsHeight: number) {
-  let holder = svg.newG("info-overlay-holder");
-  let bg = svg.newRect({
+  const holder = svg.newG("info-overlay-holder");
+  const bg = svg.newRect({
     "height": detailsHeight,
     "rx": 2,
     "ry": 2,
@@ -42,23 +42,23 @@ function createHolder(y: number, detailsHeight: number) {
 
 export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHeight: number): SVGGElement {
   const requestID = overlay.index + 1;
-  let holder = createHolder(y, detailsHeight);
+  const holder = createHolder(y, detailsHeight);
 
-  let foreignObject = svg.newForeignObject({
+  const foreignObject = svg.newForeignObject({
     "height": detailsHeight,
     "width": "100%",
     "x": "0",
     "y": y,
   });
 
-  let closeBtn = createCloseButtonSvg(y);
+  const closeBtn = createCloseButtonSvg(y);
   closeBtn.addEventListener("click", () => overlay.onClose(overlay.index));
 
-  let body = createDetailsBody(requestID, detailsHeight, overlay.entry);
-  let buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
-  let tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
+  const body = createDetailsBody(requestID, detailsHeight, overlay.entry);
+  const buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
+  const tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
 
-  let setTabStatus = (tabIndex: number) => {
+  const setTabStatus = (tabIndex: number) => {
     overlay.openTabIndex = tabIndex;
     forEachNodeList(tabs, (tab: HTMLDivElement, j) => {
       tab.style.display = (tabIndex === j) ? "block" : "none";

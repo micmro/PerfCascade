@@ -16,7 +16,7 @@ export function readFile(file: File,
 
   function parseJson(rawData) {
     try {
-      let harData = JSON.parse(rawData);
+      const harData = JSON.parse(rawData);
       callback(null, harData.log);
     } catch (e) {
       callback(e);
@@ -24,7 +24,7 @@ export function readFile(file: File,
   }
 
   /** start reading the file */
-  let extension = fileName.match(/\.[0-9a-z]+$/i)[0];
+  const extension = fileName.match(/\.[0-9a-z]+$/i)[0];
   if ([".zhar", ".zip"].indexOf(extension) !== -1) {
     /** zhar */
     zip.createReader(new zip.BlobReader(file), (zipReader) => {
@@ -38,7 +38,7 @@ export function readFile(file: File,
     });
   } else {
 
-    let reader = new FileReader();
+    const reader = new FileReader();
 
     /** try to parse the file once uploaded to browser */
     reader.addEventListener("load", (e: any) => {

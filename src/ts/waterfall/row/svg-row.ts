@@ -35,22 +35,22 @@ export function createRow(context: Context, index: number,
   const y = rectData.y;
   const rowHeight = rectData.height;
   const leftColumnWith = context.options.leftColumnWith;
-  let rowItem = svg.newA(entry.responseDetails.rowClass);
+  const rowItem = svg.newA(entry.responseDetails.rowClass);
   rowItem.setAttribute("tabindex", "0");
   rowItem.setAttribute("xlink:href", "javascript:void(0)");
-  let leftFixedHolder = svg.newSvg("left-fixed-holder", {
+  const leftFixedHolder = svg.newSvg("left-fixed-holder", {
     "width": `${leftColumnWith}%`,
     "x": "0",
   });
-  let flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
+  const flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
     "width": `${100 - leftColumnWith}%`,
     "x": `${leftColumnWith}%`,
   });
 
-  let rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
-  let rowName = rowSubComponents.createNameRowBg(y, rowHeight);
-  let rowBar = rowSubComponents.createRowBg(y, rowHeight);
-  let bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
+  const rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
+  const rowName = rowSubComponents.createNameRowBg(y, rowHeight);
+  const rowBar = rowSubComponents.createRowBg(y, rowHeight);
+  const bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
 
   let x = ROW_LEFT_MARGIN + maxIconsWidth;
 
@@ -71,14 +71,14 @@ export function createRow(context: Context, index: number,
   // Jump to the largest offset of all rows
   x = ROW_LEFT_MARGIN + maxIconsWidth;
 
-  let requestNumber = `${index + 1}`;
+  const requestNumber = `${index + 1}`;
 
   const requestNumberLabel = rowSubComponents.createRequestNumberLabel(x, y, requestNumber, rowHeight, maxNumberWidth);
   // 4 is slightly bigger than the hover "glow" around the url
   x += maxNumberWidth + 4;
-  let shortLabel = rowSubComponents.createRequestLabelClipped(x, y, resourceUrlFormatter(entry.url, 40),
+  const shortLabel = rowSubComponents.createRequestLabelClipped(x, y, resourceUrlFormatter(entry.url, 40),
     rowHeight);
-  let fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.url, rowHeight);
+  const fullLabel = rowSubComponents.createRequestLabelFull(x, y, entry.url, rowHeight);
 
   // create and attach request block
   rowBar.appendChild(rect);
