@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:1.4.0 (06/04/2017) */
+/*! github.com/micmro/PerfCascade Version:2.0.0 (06/05/2017) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -820,7 +820,7 @@ a:hover {
 .block-undefined {fill: #0f0;}
 
 /* Info overlay SVG - wrapper */
-.info-overlay {fill: #fff; stroke: #cdcdcd;}
+.info-overlay-bg {fill: #fff; stroke: #cdcdcd;}
 .info-overlay-close-btn {fill: rgba(205, 205, 205, 0.8); transform: translate(-23px, -23px); cursor: pointer;}
 .info-overlay-close-btn text {fill: #111; pointer-events: none;}
 .info-overlay-close-btn:focus {border: solid 1px #36c;}
@@ -874,8 +874,11 @@ a:hover {
 .info-overlay-holder .tab-nav li {margin: 0; padding: 0; display: inline-block;}
 .info-overlay-holder button { background: transparent; outline:0; border:0; border-bottom: solid 2px transparent; padding: 0.5em 1em; margin:0 0.25em;}
 .info-overlay-holder li:first-child  button {margin-left: 1em;}
-.info-overlay-holder button:focus,.info-overlay-holder button:hover {border-color: rgba(255,255,255, 0.6);}
+.info-overlay-holder button:focus,
+.info-overlay-holder button.active:focus,
+.info-overlay-holder button:hover {border-color: rgba(255,255,255, 0.6);}
 .info-overlay-holder button.active {border-color: #fff; cursor: default;}
+.info-overlay-holder button.active:focus {border-color: rgba(255,255,255, 0.8);}
 
 /* Info overlay HTML - content */
 .info-overlay-holder dt {float: left; clear: both; margin-top: 0.5em; width: 25%; text-align: right; font-weight: bold; }
