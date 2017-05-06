@@ -1,6 +1,14 @@
 import { escapeHtml, sanitizeUrlForLink } from "../../helpers/parse";
 import { WaterfallEntry } from "../../typing/waterfall";
 
+/**
+ * Creates the HTML body for the overlay
+ *
+ * _All tabable elements are set to `tabindex="-1"` to avoid tabing issues_
+ * @param requestID ID
+ * @param detailsHeight
+ * @param entry
+ */
 export function createDetailsBody(requestID: number, detailsHeight: number, entry: WaterfallEntry) {
 
   let html = document.createElement("html") as HTMLHtmlElement;
@@ -33,7 +41,9 @@ export function createDetailsBody(requestID: number, detailsHeight: number, entr
   body.innerHTML = `
     <div class="wrapper">
       <header class="type-${entry.responseDetails.requestType}">
-        <h3><strong>#${requestID}</strong> <a href="${sanitizeUrlForLink(entry.url)}">${escapeHtml(entry.url)}</a></h3>
+        <h3><strong>#${requestID}</strong> <a href="${sanitizeUrlForLink(entry.url)}">
+          ${escapeHtml(entry.url)}
+        </a></h3>
         <nav class="tab-nav">
           <ul>
             ${tabMenu}

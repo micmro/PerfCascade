@@ -1,10 +1,7 @@
+import { forEachNodeList } from "../../helpers/dom";
 import * as svg from "../../helpers/svg";
 import { OpenOverlay } from "../../typing/open-overlay";
 import { createDetailsBody } from "./html-details-body";
-
-export function forEach(els: NodeListOf<Element>, fn: (el: Element, index: number) => any) {
-  Array.prototype.forEach.call(els, fn);
-}
 
 function createCloseButtonSvg(y: number): SVGGElement {
   let closeBtn = svg.newA("info-overlay-close-btn");
@@ -29,9 +26,7 @@ function createCloseButtonSvg(y: number): SVGGElement {
 }
 
 function createHolder(y: number, detailsHeight: number) {
-
-  let innerHolder = svg.newG("info-overlay-holder");
-
+  let holder = svg.newG("info-overlay-holder");
   let bg = svg.newRect({
     "height": detailsHeight,
     "rx": 2,
@@ -39,15 +34,14 @@ function createHolder(y: number, detailsHeight: number) {
     "width": "100%",
     "x": "0",
     "y": y,
-  }, "info-overlay");
+  }, "info-overlay-bg");
 
-  innerHolder.appendChild(bg);
-  return innerHolder;
+  holder.appendChild(bg);
+  return holder;
 }
 
 export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHeight: number): SVGGElement {
   const requestID = overlay.index + 1;
-  let wrapper = svg.newG("outer-info-overlay-holder");
   let holder = createHolder(y, detailsHeight);
 
   let foreignObject = svg.newForeignObject({
@@ -66,13 +60,13 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
 
   let setTabStatus = (tabIndex: number) => {
     overlay.openTabIndex = tabIndex;
-    forEach(tabs, (tab: HTMLDivElement, j) => {
+    forEachNodeList(tabs, (tab: HTMLDivElement, j) => {
       tab.style.display = (tabIndex === j) ? "block" : "none";
       buttons.item(j).classList.toggle("active", (tabIndex === j));
     });
   };
 
-  forEach(buttons, (btn, tabIndex) => {
+  forEachNodeList(buttons, (btn, tabIndex) => {
     btn.addEventListener("click", () => setTabStatus(tabIndex));
   });
 
@@ -82,7 +76,5 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
   holder.appendChild(foreignObject);
   holder.appendChild(closeBtn);
 
-  wrapper.appendChild(holder);
-
-  return wrapper;
+  return holder;
 }

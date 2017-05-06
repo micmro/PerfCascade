@@ -4,9 +4,9 @@
 
 import * as misc from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
-import {timingTypeToCssClass} from "../../transformers/styling-converters";
-import {RectData} from "../../typing/rect-data";
-import {WaterfallEntryTiming} from "../../typing/waterfall";
+import { timingTypeToCssClass } from "../../transformers/styling-converters";
+import { RectData } from "../../typing/rect-data";
+import { WaterfallEntryTiming } from "../../typing/waterfall";
 
 /**
  * Creates the `rect` that represent the timings in `rectData`
@@ -148,12 +148,16 @@ export function createRequestLabelClipped(x: number, y: number, name: string, he
  */
 export function createRequestLabelFull(x: number, y: number, name: string, height: number) {
   let blockLabel = createRequestLabel(x, y, name, height);
-  let labelHolder = svg.newG("full-label");
+  let labelHolder = svg.newG("full-label", {}, {
+    clipPath: `url(#titleFullClipPath)`,
+  });
   labelHolder.appendChild(svg.newRect({
     "height": height - 4,
     "rx": 5,
     "ry": 5,
-    "width": svg.getNodeTextWidth(blockLabel),
+    // for initial load performance use 500px as base width
+    // it's updated one by one on hover
+    "width": 500,
     "x": x - 3,
     "y": y + 3,
   }, "label-full-bg"));
@@ -168,11 +172,13 @@ function createRequestLabel(x: number, y: number, name: string, height: number):
   let blockLabel = svg.newTextEl(blockName, {x, y});
 
   blockLabel.appendChild(svg.newTitle(name));
-
   blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1";
 
   return blockLabel;
 }
+
+const supportsAnimationFrame = (typeof window.requestAnimationFrame === "function" &&
+  typeof window.cancelAnimationFrame === "function");
 
 /**
  * Appends the labels to `rowFixed` - TODO: see if this can be done more elegant
@@ -192,17 +198,38 @@ export function appendRequestLabels(rowFixed: SVGGElement, requestNumberLabel: S
   rowFixed.appendChild(requestNumberLabel);
   rowFixed.appendChild(shortLabel);
   rowFixed.appendChild(fullLabel);
-
+  /** the size adjustment only needs to happend once, this var keeps track of that */
+  let isAdjusted = false;
+  /** store AnimationFrame id, to cancel it if hovering was too fast */
+  let updateAnimFrame: number;
   rowFixed.addEventListener("mouseenter", () => {
     fullLabel.style.display = "block";
     shortLabel.style.display = "none";
     fullLabel.style.visibility = "visible";
-    labelFullBg.style.width = (fullLabelText.clientWidth + 10).toString();
+
+    // offload doublecheck of width
+    const update = () => {
+      const newWidth = fullLabelText.getBBox().width + 10;
+      labelFullBg.setAttribute("width", newWidth.toString());
+      isAdjusted = true;
+      updateAnimFrame = undefined;
+    };
+
+    if (!isAdjusted) {
+      if (supportsAnimationFrame) {
+        updateAnimFrame = window.requestAnimationFrame(update);
+      } else {
+        update();
+      }
+    }
   });
   rowFixed.addEventListener("mouseleave", () => {
     shortLabel.style.display = "block";
     fullLabel.style.display = "none";
     fullLabel.style.visibility = "hidden";
+    if (supportsAnimationFrame && updateAnimFrame !== undefined) {
+      cancelAnimationFrame(updateAnimFrame);
+    }
   });
 }
 
@@ -223,8 +250,7 @@ export function createBgStripe(y: number, height: number, isEven: boolean): SVGR
   }, className);
 }
 
-export function createNameRowBg(y: number, rowHeight: number,
-                                onClick: EventListener): SVGGElement {
+export function createNameRowBg(y: number, rowHeight: number): SVGGElement {
   let rowFixed = svg.newG("row row-fixed");
 
   rowFixed.appendChild(svg.newRect({
@@ -237,12 +263,10 @@ export function createNameRowBg(y: number, rowHeight: number,
       "opacity": 0,
     }));
 
-  rowFixed.addEventListener("click", onClick);
-
   return rowFixed;
 }
 
-export function createRowBg(y: number, rowHeight: number, onClick: EventListener): SVGGElement {
+export function createRowBg(y: number, rowHeight: number): SVGGElement {
   let rowFixed = svg.newG("row row-flex");
 
   rowFixed.appendChild(svg.newRect({
@@ -254,8 +278,6 @@ export function createRowBg(y: number, rowHeight: number, onClick: EventListener
     {
       "opacity": 0,
     }));
-
-  rowFixed.addEventListener("click", onClick);
 
   return rowFixed;
 }

@@ -1,17 +1,54 @@
-import { removeChildren } from "../../helpers/dom";
-import { Context, OverlayManagerClass } from "../../typing/context";
+import {
+  getLastItemOfNodeList,
+  getParentByClassName,
+  removeChildren,
+} from "../../helpers/dom";
+import {
+  find,
+  isTabDown,
+  isTabUp,
+} from "../../helpers/misc";
+import { Context } from "../../typing/context";
 import { OpenOverlay, OverlayChangeEvent } from "../../typing/open-overlay";
 import { WaterfallEntry } from "../../typing/waterfall";
 import { createRowInfoOverlay } from "./svg-details-overlay";
 
 /** Overlay (popup) instance manager */
-export default class OverlayManager implements OverlayManagerClass {
+class OverlayManager {
+  private static showFullName = (el: Element) => {
+    el.getElementsByClassName("row-fixed").item(0)
+      .dispatchEvent(new MouseEvent("mouseenter"));
+  }
+  /**
+   * Keypress Event handler for fist el in Overlay,
+   * to manage highlighting of the element above
+   */
+  private static firstElKeypress = (evt: KeyboardEvent) => {
+    if (isTabUp(evt)) {
+      const par = getParentByClassName(evt.target as Element, "row-overlay-holder") as SVGGElement;
+      if (par && par.previousElementSibling) {
+        OverlayManager.showFullName(par.previousElementSibling);
+      }
+    }
+  }
+
+  /**
+   * Keypress Event handler for last el in Overlay,
+   * to manage highlighting of the element below
+   */
+  private static lastElKeypress = (evt: KeyboardEvent) => {
+    if (isTabDown(evt)) {
+      const par = getParentByClassName(evt.target as Element, "row-overlay-holder") as SVGGElement;
+      if (par && par.nextElementSibling) {
+        OverlayManager.showFullName(par.nextElementSibling);
+      }
+    }
+  }
+
   /** Collection of currely open overlays */
   private openOverlays: OpenOverlay[] = [];
 
-  // TODO: move `overlayHolder` to constructor
-  constructor(private context: Context, private overlayHolder: SVGGElement) {
-
+  constructor(private context: Context) {
   }
 
   /** all open overlays height combined */
@@ -23,111 +60,137 @@ export default class OverlayManager implements OverlayManagerClass {
    * Opens an overlay - rerenders others internaly
    */
   public openOverlay(index: number, y: number, detailsHeight: number,
-                     entry: WaterfallEntry, barEls: SVGGElement[]) {
+                     entry: WaterfallEntry, rowItems: SVGAElement[]) {
     if (this.openOverlays.some((o) => o.index === index)) {
       return;
     }
     const self = this;
-
-    this.openOverlays.push({
+    const newOverlay: OpenOverlay = {
       "defaultY": y,
       "entry": entry,
       "index": index,
       "onClose": () => {
-        self.closeOverlay(index, detailsHeight, barEls);
+        self.closeOverlay(index, detailsHeight, rowItems);
       },
       "openTabIndex": 0,
-    });
+    };
+    this.openOverlays.push(newOverlay);
+    this.openOverlays = this.openOverlays.sort((a, b) => a.index > b.index ? 1 : -1);
 
-    this.renderOverlays(detailsHeight);
+    this.renderOverlays(detailsHeight, rowItems);
     this.context.pubSub.publishToOverlayChanges({
+      "changedIndex": index,
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
-      "openOverlays": self.openOverlays,
       "type": "open",
     } as OverlayChangeEvent);
-    this.realignBars(barEls);
   }
 
   /**
    * Toggles an overlay - rerenders others
    */
   public toggleOverlay(index: number, y: number, detailsHeight: number,
-                       entry: WaterfallEntry, barEls: SVGGElement[]) {
+                       entry: WaterfallEntry, rowItems: SVGAElement[]) {
     if (this.openOverlays.some((o) => o.index === index)) {
-      this.closeOverlay(index, detailsHeight, barEls);
+      this.closeOverlay(index, detailsHeight, rowItems);
     } else {
-      this.openOverlay(index, y, detailsHeight, entry, barEls);
+      this.openOverlay(index, y, detailsHeight, entry, rowItems);
     }
   }
 
   /**
    * closes on overlay - rerenders others internally
    */
-  public closeOverlay(index: number, detailsHeight: number, barEls: SVGGElement[]) {
+  public closeOverlay(index: number, detailsHeight: number, rowItems: SVGAElement[]) {
     const self = this;
     this.openOverlays.splice(this.openOverlays.reduce((prev: number, curr, i) => {
       return (curr.index === index) ? i : prev;
     }, -1), 1);
 
-    this.renderOverlays(detailsHeight);
+    this.renderOverlays(detailsHeight, rowItems);
     this.context.pubSub.publishToOverlayChanges({
+      "changedIndex": index,
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
-      "openOverlays": self.openOverlays,
       "type": "closed",
     } as OverlayChangeEvent);
-    this.realignBars(barEls);
   }
 
   /**
-   * sets the offset for request-bars
-   * @param  {SVGGElement[]} barEls
+   * Sets the offset for a request-bar
+   * @param {SVGAElement[]} rowItems
+   * @param {number} offset
    */
-  private realignBars(barEls: SVGGElement[]) {
-    barEls.forEach((bar, j) => {
-      let offset = this.getOverlayOffset(j);
-      bar.setAttribute("transform", `translate(0, ${offset})`);
-    });
-  }
-
-  /** y offset to it's default y position */
-  private getOverlayOffset(rowIndex: number): number {
-    return this.openOverlays.reduce((col, overlay) => {
-      if (overlay.index < rowIndex) {
-        return col + overlay.height;
-      }
-      return col;
-    }, 0);
+  private realignRow = (rowItem: SVGAElement, offset: number) => {
+    rowItem.setAttribute("transform", `translate(0, ${offset})`);
   }
 
   /**
-   * removes all overlays and renders them again
+   * Renders / Adjusts Overlays
    *
    * @summary this is to re-set the "y" position since there is a bug in chrome with
    * tranform of an SVG and positioning/scoll of a foreignObjects
    * @param  {number} detailsHeight
-   * @param  {SVGGElement} overlayHolder
+   * @param  {SVGAElement[]} rowItems
    */
-  private renderOverlays(detailsHeight: number) {
-    removeChildren(this.overlayHolder);
-
+  private renderOverlays(detailsHeight: number, rowItems: SVGAElement[]) {
+    /** shared variable to keep track of heigth */
     let currY = 0;
-    this.openOverlays
-      .sort((a, b) => a.index > b.index ? 1 : -1)
-      .forEach((overlay) => {
-        let y = overlay.defaultY + currY;
-        let infoOverlay = createRowInfoOverlay(overlay, y, detailsHeight);
-        // if overlay has a preview image show it
-        let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement;
-        if (previewImg && !previewImg.src) {
-          previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
-        }
-        this.overlayHolder.appendChild(infoOverlay);
+    let updateHeight = (overlay, y, currHeight) => {
+      currY += currHeight;
+      overlay.actualY = y;
+      overlay.height = currHeight;
+    };
 
-        let currHeight = infoOverlay.getBoundingClientRect().height;
-        currY += currHeight;
-        overlay.actualY = y;
-        overlay.height = currHeight;
-        return overlay;
-      });
+    let addNewOverlay = (overlayHolder: SVGGElement, overlay: OpenOverlay) => {
+      let y = overlay.defaultY + currY;
+      let infoOverlay = createRowInfoOverlay(overlay, y, detailsHeight);
+      // if overlay has a preview image show it
+      let previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement;
+      if (previewImg && !previewImg.src) {
+        previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
+      }
+      infoOverlay.querySelector("a")
+        .addEventListener("keydown", OverlayManager.firstElKeypress);
+      getLastItemOfNodeList(infoOverlay.querySelectorAll("button"))
+        .addEventListener("keydown", OverlayManager.lastElKeypress);
+      overlayHolder.appendChild(infoOverlay);
+      updateHeight(overlay, y, infoOverlay.getBoundingClientRect().height);
+    };
+    let updateRow = (rowItem: SVGAElement, index: number) => {
+      const overlay = find(this.openOverlays, (o) => o.index === index);
+      const overlayEl = rowItem.nextElementSibling.firstElementChild as SVGGElement;
+      this.realignRow(rowItem, currY);
+
+      if (overlay === undefined) {
+        if (overlayEl) {
+          // remove closed overlay
+          rowItem.nextElementSibling.querySelector("a")
+            .removeEventListener("keydown", OverlayManager.firstElKeypress);
+          getLastItemOfNodeList(rowItem.nextElementSibling.querySelectorAll("button"))
+            .removeEventListener("keydown", OverlayManager.lastElKeypress);
+          removeChildren(rowItem.nextElementSibling);
+        }
+        return; // not open
+      }
+      if (overlayEl) {
+        const bg = overlayEl.querySelector(".info-overlay-bg");
+        const fo = overlayEl.querySelector("foreignObject");
+        const btnRect = overlayEl.querySelector(".info-overlay-close-btn rect");
+        const btnText = overlayEl.querySelector(".info-overlay-close-btn text");
+        updateHeight(overlay, overlay.defaultY + currY, overlay.height);
+        // needs updateHeight
+        bg.setAttribute("y", overlay.actualY.toString());
+        fo.setAttribute("y", overlay.actualY.toString());
+        btnText.setAttribute("y", overlay.actualY.toString());
+        btnRect.setAttribute("y", overlay.actualY.toString());
+        return;
+      }
+      addNewOverlay(rowItem.nextElementSibling as SVGGElement, overlay);
+    };
+    rowItems.forEach(updateRow);
   }
 };
+
+export {
+  OverlayManager
+};
+export default OverlayManager;
