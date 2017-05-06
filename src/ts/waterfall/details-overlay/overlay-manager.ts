@@ -80,9 +80,7 @@ class OverlayManager {
     this.renderOverlays(detailsHeight, rowItems);
     this.context.pubSub.publishToOverlayChanges({
       "changedIndex": index,
-      "changedOverlay": newOverlay,
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
-      "openOverlays": self.openOverlays,
       "type": "open",
     } as OverlayChangeEvent);
   }
@@ -112,7 +110,6 @@ class OverlayManager {
     this.context.pubSub.publishToOverlayChanges({
       "changedIndex": index,
       "combinedOverlayHeight": self.getCombinedOverlayHeight(),
-      "openOverlays": self.openOverlays,
       "type": "closed",
     } as OverlayChangeEvent);
   }
@@ -158,7 +155,7 @@ class OverlayManager {
       overlayHolder.appendChild(infoOverlay);
       updateHeight(overlay, y, infoOverlay.getBoundingClientRect().height);
     };
-    let updateRow = (rowItem, index) => {
+    let updateRow = (rowItem: SVGAElement, index: number) => {
       const overlay = find(this.openOverlays, (o) => o.index === index);
       const overlayEl = rowItem.nextElementSibling.firstElementChild as SVGGElement;
       this.realignRow(rowItem, currY);

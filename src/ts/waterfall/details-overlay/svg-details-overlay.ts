@@ -1,10 +1,7 @@
+import { forEachNodeList } from "../../helpers/dom";
 import * as svg from "../../helpers/svg";
 import { OpenOverlay } from "../../typing/open-overlay";
 import { createDetailsBody } from "./html-details-body";
-
-export function forEach(els: NodeListOf<Element>, fn: (el: Element, index: number) => any) {
-  Array.prototype.forEach.call(els, fn);
-}
 
 function createCloseButtonSvg(y: number): SVGGElement {
   let closeBtn = svg.newA("info-overlay-close-btn");
@@ -63,13 +60,13 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
 
   let setTabStatus = (tabIndex: number) => {
     overlay.openTabIndex = tabIndex;
-    forEach(tabs, (tab: HTMLDivElement, j) => {
+    forEachNodeList(tabs, (tab: HTMLDivElement, j) => {
       tab.style.display = (tabIndex === j) ? "block" : "none";
       buttons.item(j).classList.toggle("active", (tabIndex === j));
     });
   };
 
-  forEach(buttons, (btn, tabIndex) => {
+  forEachNodeList(buttons, (btn, tabIndex) => {
     btn.addEventListener("click", () => setTabStatus(tabIndex));
   });
 

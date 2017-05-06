@@ -22,11 +22,8 @@ export interface OpenOverlay {
 
 export interface OverlayChangeEvent {
   type: EventType;
-  /** list of currenly open overlays */
-  openOverlays: OpenOverlay[];
   /** index that triggerd the change */
   changedIndex?: number;
-  changedOverlay: OpenOverlay;
   combinedOverlayHeight: number;
 }
 

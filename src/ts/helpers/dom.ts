@@ -67,3 +67,8 @@ export function getLastItemOfNodeList<T extends Node>(list: NodeListOf<T>) {
   }
   return list.item(list.length - 1);
 }
+
+// /** Calls `fn` with each element of `els` */
+export function forEachNodeList<T extends Node>(els: NodeListOf<T>, fn: (el: T, index: number) => any) {
+  Array.prototype.forEach.call(els, fn);
+}
