@@ -7,10 +7,10 @@ function createCloseButtonSvg(y: number): SVGGElement {
   const closeBtn = svg.newA("info-overlay-close-btn");
 
   closeBtn.appendChild(svg.newRect({
-    "height": 23,
-    "width": 23,
-    "x": "100%",
-    "y": y,
+    height: 23,
+    width: 23,
+    x: "100%",
+    y,
   }));
 
   closeBtn.appendChild(svg.newTextEl("✕", {
@@ -28,12 +28,12 @@ function createCloseButtonSvg(y: number): SVGGElement {
 function createHolder(y: number, detailsHeight: number) {
   const holder = svg.newG("info-overlay-holder");
   const bg = svg.newRect({
-    "height": detailsHeight,
-    "rx": 2,
-    "ry": 2,
-    "width": "100%",
-    "x": "0",
-    "y": y,
+    height: detailsHeight,
+    rx: 2,
+    ry: 2,
+    width: "100%",
+    x: "0",
+    y,
   }, "info-overlay-bg");
 
   holder.appendChild(bg);
@@ -45,10 +45,10 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
   const holder = createHolder(y, detailsHeight);
 
   const foreignObject = svg.newForeignObject({
-    "height": detailsHeight,
-    "width": "100%",
-    "x": "0",
-    "y": y,
+    height: detailsHeight,
+    width: "100%",
+    x: "0",
+    y,
   });
 
   const closeBtn = createCloseButtonSvg(y);

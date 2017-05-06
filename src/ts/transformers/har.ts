@@ -272,8 +272,8 @@ const getTimePair = (key: string, harEntry: Entry, collect: WaterfallEntryTiming
   const end = isNaN(preciseEnd) ? (start + harEntry.timings[key]) : preciseEnd;
 
   return {
-    "end": Math.round(end),
-    "start": Math.round(start),
+    end: Math.round(end),
+    start: Math.round(start),
   };
 };
 

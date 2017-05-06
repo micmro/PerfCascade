@@ -1,11 +1,11 @@
 import * as svg from "../helpers/svg";
-import {requestTypeToCssClass} from "../transformers/styling-converters";
-import {Context} from "../typing/context";
-import {ChartRenderOption} from "../typing/options";
-import {RectData} from "../typing/rect-data";
-import {HoverEvtListeners} from "../typing/svg-alignment-helpers";
-import {Mark} from "../typing/waterfall";
-import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
+import { requestTypeToCssClass } from "../transformers/styling-converters";
+import { Context } from "../typing/context";
+import { ChartRenderOption } from "../typing/options";
+import { RectData } from "../typing/rect-data";
+import { HoverEvtListeners } from "../typing/svg-alignment-helpers";
+import { Mark } from "../typing/waterfall";
+import { WaterfallData, WaterfallEntry } from "../typing/waterfall";
 import OverlayManager from "./details-overlay/overlay-manager";
 import { PubSub } from "./details-overlay/pub-sub";
 import * as row from "./row/svg-row";
@@ -36,7 +36,7 @@ function getWidestDigitString(n: number): string {
  */
 function getSvgHeight(marks: Mark[], diagramHeight: number): number {
   const maxMarkTextLength = marks.reduce((currMax: number, currValue: Mark) => {
-    const attributes = {x: 0, y: 0};
+    const attributes = { x: 0, y: 0 };
     return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, attributes), true));
   }, 0);
 
@@ -92,13 +92,13 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
 
   /** Main SVG Element that holds all data */
   const timeLineHolder = svg.newSvg("water-fall-chart", {
-    "height": chartHolderHeight,
+    height: chartHolderHeight,
   });
 
   /** Holder for scale, event and marks */
   const scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
-    "width": `${100 - options.leftColumnWith}%`,
-    "x": `${options.leftColumnWith}%`,
+    width: `${100 - options.leftColumnWith}%`,
+    x: `${options.leftColumnWith}%`,
   });
 
   /** Holder for on-hover vertical comparison bars */
@@ -156,16 +156,16 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
     const x = (entry.start || 0.001);
     const detailsHeight = 450;
     const rectData = {
-      "cssClass": requestTypeToCssClass(entry.responseDetails.requestType),
-      "height": options.rowHeight,
-      "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-      "label": `${entry.url} (${Math.round(entry.start)}ms - ` +
+      cssClass: requestTypeToCssClass(entry.responseDetails.requestType),
+      height: options.rowHeight,
+      hideOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
+      label: `${entry.url} (${Math.round(entry.start)}ms - ` +
         `${Math.round(entry.end)}ms | total: ${Math.round(entry.total)}ms)`,
-      "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
-      "unit": context.unit,
-      "width": entryWidth,
-      "x": x,
-      "y": y,
+      showOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
+      unit: context.unit,
+      width: entryWidth,
+      x,
+      y,
     } as RectData;
 
     const showDetailsOverlay = () => {

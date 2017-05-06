@@ -4,7 +4,7 @@
 
 import { addClass } from "./dom";
 
-export interface StringToStringOrNumberMap { [key: string]: string|number; }
+export interface StringToStringOrNumberMap { [key: string]: string | number; }
 export type DomAttributeMap = StringToStringOrNumberMap;
 export type CssStyleMap = StringToStringOrNumberMap;
 
@@ -45,8 +45,7 @@ interface SvgElementOptions {
   className?: string;
 }
 
-function newElement<T extends StylableSVGElement>(tagName: string,
-                                                  {
+function newElement<T extends StylableSVGElement>(tagName: string, {
                                                     attributes = {},
                                                     css = {},
                                                     text = "",
@@ -66,35 +65,35 @@ function newElement<T extends StylableSVGElement>(tagName: string,
 }
 
 export function newSvg(className: string, attributes: DomAttributeMap, css: CssStyleMap = {}): SVGSVGElement {
-  return newElement<SVGSVGElement>("svg", {className, attributes, css});
+  return newElement<SVGSVGElement>("svg", { className, attributes, css });
 }
 
 export function newG(className: string, attributes: DomAttributeMap = {}, css: CssStyleMap = {}): SVGGElement {
-  return newElement<SVGGElement>("g", {className, attributes, css});
+  return newElement<SVGGElement>("g", { className, attributes, css });
 }
 
 export function newClipPath(id: string): SVGClipPathElement {
-  const attributes = {id};
-  return newElement<SVGClipPathElement>("clipPath", {attributes});
+  const attributes = { id };
+  return newElement<SVGClipPathElement>("clipPath", { attributes });
 }
 
 export function newForeignObject(attributes: DomAttributeMap) {
-  return newElement<SVGForeignObjectElement>("foreignObject", {attributes});
+  return newElement<SVGForeignObjectElement>("foreignObject", { attributes });
 }
 
 export function newA(className: string): SVGAElement {
-  return newElement<SVGAElement>("a", {className});
+  return newElement<SVGAElement>("a", { className });
 }
 
 export function newRect(attributes: DomAttributeMap,
                         className: string = "",
                         css: CssStyleMap = {}) {
-  return newElement<SVGRectElement>("rect", {attributes, className, css});
+  return newElement<SVGRectElement>("rect", { attributes, className, css });
 }
 
 export function newLine(attributes: DomAttributeMap,
                         className: string = "") {
-  return newElement<SVGLineElement>("line", {className, attributes});
+  return newElement<SVGLineElement>("line", { className, attributes });
 }
 
 export function newTitle(text: string) {
@@ -106,7 +105,7 @@ export function newTitle(text: string) {
 export function newTextEl(text: string,
                           attributes: DomAttributeMap = {},
                           css: CssStyleMap = {}) {
-  return newElement<SVGTextElement>("text", {text, attributes, css});
+  return newElement<SVGTextElement>("text", { text, attributes, css });
 }
 
 export function newPath(d: string) {
@@ -125,8 +124,8 @@ const getTestSVGEl = (() => {
     // lazy init svgTestEl
     if (svgTestEl === undefined) {
       const attributes = {
-        "className": "water-fall-chart temp",
-        "width": "9999px",
+        className: "water-fall-chart temp",
+        width: "9999px",
       };
       const css = {
         "left": "0px",
@@ -140,7 +139,7 @@ const getTestSVGEl = (() => {
 
     // needs access to body to measure size
     // TODO: refactor for server side use
-    if (svgTestEl.parentElement === undefined ) {
+    if (svgTestEl.parentElement === undefined) {
       window.document.body.appendChild(svgTestEl);
     }
 

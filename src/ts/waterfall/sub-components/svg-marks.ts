@@ -13,7 +13,7 @@ import { Mark } from "../../typing/waterfall";
 export function createMarks(context: Context, marks: Mark[]) {
   const diagramHeight = context.diagramHeight;
   const marksHolder = svg.newG("marker-holder", {
-    "transform": "scale(1, 1)",
+    transform: "scale(1, 1)",
   });
 
   marks.forEach((mark, i) => {
@@ -27,10 +27,10 @@ export function createMarks(context: Context, marks: Mark[]) {
     mark.x = x;
 
     const line = svg.newLine({
-      "x1": x + "%",
-      "x2": x + "%",
-      "y1": 0,
-      "y2": diagramHeight,
+      x1: x + "%",
+      x2: x + "%",
+      y1: 0,
+      y2: diagramHeight,
     });
 
     const lastMark = marks[i - 1];
@@ -41,10 +41,10 @@ export function createMarks(context: Context, marks: Mark[]) {
     }
     // would use polyline but can't use percentage for points
     const lineConnection = svg.newLine({
-      "x1": x + "%",
-      "x2": mark.x + "%",
-      "y1": diagramHeight,
-      "y2": diagramHeight + 23,
+      x1: x + "%",
+      x2: mark.x + "%",
+      y1: diagramHeight,
+      y2: diagramHeight + 23,
     });
     lineHolder.appendChild(line);
     lineHolder.appendChild(lineConnection);
@@ -128,10 +128,10 @@ export function createLineRect(context: Context, entry: Mark): SVGGElement {
   const holder = svg.newG(`line-mark-holder line-marker-${toCssClass(entry.name)}`);
   holder.appendChild(svg.newTitle(entry.name.replace(/^startTimer-/, "")));
   holder.appendChild(svg.newRect({
-    "height": context.diagramHeight,
-    "width": ((entry.duration || 1) / context.unit) + "%",
-    "x": ((entry.startTime || 0.001) / context.unit) + "%",
-    "y": 0,
+    height: context.diagramHeight,
+    width: ((entry.duration || 1) / context.unit) + "%",
+    x: ((entry.startTime || 0.001) / context.unit) + "%",
+    y: 0,
   }, "line-mark"));
 
   return holder;

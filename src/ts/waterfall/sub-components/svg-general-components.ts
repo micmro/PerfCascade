@@ -39,10 +39,10 @@ const appendSecond = (context: Context, timeHolder: SVGGElement,
 
   const x = roundNumber(secPerc * sec) + "%";
   const lineEl = svg.newLine({
-    "x1": x,
-    "x2": x,
-    "y1": 0,
-    "y2": diagramHeight,
+    x1: x,
+    x2: x,
+    y1: 0,
+    y2: diagramHeight,
   }, lineClass);
 
   context.pubSub.subscribeToOverlayChanges((change: OverlayChangeEvent) => {
