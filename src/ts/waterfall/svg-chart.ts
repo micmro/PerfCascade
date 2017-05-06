@@ -92,13 +92,13 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
 
   /** Main SVG Element that holds all data */
   const timeLineHolder = svg.newSvg("water-fall-chart", {
-    "height": chartHolderHeight,
+    height: chartHolderHeight,
   });
 
   /** Holder for scale, event and marks */
   const scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
-    "width": `${100 - options.leftColumnWith}%`,
-    "x": `${options.leftColumnWith}%`,
+    width: `${100 - options.leftColumnWith}%`,
+    x: `${options.leftColumnWith}%`,
   });
 
   /** Holder for on-hover vertical comparison bars */
@@ -156,16 +156,16 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
     const x = (entry.start || 0.001);
     const detailsHeight = 450;
     const rectData = {
-      "cssClass": requestTypeToCssClass(entry.responseDetails.requestType),
-      "height": options.rowHeight,
-      "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-      "label": `${entry.url} (${Math.round(entry.start)}ms - ` +
+      cssClass: requestTypeToCssClass(entry.responseDetails.requestType),
+      height: options.rowHeight,
+      hideOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
+      label: `${entry.url} (${Math.round(entry.start)}ms - ` +
         `${Math.round(entry.end)}ms | total: ${Math.round(entry.total)}ms)`,
-      "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
-      "unit": context.unit,
-      "width": entryWidth,
-      "x": x,
-      "y": y,
+      showOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
+      unit: context.unit,
+      width: entryWidth,
+      x,
+      y,
     } as RectData;
 
     const showDetailsOverlay = () => {

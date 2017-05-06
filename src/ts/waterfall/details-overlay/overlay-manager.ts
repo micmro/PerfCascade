@@ -66,22 +66,22 @@ class OverlayManager {
     }
     const self = this;
     const newOverlay: OpenOverlay = {
-      "defaultY": y,
-      "entry": entry,
-      "index": index,
-      "onClose": () => {
+      defaultY: y,
+      entry,
+      index,
+      onClose: () => {
         self.closeOverlay(index, detailsHeight, rowItems);
       },
-      "openTabIndex": 0,
+      openTabIndex: 0,
     };
     this.openOverlays.push(newOverlay);
     this.openOverlays = this.openOverlays.sort((a, b) => a.index > b.index ? 1 : -1);
 
     this.renderOverlays(detailsHeight, rowItems);
     this.context.pubSub.publishToOverlayChanges({
-      "changedIndex": index,
-      "combinedOverlayHeight": self.getCombinedOverlayHeight(),
-      "type": "open",
+      changedIndex: index,
+      combinedOverlayHeight: self.getCombinedOverlayHeight(),
+      type: "open",
     } as OverlayChangeEvent);
   }
 
@@ -108,9 +108,9 @@ class OverlayManager {
 
     this.renderOverlays(detailsHeight, rowItems);
     this.context.pubSub.publishToOverlayChanges({
-      "changedIndex": index,
-      "combinedOverlayHeight": self.getCombinedOverlayHeight(),
-      "type": "closed",
+      changedIndex: index,
+      combinedOverlayHeight: self.getCombinedOverlayHeight(),
+      type: "closed",
     } as OverlayChangeEvent);
   }
 

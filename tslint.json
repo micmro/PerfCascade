@@ -5,9 +5,6 @@
   ],
   "rules": {
     "interface-name": [false],
-
-    // Disable this until https://github.com/palantir/tslint/commit/16e8d0 is released to avoid crash
-    "object-literal-key-quotes": [false],
     "object-curly-spacing": [true],
 
     "no-console": [false],

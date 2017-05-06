@@ -16,10 +16,10 @@ import { WaterfallEntryTiming } from "../../typing/waterfall";
 function makeBlock(rectData: RectData, className: string) {
   const blockHeight = rectData.height - 1;
   const rect = svg.newRect({
-    "height": blockHeight,
-    "width": misc.roundNumber(rectData.width / rectData.unit) + "%",
-    "x": misc.roundNumber(rectData.x / rectData.unit) + "%",
-    "y": rectData.y,
+    height: blockHeight,
+    width: misc.roundNumber(rectData.width / rectData.unit) + "%",
+    x: misc.roundNumber(rectData.x / rectData.unit) + "%",
+    y: rectData.y,
   }, className);
   if (rectData.label) {
     rect.appendChild(svg.newTitle(rectData.label)); // Add tile to wedge path
@@ -40,16 +40,16 @@ function makeBlock(rectData: RectData, className: string) {
  */
 function segmentToRectData(segment: WaterfallEntryTiming, rectData: RectData): RectData {
   return {
-    "cssClass": timingTypeToCssClass(segment.type),
-    "height": (rectData.height - 6),
-    "hideOverlay": rectData.hideOverlay,
-    "label": segment.type + " (" + Math.round(segment.start) + "ms - "
+    cssClass: timingTypeToCssClass(segment.type),
+    height: (rectData.height - 6),
+    hideOverlay: rectData.hideOverlay,
+    label: segment.type + " (" + Math.round(segment.start) + "ms - "
     + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
-    "showOverlay": rectData.showOverlay,
-    "unit": rectData.unit,
-    "width": segment.total,
-    "x": segment.start || 0.001,
-    "y": rectData.y,
+    showOverlay: rectData.showOverlay,
+    unit: rectData.unit,
+    width: segment.total,
+    x: segment.start || 0.001,
+    y: rectData.y,
   } as RectData;
 }
 
@@ -73,7 +73,7 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
     percStart = firstX / rectData.unit - spacingPerc;
-    txtEl = svg.newTextEl(totalLabel, { x: `${misc.roundNumber(percStart)}%`, y }, { "textAnchor": "end" });
+    txtEl = svg.newTextEl(totalLabel, { x: `${misc.roundNumber(percStart)}%`, y }, { textAnchor: "end" });
   }
 
   return txtEl;
@@ -152,14 +152,14 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
     clipPath: `url(#titleFullClipPath)`,
   });
   labelHolder.appendChild(svg.newRect({
-    "height": height - 4,
-    "rx": 5,
-    "ry": 5,
+    height: height - 4,
+    rx: 5,
+    ry: 5,
     // for initial load performance use 500px as base width
     // it's updated one by one on hover
-    "width": 500,
-    "x": x - 3,
-    "y": y + 3,
+    width: 500,
+    x: x - 3,
+    y: y + 3,
   }, "label-full-bg"));
   labelHolder.appendChild(blockLabel);
   return labelHolder;
@@ -243,10 +243,10 @@ export function appendRequestLabels(rowFixed: SVGGElement, requestNumberLabel: S
 export function createBgStripe(y: number, height: number, isEven: boolean): SVGRectElement {
   const className = isEven ? "even" : "odd";
   return svg.newRect({
-    "height": height,
-    "width": "100%", // make up for the spacing
-    "x": 0,
-    "y": y,
+    height,
+    width: "100%", // make up for the spacing
+    x: 0,
+    y,
   }, className);
 }
 
@@ -254,13 +254,13 @@ export function createNameRowBg(y: number, rowHeight: number): SVGGElement {
   const rowFixed = svg.newG("row row-fixed");
 
   rowFixed.appendChild(svg.newRect({
-      "height": rowHeight,
-      "width": "100%",
-      "x": "0",
-      "y": y,
+      height: rowHeight,
+      width: "100%",
+      x: "0",
+      y,
     }, "",
     {
-      "opacity": 0,
+      opacity: 0,
     }));
 
   return rowFixed;
@@ -270,13 +270,13 @@ export function createRowBg(y: number, rowHeight: number): SVGGElement {
   const rowFixed = svg.newG("row row-flex");
 
   rowFixed.appendChild(svg.newRect({
-      "height": rowHeight,
-      "width": "100%",
-      "x": "0",
-      "y": y,
+      height: rowHeight,
+      width: "100%",
+      x: "0",
+      y,
     }, "",
     {
-      "opacity": 0,
+      opacity: 0,
     }));
 
   return rowFixed;

@@ -45,12 +45,11 @@ interface SvgElementOptions {
   className?: string;
 }
 
-function newElement<T extends StylableSVGElement>(tagName: string,
-                                                  {
+function newElement<T extends StylableSVGElement>(tagName: string, {
                                                     attributes = {},
-    css = {},
-    text = "",
-    className = "",
+                                                    css = {},
+                                                    text = "",
+                                                    className = "",
                                                   }: SvgElementOptions = {}): T {
   const element = document.createElementNS(svgNamespaceUri, tagName) as T;
   if (className) {
@@ -125,8 +124,8 @@ const getTestSVGEl = (() => {
     // lazy init svgTestEl
     if (svgTestEl === undefined) {
       const attributes = {
-        "className": "water-fall-chart temp",
-        "width": "9999px",
+        className: "water-fall-chart temp",
+        width: "9999px",
       };
       const css = {
         "left": "0px",

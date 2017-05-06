@@ -14,14 +14,14 @@ import * as rowSubComponents from "./svg-row-subcomponents";
 // initial clip path
 const clipPathElProto = svg.newClipPath("titleClipPath");
 clipPathElProto.appendChild(svg.newRect({
-  "height": "100%",
-  "width": "100%",
+  height: "100%",
+  width: "100%",
 }));
 
 const clipPathElFullProto = svg.newClipPath("titleFullClipPath");
 clipPathElFullProto.appendChild(svg.newRect({
-  "height": "100%",
-  "width": "100%",
+  height: "100%",
+  width: "100%",
 }));
 
 const ROW_LEFT_MARGIN = 3;
@@ -39,12 +39,12 @@ export function createRow(context: Context, index: number,
   rowItem.setAttribute("tabindex", "0");
   rowItem.setAttribute("xlink:href", "javascript:void(0)");
   const leftFixedHolder = svg.newSvg("left-fixed-holder", {
-    "width": `${leftColumnWith}%`,
-    "x": "0",
+    width: `${leftColumnWith}%`,
+    x: "0",
   });
   const flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
-    "width": `${100 - leftColumnWith}%`,
-    "x": `${leftColumnWith}%`,
+    width: `${100 - leftColumnWith}%`,
+    x: `${leftColumnWith}%`,
   });
 
   const rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);

@@ -169,11 +169,11 @@ export function getKeys(entry: Entry, requestID: number, startRelative: number, 
   const headerToKvTuple = (header: Header): KvTuple => [header.name, header.value];
 
   return {
-    "general": parseGeneralDetails(entry, startRelative, requestID),
-    "request": parseRequestDetails(entry),
-    "requestHeaders": requestHeaders.map(headerToKvTuple),
-    "response": parseResponseDetails(entry),
-    "responseHeaders": responseHeaders.map(headerToKvTuple),
-    "timings": parseTimings(entry, startRelative, endRelative),
+    general: parseGeneralDetails(entry, startRelative, requestID),
+    request: parseRequestDetails(entry),
+    requestHeaders: requestHeaders.map(headerToKvTuple),
+    response: parseResponseDetails(entry),
+    responseHeaders: responseHeaders.map(headerToKvTuple),
+    timings: parseTimings(entry, startRelative, endRelative),
   };
 }

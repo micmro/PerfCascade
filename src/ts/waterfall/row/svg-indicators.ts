@@ -10,7 +10,7 @@ import {
  * _Width of icons is fixed_
  */
 export function makeIcon(type: string, title: string): Icon {
-  return { "type": type, "title": title, "width": 20 };
+  return { type, title, width: 20 };
 }
 
 /**
