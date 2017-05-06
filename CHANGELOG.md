@@ -2,6 +2,27 @@
 
 
 
+<a name="v2.0.0"></a>
+# v2.0.0 (2017-05-06)
+
+* #188 additional cleanup ([bdb9510](https://github.com/micmro/PerfCascade/commit/bdb9510))
+* #188 basic outer tabing working ([5b643bf](https://github.com/micmro/PerfCascade/commit/5b643bf))
+* #188 fix cross browser tabing ([3669cb7](https://github.com/micmro/PerfCascade/commit/3669cb7))
+* #188 fix re-render bg bug ([2bf411e](https://github.com/micmro/PerfCascade/commit/2bf411e))
+* #188 fix tooltip length and perf improvement ([5722be5](https://github.com/micmro/PerfCascade/commit/5722be5))
+* #188 remove re-query of rows and fix type ([2871a43](https://github.com/micmro/PerfCascade/commit/2871a43))
+* add find parentByClass helper ([76488e2](https://github.com/micmro/PerfCascade/commit/76488e2))
+* cleanup ([87d7e70](https://github.com/micmro/PerfCascade/commit/87d7e70))
+* fix linting-issues found by nes version of tslint ([35ee261](https://github.com/micmro/PerfCascade/commit/35ee261))
+* implify class typing ([79c1ae3](https://github.com/micmro/PerfCascade/commit/79c1ae3))
+* optimize SVGs and imporve perf ([7c635a5](https://github.com/micmro/PerfCascade/commit/7c635a5))
+* reorder row structure, tab mostly working ([2567cc5](https://github.com/micmro/PerfCascade/commit/2567cc5))
+* reset shadow value for getNodeTextWidth ([277468e](https://github.com/micmro/PerfCascade/commit/277468e))
+* simplify OverlayChangeEvent and generalize forEachNodeList ([caf8f25](https://github.com/micmro/PerfCascade/commit/caf8f25))
+* Updated dependencies ([b022923](https://github.com/micmro/PerfCascade/commit/b022923))
+
+
+
 <a name="v1.4.0"></a>
 # v1.4.0 (2017-04-06)
 
