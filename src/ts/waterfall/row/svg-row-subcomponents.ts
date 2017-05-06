@@ -66,14 +66,14 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
   const totalLabel = `${Math.round(timeTotal)} ms`;
 
   let percStart = (rectData.x + rectData.width) / rectData.unit + spacingPerc;
-  let txtEl = svg.newTextEl(totalLabel, {x: `${misc.roundNumber(percStart)}%`, y});
+  let txtEl = svg.newTextEl(totalLabel, { x: `${misc.roundNumber(percStart)}%`, y });
 
   // (pessimistic) estimation of text with to avoid performance penalty of `getBBox`
   const roughTxtWidth = totalLabel.length * 8;
 
   if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
     percStart = firstX / rectData.unit - spacingPerc;
-    txtEl = svg.newTextEl(totalLabel, {x: `${misc.roundNumber(percStart)}%`, y}, {"textAnchor": "end"});
+    txtEl = svg.newTextEl(totalLabel, { x: `${misc.roundNumber(percStart)}%`, y }, { "textAnchor": "end" });
   }
 
   return txtEl;
@@ -121,7 +121,7 @@ export function createRect(rectData: RectData, segments: WaterfallEntryTiming[],
 export function createRequestNumberLabel(x: number, y: number, requestNumber: string, height: number, width: number) {
   y += Math.round(height / 2) + 5;
   x += width;
-  return svg.newTextEl(requestNumber, {x, y}, {"text-anchor": "end"});
+  return svg.newTextEl(requestNumber, { x, y }, { "text-anchor": "end" });
 }
 
 /**
@@ -169,7 +169,7 @@ export function createRequestLabelFull(x: number, y: number, name: string, heigh
 function createRequestLabel(x: number, y: number, name: string, height: number): SVGTextElement {
   const blockName = misc.resourceUrlFormatter(name, 125);
   y = y + Math.round(height / 2) + 5;
-  const blockLabel = svg.newTextEl(blockName, {x, y});
+  const blockLabel = svg.newTextEl(blockName, { x, y });
 
   blockLabel.appendChild(svg.newTitle(name));
   blockLabel.style.opacity = name.match(/js.map$/) ? "0.5" : "1";

@@ -1,4 +1,4 @@
-import {WaterfallEntry} from "./waterfall";
+import { WaterfallEntry } from "./waterfall";
 
 export type OnCloseFn = (overlayIndex: number) => void;
 

@@ -1,4 +1,4 @@
-import {RequestType, TimingType} from "../typing/waterfall";
+import { RequestType, TimingType } from "../typing/waterfall";
 
 /**
  * Convert a RequestType into a CSS class

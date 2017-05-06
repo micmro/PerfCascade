@@ -1,11 +1,11 @@
 import * as svg from "../helpers/svg";
-import {requestTypeToCssClass} from "../transformers/styling-converters";
-import {Context} from "../typing/context";
-import {ChartRenderOption} from "../typing/options";
-import {RectData} from "../typing/rect-data";
-import {HoverEvtListeners} from "../typing/svg-alignment-helpers";
-import {Mark} from "../typing/waterfall";
-import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
+import { requestTypeToCssClass } from "../transformers/styling-converters";
+import { Context } from "../typing/context";
+import { ChartRenderOption } from "../typing/options";
+import { RectData } from "../typing/rect-data";
+import { HoverEvtListeners } from "../typing/svg-alignment-helpers";
+import { Mark } from "../typing/waterfall";
+import { WaterfallData, WaterfallEntry } from "../typing/waterfall";
 import OverlayManager from "./details-overlay/overlay-manager";
 import { PubSub } from "./details-overlay/pub-sub";
 import * as row from "./row/svg-row";
@@ -36,7 +36,7 @@ function getWidestDigitString(n: number): string {
  */
 function getSvgHeight(marks: Mark[], diagramHeight: number): number {
   const maxMarkTextLength = marks.reduce((currMax: number, currValue: Mark) => {
-    const attributes = {x: 0, y: 0};
+    const attributes = { x: 0, y: 0 };
     return Math.max(currMax, svg.getNodeTextWidth(svg.newTextEl(currValue.name, attributes), true));
   }, 0);
 

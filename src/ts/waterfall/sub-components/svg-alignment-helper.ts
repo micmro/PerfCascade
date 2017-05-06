@@ -4,7 +4,7 @@
 
 import { addClass, removeClass } from "../../helpers/dom";
 import * as svg from "../../helpers/svg";
-import {HoverElements, HoverEvtListeners} from "../../typing/svg-alignment-helpers";
+import { HoverElements, HoverEvtListeners } from "../../typing/svg-alignment-helpers";
 
 /**
  * Creates verticale alignment bars

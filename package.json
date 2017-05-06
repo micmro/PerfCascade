@@ -50,6 +50,7 @@
     "load-grunt-config": "^0.19.2",
     "tsify": "^3.0.1",
     "tslint": "^5.2.0",
+    "tslint-eslint-rules": "^4.0.0",
     "typescript": "^2.3.2",
     "whatwg-fetch": "^2.0.3"
   },
