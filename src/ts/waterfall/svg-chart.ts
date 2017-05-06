@@ -7,7 +7,7 @@ import {HoverEvtListeners} from "../typing/svg-alignment-helpers";
 import {Mark} from "../typing/waterfall";
 import {WaterfallData, WaterfallEntry} from "../typing/waterfall";
 import OverlayManager from "./details-overlay/overlay-manager";
-import PubSub from "./details-overlay/pub-sub";
+import { PubSub } from "./details-overlay/pub-sub";
 import * as row from "./row/svg-row";
 import * as alignmentHelper from  "./sub-components/svg-alignment-helper";
 import * as generalComponents from "./sub-components/svg-general-components";

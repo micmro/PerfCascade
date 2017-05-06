@@ -1,7 +1,6 @@
 import { OverlayManager } from "../waterfall/details-overlay/overlay-manager";
-import { OverlayChangeEvent, OverlayChangeSubscriber } from "./open-overlay";
+import { PubSub } from "../waterfall/details-overlay/pub-sub";
 import { ChartRenderOption } from "./options";
-import { WaterfallEntry } from "./waterfall";
 
 /**
  * Context object that is passed to (usually stateless) child-functions
@@ -9,7 +8,7 @@ import { WaterfallEntry } from "./waterfall";
  */
 export interface Context {
   /** Publish and Subscribe instance for overlay updates */
-  pubSub: PubSubClass;
+  pubSub: PubSub;
   /** Overlay (popup) instance manager */
   overlayManager: OverlayManager;
   /** horizontal unit (duration in ms of 1%) */
@@ -18,27 +17,4 @@ export interface Context {
   diagramHeight: number;
   /** Chart config/customization options */
   options: ChartRenderOption;
-}
-
-export interface PubSubClass {
-  subscribeToOverlayChanges: (fn: OverlayChangeSubscriber) => void;
-  subscribeToSpecificOverlayChanges: (index: number, fn: OverlayChangeSubscriber) => void;
-  publishToOverlayChanges: (change: OverlayChangeEvent) => void;
-}
-
-export interface OverlayManagerClass {
-  /** all open overlays height combined */
-  getCombinedOverlayHeight: () => number;
-
-  /** Opens an overlay - rerenders others  */
-  openOverlay: (index: number, y: number, detailsHeight: number, entry: WaterfallEntry,
-    rowItems: SVGAElement[]) => void;
-  /** toggles an overlay - rerenders others  */
-  toggleOverlay: (index: number, y: number, detailsHeight: number, entry: WaterfallEntry,
-    rowItems: SVGAElement[]) => void;
-
-  /** closes on overlay - rerenders others internally */
-  closeOverlay: (index: number, detailsHeight: number, rowItems: SVGAElement[]) => void;
-
-  // constructor(context: Context, overlayHolder: SVGGElement);
 }

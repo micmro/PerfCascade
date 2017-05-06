@@ -8,13 +8,13 @@ import {
   isTabDown,
   isTabUp,
 } from "../../helpers/misc";
-import { Context, OverlayManagerClass } from "../../typing/context";
+import { Context } from "../../typing/context";
 import { OpenOverlay, OverlayChangeEvent } from "../../typing/open-overlay";
 import { WaterfallEntry } from "../../typing/waterfall";
 import { createRowInfoOverlay } from "./svg-details-overlay";
 
 /** Overlay (popup) instance manager */
-class OverlayManager implements OverlayManagerClass {
+class OverlayManager {
   private static showFullName = (el: Element) => {
     el.getElementsByClassName("row-fixed").item(0)
       .dispatchEvent(new MouseEvent("mouseenter"));
@@ -192,6 +192,7 @@ class OverlayManager implements OverlayManagerClass {
     rowItems.forEach(updateRow);
   }
 };
+
 export {
   OverlayManager
 };
