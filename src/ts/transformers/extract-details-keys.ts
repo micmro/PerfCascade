@@ -146,11 +146,16 @@ function parseTimings(entry: Entry, start: number, end: number): KvTuple[] {
   const optionalTiming = (timing?: number) => parseAndFormat(timing, parseNonNegative, formatMilliseconds);
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
 
+  let connectVal = optionalTiming(timings.connect);
+  if (timings.ssl > 0) {
+    // SSL time is also included in the connect field (to ensure backward compatibility with HAR 1.1).
+    connectVal = `${connectVal} (without TLS: ${optionalTiming(timings.connect - timings.ssl)})`;
+  }
   return [
     ["Total", formatMilliseconds(total)],
     ["Blocked", optionalTiming(timings.blocked)],
     ["DNS", optionalTiming(timings.dns)],
-    ["Connect", optionalTiming(timings.connect)],
+    ["Connect", connectVal],
     ["SSL (TLS)", optionalTiming(timings.ssl)],
     ["Send", formatMilliseconds(timings.send)],
     ["Wait", formatMilliseconds(timings.wait)],
