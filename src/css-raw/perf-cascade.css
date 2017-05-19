@@ -32,7 +32,12 @@
 .row-item .even {fill: #ccc; opacity: 0.05;}
 .row-item .odd {fill: #000; opacity: 0.05;}
 .row-item:hover .odd,
-.row-item:hover .even {fill: #000; opacity: 0.1}
+.row-item:hover .even {fill: #000; opacity: 0.1;}
+
+.row-item:focus {outline: solid 1.5px #aaa; outline-offset: -1.5px}
+.row-item:focus .odd,
+.row-item:focus .even {fill: #000; opacity: 0.2; }
+
 .row-item .rect-holder text {fill: #aaa}
 .row-item.status5xx .even {fill: #f66;}
 .row-item.status5xx .odd {fill: #f00;}
