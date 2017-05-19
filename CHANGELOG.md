@@ -2,6 +2,15 @@
 
 
 
+<a name="v2.0.1"></a>
+## v2.0.1 (2017-05-19)
+
+* #122 add object-curly-spacing ([289570a](https://github.com/micmro/PerfCascade/commit/289570a))
+* #204 add note to Connect time with TLS ([b1301c1](https://github.com/micmro/PerfCascade/commit/b1301c1))
+* add object-literal-key-quotes rule and fix lint issues ([ac46b5b](https://github.com/micmro/PerfCascade/commit/ac46b5b))
+
+
+
 <a name="v2.0.0"></a>
 # v2.0.0 (2017-05-06)
 
