@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.0.0 (06/05/2017) */
+/*! github.com/micmro/PerfCascade Version:2.0.1 (19/05/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -766,8 +766,8 @@ var getTestSVGEl = (function () {
         // lazy init svgTestEl
         if (svgTestEl === undefined) {
             var attributes = {
-                "className": "water-fall-chart temp",
-                "width": "9999px",
+                className: "water-fall-chart temp",
+                width: "9999px",
             };
             var css = {
                 "left": "0px",
@@ -1139,11 +1139,16 @@ function parseTimings(entry, start, end) {
     var timings = entry.timings;
     var optionalTiming = function (timing) { return parse_1.parseAndFormat(timing, parse_1.parseNonNegative, parse_1.formatMilliseconds); };
     var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    var connectVal = optionalTiming(timings.connect);
+    if (timings.ssl > 0) {
+        // SSL time is also included in the connect field (to ensure backward compatibility with HAR 1.1).
+        connectVal = connectVal + " (without TLS: " + optionalTiming(timings.connect - timings.ssl) + ")";
+    }
     return [
         ["Total", parse_1.formatMilliseconds(total)],
         ["Blocked", optionalTiming(timings.blocked)],
         ["DNS", optionalTiming(timings.dns)],
-        ["Connect", optionalTiming(timings.connect)],
+        ["Connect", connectVal],
         ["SSL (TLS)", optionalTiming(timings.ssl)],
         ["Send", parse_1.formatMilliseconds(timings.send)],
         ["Wait", parse_1.formatMilliseconds(timings.wait)],
@@ -1160,12 +1165,12 @@ function getKeys(entry, requestID, startRelative, endRelative) {
     var responseHeaders = entry.response.headers;
     var headerToKvTuple = function (header) { return [header.name, header.value]; };
     return {
-        "general": parseGeneralDetails(entry, startRelative, requestID),
-        "request": parseRequestDetails(entry),
-        "requestHeaders": requestHeaders.map(headerToKvTuple),
-        "response": parseResponseDetails(entry),
-        "responseHeaders": responseHeaders.map(headerToKvTuple),
-        "timings": parseTimings(entry, startRelative, endRelative),
+        general: parseGeneralDetails(entry, startRelative, requestID),
+        request: parseRequestDetails(entry),
+        requestHeaders: requestHeaders.map(headerToKvTuple),
+        response: parseResponseDetails(entry),
+        responseHeaders: responseHeaders.map(headerToKvTuple),
+        timings: parseTimings(entry, startRelative, endRelative),
     };
 }
 exports.getKeys = getKeys;
@@ -1620,8 +1625,8 @@ var getTimePair = function (key, harEntry, collect, startRelative) {
         ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart;
     var end = isNaN(preciseEnd) ? (start + harEntry.timings[key]) : preciseEnd;
     return {
-        "end": Math.round(end),
-        "start": Math.round(start),
+        end: Math.round(end),
+        start: Math.round(start),
     };
 };
 /**
@@ -1914,21 +1919,21 @@ var OverlayManager = (function () {
         }
         var self = this;
         var newOverlay = {
-            "defaultY": y,
-            "entry": entry,
-            "index": index,
-            "onClose": function () {
+            defaultY: y,
+            entry: entry,
+            index: index,
+            onClose: function () {
                 self.closeOverlay(index, detailsHeight, rowItems);
             },
-            "openTabIndex": 0,
+            openTabIndex: 0,
         };
         this.openOverlays.push(newOverlay);
         this.openOverlays = this.openOverlays.sort(function (a, b) { return a.index > b.index ? 1 : -1; });
         this.renderOverlays(detailsHeight, rowItems);
         this.context.pubSub.publishToOverlayChanges({
-            "changedIndex": index,
-            "combinedOverlayHeight": self.getCombinedOverlayHeight(),
-            "type": "open",
+            changedIndex: index,
+            combinedOverlayHeight: self.getCombinedOverlayHeight(),
+            type: "open",
         });
     };
     /**
@@ -1952,9 +1957,9 @@ var OverlayManager = (function () {
         }, -1), 1);
         this.renderOverlays(detailsHeight, rowItems);
         this.context.pubSub.publishToOverlayChanges({
-            "changedIndex": index,
-            "combinedOverlayHeight": self.getCombinedOverlayHeight(),
-            "type": "closed",
+            changedIndex: index,
+            combinedOverlayHeight: self.getCombinedOverlayHeight(),
+            type: "closed",
         });
     };
     /**
@@ -2094,10 +2099,10 @@ var html_details_body_1 = require("./html-details-body");
 function createCloseButtonSvg(y) {
     var closeBtn = svg.newA("info-overlay-close-btn");
     closeBtn.appendChild(svg.newRect({
-        "height": 23,
-        "width": 23,
-        "x": "100%",
-        "y": y,
+        height: 23,
+        width: 23,
+        x: "100%",
+        y: y,
     }));
     closeBtn.appendChild(svg.newTextEl("✕", {
         dx: 7,
@@ -2111,12 +2116,12 @@ function createCloseButtonSvg(y) {
 function createHolder(y, detailsHeight) {
     var holder = svg.newG("info-overlay-holder");
     var bg = svg.newRect({
-        "height": detailsHeight,
-        "rx": 2,
-        "ry": 2,
-        "width": "100%",
-        "x": "0",
-        "y": y,
+        height: detailsHeight,
+        rx: 2,
+        ry: 2,
+        width: "100%",
+        x: "0",
+        y: y,
     }, "info-overlay-bg");
     holder.appendChild(bg);
     return holder;
@@ -2125,10 +2130,10 @@ function createRowInfoOverlay(overlay, y, detailsHeight) {
     var requestID = overlay.index + 1;
     var holder = createHolder(y, detailsHeight);
     var foreignObject = svg.newForeignObject({
-        "height": detailsHeight,
-        "width": "100%",
-        "x": "0",
-        "y": y,
+        height: detailsHeight,
+        width: "100%",
+        x: "0",
+        y: y,
     });
     var closeBtn = createCloseButtonSvg(y);
     closeBtn.addEventListener("click", function () { return overlay.onClose(overlay.index); });
@@ -2163,7 +2168,7 @@ var misc_1 = require("../../helpers/misc");
  * _Width of icons is fixed_
  */
 function makeIcon(type, title) {
-    return { "type": type, "title": title, "width": 20 };
+    return { type: type, title: title, width: 20 };
 }
 exports.makeIcon = makeIcon;
 /**
@@ -2219,10 +2224,10 @@ var styling_converters_1 = require("../../transformers/styling-converters");
 function makeBlock(rectData, className) {
     var blockHeight = rectData.height - 1;
     var rect = svg.newRect({
-        "height": blockHeight,
-        "width": misc.roundNumber(rectData.width / rectData.unit) + "%",
-        "x": misc.roundNumber(rectData.x / rectData.unit) + "%",
-        "y": rectData.y,
+        height: blockHeight,
+        width: misc.roundNumber(rectData.width / rectData.unit) + "%",
+        x: misc.roundNumber(rectData.x / rectData.unit) + "%",
+        y: rectData.y,
     }, className);
     if (rectData.label) {
         rect.appendChild(svg.newTitle(rectData.label)); // Add tile to wedge path
@@ -2241,16 +2246,16 @@ function makeBlock(rectData, className) {
  */
 function segmentToRectData(segment, rectData) {
     return {
-        "cssClass": styling_converters_1.timingTypeToCssClass(segment.type),
-        "height": (rectData.height - 6),
-        "hideOverlay": rectData.hideOverlay,
-        "label": segment.type + " (" + Math.round(segment.start) + "ms - "
+        cssClass: styling_converters_1.timingTypeToCssClass(segment.type),
+        height: (rectData.height - 6),
+        hideOverlay: rectData.hideOverlay,
+        label: segment.type + " (" + Math.round(segment.start) + "ms - "
             + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
-        "showOverlay": rectData.showOverlay,
-        "unit": rectData.unit,
-        "width": segment.total,
-        "x": segment.start || 0.001,
-        "y": rectData.y,
+        showOverlay: rectData.showOverlay,
+        unit: rectData.unit,
+        width: segment.total,
+        x: segment.start || 0.001,
+        y: rectData.y,
     };
 }
 /**
@@ -2270,7 +2275,7 @@ function createTimingLabel(rectData, timeTotal, firstX) {
     var roughTxtWidth = totalLabel.length * 8;
     if (percStart + (roughTxtWidth / minWidth * 100) > 100) {
         percStart = firstX / rectData.unit - spacingPerc;
-        txtEl = svg.newTextEl(totalLabel, { x: misc.roundNumber(percStart) + "%", y: y }, { "textAnchor": "end" });
+        txtEl = svg.newTextEl(totalLabel, { x: misc.roundNumber(percStart) + "%", y: y }, { textAnchor: "end" });
     }
     return txtEl;
 }
@@ -2342,14 +2347,14 @@ function createRequestLabelFull(x, y, name, height) {
         clipPath: "url(#titleFullClipPath)",
     });
     labelHolder.appendChild(svg.newRect({
-        "height": height - 4,
-        "rx": 5,
-        "ry": 5,
+        height: height - 4,
+        rx: 5,
+        ry: 5,
         // for initial load performance use 500px as base width
         // it's updated one by one on hover
-        "width": 500,
-        "x": x - 3,
-        "y": y + 3,
+        width: 500,
+        x: x - 3,
+        y: y + 3,
     }, "label-full-bg"));
     labelHolder.appendChild(blockLabel);
     return labelHolder;
@@ -2426,22 +2431,22 @@ exports.appendRequestLabels = appendRequestLabels;
 function createBgStripe(y, height, isEven) {
     var className = isEven ? "even" : "odd";
     return svg.newRect({
-        "height": height,
-        "width": "100%",
-        "x": 0,
-        "y": y,
+        height: height,
+        width: "100%",
+        x: 0,
+        y: y,
     }, className);
 }
 exports.createBgStripe = createBgStripe;
 function createNameRowBg(y, rowHeight) {
     var rowFixed = svg.newG("row row-fixed");
     rowFixed.appendChild(svg.newRect({
-        "height": rowHeight,
-        "width": "100%",
-        "x": "0",
-        "y": y,
+        height: rowHeight,
+        width: "100%",
+        x: "0",
+        y: y,
     }, "", {
-        "opacity": 0,
+        opacity: 0,
     }));
     return rowFixed;
 }
@@ -2449,12 +2454,12 @@ exports.createNameRowBg = createNameRowBg;
 function createRowBg(y, rowHeight) {
     var rowFixed = svg.newG("row row-flex");
     rowFixed.appendChild(svg.newRect({
-        "height": rowHeight,
-        "width": "100%",
-        "x": "0",
-        "y": y,
+        height: rowHeight,
+        width: "100%",
+        x: "0",
+        y: y,
     }, "", {
-        "opacity": 0,
+        opacity: 0,
     }));
     return rowFixed;
 }
@@ -2471,13 +2476,13 @@ var rowSubComponents = require("./svg-row-subcomponents");
 // initial clip path
 var clipPathElProto = svg.newClipPath("titleClipPath");
 clipPathElProto.appendChild(svg.newRect({
-    "height": "100%",
-    "width": "100%",
+    height: "100%",
+    width: "100%",
 }));
 var clipPathElFullProto = svg.newClipPath("titleFullClipPath");
 clipPathElFullProto.appendChild(svg.newRect({
-    "height": "100%",
-    "width": "100%",
+    height: "100%",
+    width: "100%",
 }));
 var ROW_LEFT_MARGIN = 3;
 // Create row for a single request
@@ -2489,12 +2494,12 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
     rowItem.setAttribute("tabindex", "0");
     rowItem.setAttribute("xlink:href", "javascript:void(0)");
     var leftFixedHolder = svg.newSvg("left-fixed-holder", {
-        "width": leftColumnWith + "%",
-        "x": "0",
+        width: leftColumnWith + "%",
+        x: "0",
     });
     var flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
-        "width": 100 - leftColumnWith + "%",
-        "x": leftColumnWith + "%",
+        width: 100 - leftColumnWith + "%",
+        x: leftColumnWith + "%",
     });
     var rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
     var rowName = rowSubComponents.createNameRowBg(y, rowHeight);
@@ -2585,16 +2590,16 @@ var svg = require("../../helpers/svg");
 function createAlignmentLines(diagramHeight) {
     return {
         endline: svg.newLine({
-            "x1": "0",
-            "x2": "0",
-            "y1": "0",
-            "y2": diagramHeight,
+            x1: "0",
+            x2: "0",
+            y1: "0",
+            y2: diagramHeight,
         }, "line-end"),
         startline: svg.newLine({
-            "x1": "0",
-            "x2": "0",
-            "y1": "0",
-            "y2": diagramHeight,
+            x1: "0",
+            x2: "0",
+            y1: "0",
+            y2: diagramHeight,
         }, "line-start"),
     };
 }
@@ -2669,10 +2674,10 @@ var appendSecond = function (context, timeHolder, secsTotal, sec, addLabel) {
     }
     var x = misc_1.roundNumber(secPerc * sec) + "%";
     var lineEl = svg.newLine({
-        "x1": x,
-        "x2": x,
-        "y1": 0,
-        "y2": diagramHeight,
+        x1: x,
+        x2: x,
+        y1: 0,
+        y2: diagramHeight,
     }, lineClass);
     context.pubSub.subscribeToOverlayChanges(function (change) {
         var offset = change.combinedOverlayHeight;
@@ -2723,7 +2728,7 @@ var svg = require("../../helpers/svg");
 function createMarks(context, marks) {
     var diagramHeight = context.diagramHeight;
     var marksHolder = svg.newG("marker-holder", {
-        "transform": "scale(1, 1)",
+        transform: "scale(1, 1)",
     });
     marks.forEach(function (mark, i) {
         var x = misc_1.roundNumber(mark.startTime / context.unit);
@@ -2735,10 +2740,10 @@ function createMarks(context, marks) {
         var lineRect;
         mark.x = x;
         var line = svg.newLine({
-            "x1": x + "%",
-            "x2": x + "%",
-            "y1": 0,
-            "y2": diagramHeight,
+            x1: x + "%",
+            x2: x + "%",
+            y1: 0,
+            y2: diagramHeight,
         });
         var lastMark = marks[i - 1];
         var minDistance = 2.5; // minimum distance between marks
@@ -2748,10 +2753,10 @@ function createMarks(context, marks) {
         }
         // would use polyline but can't use percentage for points
         var lineConnection = svg.newLine({
-            "x1": x + "%",
-            "x2": mark.x + "%",
-            "y1": diagramHeight,
-            "y2": diagramHeight + 23,
+            x1: x + "%",
+            x2: mark.x + "%",
+            y1: diagramHeight,
+            y2: diagramHeight + 23,
         });
         lineHolder.appendChild(line);
         lineHolder.appendChild(lineConnection);
@@ -2829,10 +2834,10 @@ function createLineRect(context, entry) {
     var holder = svg.newG("line-mark-holder line-marker-" + misc_1.toCssClass(entry.name));
     holder.appendChild(svg.newTitle(entry.name.replace(/^startTimer-/, "")));
     holder.appendChild(svg.newRect({
-        "height": context.diagramHeight,
-        "width": ((entry.duration || 1) / context.unit) + "%",
-        "x": ((entry.startTime || 0.001) / context.unit) + "%",
-        "y": 0,
+        height: context.diagramHeight,
+        width: ((entry.duration || 1) / context.unit) + "%",
+        x: ((entry.startTime || 0.001) / context.unit) + "%",
+        y: 0,
     }, "line-mark"));
     return holder;
 }
@@ -2917,12 +2922,12 @@ function createWaterfallSvg(data, options) {
     var chartHolderHeight = getSvgHeight(data.marks, context.diagramHeight);
     /** Main SVG Element that holds all data */
     var timeLineHolder = svg.newSvg("water-fall-chart", {
-        "height": chartHolderHeight,
+        height: chartHolderHeight,
     });
     /** Holder for scale, event and marks */
     var scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
-        "width": 100 - options.leftColumnWith + "%",
-        "x": options.leftColumnWith + "%",
+        width: 100 - options.leftColumnWith + "%",
+        x: options.leftColumnWith + "%",
     });
     /** Holder for on-hover vertical comparison bars */
     var hoverOverlayHolder;
@@ -2968,16 +2973,16 @@ function createWaterfallSvg(data, options) {
         var x = (entry.start || 0.001);
         var detailsHeight = 450;
         var rectData = {
-            "cssClass": styling_converters_1.requestTypeToCssClass(entry.responseDetails.requestType),
-            "height": options.rowHeight,
-            "hideOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-            "label": entry.url + " (" + Math.round(entry.start) + "ms - " +
+            cssClass: styling_converters_1.requestTypeToCssClass(entry.responseDetails.requestType),
+            height: options.rowHeight,
+            hideOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
+            label: entry.url + " (" + Math.round(entry.start) + "ms - " +
                 (Math.round(entry.end) + "ms | total: " + Math.round(entry.total) + "ms)"),
-            "showOverlay": options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
-            "unit": context.unit,
-            "width": entryWidth,
-            "x": x,
-            "y": y,
+            showOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
+            unit: context.unit,
+            width: entryWidth,
+            x: x,
+            y: y,
         };
         var showDetailsOverlay = function () {
             context.overlayManager.toggleOverlay(i, y + options.rowHeight, detailsHeight, entry, rowItems);
