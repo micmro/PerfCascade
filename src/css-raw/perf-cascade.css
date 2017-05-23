@@ -59,6 +59,7 @@
 .row-item.status3xx:hover .even,
 .row-item.status3xx:hover .odd {opacity: 0.5;}
 
+.tooltip-holder {overflow: visible;}
 .tootlip-payload {padding: 0.25em; font-size: 10px; display: inline-block;  background: rgba(255,255,255, 0.9); overflow-wrap: break-word;}
 
 /** overlay animation settings **/

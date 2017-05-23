@@ -8,7 +8,6 @@ import { timingTypeToCssClass } from "../../transformers/styling-converters";
 import { RectData } from "../../typing/rect-data";
 import { WaterfallEntryTiming } from "../../typing/waterfall";
 import {
-  makeTooltip,
   onHoverInShowTooltip,
   onHoverOutShowTooltip,
 } from "./svg-tooltip";
@@ -30,15 +29,13 @@ function makeBlock(rectData: RectData, className: string) {
   }, className);
   holder.appendChild(rect);
   if (rectData.label) {
-    // rect.appendChild(svg.newTitle(rectData.label)); // Add tile to wedge path
-    holder.appendChild(makeTooltip(rectData, rectX, blockHeight));
+    rect.addEventListener("mouseenter", (evt: MouseEvent) => onHoverInShowTooltip(evt, rectData));
+    rect.addEventListener("mouseleave", onHoverOutShowTooltip);
   }
   if (rectData.showOverlay && rectData.hideOverlay) {
     rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
     rect.addEventListener("mouseleave", rectData.hideOverlay(rectData));
   }
-  rect.addEventListener("mouseenter", onHoverInShowTooltip);
-  rect.addEventListener("mouseleave", onHoverOutShowTooltip);
   return holder;
 }
 

@@ -1,18 +1,45 @@
+import { getParentByClassName } from "../../helpers/dom";
 import * as svg from "../../helpers/svg";
 import { RectData } from "../../typing/rect-data";
 
 /** static event-handler to show tooltip */
-export const onHoverInShowTooltip = (evt: MouseEvent) => {
-  const parent = evt.target as SVGRectElement;
-  const foreignEl = (parent).nextElementSibling as SVGForeignObjectElement;
-  foreignEl.style.display = "block";
+export const onHoverInShowTooltip = (evt: MouseEvent, rectData: RectData) => {
+  const base = evt.target as SVGRectElement;
+  const holder = getParentByClassName(base, "water-fall-chart") as SVGGElement;
+  const foreignEl = holder.getElementsByClassName("tooltip").item(0) as SVGForeignObjectElement;
   const innerDiv = foreignEl.firstElementChild as HTMLDivElement;
+  const y = parseInt(base.getAttribute("y"), 10);
+  let x = base.getAttribute("x");
+  const xPercInt = parseFloat(x);
+  const rowWidth = base.width.baseVal.value || base.getBoundingClientRect().width;
+  const pxPerPerc = rowWidth / (rectData.width / rectData.unit);
+  const percPerPx = (rectData.width / rectData.unit) / rowWidth;
+  if (xPercInt > 55) {
+    console.log((95 - xPercInt) * pxPerPerc);
+    if ((95 - xPercInt) * pxPerPerc > 200) {
+      foreignEl.setAttribute("width", `${95 - xPercInt}%`);
+    } else {
+      x = `${xPercInt - 210 * percPerPx}%`;
+      foreignEl.setAttribute("width", `200`);
+    }
+  }
+  innerDiv.innerText = rectData.label;
+  foreignEl.style.display = "block";
   const height = innerDiv.clientHeight + 5;
-
-  foreignEl.setAttribute("transform", `translate(5, ${-height})`);
+  let yOffset = height;
+  foreignEl.setAttribute("x", x);
+  if (y - height < 0) {
+    yOffset = -(yOffset + base.clientHeight);
+  }
+  // console.log(y, height, y - height);
+  foreignEl.setAttribute("transform", `translate(0, ${y + -yOffset})`);
+  foreignEl.setAttribute("height", height.toString());
 };
+
 export const onHoverOutShowTooltip = (evt: MouseEvent) => {
-  const foreignEl = (evt.target as SVGRectElement).nextElementSibling as SVGForeignObjectElement;
+  const parent = evt.target as SVGRectElement;
+  const holder = getParentByClassName(parent, "rows-holder") as SVGGElement;
+  const foreignEl = holder.getElementsByClassName("tooltip").item(0) as SVGForeignObjectElement;
   foreignEl.style.display = "none";
 };
 
@@ -20,52 +47,29 @@ export const onHoverOutShowTooltip = (evt: MouseEvent) => {
 // http://www.petercollingridge.co.uk/sites/files/peter/tooltip_final_0.svg
 // view-source:http://www.petercollingridge.co.uk/sites/files/peter/tooltip_final_0.svg
 
-export const makeTooltip = (rectData: RectData, x: string, blockHeight: number) => {
-  const y = rectData.y;
+export const makeTooltip = () => {
+  const holder = svg.newSvg("tooltip-holder", {
+    // height: "100%",
+    transform: "translate(5, 0)", // offset from original
+    width: "75%",
+    x: "25%",
+    y: "0",
+  });
+  // const y = rectData.y;
   const width = 200;
-  // const holder = svg.newG("tooltip", {}, {
-  //   display: "none",
-  //   zIndex: 999,
-  // });
-  // const txtEl = svg.makeWrapSvgText(rectData.label, 150, x);
-  blockHeight++; // REMOVE ME
   const foreignEl = svg.newForeignObject({
-    x,
-    y,
-    width,
-    height: "100%",
+    height: "25%",
     transform: `translate(0, 0)`,
+    width,
+    x: 0,
+    y: 0,
   });
   foreignEl.classList.add("tooltip");
+  // foreignEl.classList.add("tooltip");
   foreignEl.innerHTML = `<body>
-    <div class="tootlip-payload" style="max-width: ${width}px">${rectData.label}</div>
+    <div class="tootlip-payload" style="max-width: 100%">XXXX</div>
   </body>`;
   foreignEl.style.display = "none";
-  // console.log(txtEl.childElementCount, blockHeight);
-  // const offset = txtEl.childElementCount * 12 * 1.2;
-  // txtEl.setAttribute("x", x);
-  // txtEl.setAttribute("y", (y - (txtEl.childElementCount - 1) * 12 * 1.2).toString());
-  // const height = txtEl.childNodes.length * 1.2;
-  // console.log(txtEl);
-  // const txt = svg.newTextEl(rectData.label, {
-  //     // lengthAdjust: "spacingAndGlyphs",
-  //     // textLength: width,
-  //     x,
-  //     y: y  + 12,
-  //   }, {
-  //     alignmentBaseline: "baseline",
-  //     fontSize: 12,
-  //   });
-  // const bgEl = svg.newRect({
-  //     height: blockHeight + "em",
-  //     width,
-  //     x,
-  //     y: (y).toString(),
-  //   }, "", {
-  //     fill: "#fff",
-  //   });
-  // // console.log(txt.getComputedTextLength());
-  // holder.appendChild(bgEl);
-  // holder.appendChild(txtEl);
-  return foreignEl;
+  holder.appendChild(foreignEl);
+  return holder;
 };
