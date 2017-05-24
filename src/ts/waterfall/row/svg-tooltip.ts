@@ -15,7 +15,6 @@ export const onHoverInShowTooltip = (evt: MouseEvent, rectData: RectData) => {
   const pxPerPerc = rowWidth / (rectData.width / rectData.unit);
   const percPerPx = (rectData.width / rectData.unit) / rowWidth;
   if (xPercInt > 55) {
-    console.log((95 - xPercInt) * pxPerPerc);
     if ((95 - xPercInt) * pxPerPerc > 200) {
       foreignEl.setAttribute("width", `${95 - xPercInt}%`);
     } else {
@@ -31,14 +30,13 @@ export const onHoverInShowTooltip = (evt: MouseEvent, rectData: RectData) => {
   if (y - height < 0) {
     yOffset = -(yOffset + base.clientHeight);
   }
-  // console.log(y, height, y - height);
   foreignEl.setAttribute("transform", `translate(0, ${y + -yOffset})`);
   foreignEl.setAttribute("height", height.toString());
 };
 
 export const onHoverOutShowTooltip = (evt: MouseEvent) => {
-  const parent = evt.target as SVGRectElement;
-  const holder = getParentByClassName(parent, "rows-holder") as SVGGElement;
+  const base = evt.target as SVGRectElement;
+  const holder = getParentByClassName(base, "water-fall-chart") as SVGGElement;
   const foreignEl = holder.getElementsByClassName("tooltip").item(0) as SVGForeignObjectElement;
   foreignEl.style.display = "none";
 };
