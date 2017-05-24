@@ -37,13 +37,16 @@ export function removeClass<T extends Element>(el: T, className: string): T {
  * @param className class that the parent should have
  */
 export function getParentByClassName(base: Element, className: string) {
-  if (base.parentElement === undefined) {
-    return undefined;
+  if (typeof base.closest === "function") {
+    return base.closest(`.${className}`);
   }
-  if (base.parentElement.classList.contains(className)) {
-    return base.parentElement;
+  while (base) {
+    if (base.classList.contains(className)) {
+      return base;
+    }
+    base = base.parentElement;
   }
-  return getParentByClassName(base.parentElement, className);
+  return undefined;
 }
 
 /**
