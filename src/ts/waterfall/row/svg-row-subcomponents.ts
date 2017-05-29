@@ -29,8 +29,16 @@ function makeBlock(rectData: RectData, className: string) {
   }, className);
   holder.appendChild(rect);
   if (rectData.label) {
-    rect.addEventListener("mouseenter", (evt: MouseEvent) => onHoverInShowTooltip(evt, rectData));
-    rect.addEventListener("mouseleave", onHoverOutShowTooltip);
+    let showDelayCb: number;
+    rect.addEventListener("mouseenter", (evt: MouseEvent) => {
+      showDelayCb = setTimeout(() => {
+        onHoverInShowTooltip(evt.target as SVGRectElement, rectData);
+      }, 100);
+    });
+    rect.addEventListener("mouseleave", (evt: MouseEvent) => {
+      clearTimeout(showDelayCb);
+      onHoverOutShowTooltip(evt.target as SVGRectElement);
+    });
   }
   if (rectData.showOverlay && rectData.hideOverlay) {
     rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
