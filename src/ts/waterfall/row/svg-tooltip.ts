@@ -1,44 +1,67 @@
-import { getParentByClassName } from "../../helpers/dom";
+import { addClass, getParentByClassName, removeClass } from "../../helpers/dom";
 import * as svg from "../../helpers/svg";
 import { RectData } from "../../typing/rect-data";
 
 /** static event-handler to show tooltip */
-export const onHoverInShowTooltip = (evt: MouseEvent, rectData: RectData) => {
-  const base = evt.target as SVGRectElement;
-  const holder = getParentByClassName(base, "water-fall-chart") as SVGGElement;
-  const foreignEl = holder.getElementsByClassName("tooltip").item(0) as SVGForeignObjectElement;
+export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, foreignEl: SVGForeignObjectElement) => {
+  console.log("onHoverInShowTooltip");
+  const offsetX = 5;
+  let offsetY = 5;
   const innerDiv = foreignEl.firstElementChild as HTMLDivElement;
-  const y = parseInt(base.getAttribute("y"), 10);
+  const y = base.getAttribute("y");
+  const yNum = parseInt(y, 10);
   let x = base.getAttribute("x");
   const xPercInt = parseFloat(x);
   const rowWidth = base.width.baseVal.value || base.getBoundingClientRect().width;
   const pxPerPerc = rowWidth / (rectData.width / rectData.unit);
   const percPerPx = (rectData.width / rectData.unit) / rowWidth;
-  if (xPercInt > 55) {
-    if ((95 - xPercInt) * pxPerPerc > 200) {
-      foreignEl.setAttribute("width", `${95 - xPercInt}%`);
-    } else {
-      x = `${xPercInt - 210 * percPerPx}%`;
-      foreignEl.setAttribute("width", `200`);
-    }
+  if (xPercInt > 55 && ((95 - xPercInt) * pxPerPerc < 200)) {
+    // if ((95 - xPercInt) * pxPerPerc > 200) {
+    //   console.log("right - slim");
+    //   foreignEl.setAttribute("width", `${95 - xPercInt}%`);
+    //   innerDiv.style.width = `${95 - xPercInt}%`;
+    // } else {
+       x = `${xPercInt - 220 * percPerPx}%`;
+       console.log("left", x);
+       addClass(foreignEl, "tooltip-left");
+       innerDiv.style.width = "200px";
+    // }
+  } else {
+    addClass(foreignEl, "tooltip-right");
+    console.log("right");
   }
   innerDiv.innerText = rectData.label;
   foreignEl.style.display = "block";
   const height = innerDiv.clientHeight + 5;
-  let yOffset = height;
   foreignEl.setAttribute("x", x);
-  if (y - height < 0) {
-    yOffset = -(yOffset + base.clientHeight);
+  foreignEl.setAttribute("y", y);
+  if (yNum - height < 0) {
+    console.log("Top max");
+    offsetY = height + 2;
+  } else {
+    offsetY = -height;
   }
-  foreignEl.setAttribute("transform", `translate(0, ${y + -yOffset})`);
+  foreignEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
   foreignEl.setAttribute("height", height.toString());
+  foreignEl.style.opacity = "1";
+  // foreignEl.style.display = "block";
+
+  /// TODO: Handle open overlays
+
 };
 
-export const onHoverOutShowTooltip = (evt: MouseEvent) => {
-  const base = evt.target as SVGRectElement;
+export const onHoverOutShowTooltip = (base: SVGRectElement) => {
   const holder = getParentByClassName(base, "water-fall-chart") as SVGGElement;
   const foreignEl = holder.getElementsByClassName("tooltip").item(0) as SVGForeignObjectElement;
-  foreignEl.style.display = "none";
+  const innerDiv = foreignEl.firstElementChild as HTMLDivElement;
+  // foreignEl.style.display = "none";
+  // foreignEl.style.opacity = "0";
+  innerDiv.style.width = "auto";
+  removeClass(foreignEl, "tooltip-left");
+  removeClass(foreignEl, "tooltip-right");
+  // foreignEl.firstElementChild.style.width = "200px";
+  // removeClass(foreignEl, "tooltip-holder-left");
+  foreignEl.setAttribute("width", `200`); // reset
 };
 
 // Ref:
@@ -53,17 +76,23 @@ export const makeTooltip = () => {
     x: "25%",
     y: "0",
   });
+  holder.appendChild(svg.newRect({
+    // fill: "#f00",
+    height: "5",
+    width: "100%",
+  }, "spacer", {
+    fill: "#f00",
+  }));
   // const y = rectData.y;
   const width = 200;
   const foreignEl = svg.newForeignObject({
     height: "25%",
-    transform: `translate(0, 0)`,
     width,
     x: 0,
     y: 0,
   });
-  foreignEl.classList.add("tooltip");
-  // foreignEl.classList.add("tooltip");
+  foreignEl.style.opacity = "0";
+  addClass(foreignEl, "tooltip");
   foreignEl.innerHTML = `<body>
     <div class="tootlip-payload" style="max-width: 100%">XXXX</div>
   </body>`;

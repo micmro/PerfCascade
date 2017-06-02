@@ -2,6 +2,7 @@
  * Creation of sub-components used in a ressource request row
  */
 
+import { getParentByClassName } from "../../helpers/dom";
 import * as misc from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
 import { timingTypeToCssClass } from "../../transformers/styling-converters";
@@ -29,15 +30,24 @@ function makeBlock(rectData: RectData, className: string) {
   }, className);
   holder.appendChild(rect);
   if (rectData.label) {
-    let showDelayCb: number;
-    rect.addEventListener("mouseenter", (evt: MouseEvent) => {
-      showDelayCb = setTimeout(() => {
-        onHoverInShowTooltip(evt.target as SVGRectElement, rectData);
+    let showDelayTimeOut: number;
+    let foreignElLazy: SVGForeignObjectElement;
+    rect.addEventListener("mouseenter", () => {
+      if (!foreignElLazy) {
+        foreignElLazy = getParentByClassName(rect, "water-fall-chart")
+          .getElementsByClassName("tooltip").item(0) as SVGForeignObjectElement;
+      }
+      showDelayTimeOut = setTimeout(() => {
+        showDelayTimeOut = null;
+        onHoverInShowTooltip(rect, rectData, foreignElLazy);
       }, 100);
     });
-    rect.addEventListener("mouseleave", (evt: MouseEvent) => {
-      clearTimeout(showDelayCb);
-      onHoverOutShowTooltip(evt.target as SVGRectElement);
+    rect.addEventListener("mouseleave", () => {
+      if (showDelayTimeOut) {
+        clearTimeout(showDelayTimeOut);
+      } else {
+        onHoverOutShowTooltip(rect);
+      }
     });
   }
   if (rectData.showOverlay && rectData.hideOverlay) {
