@@ -2,14 +2,26 @@ import { addClass, getParentByClassName, removeClass } from "../../helpers/dom";
 import * as svg from "../../helpers/svg";
 import { RectData } from "../../typing/rect-data";
 
+const translateYRegEx = /translate\(\d+[, ]+(\d+)\)/;
+
+const getTranslateY = (str: string = "") => {
+  const res = translateYRegEx.exec(str);
+  if (res && res.length >= 2) {
+    return parseInt(res[1], 10);
+  }
+  return 0;
+};
+
 /** static event-handler to show tooltip */
 export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, foreignEl: SVGForeignObjectElement) => {
   console.log("onHoverInShowTooltip");
   const offsetX = 5;
   let offsetY = 5;
   const innerDiv = foreignEl.firstElementChild as HTMLDivElement;
+  const row = getParentByClassName(base, "row-item") as SVGAElement;
+  const yTransformOffest = getTranslateY(row.getAttribute("transform"));
   const y = base.getAttribute("y");
-  const yNum = parseInt(y, 10);
+  const yNum = parseInt(base.getAttribute("y"), 10);
   let x = base.getAttribute("x");
   const xPercInt = parseFloat(x);
   const rowWidth = base.width.baseVal.value || base.getBoundingClientRect().width;
@@ -41,7 +53,7 @@ export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, f
   } else {
     offsetY = -height;
   }
-  foreignEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+  foreignEl.style.transform = `translate(${offsetX}px, ${offsetY + yTransformOffest}px)`;
   foreignEl.setAttribute("height", height.toString());
   foreignEl.style.opacity = "1";
   // foreignEl.style.display = "block";
