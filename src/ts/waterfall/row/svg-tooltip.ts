@@ -48,12 +48,11 @@ export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, f
   foreignEl.setAttribute("x", x);
   foreignEl.setAttribute("y", y);
   if (yNum - height < 0) {
-    console.log("Top max");
-    offsetY = height + 2;
+    offsetY = yTransformOffest + rectData.height + 10; // more offset to not hide text with mouse
   } else {
-    offsetY = -height;
+    offsetY = yTransformOffest - height;
   }
-  foreignEl.style.transform = `translate(${offsetX}px, ${offsetY + yTransformOffest}px)`;
+  foreignEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
   foreignEl.setAttribute("height", height.toString());
   foreignEl.style.opacity = "1";
   // foreignEl.style.display = "block";
