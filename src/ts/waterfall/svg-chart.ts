@@ -189,7 +189,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   timeLineHolder.appendChild(scaleAndMarksHolder);
   timeLineHolder.appendChild(rowHolder);
   timeLineHolder.appendChild(overlayHolder);
-  timeLineHolder.appendChild(makeTooltip());
+  timeLineHolder.appendChild(makeTooltip(options));
 
   return timeLineHolder;
 }

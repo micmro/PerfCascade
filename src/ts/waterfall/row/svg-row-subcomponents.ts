@@ -35,7 +35,7 @@ function makeBlock(rectData: RectData, className: string) {
     rect.addEventListener("mouseenter", () => {
       if (!foreignElLazy) {
         foreignElLazy = getParentByClassName(rect, "water-fall-chart")
-          .getElementsByClassName("tooltip").item(0) as SVGForeignObjectElement;
+          .querySelector(".tooltip") as SVGForeignObjectElement;
       }
       showDelayTimeOut = setTimeout(() => {
         showDelayTimeOut = null;

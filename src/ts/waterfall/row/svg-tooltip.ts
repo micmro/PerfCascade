@@ -1,8 +1,16 @@
-import { addClass, getParentByClassName, removeClass } from "../../helpers/dom";
+import {
+  addClass,
+  getParentByClassName,
+  makeBodyEl,
+  makeHtmlEl,
+  removeClass,
+} from "../../helpers/dom";
 import * as svg from "../../helpers/svg";
+import { ChartRenderOption } from "../../typing/options";
 import { RectData } from "../../typing/rect-data";
 
-const translateYRegEx = /translate\(\d+[, ]+(\d+)\)/;
+const translateYRegEx = /(?:translate)\(.+[, ]+(.+)\)/;
+const tooltipMaxWidth = 200;
 
 const getTranslateY = (str: string = "") => {
   const res = translateYRegEx.exec(str);
@@ -14,100 +22,89 @@ const getTranslateY = (str: string = "") => {
 
 /** static event-handler to show tooltip */
 export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, foreignEl: SVGForeignObjectElement) => {
-  console.log("onHoverInShowTooltip");
-  const offsetX = 5;
-  let offsetY = 5;
-  const innerDiv = foreignEl.firstElementChild as HTMLDivElement;
+  const innerDiv = foreignEl.querySelector(".tooltip-payload") as HTMLDivElement;
   const row = getParentByClassName(base, "row-item") as SVGAElement;
-  const yTransformOffest = getTranslateY(row.getAttribute("transform"));
-  const y = base.getAttribute("y");
-  const yNum = parseInt(base.getAttribute("y"), 10);
-  let x = base.getAttribute("x");
+  const yTransformOffsest = getTranslateY(row.getAttribute("transform"));
+  /** Base Y */
+  const yInt = parseInt(base.getAttribute("y"), 10);
+  /** Base X */
+  const x = base.getAttribute("x");
+  /** X Positon of parent in Percent */
   const xPercInt = parseFloat(x);
-  const rowWidth = base.width.baseVal.value || base.getBoundingClientRect().width;
-  const pxPerPerc = rowWidth / (rectData.width / rectData.unit);
-  const percPerPx = (rectData.width / rectData.unit) / rowWidth;
-  if (xPercInt > 55 && ((95 - xPercInt) * pxPerPerc < 200)) {
-    // if ((95 - xPercInt) * pxPerPerc > 200) {
-    //   console.log("right - slim");
-    //   foreignEl.setAttribute("width", `${95 - xPercInt}%`);
-    //   innerDiv.style.width = `${95 - xPercInt}%`;
-    // } else {
-       x = `${xPercInt - 220 * percPerPx}%`;
-       console.log("left", x);
-       addClass(foreignEl, "tooltip-left");
-       innerDiv.style.width = "200px";
-    // }
-  } else {
-    addClass(foreignEl, "tooltip-right");
-    console.log("right");
-  }
+  let offsetY = 50;
+  /** Row's width in Pixel */
+  const rowWidthPx = base.width.baseVal.value || base.getBoundingClientRect().width;
+  /** current ratio: 1% ≙ `pxPerPerc` Pixel */
+  const pxPerPerc = rowWidthPx / (rectData.width / rectData.unit);
+  const percPerPx = (rectData.width / rectData.unit) / rowWidthPx;
+  const isLeftOfRow = xPercInt > 50 && ((95 - xPercInt) * pxPerPerc < tooltipMaxWidth);
   innerDiv.innerText = rectData.label;
+  addClass(innerDiv, "no-anim");
   foreignEl.style.display = "block";
-  const height = innerDiv.clientHeight + 5;
-  foreignEl.setAttribute("x", x);
-  foreignEl.setAttribute("y", y);
-  if (yNum - height < 0) {
-    offsetY = yTransformOffest + rectData.height + 10; // more offset to not hide text with mouse
-  } else {
-    offsetY = yTransformOffest - height;
+  innerDiv.style.opacity = "0.1";
+
+  /** First heigth, floating might change this later, since with is not fixed */
+  const initialHeight = innerDiv.clientHeight + 5;
+
+  if (yInt + yTransformOffsest - initialHeight > 0) { // above row
+    offsetY = yTransformOffsest - initialHeight;
+  } else { // below row: more offset to not hide text with mouse
+    offsetY = yTransformOffsest + rectData.height + 10;
   }
-  foreignEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-  foreignEl.setAttribute("height", height.toString());
-  foreignEl.style.opacity = "1";
-  // foreignEl.style.display = "block";
+  if (isLeftOfRow) {
+    innerDiv.style.left = `${xPercInt - ((innerDiv.clientWidth + 5) * percPerPx)}%`;
+  } else {
+    innerDiv.style.left = x;
+  }
+  foreignEl.setAttribute("y", `${yInt + offsetY}px`);
+  foreignEl.setAttribute("height", initialHeight.toString());
+  removeClass(innerDiv, "no-anim");
+  innerDiv.style.opacity = "1";
 
-  /// TODO: Handle open overlays
-
+  const diff = (innerDiv.clientHeight + 5) - initialHeight;
+  if (diff !== 0) {
+    // make adjustments if the initial height was wrong
+    foreignEl.setAttribute("height", (initialHeight + diff).toString());
+    foreignEl.setAttribute("y", `${yInt + offsetY - diff}px`);
+  }
 };
 
 export const onHoverOutShowTooltip = (base: SVGRectElement) => {
   const holder = getParentByClassName(base, "water-fall-chart") as SVGGElement;
-  const foreignEl = holder.getElementsByClassName("tooltip").item(0) as SVGForeignObjectElement;
-  const innerDiv = foreignEl.firstElementChild as HTMLDivElement;
-  // foreignEl.style.display = "none";
-  // foreignEl.style.opacity = "0";
-  innerDiv.style.width = "auto";
-  removeClass(foreignEl, "tooltip-left");
-  removeClass(foreignEl, "tooltip-right");
-  // foreignEl.firstElementChild.style.width = "200px";
-  // removeClass(foreignEl, "tooltip-holder-left");
-  foreignEl.setAttribute("width", `200`); // reset
+  const foreignEl = holder.querySelector(".tooltip") as SVGForeignObjectElement;
+  const innerDiv = foreignEl.querySelector(".tooltip-payload") as HTMLDivElement;
+  foreignEl.style.display = "none";
+  foreignEl.setAttribute("height", "250"); // set to high value
+  innerDiv.style.opacity = "0";
 };
 
-// Ref:
-// http://www.petercollingridge.co.uk/sites/files/peter/tooltip_final_0.svg
-// view-source:http://www.petercollingridge.co.uk/sites/files/peter/tooltip_final_0.svg
-
-export const makeTooltip = () => {
+/**
+ * Creates the Tooltip base elements
+ * @param {ChartOptions} options - Chart config/customization options
+ */
+export const makeTooltip = (options: ChartRenderOption) => {
+  const leftColOffsetPerc = options.leftColumnWith;
   const holder = svg.newSvg("tooltip-holder", {
-    // height: "100%",
-    transform: "translate(5, 0)", // offset from original
-    width: "75%",
-    x: "25%",
+    width: "100%",
+    x: "0",
     y: "0",
   });
-  holder.appendChild(svg.newRect({
-    // fill: "#f00",
-    height: "5",
-    width: "100%",
-  }, "spacer", {
-    fill: "#f00",
-  }));
-  // const y = rectData.y;
-  const width = 200;
   const foreignEl = svg.newForeignObject({
-    height: "25%",
-    width,
-    x: 0,
-    y: 0,
+    width: `100%`,
+    x: "0",
+    y: `${leftColOffsetPerc}%`,
+  }, "tooltip", {
+    display: "none",
   });
-  foreignEl.style.opacity = "0";
-  addClass(foreignEl, "tooltip");
-  foreignEl.innerHTML = `<body>
-    <div class="tootlip-payload" style="max-width: 100%">XXXX</div>
-  </body>`;
-  foreignEl.style.display = "none";
+
+  const html = makeHtmlEl();
+  const body = makeBodyEl({
+    left: `${leftColOffsetPerc}%`,
+    width: `${100 - leftColOffsetPerc}%`,
+  }, `<div class="tooltip-payload" style="max-width: ${tooltipMaxWidth}px; opacity: 0;"></div>`);
+
+  html.appendChild(body);
+  foreignEl.appendChild(html);
   holder.appendChild(foreignEl);
   return holder;
 };
