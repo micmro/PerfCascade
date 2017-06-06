@@ -39,9 +39,10 @@ export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, f
   const percPerPx = (rectData.width / rectData.unit) / rowWidthPx;
   const isLeftOfRow = xPercInt > 50 && ((95 - xPercInt) * pxPerPerc < tooltipMaxWidth);
   innerDiv.innerText = rectData.label;
+  // Disable animation for size-gathering
   addClass(innerDiv, "no-anim");
   foreignEl.style.display = "block";
-  innerDiv.style.opacity = "0.1";
+  innerDiv.style.opacity = "0.01";
 
   /** First heigth, floating might change this later, since with is not fixed */
   const initialHeight = innerDiv.clientHeight + 5;
@@ -52,11 +53,20 @@ export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, f
     offsetY = yTransformOffsest + rectData.height + 10;
   }
   if (isLeftOfRow) {
-    innerDiv.style.left = `${xPercInt - ((innerDiv.clientWidth + 5) * percPerPx)}%`;
+    const newLeft = xPercInt - ((innerDiv.clientWidth + 5) * percPerPx);
+    let leftOffset = parseInt(foreignEl.querySelector("body").style.left, 10);
+    const ratio = 1 / (1 / 100 * (100 - leftOffset));
+    leftOffset = ratio * leftOffset;
+    if (newLeft > -leftOffset) { // tooltip still visible
+      innerDiv.style.left = `${newLeft}%`;
+    } else {
+      // change value to not crop tooltip
+      innerDiv.style.left = `${-leftOffset}%`;
+    }
   } else {
     innerDiv.style.left = x;
   }
-  foreignEl.setAttribute("y", `${yInt + offsetY}px`);
+  foreignEl.setAttribute("y", `${yInt + offsetY}`);
   foreignEl.setAttribute("height", initialHeight.toString());
   removeClass(innerDiv, "no-anim");
   innerDiv.style.opacity = "1";
@@ -65,7 +75,7 @@ export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, f
   if (diff !== 0) {
     // make adjustments if the initial height was wrong
     foreignEl.setAttribute("height", (initialHeight + diff).toString());
-    foreignEl.setAttribute("y", `${yInt + offsetY - diff}px`);
+    foreignEl.setAttribute("y", `${yInt + offsetY - diff}`);
   }
 };
 
@@ -94,8 +104,8 @@ export const makeTooltip = (options: ChartRenderOption) => {
     x: "0",
     y: `${leftColOffsetPerc}%`,
   }, "tooltip", {
-    display: "none",
-  });
+      display: "none",
+    });
 
   const html = makeHtmlEl();
   const body = makeBodyEl({
