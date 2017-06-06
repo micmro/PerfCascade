@@ -2,7 +2,7 @@
  *  SVG Helpers
  */
 
-import { addClass } from "./dom";
+import { addClass, safeSetAttributes, safeSetStyles } from "./dom";
 
 export interface StringToStringOrNumberMap { [key: string]: string | number; }
 export type DomAttributeMap = StringToStringOrNumberMap;
@@ -11,31 +11,8 @@ export type CssStyleMap = StringToStringOrNumberMap;
 /** Namespace for SVG Elements */
 const svgNamespaceUri = "http://www.w3.org/2000/svg";
 
-function entries(obj: StringToStringOrNumberMap): Array<[string, string]> {
-  const entries: Array<[string, string]> = [];
-  for (const k of Object.keys(obj)) {
-    entries.push([k, String((obj[k]))]);
-  }
-  return entries;
-}
-
-function safeSetAttribute(el: SVGElement, key: string, s: string) {
-  if (!(key in el)) {
-    console.warn(new Error(`Trying to set non-existing attribute ${key} = ${s} on a <${el.tagName.toLowerCase()}>.`));
-  }
-  el.setAttributeNS(null, key, s);
-}
-
 interface StylableSVGElement extends SVGElement {
   readonly style: CSSStyleDeclaration;
-}
-
-function safeSetStyle(el: StylableSVGElement, key: string, s: string) {
-  if (key in el.style) {
-    el.style[key] = s;
-  } else {
-    console.warn(new Error(`Trying to set non-existing style ${key} = ${s} on a <${el.tagName.toLowerCase()}>.`));
-  }
 }
 
 interface SvgElementOptions {
@@ -58,9 +35,8 @@ function newElement<T extends StylableSVGElement>(tagName: string, {
   if (text) {
     element.textContent = text;
   }
-  entries(css).forEach(([key, value]) => safeSetStyle(element, key, value));
-  entries(attributes).forEach(([key, value]) => safeSetAttribute(element, key, value));
-
+  safeSetStyles(element, css);
+  safeSetAttributes(element, attributes);
   return element;
 }
 
@@ -77,8 +53,8 @@ export function newClipPath(id: string): SVGClipPathElement {
   return newElement<SVGClipPathElement>("clipPath", { attributes });
 }
 
-export function newForeignObject(attributes: DomAttributeMap) {
-  return newElement<SVGForeignObjectElement>("foreignObject", { attributes });
+export function newForeignObject(attributes: DomAttributeMap, className = "", css: CssStyleMap = {}) {
+  return newElement<SVGForeignObjectElement>("foreignObject", { attributes, className, css });
 }
 
 export function newA(className: string): SVGAElement {
@@ -86,13 +62,13 @@ export function newA(className: string): SVGAElement {
 }
 
 export function newRect(attributes: DomAttributeMap,
-                        className: string = "",
+                        className = "",
                         css: CssStyleMap = {}) {
   return newElement<SVGRectElement>("rect", { attributes, className, css });
 }
 
 export function newLine(attributes: DomAttributeMap,
-                        className: string = "") {
+                        className = "") {
   return newElement<SVGLineElement>("line", { className, attributes });
 }
 
