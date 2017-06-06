@@ -9,7 +9,7 @@ export interface RectData {
   x: number;
   y: number;
   cssClass: string;
-  /** Label to show in the tooltio */
+  /** Label to show in the tooltip */
   label?: string;
   /** horizontal unit (duration in ms of 1%) */
   unit: number;
