@@ -57,10 +57,10 @@ function createContext(data: WaterfallData, options: ChartRenderOption,
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
   const context = {
     diagramHeight,
+    options,
     overlayManager: undefined,
     pubSub : new PubSub(),
     unit,
-    options,
   };
   // `overlayManager` needs the `context` reference, so it's attached later
   context.overlayManager = new OverlayManager(context);

@@ -76,7 +76,7 @@ export function forEachNodeList<T extends Node>(els: NodeListOf<T>, fn: (el: T, 
   Array.prototype.forEach.call(els, fn);
 }
 
-interface StringOrNumberMap { [key: string]: string | number; }
+export interface StringOrNumberMap { [key: string]: string | number; }
 
 /** Sets a CSS style property, but only if property exists on `el` */
 export function safeSetStyle(el: HTMLElement | SVGElement, property: string, value: string) {
