@@ -5,20 +5,11 @@
 <a name="v2.0.2"></a>
 ## v2.0.2 (2017-06-07)
 
-* above / below positioning working ([aca9814](https://github.com/micmro/PerfCascade/commit/aca9814))
-* add display delay ([c174f8d](https://github.com/micmro/PerfCascade/commit/c174f8d))
-* add overlay offset ([4f36b7d](https://github.com/micmro/PerfCascade/commit/4f36b7d))
-* basic version (top ones are still hidden) ([565dc58](https://github.com/micmro/PerfCascade/commit/565dc58))
-* basics working ([bbf33d5](https://github.com/micmro/PerfCascade/commit/bbf33d5))
-* basics working (except open overlays) ([a642d0d](https://github.com/micmro/PerfCascade/commit/a642d0d))
-* fix typo ([065bfc3](https://github.com/micmro/PerfCascade/commit/065bfc3))
-* fixed left alignement issue ([0e953f9](https://github.com/micmro/PerfCascade/commit/0e953f9))
+* #203 add SVG/HTML Tooltip ([aca9814](https://github.com/micmro/PerfCascade/commit/aca9814))
 * improve focus styling ([e4b0c6d](https://github.com/micmro/PerfCascade/commit/e4b0c6d))
-* left-side positioning and overflow fixed. ([0016cb4](https://github.com/micmro/PerfCascade/commit/0016cb4))
-* performance improvement ([f3f0b37](https://github.com/micmro/PerfCascade/commit/f3f0b37))
 * safeSetStyle / safeSetAttribute helpers globalised ([a5ebd5b](https://github.com/micmro/PerfCascade/commit/a5ebd5b))
 * update dependencies and fix lint issues ([67bbbae](https://github.com/micmro/PerfCascade/commit/67bbbae))
-* working accross browsers ([c5388d2](https://github.com/micmro/PerfCascade/commit/c5388d2))
+* #203 working accross browsers ([c5388d2](https://github.com/micmro/PerfCascade/commit/c5388d2))
 
 
 
@@ -41,7 +32,6 @@
 * #188 fix tooltip length and perf improvement ([5722be5](https://github.com/micmro/PerfCascade/commit/5722be5))
 * #188 remove re-query of rows and fix type ([2871a43](https://github.com/micmro/PerfCascade/commit/2871a43))
 * add find parentByClass helper ([76488e2](https://github.com/micmro/PerfCascade/commit/76488e2))
-* cleanup ([87d7e70](https://github.com/micmro/PerfCascade/commit/87d7e70))
 * fix linting-issues found by nes version of tslint ([35ee261](https://github.com/micmro/PerfCascade/commit/35ee261))
 * implify class typing ([79c1ae3](https://github.com/micmro/PerfCascade/commit/79c1ae3))
 * optimize SVGs and imporve perf ([7c635a5](https://github.com/micmro/PerfCascade/commit/7c635a5))
