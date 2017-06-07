@@ -1,3 +1,4 @@
+import { makeBodyEl, makeHtmlEl } from "../../helpers/dom";
 import { escapeHtml, sanitizeUrlForLink } from "../../helpers/parse";
 import { WaterfallEntry } from "../../typing/waterfall";
 
@@ -11,10 +12,8 @@ import { WaterfallEntry } from "../../typing/waterfall";
  */
 export function createDetailsBody(requestID: number, detailsHeight: number, entry: WaterfallEntry) {
 
-  const html = document.createElement("html") as HTMLHtmlElement;
-  const body = document.createElement("body");
-  body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-  html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
+  const html = makeHtmlEl();
+  const body = makeBodyEl();
 
   const tabMenu = entry.tabs.map((t) => {
     return `<li><button class="tab-button">${t.title}</button></li>`;

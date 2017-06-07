@@ -91,13 +91,13 @@ export function createWaterfallEntry(url: string,
                                      tabs: WaterfallEntryTab[]): WaterfallEntry {
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   return {
+    end,
+    responseDetails,
+    segments,
+    start,
+    tabs,
     total,
     url,
-    start,
-    end,
-    segments,
-    responseDetails,
-    tabs,
   };
 }
 
@@ -108,10 +108,10 @@ export function createWaterfallEntryTiming(type: TimingType,
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
   const typeClean = sanitizeAlphaNumeric(type) as TimingType;
   return {
+    end,
+    start,
     total,
     type : typeClean,
-    start,
-    end,
   };
 }
 

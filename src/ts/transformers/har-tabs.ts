@@ -42,9 +42,9 @@ export function makeTabs(entry: Entry, requestID: number, requestType: RequestTy
 /** Helper to create `WaterfallEntryTab` object literal  */
 function makeWaterfallEntryTab(title: string, content: string, tabClass: string = ""): WaterfallEntryTab {
   return {
-    title,
     content,
     tabClass,
+    title,
   };
 }
 
@@ -52,9 +52,9 @@ function makeWaterfallEntryTab(title: string, content: string, tabClass: string 
 function makeLazyWaterfallEntryTab(title: string, renderContent: TabRenderer,
                                    tabClass: string = ""): WaterfallEntryTab {
   return {
-    title,
     renderContent,
     tabClass,
+    title,
   };
 }
 

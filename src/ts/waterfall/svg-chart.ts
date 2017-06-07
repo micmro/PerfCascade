@@ -9,6 +9,7 @@ import { WaterfallData, WaterfallEntry } from "../typing/waterfall";
 import OverlayManager from "./details-overlay/overlay-manager";
 import { PubSub } from "./details-overlay/pub-sub";
 import * as row from "./row/svg-row";
+import { makeTooltip } from "./row/svg-tooltip";
 import * as alignmentHelper from "./sub-components/svg-alignment-helper";
 import * as generalComponents from "./sub-components/svg-general-components";
 import * as marks from "./sub-components/svg-marks";
@@ -56,10 +57,10 @@ function createContext(data: WaterfallData, options: ChartRenderOption,
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
   const context = {
     diagramHeight,
+    options,
     overlayManager: undefined,
     pubSub : new PubSub(),
     unit,
-    options,
   };
   // `overlayManager` needs the `context` reference, so it's attached later
   context.overlayManager = new OverlayManager(context);
@@ -188,6 +189,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   timeLineHolder.appendChild(scaleAndMarksHolder);
   timeLineHolder.appendChild(rowHolder);
   timeLineHolder.appendChild(overlayHolder);
+  timeLineHolder.appendChild(makeTooltip(options));
 
   return timeLineHolder;
 }

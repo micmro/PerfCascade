@@ -199,8 +199,8 @@ const getUserTimimngs = (currPage: Page, options: HarTransformerOptions) => {
     if (fullName !== name && currPage[`_userTime.endTimer-${name}`]) {
       duration = currPage[`_userTime.endTimer-${name}`] - currPage[k];
       return {
-        name: `${options.showUserTimingEndMarker ? fullName : name} (${currPage[k]} - ${currPage[k] + duration} ms)`,
         duration,
+        name: `${options.showUserTimingEndMarker ? fullName : name} (${currPage[k]} - ${currPage[k] + duration} ms)`,
         startTime: currPage[k],
         // x: currPage[k],
       } as UserTiming;
@@ -289,9 +289,9 @@ const createResponseDetails = (entry: Entry, indicators: WaterfallEntryIndicator
   const statusClean = toInt(entry.response.status);
   return {
     icon: makeMimeTypeIcon(statusClean, entry.response.statusText, requestType, entry.response.redirectURL),
-    rowClass: makeRowCssClasses(statusClean),
     indicators,
     requestType,
+    rowClass: makeRowCssClasses(statusClean),
     statusCode: statusClean,
   };
 };

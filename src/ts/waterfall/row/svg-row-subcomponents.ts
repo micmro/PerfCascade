@@ -2,11 +2,16 @@
  * Creation of sub-components used in a ressource request row
  */
 
+import { getParentByClassName } from "../../helpers/dom";
 import * as misc from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
 import { timingTypeToCssClass } from "../../transformers/styling-converters";
 import { RectData } from "../../typing/rect-data";
 import { WaterfallEntryTiming } from "../../typing/waterfall";
+import {
+  onHoverInShowTooltip,
+  onHoverOutShowTooltip,
+} from "./svg-tooltip";
 
 /**
  * Creates the `rect` that represent the timings in `rectData`
@@ -14,22 +19,42 @@ import { WaterfallEntryTiming } from "../../typing/waterfall";
  * @param  {string} className - className for block `rect`
  */
 function makeBlock(rectData: RectData, className: string) {
+  const holder = svg.newG("");
   const blockHeight = rectData.height - 1;
+  const rectX = misc.roundNumber(rectData.x / rectData.unit) + "%";
   const rect = svg.newRect({
     height: blockHeight,
     width: misc.roundNumber(rectData.width / rectData.unit) + "%",
-    x: misc.roundNumber(rectData.x / rectData.unit) + "%",
+    x: rectX,
     y: rectData.y,
   }, className);
+  holder.appendChild(rect);
   if (rectData.label) {
-    rect.appendChild(svg.newTitle(rectData.label)); // Add tile to wedge path
+    let showDelayTimeOut: number;
+    let foreignElLazy: SVGForeignObjectElement;
+    rect.addEventListener("mouseenter", () => {
+      if (!foreignElLazy) {
+        foreignElLazy = getParentByClassName(rect, "water-fall-chart")
+          .querySelector(".tooltip") as SVGForeignObjectElement;
+      }
+      showDelayTimeOut = setTimeout(() => {
+        showDelayTimeOut = null;
+        onHoverInShowTooltip(rect, rectData, foreignElLazy);
+      }, 100);
+    });
+    rect.addEventListener("mouseleave", () => {
+      if (showDelayTimeOut) {
+        clearTimeout(showDelayTimeOut);
+      } else {
+        onHoverOutShowTooltip(rect);
+      }
+    });
   }
   if (rectData.showOverlay && rectData.hideOverlay) {
     rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
     rect.addEventListener("mouseleave", rectData.hideOverlay(rectData));
   }
-
-  return rect;
+  return holder;
 }
 
 /**
@@ -209,7 +234,7 @@ export function appendRequestLabels(rowFixed: SVGGElement, requestNumberLabel: S
 
     // offload doublecheck of width
     const update = () => {
-      const newWidth = fullLabelText.getBBox().width + 10;
+      const newWidth = fullLabelText.getComputedTextLength() + 10;
       labelFullBg.setAttribute("width", newWidth.toString());
       isAdjusted = true;
       updateAnimFrame = undefined;
@@ -254,11 +279,11 @@ export function createNameRowBg(y: number, rowHeight: number): SVGGElement {
   const rowFixed = svg.newG("row row-fixed");
 
   rowFixed.appendChild(svg.newRect({
-      height: rowHeight,
-      width: "100%",
-      x: "0",
-      y,
-    }, "",
+    height: rowHeight,
+    width: "100%",
+    x: "0",
+    y,
+  }, "",
     {
       opacity: 0,
     }));
@@ -270,11 +295,11 @@ export function createRowBg(y: number, rowHeight: number): SVGGElement {
   const rowFixed = svg.newG("row row-flex");
 
   rowFixed.appendChild(svg.newRect({
-      height: rowHeight,
-      width: "100%",
-      x: "0",
-      y,
-    }, "",
+    height: rowHeight,
+    width: "100%",
+    x: "0",
+    y,
+  }, "",
     {
       opacity: 0,
     }));
