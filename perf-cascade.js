@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.0.1 (19/05/2017) */
+/*! github.com/micmro/PerfCascade Version:2.0.2 (07/06/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -44,13 +44,16 @@ exports.removeClass = removeClass;
  * @param className class that the parent should have
  */
 function getParentByClassName(base, className) {
-    if (base.parentElement === undefined) {
-        return undefined;
+    if (typeof base.closest === "function") {
+        return base.closest("." + className);
     }
-    if (base.parentElement.classList.contains(className)) {
-        return base.parentElement;
+    while (base) {
+        if (base.classList.contains(className)) {
+            return base;
+        }
+        base = base.parentElement;
     }
-    return getParentByClassName(base.parentElement, className);
+    return undefined;
 }
 exports.getParentByClassName = getParentByClassName;
 /**
@@ -75,11 +78,61 @@ function getLastItemOfNodeList(list) {
     return list.item(list.length - 1);
 }
 exports.getLastItemOfNodeList = getLastItemOfNodeList;
-// /** Calls `fn` with each element of `els` */
+/** Calls `fn` with each element of `els` */
 function forEachNodeList(els, fn) {
     Array.prototype.forEach.call(els, fn);
 }
 exports.forEachNodeList = forEachNodeList;
+/** Sets a CSS style property, but only if property exists on `el` */
+function safeSetStyle(el, property, value) {
+    if (property in el.style) {
+        el.style[property] = value;
+    }
+    else {
+        console.warn(new Error("Trying to set non-existing style " +
+            (property + " = " + value + " on a <" + el.tagName.toLowerCase() + ">.")));
+    }
+}
+exports.safeSetStyle = safeSetStyle;
+/** Sets an attribute, but only if `name` exists on `el` */
+function safeSetAttribute(el, name, value) {
+    if (!(name in el)) {
+        console.warn(new Error("Trying to set non-existing attribute " +
+            (name + " = " + value + " on a <" + el.tagName.toLowerCase() + ">.")));
+    }
+    el.setAttributeNS(null, name, value);
+}
+exports.safeSetAttribute = safeSetAttribute;
+/** Sets multiple CSS style properties, but only if property exists on `el` */
+function safeSetStyles(el, css) {
+    Object.keys(css).forEach(function (property) {
+        safeSetStyle(el, property, css[property].toString());
+    });
+}
+exports.safeSetStyles = safeSetStyles;
+/** Sets attributes, but only if they exist on `el` */
+function safeSetAttributes(el, attributes) {
+    Object.keys(attributes).forEach(function (name) {
+        safeSetAttribute(el, name, attributes[name].toString());
+    });
+}
+exports.safeSetAttributes = safeSetAttributes;
+function makeHtmlEl() {
+    var html = document.createElement("html");
+    html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
+    return html;
+}
+exports.makeHtmlEl = makeHtmlEl;
+function makeBodyEl(css, innerHTML) {
+    if (css === void 0) { css = {}; }
+    if (innerHTML === void 0) { innerHTML = ""; }
+    var body = document.createElement("body");
+    body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    safeSetStyles(body, css);
+    body.innerHTML = innerHTML;
+    return body;
+}
+exports.makeBodyEl = makeBodyEl;
 
 },{}],2:[function(require,module,exports){
 "use strict";
@@ -663,28 +716,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("./dom");
 /** Namespace for SVG Elements */
 var svgNamespaceUri = "http://www.w3.org/2000/svg";
-function entries(obj) {
-    var entries = [];
-    for (var _i = 0, _a = Object.keys(obj); _i < _a.length; _i++) {
-        var k = _a[_i];
-        entries.push([k, String((obj[k]))]);
-    }
-    return entries;
-}
-function safeSetAttribute(el, key, s) {
-    if (!(key in el)) {
-        console.warn(new Error("Trying to set non-existing attribute " + key + " = " + s + " on a <" + el.tagName.toLowerCase() + ">."));
-    }
-    el.setAttributeNS(null, key, s);
-}
-function safeSetStyle(el, key, s) {
-    if (key in el.style) {
-        el.style[key] = s;
-    }
-    else {
-        console.warn(new Error("Trying to set non-existing style " + key + " = " + s + " on a <" + el.tagName.toLowerCase() + ">."));
-    }
-}
 function newElement(tagName, _a) {
     var _b = _a === void 0 ? {} : _a, _c = _b.attributes, attributes = _c === void 0 ? {} : _c, _d = _b.css, css = _d === void 0 ? {} : _d, _e = _b.text, text = _e === void 0 ? "" : _e, _f = _b.className, className = _f === void 0 ? "" : _f;
     var element = document.createElementNS(svgNamespaceUri, tagName);
@@ -694,14 +725,8 @@ function newElement(tagName, _a) {
     if (text) {
         element.textContent = text;
     }
-    entries(css).forEach(function (_a) {
-        var key = _a[0], value = _a[1];
-        return safeSetStyle(element, key, value);
-    });
-    entries(attributes).forEach(function (_a) {
-        var key = _a[0], value = _a[1];
-        return safeSetAttribute(element, key, value);
-    });
+    dom_1.safeSetStyles(element, css);
+    dom_1.safeSetAttributes(element, attributes);
     return element;
 }
 function newSvg(className, attributes, css) {
@@ -720,8 +745,10 @@ function newClipPath(id) {
     return newElement("clipPath", { attributes: attributes });
 }
 exports.newClipPath = newClipPath;
-function newForeignObject(attributes) {
-    return newElement("foreignObject", { attributes: attributes });
+function newForeignObject(attributes, className, css) {
+    if (className === void 0) { className = ""; }
+    if (css === void 0) { css = {}; }
+    return newElement("foreignObject", { attributes: attributes, className: className, css: css });
 }
 exports.newForeignObject = newForeignObject;
 function newA(className) {
@@ -799,6 +826,9 @@ var getTestSVGEl = (function () {
  */
 function getNodeTextWidth(textNode, skipClone) {
     if (skipClone === void 0) { skipClone = false; }
+    if (textNode.textContent.length === 0) {
+        return 0;
+    }
     var tmp = getTestSVGEl();
     var tmpTextNode;
     var shadow;
@@ -815,7 +845,7 @@ function getNodeTextWidth(textNode, skipClone) {
     tmpTextNode.style.textShadow = "0";
     tmp.appendChild(tmpTextNode);
     window.document.body.appendChild(tmp);
-    var width = tmpTextNode.getBBox().width;
+    var width = tmpTextNode.getComputedTextLength();
     if (skipClone && shadow !== undefined) {
         textNode.style.textShadow = shadow;
     }
@@ -917,7 +947,7 @@ function fromHar(harData, options) {
 }
 exports.fromHar = fromHar;
 
-},{"./helpers/parse":5,"./legend/legend":7,"./paging/paging":9,"./transformers/har":13,"./waterfall/svg-chart":26}],9:[function(require,module,exports){
+},{"./helpers/parse":5,"./legend/legend":7,"./paging/paging":9,"./transformers/har":13,"./waterfall/svg-chart":27}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../helpers/dom");
@@ -1342,18 +1372,18 @@ exports.makeTabs = makeTabs;
 function makeWaterfallEntryTab(title, content, tabClass) {
     if (tabClass === void 0) { tabClass = ""; }
     return {
-        title: title,
         content: content,
         tabClass: tabClass,
+        title: title,
     };
 }
 /** Helper to create `WaterfallEntryTab` object literal that is evaluated lazyly at runtime (e.g. for performance) */
 function makeLazyWaterfallEntryTab(title, renderContent, tabClass) {
     if (tabClass === void 0) { tabClass = ""; }
     return {
-        title: title,
         renderContent: renderContent,
         tabClass: tabClass,
+        title: title,
     };
 }
 /** General tab with warnings etc. */
@@ -1557,8 +1587,8 @@ var getUserTimimngs = function (currPage, options) {
         if (fullName !== name && currPage["_userTime.endTimer-" + name]) {
             duration = currPage["_userTime.endTimer-" + name] - currPage[k];
             return {
-                name: (options.showUserTimingEndMarker ? fullName : name) + " (" + currPage[k] + " - " + (currPage[k] + duration) + " ms)",
                 duration: duration,
+                name: (options.showUserTimingEndMarker ? fullName : name) + " (" + currPage[k] + " - " + (currPage[k] + duration) + " ms)",
                 startTime: currPage[k],
             };
         }
@@ -1641,9 +1671,9 @@ var createResponseDetails = function (entry, indicators) {
     var statusClean = parse_1.toInt(entry.response.status);
     return {
         icon: helpers_1.makeMimeTypeIcon(statusClean, entry.response.statusText, requestType, entry.response.redirectURL),
-        rowClass: helpers_1.makeRowCssClasses(statusClean),
         indicators: indicators,
         requestType: requestType,
+        rowClass: helpers_1.makeRowCssClasses(statusClean),
         statusCode: statusClean,
     };
 };
@@ -1727,13 +1757,13 @@ function createWaterfallEntry(url, start, end, segments, responseDetails, tabs) 
     if (segments === void 0) { segments = []; }
     var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
     return {
+        end: end,
+        responseDetails: responseDetails,
+        segments: segments,
+        start: start,
+        tabs: tabs,
         total: total,
         url: url,
-        start: start,
-        end: end,
-        segments: segments,
-        responseDetails: responseDetails,
-        tabs: tabs,
     };
 }
 exports.createWaterfallEntry = createWaterfallEntry;
@@ -1742,10 +1772,10 @@ function createWaterfallEntryTiming(type, start, end) {
     var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
     var typeClean = parse_1.sanitizeAlphaNumeric(type);
     return {
+        end: end,
+        start: start,
         total: total,
         type: typeClean,
-        start: start,
-        end: end,
     };
 }
 exports.createWaterfallEntryTiming = createWaterfallEntryTiming;
@@ -1843,6 +1873,7 @@ exports.timingTypeToCssClass = timingTypeToCssClass;
 },{}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var dom_1 = require("../../helpers/dom");
 var parse_1 = require("../../helpers/parse");
 /**
  * Creates the HTML body for the overlay
@@ -1853,10 +1884,8 @@ var parse_1 = require("../../helpers/parse");
  * @param entry
  */
 function createDetailsBody(requestID, detailsHeight, entry) {
-    var html = document.createElement("html");
-    var body = document.createElement("body");
-    body.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-    html.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", "http://www.w3.org/2000/xmlns/");
+    var html = dom_1.makeHtmlEl();
+    var body = dom_1.makeBodyEl();
     var tabMenu = entry.tabs.map(function (t) {
         return "<li><button class=\"tab-button\">" + t.title + "</button></li>";
     }).join("\n");
@@ -1885,7 +1914,7 @@ function createDetailsBody(requestID, detailsHeight, entry) {
 }
 exports.createDetailsBody = createDetailsBody;
 
-},{"../../helpers/parse":5}],17:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/parse":5}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../../helpers/dom");
@@ -2213,30 +2242,54 @@ exports.getIndicatorIcons = getIndicatorIcons;
  * Creation of sub-components used in a ressource request row
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+var dom_1 = require("../../helpers/dom");
 var misc = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
 var styling_converters_1 = require("../../transformers/styling-converters");
+var svg_tooltip_1 = require("./svg-tooltip");
 /**
  * Creates the `rect` that represent the timings in `rectData`
  * @param  {RectData} rectData - Data for block
  * @param  {string} className - className for block `rect`
  */
 function makeBlock(rectData, className) {
+    var holder = svg.newG("");
     var blockHeight = rectData.height - 1;
+    var rectX = misc.roundNumber(rectData.x / rectData.unit) + "%";
     var rect = svg.newRect({
         height: blockHeight,
         width: misc.roundNumber(rectData.width / rectData.unit) + "%",
-        x: misc.roundNumber(rectData.x / rectData.unit) + "%",
+        x: rectX,
         y: rectData.y,
     }, className);
+    holder.appendChild(rect);
     if (rectData.label) {
-        rect.appendChild(svg.newTitle(rectData.label)); // Add tile to wedge path
+        var showDelayTimeOut_1;
+        var foreignElLazy_1;
+        rect.addEventListener("mouseenter", function () {
+            if (!foreignElLazy_1) {
+                foreignElLazy_1 = dom_1.getParentByClassName(rect, "water-fall-chart")
+                    .querySelector(".tooltip");
+            }
+            showDelayTimeOut_1 = setTimeout(function () {
+                showDelayTimeOut_1 = null;
+                svg_tooltip_1.onHoverInShowTooltip(rect, rectData, foreignElLazy_1);
+            }, 100);
+        });
+        rect.addEventListener("mouseleave", function () {
+            if (showDelayTimeOut_1) {
+                clearTimeout(showDelayTimeOut_1);
+            }
+            else {
+                svg_tooltip_1.onHoverOutShowTooltip(rect);
+            }
+        });
     }
     if (rectData.showOverlay && rectData.hideOverlay) {
         rect.addEventListener("mouseenter", rectData.showOverlay(rectData));
         rect.addEventListener("mouseleave", rectData.hideOverlay(rectData));
     }
-    return rect;
+    return holder;
 }
 /**
  * Converts a segment to RectData
@@ -2397,7 +2450,7 @@ function appendRequestLabels(rowFixed, requestNumberLabel, shortLabel, fullLabel
         fullLabel.style.visibility = "visible";
         // offload doublecheck of width
         var update = function () {
-            var newWidth = fullLabelText.getBBox().width + 10;
+            var newWidth = fullLabelText.getComputedTextLength() + 10;
             labelFullBg.setAttribute("width", newWidth.toString());
             isAdjusted = true;
             updateAnimFrame = undefined;
@@ -2465,7 +2518,7 @@ function createRowBg(y, rowHeight) {
 }
 exports.createRowBg = createRowBg;
 
-},{"../../helpers/misc":4,"../../helpers/svg":6,"../../transformers/styling-converters":15}],22:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/misc":4,"../../helpers/svg":6,"../../transformers/styling-converters":15,"./svg-tooltip":23}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var icons = require("../../helpers/icons");
@@ -2577,6 +2630,116 @@ exports.createRow = createRow;
 
 },{"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":6,"./svg-indicators":20,"./svg-row-subcomponents":21}],23:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var dom_1 = require("../../helpers/dom");
+var svg = require("../../helpers/svg");
+var translateYRegEx = /(?:translate)\(.+[, ]+(.+)\)/;
+var tooltipMaxWidth = 200;
+var getTranslateY = function (str) {
+    if (str === void 0) { str = ""; }
+    var res = translateYRegEx.exec(str);
+    if (res && res.length >= 2) {
+        return parseInt(res[1], 10);
+    }
+    return 0;
+};
+/** static event-handler to show tooltip */
+exports.onHoverInShowTooltip = function (base, rectData, foreignEl) {
+    var innerDiv = foreignEl.querySelector(".tooltip-payload");
+    var row = dom_1.getParentByClassName(base, "row-item");
+    var yTransformOffsest = getTranslateY(row.getAttribute("transform"));
+    /** Base Y */
+    var yInt = parseInt(base.getAttribute("y"), 10);
+    /** Base X */
+    var x = base.getAttribute("x");
+    /** X Positon of parent in Percent */
+    var xPercInt = parseFloat(x);
+    var offsetY = 50;
+    /** Row's width in Pixel */
+    var rowWidthPx = base.width.baseVal.value || base.getBoundingClientRect().width;
+    /** current ratio: 1% ≙ `pxPerPerc` Pixel */
+    var pxPerPerc = rowWidthPx / (rectData.width / rectData.unit);
+    var percPerPx = (rectData.width / rectData.unit) / rowWidthPx;
+    var isLeftOfRow = xPercInt > 50 && ((95 - xPercInt) * pxPerPerc < tooltipMaxWidth);
+    innerDiv.innerText = rectData.label;
+    // Disable animation for size-gathering
+    dom_1.addClass(innerDiv, "no-anim");
+    foreignEl.style.display = "block";
+    innerDiv.style.opacity = "0.01";
+    /** First heigth, floating might change this later, since with is not fixed */
+    var initialHeight = innerDiv.clientHeight + 5;
+    if (yInt + yTransformOffsest - initialHeight > 0) {
+        offsetY = yTransformOffsest - initialHeight;
+    }
+    else {
+        offsetY = yTransformOffsest + rectData.height + 10;
+    }
+    if (isLeftOfRow) {
+        var newLeft = xPercInt - ((innerDiv.clientWidth + 5) * percPerPx);
+        var leftOffset = parseInt(foreignEl.querySelector("body").style.left, 10);
+        var ratio = 1 / (1 / 100 * (100 - leftOffset));
+        leftOffset = ratio * leftOffset;
+        if (newLeft > -leftOffset) {
+            innerDiv.style.left = newLeft + "%";
+        }
+        else {
+            // change value to not crop tooltip
+            innerDiv.style.left = -leftOffset + "%";
+        }
+    }
+    else {
+        innerDiv.style.left = x;
+    }
+    foreignEl.setAttribute("y", "" + (yInt + offsetY));
+    foreignEl.setAttribute("height", initialHeight.toString());
+    dom_1.removeClass(innerDiv, "no-anim");
+    innerDiv.style.opacity = "1";
+    var diff = (innerDiv.clientHeight + 5) - initialHeight;
+    if (diff !== 0) {
+        // make adjustments if the initial height was wrong
+        foreignEl.setAttribute("height", (initialHeight + diff).toString());
+        foreignEl.setAttribute("y", "" + (yInt + offsetY - diff));
+    }
+};
+exports.onHoverOutShowTooltip = function (base) {
+    var holder = dom_1.getParentByClassName(base, "water-fall-chart");
+    var foreignEl = holder.querySelector(".tooltip");
+    var innerDiv = foreignEl.querySelector(".tooltip-payload");
+    foreignEl.style.display = "none";
+    foreignEl.setAttribute("height", "250"); // set to high value
+    innerDiv.style.opacity = "0";
+};
+/**
+ * Creates the Tooltip base elements
+ * @param {ChartOptions} options - Chart config/customization options
+ */
+exports.makeTooltip = function (options) {
+    var leftColOffsetPerc = options.leftColumnWith;
+    var holder = svg.newSvg("tooltip-holder", {
+        width: "100%",
+        x: "0",
+        y: "0",
+    });
+    var foreignEl = svg.newForeignObject({
+        width: "100%",
+        x: "0",
+        y: leftColOffsetPerc + "%",
+    }, "tooltip", {
+        display: "none",
+    });
+    var html = dom_1.makeHtmlEl();
+    var body = dom_1.makeBodyEl({
+        left: leftColOffsetPerc + "%",
+        width: 100 - leftColOffsetPerc + "%",
+    }, "<div class=\"tooltip-payload\" style=\"max-width: " + tooltipMaxWidth + "px; opacity: 0;\"></div>");
+    html.appendChild(body);
+    foreignEl.appendChild(html);
+    holder.appendChild(foreignEl);
+    return holder;
+};
+
+},{"../../helpers/dom":1,"../../helpers/svg":6}],24:[function(require,module,exports){
+"use strict";
 /**
  * vertical alignment helper lines
  */
@@ -2637,7 +2800,7 @@ function makeHoverEvtListeners(hoverEl) {
 }
 exports.makeHoverEvtListeners = makeHoverEvtListeners;
 
-},{"../../helpers/dom":1,"../../helpers/svg":6}],24:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/svg":6}],25:[function(require,module,exports){
 "use strict";
 /**
  * Creation of sub-components of the waterfall chart
@@ -2714,7 +2877,7 @@ function createTimeScale(context, durationMs) {
 }
 exports.createTimeScale = createTimeScale;
 
-},{"../../helpers/misc":4,"../../helpers/svg":6}],25:[function(require,module,exports){
+},{"../../helpers/misc":4,"../../helpers/svg":6}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../../helpers/dom");
@@ -2843,7 +3006,7 @@ function createLineRect(context, entry) {
 }
 exports.createLineRect = createLineRect;
 
-},{"../../helpers/dom":1,"../../helpers/misc":4,"../../helpers/svg":6}],26:[function(require,module,exports){
+},{"../../helpers/dom":1,"../../helpers/misc":4,"../../helpers/svg":6}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var svg = require("../helpers/svg");
@@ -2851,6 +3014,7 @@ var styling_converters_1 = require("../transformers/styling-converters");
 var overlay_manager_1 = require("./details-overlay/overlay-manager");
 var pub_sub_1 = require("./details-overlay/pub-sub");
 var row = require("./row/svg-row");
+var svg_tooltip_1 = require("./row/svg-tooltip");
 var alignmentHelper = require("./sub-components/svg-alignment-helper");
 var generalComponents = require("./sub-components/svg-general-components");
 var marks = require("./sub-components/svg-marks");
@@ -2893,10 +3057,10 @@ function createContext(data, options, entriesToShow) {
     var diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
     var context = {
         diagramHeight: diagramHeight,
+        options: options,
         overlayManager: undefined,
         pubSub: new pub_sub_1.PubSub(),
         unit: unit,
-        options: options,
     };
     // `overlayManager` needs the `context` reference, so it's attached later
     context.overlayManager = new overlay_manager_1.default(context);
@@ -3000,9 +3164,10 @@ function createWaterfallSvg(data, options) {
     timeLineHolder.appendChild(scaleAndMarksHolder);
     timeLineHolder.appendChild(rowHolder);
     timeLineHolder.appendChild(overlayHolder);
+    timeLineHolder.appendChild(svg_tooltip_1.makeTooltip(options));
     return timeLineHolder;
 }
 exports.createWaterfallSvg = createWaterfallSvg;
 
-},{"../helpers/svg":6,"../transformers/styling-converters":15,"./details-overlay/overlay-manager":17,"./details-overlay/pub-sub":18,"./row/svg-row":22,"./sub-components/svg-alignment-helper":23,"./sub-components/svg-general-components":24,"./sub-components/svg-marks":25}]},{},[8])(8)
+},{"../helpers/svg":6,"../transformers/styling-converters":15,"./details-overlay/overlay-manager":17,"./details-overlay/pub-sub":18,"./row/svg-row":22,"./row/svg-tooltip":23,"./sub-components/svg-alignment-helper":24,"./sub-components/svg-general-components":25,"./sub-components/svg-marks":26}]},{},[8])(8)
 });
