@@ -2,6 +2,15 @@
 
 
 
+<a name="v2.1.0"></a>
+# v2.1.0 (2017-06-09)
+
+* bump tslint ([18da565](https://github.com/micmro/PerfCascade/commit/18da565))
+* improve tooltip readability ([e055caa](https://github.com/micmro/PerfCascade/commit/e055caa))
+* Update CHANGELOG.md ([7e5f22d](https://github.com/micmro/PerfCascade/commit/7e5f22d))
+
+
+
 <a name="v2.0.2"></a>
 ## v2.0.2 (2017-06-07)
 
