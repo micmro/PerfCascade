@@ -68,8 +68,9 @@ function segmentToRectData(segment: WaterfallEntryTiming, rectData: RectData): R
     cssClass: timingTypeToCssClass(segment.type),
     height: (rectData.height - 6),
     hideOverlay: rectData.hideOverlay,
-    label: segment.type + " (" + Math.round(segment.start) + "ms - "
-    + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
+    label: `<strong>${segment.type}</strong><br/>` +
+    `${Math.round(segment.start)}ms - ${Math.round(segment.end)}ms<br/>` +
+    `total: ${Math.round(segment.total)}ms`,
     showOverlay: rectData.showOverlay,
     unit: rectData.unit,
     width: segment.total,

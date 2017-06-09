@@ -38,7 +38,7 @@ export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, f
   const pxPerPerc = rowWidthPx / (rectData.width / rectData.unit);
   const percPerPx = (rectData.width / rectData.unit) / rowWidthPx;
   const isLeftOfRow = xPercInt > 50 && ((95 - xPercInt) * pxPerPerc < tooltipMaxWidth);
-  innerDiv.innerText = rectData.label;
+  innerDiv.innerHTML = rectData.label;
   // Disable animation for size-gathering
   addClass(innerDiv, "no-anim");
   foreignEl.style.display = "block";
