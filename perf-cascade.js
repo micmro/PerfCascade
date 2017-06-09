@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.0.2 (07/06/2017) */
+/*! github.com/micmro/PerfCascade Version:2.1.0 (09/06/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -2302,8 +2302,9 @@ function segmentToRectData(segment, rectData) {
         cssClass: styling_converters_1.timingTypeToCssClass(segment.type),
         height: (rectData.height - 6),
         hideOverlay: rectData.hideOverlay,
-        label: segment.type + " (" + Math.round(segment.start) + "ms - "
-            + Math.round(segment.end) + "ms | total: " + Math.round(segment.total) + "ms)",
+        label: "<strong>" + segment.type + "</strong><br/>" +
+            (Math.round(segment.start) + "ms - " + Math.round(segment.end) + "ms<br/>") +
+            ("total: " + Math.round(segment.total) + "ms"),
         showOverlay: rectData.showOverlay,
         unit: rectData.unit,
         width: segment.total,
@@ -2661,7 +2662,7 @@ exports.onHoverInShowTooltip = function (base, rectData, foreignEl) {
     var pxPerPerc = rowWidthPx / (rectData.width / rectData.unit);
     var percPerPx = (rectData.width / rectData.unit) / rowWidthPx;
     var isLeftOfRow = xPercInt > 50 && ((95 - xPercInt) * pxPerPerc < tooltipMaxWidth);
-    innerDiv.innerText = rectData.label;
+    innerDiv.innerHTML = rectData.label;
     // Disable animation for size-gathering
     dom_1.addClass(innerDiv, "no-anim");
     foreignEl.style.display = "block";
@@ -3140,8 +3141,9 @@ function createWaterfallSvg(data, options) {
             cssClass: styling_converters_1.requestTypeToCssClass(entry.responseDetails.requestType),
             height: options.rowHeight,
             hideOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
-            label: entry.url + " (" + Math.round(entry.start) + "ms - " +
-                (Math.round(entry.end) + "ms | total: " + Math.round(entry.total) + "ms)"),
+            label: "<strong>" + entry.url + "</strong><br/>" +
+                (Math.round(entry.start) + "ms - " + Math.round(entry.end) + "ms<br/>") +
+                ("total: " + Math.round(entry.total) + "ms"),
             showOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
             unit: context.unit,
             width: entryWidth,
