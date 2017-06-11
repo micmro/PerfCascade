@@ -1,5 +1,8 @@
 import { WaterfallDocs } from "./waterfall";
 
+/** Callback called when mouse enters and leaves a time slice */
+export type TimeSliceMouseEvent = (sliceMs: number, evt: MouseEvent) => void;
+
 export interface ChartRenderOption {
   /** Height of every request bar block plus spacer pixel (in px) */
   rowHeight: number;
@@ -21,6 +24,12 @@ export interface ChartRenderOption {
   onParsed: (data: WaterfallDocs) => void;
   /** Set a row length time in ms (if not set the time is calculated from the HAR)  */
   fixedLengthMs: number;
+  /** Segments of consecutive slices of time in milliseconds */
+  timeSlices: number[];
+  /** callback called when entering a new timeSlice */
+  timeSliceOnEnter: TimeSliceMouseEvent;
+  /** callback called when leaving a timeSlice */
+  timeSliceOnLeave: TimeSliceMouseEvent;
 }
 
 export interface HarTransformerOptions {

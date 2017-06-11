@@ -18,6 +18,9 @@ const defaultChartOptions: Readonly<ChartOptions> = {
   showAlignmentHelpers: true,
   showIndicatorIcons: true,
   showMimeTypeIcon: true,
+  timeSliceOnEnter: undefined,
+  timeSliceOnLeave: undefined,
+  timeSlices: [],
 };
 
 /** default options to use if not set in `options` parameter */
