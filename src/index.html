@@ -112,6 +112,9 @@
                     showAlignmentHelpers: false,
                     showMimeTypeIcon: false,
                     showIndicatorIcons: false,
+                    timeSlices: [0, 750, 1300],
+                    timeSliceOnEnter: (slice, evt) => {console.log("timeSliceOnEnter", slice, evt)},
+                    timeSliceOnLeave: (slice, evt) => {console.log("timeSliceOnLeave", slice, evt)}
                 }, "fileinput2", outputHolder2El, "test-data/wpt_github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har");
         })(window.perfCascade)
     </script>

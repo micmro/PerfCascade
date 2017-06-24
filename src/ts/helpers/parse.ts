@@ -200,6 +200,18 @@ export function validateOptions(options: ChartRenderOption): ChartRenderOption {
   const ensureBoolean = (name: keyof ChartRenderOption) => {
     options[name] = !!options[name];
   };
+  const ensureArray = (name: keyof ChartRenderOption) => {
+    if (!Array.isArray(options[name])) {
+      throw TypeError(`option "${name}" needs to be an array`);
+    }
+  };
+  const ensureFunctionOrUndefined = (name: keyof ChartRenderOption) => {
+    if (typeof options[name] !== "function"
+      && options[name] !== undefined
+      && options[name] !== null) {
+      throw TypeError(`option "${name}" needs to be a function (or undefined)`);
+    }
+  };
 
   validateInt("leftColumnWidth");
   validateInt("rowHeight");
@@ -207,6 +219,9 @@ export function validateOptions(options: ChartRenderOption): ChartRenderOption {
   ensureBoolean("showAlignmentHelpers");
   ensureBoolean("showIndicatorIcons");
   ensureBoolean("showMimeTypeIcon");
-
+  ensureArray("timeSlices");
+  ensureFunctionOrUndefined("onParsed");
+  ensureFunctionOrUndefined("timeSliceOnEnter");
+  ensureFunctionOrUndefined("timeSliceOnLeave");
   return options;
 }
