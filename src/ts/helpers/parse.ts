@@ -94,7 +94,7 @@ export function formatSeconds(seconds: number): string {
 }
 
 export function formatDateLocalized(date: Date): string {
-  return `${date.toUTCString()}</br>(local time: ${date.toLocaleString()})`;
+  return `${date.toUTCString()}<br/>(local time: ${date.toLocaleString()})`;
 }
 
 const bytesPerKB = 1024;
