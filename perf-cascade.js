@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.1.0 (09/06/2017) */
+/*! github.com/micmro/PerfCascade Version:2.1.1 (26/06/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -606,7 +606,7 @@ function formatSeconds(seconds) {
 }
 exports.formatSeconds = formatSeconds;
 function formatDateLocalized(date) {
-    return date.toUTCString() + "</br>(local time: " + date.toLocaleString() + ")";
+    return date.toUTCString() + "<br/>(local time: " + date.toLocaleString() + ")";
 }
 exports.formatDateLocalized = formatDateLocalized;
 var bytesPerKB = 1024;
@@ -1685,6 +1685,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
 var svg_indicators_1 = require("../waterfall/row/svg-indicators");
+/** Escapes all HTML except linebreaks `<br/>` */
+var escapeHtmlLight = function (str) { return parse_1.escapeHtml(str).replace("&ltbr/&gt", "<br/>"); };
 /**
  * Converts `dlKeyValues` to the contennd a definition list, without the outer `<dl>` tags
  * @param {KvTuple[]} dlKeyValues array of Key/Value pair
@@ -1703,7 +1705,7 @@ function makeDefinitionList(dlKeyValues, addClass) {
     };
     return dlKeyValues
         .filter(function (tuple) { return tuple[1] !== undefined; })
-        .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + parse_1.escapeHtml(tuple[0]) + "</dt>\n      <dd>" + parse_1.escapeHtml(tuple[1]) + "</dd>\n    "; }).join("");
+        .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + escapeHtmlLight(tuple[0]) + "</dt>\n      <dd>" + escapeHtmlLight(tuple[1]) + "</dd>\n    "; }).join("");
 }
 exports.makeDefinitionList = makeDefinitionList;
 /**
