@@ -13,6 +13,9 @@ import {
 } from "../typing/waterfall";
 import { makeIcon } from "../waterfall/row/svg-indicators";
 
+/** Escapes all HTML except linebreaks `<br/>` */
+const escapeHtmlLight = (str: string) => escapeHtml(str).replace("&ltbr/&gt", "<br/>");
+
 /**
  * Converts `dlKeyValues` to the contennd a definition list, without the outer `<dl>` tags
  * @param {KvTuple[]} dlKeyValues array of Key/Value pair
@@ -31,8 +34,8 @@ export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = f
   return dlKeyValues
     .filter((tuple: KvTuple) => tuple[1] !== undefined)
     .map((tuple) => `
-      <dt ${makeClass(tuple[0])}>${escapeHtml(tuple[0])}</dt>
-      <dd>${escapeHtml(tuple[1])}</dd>
+      <dt ${makeClass(tuple[0])}>${escapeHtmlLight(tuple[0])}</dt>
+      <dd>${escapeHtmlLight(tuple[1])}</dd>
     `).join("");
 }
 
