@@ -2,6 +2,13 @@
 
 
 
+<a name="v2.1.1"></a>
+## v2.1.1 (2017-06-26)
+
+* #208 Allow linebreaks in tab definition lists ([950c367](https://github.com/micmro/PerfCascade/commit/950c367))
+
+
+
 <a name="v2.1.0"></a>
 # v2.1.0 (2017-06-09)
 
