@@ -5,6 +5,7 @@
 import { Entry } from "har-format";
 import { hasHeader } from "../helpers/har";
 import * as misc from "../helpers/misc";
+import { toInt } from "../helpers/parse";
 import { WaterfallEntryIndicator } from "../typing/waterfall";
 import { RequestType } from "../typing/waterfall";
 
@@ -64,13 +65,6 @@ function isSecure(entry: Entry) {
 function isPush(entry: Entry): boolean {
   if (entry._was_pushed === undefined || entry._was_pushed === null) {
     return false;
-  }
-  function toInt(input: string | number): number {
-    if (typeof input === "string") {
-      return parseInt(input, 10);
-    } else {
-      return input;
-    }
   }
   return toInt(entry._was_pushed) === 1;
 }
