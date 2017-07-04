@@ -3,11 +3,12 @@
  */
 
 import { getParentByClassName } from "../../helpers/dom";
+import { push } from "../../helpers/icons";
 import * as misc from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
 import { timingTypeToCssClass } from "../../transformers/styling-converters";
 import { RectData } from "../../typing/rect-data";
-import { WaterfallEntryTiming } from "../../typing/waterfall";
+import { WaterfallEntry, WaterfallEntryTiming } from "../../typing/waterfall";
 import {
   onHoverInShowTooltip,
   onHoverOutShowTooltip,
@@ -105,14 +106,45 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
   return txtEl;
 }
 
+function createPushIndicator(rectData: RectData): SVGElement {
+  const scale = 0.6;
+  const iconNaturalSize = 12; // default svg size (12px)
+  const y = rectData.y + ((rectData.height - 4  - (iconNaturalSize * scale))  / 2);
+  const percStart = (rectData.x + rectData.width) / rectData.unit;
+  const iconEl = push(`${misc.roundNumber(percStart)}%`, y, "Http2 Push", scale);
+
+  const el = svg.newG(`push-inline-wrap`, {
+    transform: `translate(-${rectData.height / 2})`,
+  }, {
+    fillOpacity: "0.5",
+  });
+  el.appendChild(iconEl);
+
+  return el;
+}
+
+// function createPushIndicator(rectData: RectData): SVGElement {
+//   const y = rectData.y + rectData.height / 1.5;
+//   const x = `${misc.roundNumber(rectData.x / rectData.unit)}%`;
+//   return svg.newTextEl("→", {
+//     transform: `translate(-5)`,
+//     x,
+//     y,
+//   }, {
+//     "fillOpacity": "0.5",
+//     "text-anchor": "end",
+//   });
+// }
+
 /**
  * Render the block and timings for a request
  * @param  {RectData}         rectData Basic dependencys and globals
- * @param  {WaterfallEntryTiming[]} segments Request and Timing Data
- * @param  {number} timeTotal  - total time of the request
- * @return {SVGElement}                Renerated SVG (rect or g element)
+ * @param  {WaterfallEntry}   entry Request Details, e.g. Request and Timing Data
+ * @return {SVGElement}       Renerated SVG (rect or g element)
  */
-export function createRect(rectData: RectData, segments: WaterfallEntryTiming[], timeTotal: number): SVGElement {
+export function createRect(rectData: RectData, entry: WaterfallEntry): SVGElement {
+  // entry.responseDetails.indicators;
+  const segments = entry.segments;
   const rect = makeBlock(rectData, `time-block ${rectData.cssClass}`);
   const rectHolder = svg.newG("rect-holder");
   let firstX = rectData.x;
@@ -129,7 +161,10 @@ export function createRect(rectData: RectData, segments: WaterfallEntryTiming[],
       }
     });
 
-    rectHolder.appendChild(createTimingLabel(rectData, timeTotal, firstX));
+    if (misc.find(entry.responseDetails.indicators, (indicator) => indicator.id === "push")) {
+      rectHolder.appendChild(createPushIndicator(rectData));
+    }
+    rectHolder.appendChild(createTimingLabel(rectData, entry.total, firstX));
   }
 
   return rectHolder;

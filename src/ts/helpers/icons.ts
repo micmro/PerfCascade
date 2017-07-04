@@ -3,7 +3,7 @@ import * as svgLib from "./svg";
  *  SVG Icons
  */
 
-const wrapSvgIcon = (x: number, y: number, title: string,
+const wrapSvgIcon = (x: string | number, y: number, title: string,
                      className: string, scale: number, svgEl: SVGElement): SVGElement => {
   const holder = svgLib.newSvg("", {
     x,
@@ -239,7 +239,7 @@ export function audio(x: number, y: number, title: string, scale: number = 1): S
 }
 
 let pushIconLazy: SVGPathElement;
-export function push(x: number, y: number, title: string, scale: number = 1): SVGElement {
+export function push(x: number | string, y: number, title: string, scale: number = 1): SVGElement {
   if (pushIconLazy === undefined) {
     const d = `M14.668 9q0 .416-.285.7L9.37 14.716Q9.067 15 8.667 15q-.393 0-.694-.285l-.577
   -.578q-.293-.292-.293-.7 0-.41.293-.7l2.256-2.258H4.23q-.4 0-.65-.29t-.25-.698v-.986q0-.408.25
