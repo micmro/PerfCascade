@@ -19,6 +19,8 @@ export interface ChartRenderOption {
   legendHolder: HTMLElement;
   /** Callback called when the HAR doc has been parsed into PerfCascases */
   onParsed: (data: WaterfallDocs) => void;
+  /** Set a row max time in ms (if not set the time is calculated from the HAR)  */
+  rowMaxTimeInMs: number;
 }
 
 export interface HarTransformerOptions {
