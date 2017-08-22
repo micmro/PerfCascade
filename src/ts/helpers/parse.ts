@@ -10,8 +10,8 @@ import { roundNumber } from "./misc";
  * @param formatFn an optional function to format the parsed input value.
  * @returns {string} a formatted string representation of the input, or undefined.
  */
-export function parseAndFormat<S, T>(input?: S,
-                                     parseFn: ((_: S) => T) = identity,
+export function parseAndFormat<S, T>(input: S,
+                                     parseFn: ((_: S) => T),
                                      formatFn: ((_: T) => string) = toString): string {
   if (input === undefined) {
     return undefined;
@@ -21,11 +21,6 @@ export function parseAndFormat<S, T>(input?: S,
     return undefined;
   }
   return formatFn(parsed);
-}
-
-/** Fallback dummy function - just maintains the type */
-function identity<T>(source: T): T {
-  return source;
 }
 
 function toString<T>(source: T): string {
