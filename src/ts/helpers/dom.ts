@@ -83,6 +83,7 @@ export function safeSetStyle(el: HTMLElement | SVGElement, property: string, val
   if (property in el.style) {
     el.style[property] = value;
   } else {
+// tslint:disable-next-line:no-console
     console.warn(new Error(`Trying to set non-existing style ` +
       `${property} = ${value} on a <${el.tagName.toLowerCase()}>.`));
   }
@@ -91,6 +92,7 @@ export function safeSetStyle(el: HTMLElement | SVGElement, property: string, val
 /** Sets an attribute, but only if `name` exists on `el` */
 export function safeSetAttribute(el: HTMLElement | SVGElement, name: string, value: string) {
   if (!(name in el)) {
+// tslint:disable-next-line:no-console
     console.warn(new Error(`Trying to set non-existing attribute ` +
       `${name} = ${value} on a <${el.tagName.toLowerCase()}>.`));
   }
