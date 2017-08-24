@@ -130,9 +130,9 @@ export function transformPage(harData: Har | Log,
     }
   });
 
-  // if we configured the max time from the outside, use that!
-  if (options.rowMaxTimeInMs) {
-    doneTime = options.rowMaxTimeInMs;
+  // if we configured fixed length from the outside, use that!
+  if (options.fixedLengthMs) {
+    doneTime = options.fixedLengthMs;
   }
 
   // Add 100ms margin to make room for labels
