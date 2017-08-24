@@ -151,6 +151,7 @@ export function sanitizeUrlForLink(unsafeUrl: string) {
   if (cleaned.indexOf("http://") === 0 || cleaned.indexOf("https://") === 0) {
     return cleaned;
   }
+// tslint:disable-next-line:no-console
   console.warn("skipped link, due to potentially unsafe url", unsafeUrl);
   return "";
 }

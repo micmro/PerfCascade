@@ -7,7 +7,6 @@
     "interface-name": [false],
     "object-curly-spacing": [true],
 
-    "no-console": [false],
     "no-string-literal": false,
 
     // allow-leading-underscore since _ is used to silence warnings about unused function parameters.
