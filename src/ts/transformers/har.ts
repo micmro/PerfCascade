@@ -7,7 +7,7 @@ import {
 } from "har-format";
 import { roundNumber } from "../helpers/misc";
 import { escapeHtml, toInt } from "../helpers/parse";
-import { HarTransformerOptions } from "../typing/options";
+import { ChartOptions, HarTransformerOptions } from "../typing/options";
 import {
   Mark,
   TimingType,
@@ -89,12 +89,12 @@ const getPages = (data: Log) => {
  * Transforms a HAR object into the format needed to render the PerfCascade
  * @param  {Har} harData - HAR document
  * @param {number=0} pageIndex - page to parse (for multi-page HAR)
- * @param {HarTransformerOptions} options - HAR-parser-specific options
+ * @param {ChartOptions} options - HAR-parser-specific options
  * @returns WaterfallData
  */
 export function transformPage(harData: Har | Log,
                               pageIndex: number = 0,
-                              options: HarTransformerOptions): WaterfallData {
+                              options: ChartOptions): WaterfallData {
   // make sure it's the *.log base node
   const data = (harData["log"] !== undefined ? harData["log"] : harData) as Log;
 
@@ -130,6 +130,11 @@ export function transformPage(harData: Har | Log,
     }
   });
 
+  // if we configured fixed length from the outside, use that!
+  if (options.fixedLengthMs) {
+    doneTime = options.fixedLengthMs;
+  }
+
   // Add 100ms margin to make room for labels
   doneTime += 100;
 
@@ -146,9 +151,9 @@ export function transformPage(harData: Har | Log,
  * Extract all `Mark`s based on `PageTiming` and `UserTiming`
  * @param {PageTiming} pageTimings - HARs `PageTiming` object
  * @param {Page} currPage - active page
- * @param {HarTransformerOptions} options - HAR-parser-specific options
+ * @param {ChartOptions} options - HAR options
  */
-const getMarks = (pageTimings: PageTiming, currPage: Page, options: HarTransformerOptions) => {
+const getMarks = (pageTimings: PageTiming, currPage: Page, options: ChartOptions) => {
   const sortFn = (a: Mark, b: Mark) => a.startTime - b.startTime;
   const marks = Object.keys(pageTimings)
     .filter((k: keyof PageTiming) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
@@ -169,9 +174,9 @@ const getMarks = (pageTimings: PageTiming, currPage: Page, options: HarTransform
 /**
  * Extract all `Mark`s based on `UserTiming`
  * @param {Page} currPage - active page
- * @param {HarTransformerOptions} options - HAR-parser-specific options
+ * @param {ChartOptions} options - HAR options
  */
-const getUserTimimngs = (currPage: Page, options: HarTransformerOptions) => {
+const getUserTimimngs = (currPage: Page, options: ChartOptions) => {
   const baseFilter = options.showUserTimingEndMarker ?
     (k: string) => k.indexOf("_userTime.") === 0 :
     (k: string) => k.indexOf("_userTime.") === 0 && k.indexOf("_userTime.endTimer-") !== 0;
