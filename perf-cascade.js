@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.1.1 (26/06/2017) */
+/*! github.com/micmro/PerfCascade Version:2.2.0 (21/10/2017) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
@@ -89,6 +89,7 @@ function safeSetStyle(el, property, value) {
         el.style[property] = value;
     }
     else {
+        // tslint:disable-next-line:no-console
         console.warn(new Error("Trying to set non-existing style " +
             (property + " = " + value + " on a <" + el.tagName.toLowerCase() + ">.")));
     }
@@ -97,6 +98,7 @@ exports.safeSetStyle = safeSetStyle;
 /** Sets an attribute, but only if `name` exists on `el` */
 function safeSetAttribute(el, name, value) {
     if (!(name in el)) {
+        // tslint:disable-next-line:no-console
         console.warn(new Error("Trying to set non-existing attribute " +
             (name + " = " + value + " on a <" + el.tagName.toLowerCase() + ">.")));
     }
@@ -527,7 +529,6 @@ var misc_1 = require("./misc");
  * @returns {string} a formatted string representation of the input, or undefined.
  */
 function parseAndFormat(input, parseFn, formatFn) {
-    if (parseFn === void 0) { parseFn = identity; }
     if (formatFn === void 0) { formatFn = toString; }
     if (input === undefined) {
         return undefined;
@@ -539,10 +540,6 @@ function parseAndFormat(input, parseFn, formatFn) {
     return formatFn(parsed);
 }
 exports.parseAndFormat = parseAndFormat;
-/** Fallback dummy function - just maintains the type */
-function identity(source) {
-    return source;
-}
 function toString(source) {
     if (typeof source["toString"] === "function") {
         return source.toString();
@@ -662,6 +659,7 @@ function sanitizeUrlForLink(unsafeUrl) {
     if (cleaned.indexOf("http://") === 0 || cleaned.indexOf("https://") === 0) {
         return cleaned;
     }
+    // tslint:disable-next-line:no-console
     console.warn("skipped link, due to potentially unsafe url", unsafeUrl);
     return "";
 }
@@ -1493,7 +1491,7 @@ var getPages = function (data) {
  * Transforms a HAR object into the format needed to render the PerfCascade
  * @param  {Har} harData - HAR document
  * @param {number=0} pageIndex - page to parse (for multi-page HAR)
- * @param {HarTransformerOptions} options - HAR-parser-specific options
+ * @param {ChartOptions} options - HAR-parser-specific options
  * @returns WaterfallData
  */
 function transformPage(harData, pageIndex, options) {
@@ -1529,6 +1527,10 @@ function transformPage(harData, pageIndex, options) {
             doneTime = mark.startTime;
         }
     });
+    // if we configured fixed length from the outside, use that!
+    if (options.fixedLengthMs) {
+        doneTime = options.fixedLengthMs;
+    }
     // Add 100ms margin to make room for labels
     doneTime += 100;
     return {
@@ -1544,7 +1546,7 @@ exports.transformPage = transformPage;
  * Extract all `Mark`s based on `PageTiming` and `UserTiming`
  * @param {PageTiming} pageTimings - HARs `PageTiming` object
  * @param {Page} currPage - active page
- * @param {HarTransformerOptions} options - HAR-parser-specific options
+ * @param {ChartOptions} options - HAR options
  */
 var getMarks = function (pageTimings, currPage, options) {
     var sortFn = function (a, b) { return a.startTime - b.startTime; };
@@ -1564,7 +1566,7 @@ var getMarks = function (pageTimings, currPage, options) {
 /**
  * Extract all `Mark`s based on `UserTiming`
  * @param {Page} currPage - active page
- * @param {HarTransformerOptions} options - HAR-parser-specific options
+ * @param {ChartOptions} options - HAR options
  */
 var getUserTimimngs = function (currPage, options) {
     var baseFilter = options.showUserTimingEndMarker ?
