@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.1.1 (26/06/2017) */
+/*! github.com/micmro/PerfCascade Version:2.2.0 (21/10/2017) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -619,7 +619,6 @@ a:hover {
   }
 }
 
-
 /*.main-content :first-child {
   margin-top: 0;
 }*/
@@ -641,7 +640,8 @@ a:hover {
   margin-bottom: 1rem;
 }
 
-.main-content ul, .main-content ol {
+.main-content ul,
+.main-content ol {
   margin-top: 0;
 }
 
@@ -652,11 +652,11 @@ a:hover {
   border-left: 0.3rem solid #dce6f0;
 }
 
-.main-content blockquote >:first-child {
+.main-content blockquote > :first-child {
   margin-top: 0;
 }
 
-.main-content blockquote >:last-child {
+.main-content blockquote > :last-child {
   margin-bottom: 0;
 }
 
@@ -670,7 +670,7 @@ a:hover {
 
 @media screen and (min-width: 64em) {
   .main-content {
-    max-width: 64rem;
+    max-width: 160rem;
     padding: 2rem 6rem;
     margin: 0 auto;
     font-size: 1.1rem;
@@ -723,6 +723,7 @@ a:hover {
     font-size: 0.9rem;
   }
 }
+
 .water-fall-chart {width:100%; overflow: visible; font-size: 12px; line-height: 1em;}
 .water-fall-chart * {box-sizing: border-box;}
 .water-fall-chart button {cursor: pointer;}
