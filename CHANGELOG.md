@@ -2,6 +2,18 @@
 
 
 
+<a name="v2.2.0"></a>
+# v2.2.0 (2017-10-21)
+
+* Lock tslint to 5.4 for now, to avoid build issues. ([95b8613](https://github.com/micmro/PerfCascade/commit/95b8613))
+* make it wider on larger screens ([d6c9474](https://github.com/micmro/PerfCascade/commit/d6c9474))
+* Only allow console.warn in a few selected places. ([0d4c2cc](https://github.com/micmro/PerfCascade/commit/0d4c2cc))
+* Remove unused function. ([966a12f](https://github.com/micmro/PerfCascade/commit/966a12f))
+* Set fixedLengthMs from outside of PerfCascade (#211) ([4401f26](https://github.com/micmro/PerfCascade/commit/4401f26))
+* Typescript to 2.3 for now, to avoid build issues ([05be814](https://github.com/micmro/PerfCascade/commit/05be814))
+
+
+
 <a name="v2.1.1"></a>
 ## v2.1.1 (2017-06-26)
 
