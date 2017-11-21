@@ -2,6 +2,13 @@
 
 
 
+<a name="v2.2.1"></a>
+## v2.2.1 (2017-11-21)
+
+* npm main entry point fix ([63de467](https://github.com/micmro/PerfCascade/commit/63de467))
+
+
+
 <a name="v2.2.0"></a>
 # v2.2.0 (2017-10-21)
 
