@@ -125,6 +125,9 @@ const htmlChars = new RegExp(Object.keys(htmlCharMap).join("|"), "g");
  * @param  {string} unsafe - string to be rendered in HTML
  */
 export function escapeHtml(unsafe: string | number | boolean = ""): string {
+  if (unsafe === null) {
+    return ""; // See https://github.com/micmro/PerfCascade/issues/217
+  }
   if (typeof unsafe !== "string") {
     if (typeof unsafe["toString"] === "function") {
       unsafe = unsafe.toString();
