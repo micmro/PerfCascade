@@ -2,6 +2,14 @@
 
 
 
+<a name="v2.2.2"></a>
+## v2.2.2 (2018-02-13)
+
+* Add null check for content. ([22cc3db](https://github.com/micmro/PerfCascade/commit/22cc3db))
+* fix lint error ([147729b](https://github.com/micmro/PerfCascade/commit/147729b))
+
+
+
 <a name="v2.2.1"></a>
 ## v2.2.1 (2017-11-21)
 
