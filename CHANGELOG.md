@@ -2,6 +2,13 @@
 
 
 
+<a name="v2.2.3"></a>
+## <small>v2.2.3 (2018-02-18)</small>
+
+* Fix missing General tab for rows with warnings. ([53077f7](https://github.com/micmro/PerfCascade/commit/53077f7))
+
+
+
 <a name="v2.2.2"></a>
 ## v2.2.2 (2018-02-13)
 
