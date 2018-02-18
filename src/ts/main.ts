@@ -68,7 +68,7 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<Cha
  * @returns {SVGSVGElement} - Chart SVG Element
  */
 export function fromHar(harData: Har, options: ChartOptions = {}): SVGSVGElement {
-  const harTransformerOptions: HarTransformerOptions = {
+  const harTransformerOptions = {
     ...defaultHarTransformerOptions,
     ...options,
   };

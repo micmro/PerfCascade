@@ -242,9 +242,9 @@ const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): Waterf
     // special case for 'connect' && 'ssl' since they share time
     // http://www.softwareishard.com/blog/har-12-spec/#timings
     if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
-      const sslStart = parseInt(harEntry[`_ssl_start`], 10) || time.start;
-      const sslEnd = parseInt(harEntry[`_ssl_end`], 10) || time.start + t.ssl;
-      const connectStart = (!!parseInt(harEntry[`_ssl_start`], 10)) ? time.start : sslEnd;
+      const sslStart = parseInt(harEntry[`_ssl_start`].toString(), 10) || time.start;
+      const sslEnd = parseInt(harEntry[`_ssl_end`].toString(), 10) || time.start + t.ssl;
+      const connectStart = (!!parseInt(harEntry[`_ssl_start`].toString(), 10)) ? time.start : sslEnd;
       return collect
         .concat([createWaterfallEntryTiming("ssl", Math.round(sslStart), Math.round(sslEnd))])
         .concat([createWaterfallEntryTiming(key, Math.round(connectStart), Math.round(time.end))]);
