@@ -32,7 +32,7 @@ export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = f
     return `class="${className}"`;
   };
   return dlKeyValues
-    .filter((tuple: KvTuple) => tuple[1] !== undefined)
+    .filter((tuple: KvTuple) => !(tuple[1] === undefined || tuple[1] === null))
     .map((tuple) => `
       <dt ${makeClass(tuple[0])}>${escapeHtmlLight(tuple[0])}</dt>
       <dd>${escapeHtmlLight(tuple[1])}</dd>
