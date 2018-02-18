@@ -92,7 +92,7 @@ function makeGeneralTab(generalData: KvTuple[], indicators: WaterfallEntryIndica
     <dl>${makeDefinitionList(info)}</dl>`;
   }
 
-  makeWaterfallEntryTab("General", content + general);
+  return makeWaterfallEntryTab("General", content + general);
 }
 
 function makeRequestTab(request: KvTuple[], requestHeaders: KvTuple[]): WaterfallEntryTab {

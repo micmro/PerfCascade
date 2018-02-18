@@ -6,6 +6,7 @@
     "sourceMap": true,
     "removeComments": false,
     "noImplicitAny": false,
+    "noImplicitReturns": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true
   },
