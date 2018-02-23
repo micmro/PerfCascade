@@ -237,15 +237,3 @@ export function audio(x: number, y: number, title: string, scale: number = 1): S
   }
   return wrapSvgIcon(x, y, title, "icon-audio", scale, audioIconLazy.cloneNode(false) as SVGPathElement);
 }
-
-let pushIconLazy: SVGPathElement;
-export function push(x: number | string, y: number, title: string, scale: number = 1): SVGElement {
-  if (pushIconLazy === undefined) {
-    const d = `M14.668 9q0 .416-.285.7L9.37 14.716Q9.067 15 8.667 15q-.393 0-.694-.285l-.577
-  -.578q-.293-.292-.293-.7 0-.41.293-.7l2.256-2.258H4.23q-.4 0-.65-.29t-.25-.698v-.986q0-.408.25
-  -.697.25-.29.65-.29h5.423L7.397 5.257q-.293-.278-.293-.693 0-.416.293-.694l.577-.576Q8.267 3 8.668
-  3q.408 0 .7.293l5.015 5.014q.285.27.285.693z`;
-    pushIconLazy = svgLib.newPath(d);
-  }
-  return wrapSvgIcon(x, y, title, "icon-push", scale, pushIconLazy.cloneNode(false) as SVGPathElement);
-}

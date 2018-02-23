@@ -3,7 +3,6 @@
  */
 
 import { getParentByClassName } from "../../helpers/dom";
-import { push } from "../../helpers/icons";
 import * as misc from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
 import { timingTypeToCssClass } from "../../transformers/styling-converters";
@@ -107,34 +106,21 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
 }
 
 function createPushIndicator(rectData: RectData): SVGElement {
-  const scale = 0.6;
-  const iconNaturalSize = 12; // default svg size (12px)
-  const y = rectData.y + ((rectData.height - 4  - (iconNaturalSize * scale))  / 2);
-  const percStart = (rectData.x + rectData.width) / rectData.unit;
-  const iconEl = push(`${misc.roundNumber(percStart)}%`, y, "Http2 Push", scale);
-
-  const el = svg.newG(`push-inline-wrap`, {
-    transform: `translate(-${rectData.height / 2})`,
-  }, {
-    fillOpacity: "0.5",
-  });
-  el.appendChild(iconEl);
+  const y = rectData.y + rectData.height / 1.5;
+  const x = `${misc.roundNumber(rectData.x / rectData.unit)}%`;
+  const el = svg.newG("http2-inidicator-holder");
+  el.appendChild(svg.newTextEl("→", {
+      transform: `translate(-5)`,
+      x,
+      y,
+    }, {
+      "fillOpacity": "0.6",
+      "text-anchor": "end",
+    }));
+  el.appendChild(svg.newTitle("http2 Push"));
 
   return el;
 }
-
-// function createPushIndicator(rectData: RectData): SVGElement {
-//   const y = rectData.y + rectData.height / 1.5;
-//   const x = `${misc.roundNumber(rectData.x / rectData.unit)}%`;
-//   return svg.newTextEl("→", {
-//     transform: `translate(-5)`,
-//     x,
-//     y,
-//   }, {
-//     "fillOpacity": "0.5",
-//     "text-anchor": "end",
-//   });
-// }
 
 /**
  * Render the block and timings for a request
