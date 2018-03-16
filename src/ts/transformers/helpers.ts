@@ -1,7 +1,7 @@
 /** Helpers that are not file-fromat specific */
 import { isInStatusCodeRange, toCssClass } from "../helpers/misc";
 import { escapeHtml, sanitizeAlphaNumeric } from "../helpers/parse";
-import { RequestType } from "../typing/waterfall";
+import { RequestType, SafeKvTuple } from "../typing/waterfall";
 import {
   Icon,
   KvTuple,
@@ -18,12 +18,12 @@ const escapeHtmlLight = (str: string) => escapeHtml(str).replace("&ltbr/&gt", "<
 
 /**
  * Converts `dlKeyValues` to the contennd a definition list, without the outer `<dl>` tags
- * @param {KvTuple[]} dlKeyValues array of Key/Value pair
+ * @param {SafeKvTuple[]} dlKeyValues array of Key/Value pair
  * @param {boolean} [addClass=false] if `true` the key in `dlKeyValues`
  * is converted to a class name andd added to the `<dt>`
  * @returns {string} stringified HTML definition list
  */
-export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = false) {
+export function makeDefinitionList(dlKeyValues: SafeKvTuple[], addClass: boolean = false) {
   const makeClass = (key: string) => {
     if (!addClass) {
       return "";
@@ -32,7 +32,6 @@ export function makeDefinitionList(dlKeyValues: KvTuple[], addClass: boolean = f
     return `class="${className}"`;
   };
   return dlKeyValues
-    .filter((tuple: KvTuple) => tuple[1] !== undefined)
     .map((tuple) => `
       <dt ${makeClass(tuple[0])}>${escapeHtmlLight(tuple[0])}</dt>
       <dd>${escapeHtmlLight(tuple[1])}</dd>
@@ -92,7 +91,7 @@ export function createWaterfallEntry(url: string,
                                      segments: WaterfallEntryTiming[] = [],
                                      responseDetails: WaterfallResponseDetails,
                                      tabs: WaterfallEntryTab[]): WaterfallEntry {
-  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+  const total = (typeof start !== "number" || typeof end !== "number") ? NaN : (end - start);
   return {
     end,
     responseDetails,
@@ -108,7 +107,7 @@ export function createWaterfallEntry(url: string,
 export function createWaterfallEntryTiming(type: TimingType,
                                            start: number,
                                            end: number): WaterfallEntryTiming {
-  const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+  const total = (typeof start !== "number" || typeof end !== "number") ? NaN : (end - start);
   const typeClean = sanitizeAlphaNumeric(type) as TimingType;
   return {
     end,

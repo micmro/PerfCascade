@@ -58,7 +58,7 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
   const buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
   const tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
 
-  const setTabStatus = (tabIndex: number) => {
+  const setTabStatus = (tabIndex: number | undefined) => {
     overlay.openTabIndex = tabIndex;
     forEachNodeList(tabs, (tab: HTMLDivElement, j) => {
       tab.style.display = (tabIndex === j) ? "block" : "none";

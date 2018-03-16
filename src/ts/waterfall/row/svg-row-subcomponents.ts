@@ -30,16 +30,16 @@ function makeBlock(rectData: RectData, className: string) {
   }, className);
   holder.appendChild(rect);
   if (rectData.label) {
-    let showDelayTimeOut: number;
-    let foreignElLazy: SVGForeignObjectElement;
+    let showDelayTimeOut: number | null;
+    let foreignElLazy: SVGForeignObjectElement | null;
     rect.addEventListener("mouseenter", () => {
       if (!foreignElLazy) {
-        foreignElLazy = getParentByClassName(rect, "water-fall-chart")
+        foreignElLazy = (getParentByClassName(rect, "water-fall-chart") as Element)
           .querySelector(".tooltip") as SVGForeignObjectElement;
       }
       showDelayTimeOut = setTimeout(() => {
         showDelayTimeOut = null;
-        onHoverInShowTooltip(rect, rectData, foreignElLazy);
+        onHoverInShowTooltip(rect, rectData, foreignElLazy as SVGForeignObjectElement);
       }, 100);
     });
     rect.addEventListener("mouseleave", () => {
@@ -64,13 +64,13 @@ function makeBlock(rectData: RectData, className: string) {
  * @returns RectData
  */
 function segmentToRectData(segment: WaterfallEntryTiming, rectData: RectData): RectData {
+  const total = (!isNaN(segment.total)) ? `<br/>total: ${Math.round(segment.total)}ms` : "";
   return {
     cssClass: timingTypeToCssClass(segment.type),
     height: (rectData.height - 6),
     hideOverlay: rectData.hideOverlay,
     label: `<strong>${segment.type}</strong><br/>` +
-    `${Math.round(segment.start)}ms - ${Math.round(segment.end)}ms<br/>` +
-    `total: ${Math.round(segment.total)}ms`,
+    `${Math.round(segment.start)}ms - ${Math.round(segment.end)}ms${total}`,
     showOverlay: rectData.showOverlay,
     unit: rectData.unit,
     width: segment.total,
@@ -121,7 +121,7 @@ export function createRect(rectData: RectData, segments: WaterfallEntryTiming[],
 
   if (segments && segments.length > 0) {
     segments.forEach((segment) => {
-      if (segment.total > 0 && typeof segment.start === "number") {
+      if (!isNaN(segment.total) && segment.total > 0 && typeof segment.start === "number") {
         const childRectData = segmentToRectData(segment, rectData);
         const childRect = makeBlock(childRectData, `segment ${childRectData.cssClass}`);
         firstX = Math.min(firstX, childRectData.x);
@@ -227,7 +227,7 @@ export function appendRequestLabels(rowFixed: SVGGElement, requestNumberLabel: S
   /** the size adjustment only needs to happend once, this var keeps track of that */
   let isAdjusted = false;
   /** store AnimationFrame id, to cancel it if hovering was too fast */
-  let updateAnimFrame: number;
+  let updateAnimFrame: number | undefined;
   rowFixed.addEventListener("mouseenter", () => {
     fullLabel.style.display = "block";
     shortLabel.style.display = "none";

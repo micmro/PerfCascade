@@ -5,19 +5,20 @@ import {
   formatDateLocalized,
   formatMilliseconds,
   formatSeconds,
+  MaybeStringOrNumber,
   parseAndFormat,
   parseDate,
   parseNonEmpty,
   parseNonNegative,
   parsePositive,
 } from "../helpers/parse";
-import { KvTuple } from "../typing/waterfall";
+import { KvTuple, SafeKvTuple } from "../typing/waterfall";
 import { flattenKvTuple } from "./helpers";
 
-const byteSizeProperty = (title: string, input: string |  number): KvTuple => {
+const byteSizeProperty = (title: string, input: MaybeStringOrNumber): KvTuple => {
   return [title, parseAndFormat(input, parsePositive, formatBytes)];
 };
-const countProperty = (title: string, input: string |  number): KvTuple => {
+const countProperty = (title: string, input: MaybeStringOrNumber): KvTuple => {
   return [title, parseAndFormat(input, parsePositive)];
 };
 
@@ -26,7 +27,7 @@ const notEmpty = (kv: KvTuple) => {
   return kv.length > 1 && kv[1] !== undefined && kv[1] !== "";
 };
 
-function parseGeneralDetails(entry: Entry, startRelative: number, requestID: number): KvTuple[] {
+function parseGeneralDetails(entry: Entry, startRelative: number, requestID: number): SafeKvTuple[] {
   return ([
     ["Request Number", `#${requestID}`],
     ["Started", new Date(entry.startedDateTime).toLocaleString() + ((startRelative > 0) ?
@@ -55,10 +56,10 @@ function parseGeneralDetails(entry: Entry, startRelative: number, requestID: num
     byteSizeProperty("Minify Save", entry._minify_save),
     byteSizeProperty("Image Total", entry._image_total),
     byteSizeProperty("Image Save", entry._image_save),
-  ] as KvTuple[]).filter(notEmpty);
+  ] as KvTuple[]).filter(notEmpty) as SafeKvTuple[];
 }
 
-function parseRequestDetails(harEntry: Entry): KvTuple[] {
+function parseRequestDetails(harEntry: Entry): SafeKvTuple[] {
   const request = harEntry.request;
   const stringHeader = (name: string): KvTuple[] => getHeaders(request.headers, name);
 
@@ -81,10 +82,10 @@ function parseRequestDetails(harEntry: Entry): KvTuple[] {
     stringHeader("If-Unmodified-Since"),
     countProperty("Querystring parameters count", request.queryString.length),
     countProperty("Cookies count", request.cookies.length),
-  ]).filter(notEmpty);
+  ]).filter(notEmpty) as SafeKvTuple[];
 }
 
-function parseResponseDetails(entry: Entry): KvTuple[] {
+function parseResponseDetails(entry: Entry): SafeKvTuple[] {
   const response = entry.response;
   const content = response.content;
   const headers = response.headers;
@@ -138,20 +139,20 @@ function parseResponseDetails(entry: Entry): KvTuple[] {
     stringHeader("Timing-Allow-Origin"),
     ["Redirect URL", parseAndFormat(response.redirectURL, parseNonEmpty)],
     ["Comment", parseAndFormat(response.comment, parseNonEmpty)],
-  ]).filter(notEmpty);
+  ]).filter(notEmpty) as SafeKvTuple[];
 }
 
-function parseTimings(entry: Entry, start: number, end: number): KvTuple[] {
+function parseTimings(entry: Entry, start: number, end: number): SafeKvTuple[] {
   const timings = entry.timings;
   const optionalTiming = (timing?: number) => parseAndFormat(timing, parseNonNegative, formatMilliseconds);
   const total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
 
   let connectVal = optionalTiming(timings.connect);
-  if (timings.ssl > 0) {
+  if (timings.ssl && timings.ssl > 0 && timings.connect) {
     // SSL time is also included in the connect field (to ensure backward compatibility with HAR 1.1).
     connectVal = `${connectVal} (without TLS: ${optionalTiming(timings.connect - timings.ssl)})`;
   }
-  return [
+  return ([
     ["Total", formatMilliseconds(total)],
     ["Blocked", optionalTiming(timings.blocked)],
     ["DNS", optionalTiming(timings.dns)],
@@ -160,7 +161,7 @@ function parseTimings(entry: Entry, start: number, end: number): KvTuple[] {
     ["Send", formatMilliseconds(timings.send)],
     ["Wait", formatMilliseconds(timings.wait)],
     ["Receive", formatMilliseconds(timings.receive)],
-  ];
+  ] as KvTuple[]).filter(notEmpty) as SafeKvTuple[];
 }
 
 /**
@@ -176,9 +177,9 @@ export function getKeys(entry: Entry, requestID: number, startRelative: number, 
   return {
     general: parseGeneralDetails(entry, startRelative, requestID),
     request: parseRequestDetails(entry),
-    requestHeaders: requestHeaders.map(headerToKvTuple),
+    requestHeaders: requestHeaders.map(headerToKvTuple).filter(notEmpty) as SafeKvTuple[],
     response: parseResponseDetails(entry),
-    responseHeaders: responseHeaders.map(headerToKvTuple),
+    responseHeaders: responseHeaders.map(headerToKvTuple).filter(notEmpty) as SafeKvTuple[],
     timings: parseTimings(entry, startRelative, endRelative),
   };
 }

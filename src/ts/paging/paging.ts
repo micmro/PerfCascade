@@ -62,7 +62,7 @@ export default class Paging {
    * @param  {OnPagingCb} cb
    * @returns number - index of the callback
    */
-  public onPageUpdate(cb: OnPagingCb): number {
+  public onPageUpdate(cb: OnPagingCb): number | undefined {
     if (this.getPageCount() > 1) {
       return this.onPageUpdateCbs.push(cb);
     }

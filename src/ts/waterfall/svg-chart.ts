@@ -1,6 +1,6 @@
 import * as svg from "../helpers/svg";
 import { requestTypeToCssClass } from "../transformers/styling-converters";
-import { Context } from "../typing/context";
+import { Context, ContextCore } from "../typing/context";
 import { ChartRenderOption } from "../typing/options";
 import { RectData } from "../typing/rect-data";
 import { HoverEvtListeners } from "../typing/svg-alignment-helpers";
@@ -55,17 +55,17 @@ function createContext(data: WaterfallData, options: ChartRenderOption,
                        entriesToShow: WaterfallEntry[]): Context {
   const unit = data.durationMs / 100;
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
-  const context = {
+  const context: ContextCore = {
     diagramHeight,
     options,
-    overlayManager: undefined,
-    pubSub : new PubSub(),
+    pubSub: new PubSub(),
     unit,
   };
   // `overlayManager` needs the `context` reference, so it's attached later
-  context.overlayManager = new OverlayManager(context);
-
-  return context;
+  return {
+    ...context,
+    overlayManager: new OverlayManager(context),
+  };
 }
 
 /**
@@ -103,7 +103,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   });
 
   /** Holder for on-hover vertical comparison bars */
-  let hoverOverlayHolder: SVGGElement;
+  let hoverOverlayHolder: SVGGElement | undefined;
   let mouseListeners: HoverEvtListeners;
   if (options.showAlignmentHelpers) {
     hoverOverlayHolder = svg.newG("hover-overlays");
@@ -162,7 +162,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
       hideOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
       label: `<strong>${entry.url}</strong><br/>` +
         `${Math.round(entry.start)}ms - ${Math.round(entry.end)}ms<br/>` +
-        `total: ${Math.round(entry.total)}ms`,
+        `total: ${isNaN(entry.total) ? "n/a " : Math.round(entry.total)}ms`,
       showOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
       unit: context.unit,
       width: entryWidth,
@@ -184,7 +184,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   // Main loop to render rows with blocks
   entriesToShow.forEach(renderRow);
 
-  if (options.showAlignmentHelpers) {
+  if (options.showAlignmentHelpers && hoverOverlayHolder !== undefined) {
     scaleAndMarksHolder.appendChild(hoverOverlayHolder);
   }
   timeLineHolder.appendChild(scaleAndMarksHolder);

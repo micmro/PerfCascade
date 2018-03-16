@@ -8,7 +8,7 @@ zip.useWebWorkers = false;
 /** handle client side file upload */
 export function readFile(file: File,
                          fileName: string,
-                         callback: (e: Error, har?: Har) => void,
+                         callback: (e: Error | null, har?: Har) => void,
                          onProgress?: (progress: number) => void) {
   if (!file) {
     return callback(new Error("Failed to load HAR file"));
@@ -24,7 +24,7 @@ export function readFile(file: File,
   }
 
   /** start reading the file */
-  const extension = fileName.match(/\.[0-9a-z]+$/i)[0];
+  const extension = (fileName.match(/\.[0-9a-z]+$/i) || [])[0];
   if ([".zhar", ".zip"].indexOf(extension) !== -1) {
     /** zhar */
     zip.createReader(new zip.BlobReader(file), (zipReader) => {

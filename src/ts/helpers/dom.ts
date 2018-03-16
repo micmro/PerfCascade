@@ -25,7 +25,7 @@ export function removeClass<T extends Element>(el: T, className: string): T {
     classList.remove(className);
   } else {
     // IE doesn't support classList in SVG
-    el.setAttribute("class", el.getAttribute("class")
+    el.setAttribute("class", (el.getAttribute("class") || "")
       .replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"));
   }
   return el;
@@ -44,9 +44,9 @@ export function getParentByClassName(base: Element, className: string) {
     if (base.classList.contains(className)) {
       return base;
     }
-    base = base.parentElement;
+    base = base.parentElement as Element;
   }
-  return undefined;
+  return null;
 }
 
 /**
@@ -55,7 +55,7 @@ export function getParentByClassName(base: Element, className: string) {
  */
 export function removeChildren<T extends Element>(el: T): T {
   while (el.hasChildNodes()) {
-    el.removeChild(el.lastChild);
+    el.removeChild(el.lastChild as Element);
   }
   return el;
 }
@@ -64,7 +64,7 @@ export function removeChildren<T extends Element>(el: T): T {
  * Get last element of `NodeList`
  * @param list NodeListOf e.g. return value of `getElementsByClassName`
  */
-export function getLastItemOfNodeList<T extends Node>(list: NodeListOf<T>) {
+export function getLastItemOfNodeList<T extends Node>(list: NodeListOf<T> | null) {
   if (!list || list.length === 0) {
     return undefined;
   }
@@ -96,7 +96,7 @@ export function safeSetAttribute(el: HTMLElement | SVGElement, name: string, val
     console.warn(new Error(`Trying to set non-existing attribute ` +
       `${name} = ${value} on a <${el.tagName.toLowerCase()}>.`));
   }
-  el.setAttributeNS(null, name, value);
+  el.setAttributeNS("", name, value);
 }
 
 /** Sets multiple CSS style properties, but only if property exists on `el` */

@@ -1,6 +1,8 @@
 import { ChartRenderOption } from "../typing/options";
 import { roundNumber } from "./misc";
 
+export type MaybeStringOrNumber = string | number | undefined | null;
+
 /**
  * Type safe and null safe way to transform, filter and format an input value, e.g. parse a Date from a string,
  * rejecting invalid dates, and formatting it as a localized string. If the input value is undefined, or the parseFn
@@ -10,9 +12,9 @@ import { roundNumber } from "./misc";
  * @param formatFn an optional function to format the parsed input value.
  * @returns {string} a formatted string representation of the input, or undefined.
  */
-export function parseAndFormat<S, T>(input: S,
+export function parseAndFormat<S, T>(input: S | undefined,
                                      parseFn: ((_: S) => T),
-                                     formatFn: ((_: T) => string) = toString): string {
+                                     formatFn: ((_: T) => string | undefined) = toString): string | undefined {
   if (input === undefined) {
     return undefined;
   }
@@ -27,15 +29,15 @@ function toString<T>(source: T): string {
   if (typeof source["toString"] === "function") {
     return source.toString();
   } else {
-    throw TypeError("Can't convert type ${typeof source} to string");
+    throw TypeError(`Can't convert type ${typeof source} to string`);
   }
 }
 
-export function parseNonEmpty(input: string): string {
+export function parseNonEmpty(input: string): string | undefined {
   return input.trim().length > 0 ? input : undefined;
 }
 
-export function parseDate(input: string): Date {
+export function parseDate(input: string): Date | undefined {
   const date = new Date(input);
   if (isNaN(date.getTime())) {
     return undefined;
@@ -43,17 +45,23 @@ export function parseDate(input: string): Date {
   return date;
 }
 
-export function parseNonNegative(input: string | number): number {
+export function parseNonNegative(input: MaybeStringOrNumber): number | undefined {
+  if (input === undefined || input === null) {
+    return undefined;
+  }
   const filter = (n) => (n >= 0);
   return parseToNumber(input, filter);
 }
 
-export function parsePositive(input: string | number): number {
+export function parsePositive(input: MaybeStringOrNumber): number | undefined {
+  if (input === undefined || input === null) {
+    return undefined;
+  }
   const filter = (n) => (n > 0);
   return parseToNumber(input, filter);
 }
 
-function parseToNumber(input: string | number, filterFn: (_: number) => boolean): number {
+function parseToNumber(input: string | number, filterFn: (_: number) => boolean): number | undefined {
   const filter = (n: number) => filterFn(n) ? n : undefined;
 
   if (typeof input === "string") {
@@ -66,15 +74,19 @@ function parseToNumber(input: string | number, filterFn: (_: number) => boolean)
   return filter(input);
 }
 
-export function formatMilliseconds(millis: number): string {
-  return `${roundNumber(millis, 3)} ms`;
+export function formatMilliseconds(millis: number | undefined): string | undefined {
+  return (millis !== undefined) ? `${roundNumber(millis, 3)} ms` : undefined;
 }
 
 const secondsPerMinute = 60;
 const secondsPerHour = 60 * secondsPerMinute;
 const secondsPerDay = 24 * secondsPerHour;
 
-export function formatSeconds(seconds: number): string {
+export function formatSeconds(seconds: number | undefined): string | undefined {
+  if (seconds === undefined) {
+    return undefined;
+  }
+
   const raw = `${roundNumber(seconds, 3)} s`;
   if (seconds > secondsPerDay) {
     return `${raw} (~${roundNumber(seconds / secondsPerDay, 0)} days)`;
@@ -88,14 +100,17 @@ export function formatSeconds(seconds: number): string {
   return raw;
 }
 
-export function formatDateLocalized(date: Date): string {
-  return `${date.toUTCString()}<br/>(local time: ${date.toLocaleString()})`;
+export function formatDateLocalized(date: Date | undefined): string | undefined {
+  return (date !== undefined) ? `${date.toUTCString()}<br/>(local time: ${date.toLocaleString()})` : undefined;
 }
 
 const bytesPerKB = 1024;
 const bytesPerMB = 1024 * bytesPerKB;
 
-export function formatBytes(bytes: number): string {
+export function formatBytes(bytes: number | undefined): string {
+  if (bytes === undefined) {
+    return "";
+  }
   const raw = `${bytes} bytes`;
   if (bytes >= bytesPerMB) {
     return `${raw} (~${roundNumber(bytes / bytesPerMB, 1)} MB)`;
@@ -124,8 +139,8 @@ const htmlChars = new RegExp(Object.keys(htmlCharMap).join("|"), "g");
  * Escapes unsafe characters in a string to render safely in HTML
  * @param  {string} unsafe - string to be rendered in HTML
  */
-export function escapeHtml(unsafe: string | number | boolean = ""): string {
-  if (unsafe === null) {
+export function escapeHtml(unsafe: MaybeStringOrNumber | boolean = ""): string {
+  if (unsafe === null || unsafe === undefined) {
     return ""; // See https://github.com/micmro/PerfCascade/issues/217
   }
   if (typeof unsafe !== "string") {
@@ -149,7 +164,7 @@ export function sanitizeUrlForLink(unsafeUrl: string) {
   if (cleaned.indexOf("http://") === 0 || cleaned.indexOf("https://") === 0) {
     return cleaned;
   }
-// tslint:disable-next-line:no-console
+  // tslint:disable-next-line:no-console
   console.warn("skipped link, due to potentially unsafe url", unsafeUrl);
   return "";
 }
@@ -163,7 +178,7 @@ export function sanitizeAlphaNumeric(unsafe: string | number) {
 }
 
 /** Ensures `input` is casted to `number` */
-export function toInt(input: string | number): number {
+export function toInt(input: MaybeStringOrNumber): number | undefined {
   if (typeof input === "number") {
     return input;
   } else if (typeof input === "string") {
@@ -176,10 +191,11 @@ export function toInt(input: string | number): number {
 /** Validates the `ChartOptions` attributes types */
 export function validateOptions(options: ChartRenderOption): ChartRenderOption {
   const validateInt = (name: keyof ChartRenderOption) => {
-    options[name] = toInt(options[name] as any);
-    if (options[name] === undefined) {
+    const val = toInt(options[name] as any);
+    if (val === undefined) {
       throw TypeError(`option "${name}" needs to be a number`);
     }
+    options[name] = val;
   };
   const ensureBoolean = (name: keyof ChartRenderOption) => {
     options[name] = !!options[name];

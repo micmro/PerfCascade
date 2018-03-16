@@ -35,7 +35,7 @@ export function createRow(context: Context, index: number,
   const y = rectData.y;
   const rowHeight = rectData.height;
   const leftColumnWith = context.options.leftColumnWith;
-  const rowItem = svg.newA(entry.responseDetails.rowClass);
+  const rowItem = svg.newA(entry.responseDetails.rowClass || "" as never);
   rowItem.setAttribute("tabindex", "0");
   rowItem.setAttribute("xlink:href", "javascript:void(0)");
   const leftFixedHolder = svg.newSvg("left-fixed-holder", {
@@ -101,20 +101,30 @@ export function createRow(context: Context, index: number,
     evt.preventDefault();
     onDetailsOverlayShow(evt);
   });
-  rowItem.addEventListener("keydown", (evt: KeyboardEvent) => {
+  rowItem.addEventListener("keydown", (evt) => {
+    const e = evt as KeyboardEvent; // need to type this manually
     // space on enter
-    if (evt.which === 32 || evt.which === 13) {
-      evt.preventDefault();
-      return onDetailsOverlayShow(evt);
+    if (e.which === 32 || e.which === 13) {
+      e.preventDefault();
+      return onDetailsOverlayShow(e);
     }
 
     // tab without open overlays around
-    if (isTabUp(evt) && !hasPrevOpenOverlay && index > 0) {
-      rowItem.previousSibling.previousSibling.lastChild.lastChild.dispatchEvent(new MouseEvent("mouseenter"));
+    if (isTabUp(e) && !hasPrevOpenOverlay && index > 0) {
+      if (rowItem.previousSibling &&
+        rowItem.previousSibling.previousSibling &&
+        rowItem.previousSibling.previousSibling.lastChild &&
+        rowItem.previousSibling.previousSibling.lastChild.lastChild) {
+        rowItem.previousSibling.previousSibling.lastChild.lastChild.dispatchEvent(new MouseEvent("mouseenter"));
+      }
       return;
     }
-    if (isTabDown(evt) && !hasOpenOverlay) {
-      if (rowItem.nextSibling && rowItem.nextSibling.nextSibling) {
+    if (isTabDown(e) && !hasOpenOverlay) {
+      if (rowItem.nextSibling &&
+          rowItem.nextSibling.nextSibling &&
+          rowItem.nextSibling.nextSibling.lastChild &&
+          rowItem.nextSibling.nextSibling.lastChild.lastChild
+        ) {
         rowItem.nextSibling.nextSibling.lastChild.lastChild.dispatchEvent(new MouseEvent("mouseenter"));
       }
       return;

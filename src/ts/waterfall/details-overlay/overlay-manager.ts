@@ -8,7 +8,7 @@ import {
   isTabDown,
   isTabUp,
 } from "../../helpers/misc";
-import { Context } from "../../typing/context";
+import { ContextCore } from "../../typing/context";
 import { OpenOverlay, OverlayChangeEvent } from "../../typing/open-overlay";
 import { WaterfallEntry } from "../../typing/waterfall";
 import { createRowInfoOverlay } from "./svg-details-overlay";
@@ -48,12 +48,12 @@ class OverlayManager {
   /** Collection of currely open overlays */
   private openOverlays: OpenOverlay[] = [];
 
-  constructor(private context: Context) {
+  constructor(private context: ContextCore) {
   }
 
   /** all open overlays height combined */
   public getCombinedOverlayHeight(): number {
-    return this.openOverlays.reduce((pre, curr) => pre + curr.height, 0);
+    return this.openOverlays.reduce((pre, curr) => pre + (curr.height || 0), 0);
   }
 
   /**
@@ -148,34 +148,35 @@ class OverlayManager {
       if (previewImg && !previewImg.src) {
         previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
       }
-      infoOverlay.querySelector("a")
+      (infoOverlay.querySelector("a") as HTMLAnchorElement)
         .addEventListener("keydown", OverlayManager.firstElKeypress);
-      getLastItemOfNodeList(infoOverlay.querySelectorAll("button"))
+      (getLastItemOfNodeList(infoOverlay.querySelectorAll("button")) as HTMLButtonElement)
         .addEventListener("keydown", OverlayManager.lastElKeypress);
       overlayHolder.appendChild(infoOverlay);
       updateHeight(overlay, y, infoOverlay.getBoundingClientRect().height);
     };
     const updateRow = (rowItem: SVGAElement, index: number) => {
       const overlay = find(this.openOverlays, (o) => o.index === index);
-      const overlayEl = rowItem.nextElementSibling.firstElementChild as SVGGElement;
+      const nextRowItem = rowItem.nextElementSibling as Element;
+      const overlayEl = nextRowItem.firstElementChild as SVGGElement;
       this.realignRow(rowItem, currY);
 
       if (overlay === undefined) {
-        if (overlayEl) {
+        if (overlayEl && nextRowItem !== null) {
           // remove closed overlay
-          rowItem.nextElementSibling.querySelector("a")
+          (nextRowItem.querySelector("a") as HTMLAnchorElement)
             .removeEventListener("keydown", OverlayManager.firstElKeypress);
-          getLastItemOfNodeList(rowItem.nextElementSibling.querySelectorAll("button"))
+          (getLastItemOfNodeList(nextRowItem.querySelectorAll("button")) as HTMLButtonElement)
             .removeEventListener("keydown", OverlayManager.lastElKeypress);
-          removeChildren(rowItem.nextElementSibling);
+          removeChildren(nextRowItem);
         }
         return; // not open
       }
-      if (overlayEl) {
-        const bg = overlayEl.querySelector(".info-overlay-bg");
-        const fo = overlayEl.querySelector("foreignObject");
-        const btnRect = overlayEl.querySelector(".info-overlay-close-btn rect");
-        const btnText = overlayEl.querySelector(".info-overlay-close-btn text");
+      if (overlayEl && overlay.actualY !== undefined) {
+        const bg = overlayEl.querySelector(".info-overlay-bg") as SVGElement;
+        const fo = overlayEl.querySelector("foreignObject") as SVGForeignObjectElement;
+        const btnRect = overlayEl.querySelector(".info-overlay-close-btn rect") as SVGRectElement;
+        const btnText = overlayEl.querySelector(".info-overlay-close-btn text") as SVGTextElement;
         updateHeight(overlay, overlay.defaultY + currY, overlay.height);
         // needs updateHeight
         bg.setAttribute("y", overlay.actualY.toString());

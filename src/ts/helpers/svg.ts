@@ -122,7 +122,7 @@ const getTestSVGEl = (() => {
     // debounced time-deleayed cleanup, so the element can be re-used in tight loops
     clearTimeout(removeSvgTestElTimeout);
     removeSvgTestElTimeout = setTimeout(() => {
-      svgTestEl.parentNode.removeChild(svgTestEl);
+      (svgTestEl.parentNode as Node).removeChild(svgTestEl);
     }, 500);
 
     return svgTestEl;
@@ -136,7 +136,7 @@ const getTestSVGEl = (() => {
  * @returns number
  */
 export function getNodeTextWidth(textNode: SVGTextElement, skipClone: boolean = false): number {
-  if (textNode.textContent.length === 0) {
+  if ((textNode.textContent || "").length === 0) {
     return 0;
   }
   const tmp = getTestSVGEl();

@@ -35,7 +35,7 @@ export function createMarks(context: Context, marks: Mark[]) {
 
     const lastMark = marks[i - 1];
     const minDistance = 2.5; // minimum distance between marks
-    if (lastMark && mark.x - lastMark.x < minDistance) {
+    if (lastMark && lastMark.x !== undefined && mark.x - lastMark.x < minDistance) {
       lineLabel.setAttribute("x", lastMark.x + minDistance + "%");
       mark.x = lastMark.x + minDistance;
     }
@@ -72,7 +72,7 @@ export function createMarks(context: Context, marks: Mark[]) {
     const onLabelMouseEnter = () => {
       if (!isHoverActive) {
         // move marker to top
-        markHolder.parentNode.appendChild(markHolder);
+        (markHolder.parentNode as SVGElement).appendChild(markHolder);
         isHoverActive = true;
         // assign class later to not break animation with DOM re-order
         if (typeof window.requestAnimationFrame === "function") {

@@ -62,6 +62,9 @@ function isSecure(entry: Entry) {
 }
 
 function isPush(entry: Entry): boolean {
+  if (entry._was_pushed === undefined || entry._was_pushed === null) {
+    return false;
+  }
   function toInt(input: string | number): number {
     if (typeof input === "string") {
       return parseInt(input, 10);
