@@ -100,6 +100,9 @@ export function transformPage(harData: Har | Log,
 
   const pages = getPages(data);
   const currPage = pages[pageIndex];
+  if (!currPage.startedDateTime) {
+    throw new TypeError(`Invalid HAR document: "log.pages[${pageIndex}].startedDateTime" is not set`);
+  }
   const pageStartTime = new Date(currPage.startedDateTime).getTime();
   const pageTimings = currPage.pageTimings;
 
