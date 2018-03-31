@@ -201,7 +201,7 @@ export function validateOptions(options: ChartRenderOption): ChartRenderOption {
     options[name] = !!options[name];
   };
 
-  validateInt("leftColumnWith");
+  validateInt("leftColumnWidth");
   validateInt("rowHeight");
   validateInt("selectedPage");
   ensureBoolean("showAlignmentHelpers");

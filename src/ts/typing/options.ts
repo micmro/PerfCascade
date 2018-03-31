@@ -10,7 +10,7 @@ export interface ChartRenderOption {
   /** Show warning icons for potential issues on the left */
   showIndicatorIcons: boolean;
   /** Relative width of the info column on the left (in percent) */
-  leftColumnWith: number;
+  leftColumnWidth: number;
   /** Select element to use for paging (if not set no Selector is rendered)   */
   pageSelector: HTMLSelectElement;
   /** Zero-based index of the pre-selected page */
