@@ -2,6 +2,17 @@
 
 
 
+<a name="v2.3.0"></a>
+## v2.3.0 (2018-03-31)
+
+* #224 throw error if startedDateTime is missing in HAR ([0757c2d](https://github.com/micmro/PerfCascade/commit/0757c2d)), closes [#224](https://github.com/micmro/PerfCascade/issues/224)
+* added ts strict mode and fixed resulting issues ([e2d0afc](https://github.com/micmro/PerfCascade/commit/e2d0afc))
+* Hide fields with null values. ([09117bf](https://github.com/micmro/PerfCascade/commit/09117bf))
+* update dependnecies ([b43e4de](https://github.com/micmro/PerfCascade/commit/b43e4de))
+* chore: update dependencies and fix new lint/compiler issues ([e328799](https://github.com/micmro/PerfCascade/commit/e328799))
+
+
+
 <a name="v2.2.3"></a>
 ## <small>v2.2.3 (2018-02-18)</small>
 
