@@ -98,8 +98,8 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
 
   /** Holder for scale, event and marks */
   const scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
-    width: `${100 - options.leftColumnWith}%`,
-    x: `${options.leftColumnWith}%`,
+    width: `${100 - options.leftColumnWidth}%`,
+    x: `${options.leftColumnWidth}%`,
   });
 
   /** Holder for on-hover vertical comparison bars */

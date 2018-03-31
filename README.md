@@ -1,7 +1,7 @@
 # PerfCascade
 Responsive, SVG based [HAR](http://www.softwareishard.com/blog/har-12-spec/) waterfall viewer .
 
-[![npm version](https://img.shields.io/npm/v/perf-cascade.svg?style=flat-square)](https://www.npmjs.com/package/perf-cascade) 
+[![npm version](https://img.shields.io/npm/v/perf-cascade.svg?style=flat-square)](https://www.npmjs.com/package/perf-cascade)
 [![npm downloads](https://img.shields.io/npm/dt/perf-cascade.svg?style=flat-square)](https://www.npmjs.com/package/perf-cascade)
 [![Build status][travis-image]][travis-url]
 
@@ -43,7 +43,7 @@ Or with options:
 /** override selected options for PerfCascade (all have defaults) */
 var options = {
   showIndicatorIcons: false, //default: true
-  leftColumnWith: 30 //default: 25
+  leftColumnWidth: 30 //default: 25
 }
 
 var perfCascadeSvg =  perfCascade.fromHar(harData, options)
@@ -72,7 +72,7 @@ see [options.d.ts](https://github.com/micmro/PerfCascade/blob/master/src/ts/typi
 | `showAlignmentHelpers` | `boolean` | `true` | Show verticale lines to easier spot potential dependencies/blocking between requests |
 | `showMimeTypeIcon` | `boolean` | `true` |  Show mime type icon on the left |
 | `showIndicatorIcons` | `boolean` | `true` |  Show warning icons for potential issues on the left |
-| `leftColumnWith` | `number` | `25` | Relative width of the info column on the left (in percent) |
+| `leftColumnWidth` | `number` | `25` | Relative width of the info column on the left (in percent) |
 | `pageSelector` | `HTMLSelectElement` | `undefined` | DOM `<select>` element to use to select a run if the HAR contains multiple runs. |
 | `selectedPage` | `number` | `0` | Zero-based index of the page to initially render.<br/>If `selectedPage` is larger than the number of pages the last page will be selected. |
 | `legendHolder` | `HTMLElement`<br/>(DOM element) | `undefined` <br/>(not shown) | If set a legend explaining the waterfall colours is rendered in the `legendHolder` DOM element. |

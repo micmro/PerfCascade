@@ -94,7 +94,7 @@ export const onHoverOutShowTooltip = (base: SVGRectElement) => {
  * @param {ChartOptions} options - Chart config/customization options
  */
 export const makeTooltip = (options: ChartRenderOption) => {
-  const leftColOffsetPerc = options.leftColumnWith;
+  const leftColOffsetPerc = options.leftColumnWidth;
   const holder = svg.newSvg("tooltip-holder", {
     width: "100%",
     x: "0",

@@ -9,7 +9,7 @@ import { createWaterfallSvg } from "./waterfall/svg-chart";
 
 /** default options to use if not set in `options` parameter */
 const defaultChartOptions: Readonly<ChartOptions> = {
-  leftColumnWith: 25,
+  leftColumnWidth: 25,
   legendHolder: undefined,
   onParsed: undefined,
   pageSelector: undefined,
@@ -35,6 +35,12 @@ export function makeLegend(): HTMLUListElement {
 }
 
 function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<ChartRenderOption> = {}): SVGSVGElement {
+  if (chartOptions["leftColumnWith"] !== undefined) {
+    // tslint:disable-next-line: no-console
+    console.warn("Depreciation Warning: The option 'leftColumnWith' has been fixed to 'leftColumnWidth', " +
+      "please update your code as this will get deprecated in the future");
+    chartOptions.leftColumnWidth = chartOptions["leftColumnWith"];
+  }
   const options: ChartRenderOption = validateOptions({ ...defaultChartOptions, ...chartOptions } as ChartRenderOption);
 
   // setup paging helper

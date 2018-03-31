@@ -34,17 +34,17 @@ export function createRow(context: Context, index: number,
 
   const y = rectData.y;
   const rowHeight = rectData.height;
-  const leftColumnWith = context.options.leftColumnWith;
+  const leftColumnWidth = context.options.leftColumnWidth;
   const rowItem = svg.newA(entry.responseDetails.rowClass || "" as never);
   rowItem.setAttribute("tabindex", "0");
   rowItem.setAttribute("xlink:href", "javascript:void(0)");
   const leftFixedHolder = svg.newSvg("left-fixed-holder", {
-    width: `${leftColumnWith}%`,
+    width: `${leftColumnWidth}%`,
     x: "0",
   });
   const flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
-    width: `${100 - leftColumnWith}%`,
-    x: `${leftColumnWith}%`,
+    width: `${100 - leftColumnWidth}%`,
+    x: `${leftColumnWidth}%`,
   });
 
   const rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
