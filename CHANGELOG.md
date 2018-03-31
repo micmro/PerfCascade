@@ -2,6 +2,13 @@
 
 
 
+<a name="v2.3.1"></a>
+## <small>v2.3.1 (2018-03-31)</small>
+
+* #207 - fix typo in leftColumnWidth & add depreciation warning ([8a2e605](https://github.com/micmro/PerfCascade/commit/8a2e605))
+
+
+
 <a name="v2.3.0"></a>
 ## v2.3.0 (2018-03-31)
 
