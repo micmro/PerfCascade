@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.2.3 (18/02/2018) */
+/*! github.com/micmro/PerfCascade Version:2.3.0 (31/03/2018) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 "use strict";
@@ -32,7 +32,7 @@ function removeClass(el, className) {
     }
     else {
         // IE doesn't support classList in SVG
-        el.setAttribute("class", el.getAttribute("class")
+        el.setAttribute("class", (el.getAttribute("class") || "")
             .replace(new RegExp("(\\s|^)" + className + "(\\s|$)", "g"), "$2"));
     }
     return el;
@@ -53,7 +53,7 @@ function getParentByClassName(base, className) {
         }
         base = base.parentElement;
     }
-    return undefined;
+    return null;
 }
 exports.getParentByClassName = getParentByClassName;
 /**
@@ -102,7 +102,7 @@ function safeSetAttribute(el, name, value) {
         console.warn(new Error("Trying to set non-existing attribute " +
             (name + " = " + value + " on a <" + el.tagName.toLowerCase() + ">.")));
     }
-    el.setAttributeNS(null, name, value);
+    el.setAttributeNS("", name, value);
 }
 exports.safeSetAttribute = safeSetAttribute;
 /** Sets multiple CSS style properties, but only if property exists on `el` */
@@ -381,7 +381,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 function parseUrl(url) {
     var pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
-    var matches = url.match(pattern);
+    var matches = url.match(pattern) || [];
     return {
         authority: matches[4],
         fragment: matches[9],
@@ -545,7 +545,7 @@ function toString(source) {
         return source.toString();
     }
     else {
-        throw TypeError("Can't convert type ${typeof source} to string");
+        throw TypeError("Can't convert type " + typeof source + " to string");
     }
 }
 function parseNonEmpty(input) {
@@ -561,11 +561,17 @@ function parseDate(input) {
 }
 exports.parseDate = parseDate;
 function parseNonNegative(input) {
+    if (input === undefined || input === null) {
+        return undefined;
+    }
     var filter = function (n) { return (n >= 0); };
     return parseToNumber(input, filter);
 }
 exports.parseNonNegative = parseNonNegative;
 function parsePositive(input) {
+    if (input === undefined || input === null) {
+        return undefined;
+    }
     var filter = function (n) { return (n > 0); };
     return parseToNumber(input, filter);
 }
@@ -582,13 +588,16 @@ function parseToNumber(input, filterFn) {
     return filter(input);
 }
 function formatMilliseconds(millis) {
-    return misc_1.roundNumber(millis, 3) + " ms";
+    return (millis !== undefined) ? misc_1.roundNumber(millis, 3) + " ms" : undefined;
 }
 exports.formatMilliseconds = formatMilliseconds;
 var secondsPerMinute = 60;
 var secondsPerHour = 60 * secondsPerMinute;
 var secondsPerDay = 24 * secondsPerHour;
 function formatSeconds(seconds) {
+    if (seconds === undefined) {
+        return undefined;
+    }
     var raw = misc_1.roundNumber(seconds, 3) + " s";
     if (seconds > secondsPerDay) {
         return raw + " (~" + misc_1.roundNumber(seconds / secondsPerDay, 0) + " days)";
@@ -603,12 +612,15 @@ function formatSeconds(seconds) {
 }
 exports.formatSeconds = formatSeconds;
 function formatDateLocalized(date) {
-    return date.toUTCString() + "<br/>(local time: " + date.toLocaleString() + ")";
+    return (date !== undefined) ? date.toUTCString() + "<br/>(local time: " + date.toLocaleString() + ")" : undefined;
 }
 exports.formatDateLocalized = formatDateLocalized;
 var bytesPerKB = 1024;
 var bytesPerMB = 1024 * bytesPerKB;
 function formatBytes(bytes) {
+    if (bytes === undefined) {
+        return "";
+    }
     var raw = bytes + " bytes";
     if (bytes >= bytesPerMB) {
         return raw + " (~" + misc_1.roundNumber(bytes / bytesPerMB, 1) + " MB)";
@@ -638,7 +650,7 @@ var htmlChars = new RegExp(Object.keys(htmlCharMap).join("|"), "g");
  */
 function escapeHtml(unsafe) {
     if (unsafe === void 0) { unsafe = ""; }
-    if (unsafe === null) {
+    if (unsafe === null || unsafe === undefined) {
         return ""; // See https://github.com/micmro/PerfCascade/issues/217
     }
     if (typeof unsafe !== "string") {
@@ -690,10 +702,11 @@ exports.toInt = toInt;
 /** Validates the `ChartOptions` attributes types */
 function validateOptions(options) {
     var validateInt = function (name) {
-        options[name] = toInt(options[name]);
-        if (options[name] === undefined) {
+        var val = toInt(options[name]);
+        if (val === undefined) {
             throw TypeError("option \"" + name + "\" needs to be a number");
         }
+        options[name] = val;
     };
     var ensureBoolean = function (name) {
         options[name] = !!options[name];
@@ -827,7 +840,7 @@ var getTestSVGEl = (function () {
  */
 function getNodeTextWidth(textNode, skipClone) {
     if (skipClone === void 0) { skipClone = false; }
-    if (textNode.textContent.length === 0) {
+    if ((textNode.textContent || "").length === 0) {
         return 0;
     }
     var tmp = getTestSVGEl();
@@ -953,7 +966,7 @@ exports.fromHar = fromHar;
 Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../helpers/dom");
 /** Class to keep track of run of a multi-run har is beeing shown  */
-var Paging = (function () {
+var Paging = /** @class */ (function () {
     function Paging(doc, selectedPageIndex) {
         if (selectedPageIndex === void 0) { selectedPageIndex = 0; }
         this.doc = doc;
@@ -1171,7 +1184,7 @@ function parseTimings(entry, start, end) {
     var optionalTiming = function (timing) { return parse_1.parseAndFormat(timing, parse_1.parseNonNegative, parse_1.formatMilliseconds); };
     var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
     var connectVal = optionalTiming(timings.connect);
-    if (timings.ssl > 0) {
+    if (timings.ssl && timings.ssl > 0 && timings.connect) {
         // SSL time is also included in the connect field (to ensure backward compatibility with HAR 1.1).
         connectVal = connectVal + " (without TLS: " + optionalTiming(timings.connect - timings.ssl) + ")";
     }
@@ -1184,7 +1197,7 @@ function parseTimings(entry, start, end) {
         ["Send", parse_1.formatMilliseconds(timings.send)],
         ["Wait", parse_1.formatMilliseconds(timings.wait)],
         ["Receive", parse_1.formatMilliseconds(timings.receive)],
-    ];
+    ].filter(notEmpty);
 }
 /**
  * Data to show in overlay tabs
@@ -1198,9 +1211,9 @@ function getKeys(entry, requestID, startRelative, endRelative) {
     return {
         general: parseGeneralDetails(entry, startRelative, requestID),
         request: parseRequestDetails(entry),
-        requestHeaders: requestHeaders.map(headerToKvTuple),
+        requestHeaders: requestHeaders.map(headerToKvTuple).filter(notEmpty),
         response: parseResponseDetails(entry),
-        responseHeaders: responseHeaders.map(headerToKvTuple),
+        responseHeaders: responseHeaders.map(headerToKvTuple).filter(notEmpty),
         timings: parseTimings(entry, startRelative, endRelative),
     };
 }
@@ -1262,6 +1275,9 @@ function isSecure(entry) {
     return entry.request.url.indexOf("https://") === 0;
 }
 function isPush(entry) {
+    if (entry._was_pushed === undefined || entry._was_pushed === null) {
+        return false;
+    }
     function toInt(input) {
         if (typeof input === "string") {
             return parseInt(input, 10);
@@ -1448,12 +1464,11 @@ var helpers_1 = require("./helpers");
  * @returns WaterfallDocs
  */
 function transformDoc(harData, options) {
-    var _this = this;
     // make sure it's the *.log base node
     var data = (harData["log"] !== undefined ? harData["log"] : harData);
     var pages = getPages(data);
     return {
-        pages: pages.map(function (_page, i) { return _this.transformPage(data, i, options); }),
+        pages: pages.map(function (_page, i) { return transformPage(data, i, options); }),
     };
 }
 exports.transformDoc = transformDoc;
@@ -1503,6 +1518,9 @@ function transformPage(harData, pageIndex, options) {
     var data = (harData["log"] !== undefined ? harData["log"] : harData);
     var pages = getPages(data);
     var currPage = pages[pageIndex];
+    if (!currPage.startedDateTime) {
+        throw new TypeError("Invalid HAR document: \"log.pages[" + pageIndex + "].startedDateTime\" is not set");
+    }
     var pageStartTime = new Date(currPage.startedDateTime).getTime();
     var pageTimings = currPage.pageTimings;
     var doneTime = 0;
@@ -1552,6 +1570,9 @@ exports.transformPage = transformPage;
  * @param {ChartOptions} options - HAR options
  */
 var getMarks = function (pageTimings, currPage, options) {
+    if (pageTimings === undefined) {
+        return [];
+    }
     var sortFn = function (a, b) { return a.startTime - b.startTime; };
     var marks = Object.keys(pageTimings)
         .filter(function (k) { return (typeof pageTimings[k] === "number" && pageTimings[k] >= 0); })
@@ -1586,7 +1607,7 @@ var getUserTimimngs = function (currPage, options) {
         var name;
         var fullName;
         var duration;
-        _a = findName.exec(k), fullName = _a[1], name = _a[2];
+        _a = findName.exec(k) || [, undefined, undefined], fullName = _a[1], name = _a[2];
         fullName = parse_1.escapeHtml(fullName);
         name = parse_1.escapeHtml(name);
         if (fullName !== name && currPage["_userTime.endTimer-" + name]) {
@@ -1616,17 +1637,18 @@ var getUserTimimngs = function (currPage, options) {
  */
 var buildDetailTimingBlocks = function (startRelative, harEntry) {
     var t = harEntry.timings;
-    return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce(function (collect, key) {
+    var types = ["blocked", "dns", "connect", "send", "wait", "receive"];
+    return types.reduce(function (collect, key) {
         var time = getTimePair(key, harEntry, collect, startRelative);
         if (time.end && time.start >= time.end) {
             return collect;
         }
         // special case for 'connect' && 'ssl' since they share time
         // http://www.softwareishard.com/blog/har-12-spec/#timings
-        if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
-            var sslStart = parseInt(harEntry["_ssl_start"], 10) || time.start;
-            var sslEnd = parseInt(harEntry["_ssl_end"], 10) || time.start + t.ssl;
-            var connectStart = (!!parseInt(harEntry["_ssl_start"], 10)) ? time.start : sslEnd;
+        if (key === "connect" && t.ssl && t.ssl !== -1) {
+            var sslStart = parseInt("" + harEntry["_ssl_start"], 10) || time.start;
+            var sslEnd = parseInt("" + harEntry["_ssl_end"], 10) || time.start + t.ssl;
+            var connectStart = (!!parseInt("" + harEntry["_ssl_start"], 10)) ? time.start : sslEnd;
             return collect
                 .concat([helpers_1.createWaterfallEntryTiming("ssl", Math.round(sslStart), Math.round(sslEnd))])
                 .concat([helpers_1.createWaterfallEntryTiming(key, Math.round(connectStart), Math.round(time.end))]);
@@ -1673,7 +1695,7 @@ var getTimePair = function (key, harEntry, collect, startRelative) {
  */
 var createResponseDetails = function (entry, indicators) {
     var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
-    var statusClean = parse_1.toInt(entry.response.status);
+    var statusClean = parse_1.toInt(entry.response.status) || 0;
     return {
         icon: helpers_1.makeMimeTypeIcon(statusClean, entry.response.statusText, requestType, entry.response.redirectURL),
         indicators: indicators,
@@ -1694,7 +1716,7 @@ var svg_indicators_1 = require("../waterfall/row/svg-indicators");
 var escapeHtmlLight = function (str) { return parse_1.escapeHtml(str).replace("&ltbr/&gt", "<br/>"); };
 /**
  * Converts `dlKeyValues` to the contennd a definition list, without the outer `<dl>` tags
- * @param {KvTuple[]} dlKeyValues array of Key/Value pair
+ * @param {SafeKvTuple[]} dlKeyValues array of Key/Value pair
  * @param {boolean} [addClass=false] if `true` the key in `dlKeyValues`
  * is converted to a class name andd added to the `<dt>`
  * @returns {string} stringified HTML definition list
@@ -1709,7 +1731,6 @@ function makeDefinitionList(dlKeyValues, addClass) {
         return "class=\"" + className + "\"";
     };
     return dlKeyValues
-        .filter(function (tuple) { return tuple[1] !== undefined; })
         .map(function (tuple) { return "\n      <dt " + makeClass(tuple[0]) + ">" + escapeHtmlLight(tuple[0]) + "</dt>\n      <dd>" + escapeHtmlLight(tuple[1]) + "</dd>\n    "; }).join("");
 }
 exports.makeDefinitionList = makeDefinitionList;
@@ -1762,7 +1783,7 @@ exports.mimeToRequestType = mimeToRequestType;
 /** helper to create a `WaterfallEntry` */
 function createWaterfallEntry(url, start, end, segments, responseDetails, tabs) {
     if (segments === void 0) { segments = []; }
-    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    var total = (typeof start !== "number" || typeof end !== "number") ? NaN : (end - start);
     return {
         end: end,
         responseDetails: responseDetails,
@@ -1776,7 +1797,7 @@ function createWaterfallEntry(url, start, end, segments, responseDetails, tabs) 
 exports.createWaterfallEntry = createWaterfallEntry;
 /** helper to create a `WaterfallEntryTiming` */
 function createWaterfallEntryTiming(type, start, end) {
-    var total = (typeof start !== "number" || typeof end !== "number") ? undefined : (end - start);
+    var total = (typeof start !== "number" || typeof end !== "number") ? NaN : (end - start);
     var typeClean = parse_1.sanitizeAlphaNumeric(type);
     return {
         end: end,
@@ -1928,7 +1949,7 @@ var dom_1 = require("../../helpers/dom");
 var misc_1 = require("../../helpers/misc");
 var svg_details_overlay_1 = require("./svg-details-overlay");
 /** Overlay (popup) instance manager */
-var OverlayManager = (function () {
+var OverlayManager = /** @class */ (function () {
     function OverlayManager(context) {
         this.context = context;
         /** Collection of currely open overlays */
@@ -1944,7 +1965,7 @@ var OverlayManager = (function () {
     }
     /** all open overlays height combined */
     OverlayManager.prototype.getCombinedOverlayHeight = function () {
-        return this.openOverlays.reduce(function (pre, curr) { return pre + curr.height; }, 0);
+        return this.openOverlays.reduce(function (pre, curr) { return pre + (curr.height || 0); }, 0);
     };
     /**
      * Opens an overlay - rerenders others internaly
@@ -2032,20 +2053,21 @@ var OverlayManager = (function () {
         };
         var updateRow = function (rowItem, index) {
             var overlay = misc_1.find(_this.openOverlays, function (o) { return o.index === index; });
-            var overlayEl = rowItem.nextElementSibling.firstElementChild;
+            var nextRowItem = rowItem.nextElementSibling;
+            var overlayEl = nextRowItem.firstElementChild;
             _this.realignRow(rowItem, currY);
             if (overlay === undefined) {
-                if (overlayEl) {
+                if (overlayEl && nextRowItem !== null) {
                     // remove closed overlay
-                    rowItem.nextElementSibling.querySelector("a")
+                    nextRowItem.querySelector("a")
                         .removeEventListener("keydown", OverlayManager.firstElKeypress);
-                    dom_1.getLastItemOfNodeList(rowItem.nextElementSibling.querySelectorAll("button"))
+                    dom_1.getLastItemOfNodeList(nextRowItem.querySelectorAll("button"))
                         .removeEventListener("keydown", OverlayManager.lastElKeypress);
-                    dom_1.removeChildren(rowItem.nextElementSibling);
+                    dom_1.removeChildren(nextRowItem);
                 }
                 return; // not open
             }
-            if (overlayEl) {
+            if (overlayEl && overlay.actualY !== undefined) {
                 var bg = overlayEl.querySelector(".info-overlay-bg");
                 var fo = overlayEl.querySelector("foreignObject");
                 var btnRect = overlayEl.querySelector(".info-overlay-close-btn rect");
@@ -2062,43 +2084,43 @@ var OverlayManager = (function () {
         };
         rowItems.forEach(updateRow);
     };
+    OverlayManager.showFullName = function (el) {
+        el.getElementsByClassName("row-fixed").item(0)
+            .dispatchEvent(new MouseEvent("mouseenter"));
+    };
+    /**
+     * Keypress Event handler for fist el in Overlay,
+     * to manage highlighting of the element above
+     */
+    OverlayManager.firstElKeypress = function (evt) {
+        if (misc_1.isTabUp(evt)) {
+            var par = dom_1.getParentByClassName(evt.target, "row-overlay-holder");
+            if (par && par.previousElementSibling) {
+                OverlayManager.showFullName(par.previousElementSibling);
+            }
+        }
+    };
+    /**
+     * Keypress Event handler for last el in Overlay,
+     * to manage highlighting of the element below
+     */
+    OverlayManager.lastElKeypress = function (evt) {
+        if (misc_1.isTabDown(evt)) {
+            var par = dom_1.getParentByClassName(evt.target, "row-overlay-holder");
+            if (par && par.nextElementSibling) {
+                OverlayManager.showFullName(par.nextElementSibling);
+            }
+        }
+    };
     return OverlayManager;
 }());
-OverlayManager.showFullName = function (el) {
-    el.getElementsByClassName("row-fixed").item(0)
-        .dispatchEvent(new MouseEvent("mouseenter"));
-};
-/**
- * Keypress Event handler for fist el in Overlay,
- * to manage highlighting of the element above
- */
-OverlayManager.firstElKeypress = function (evt) {
-    if (misc_1.isTabUp(evt)) {
-        var par = dom_1.getParentByClassName(evt.target, "row-overlay-holder");
-        if (par && par.previousElementSibling) {
-            OverlayManager.showFullName(par.previousElementSibling);
-        }
-    }
-};
-/**
- * Keypress Event handler for last el in Overlay,
- * to manage highlighting of the element below
- */
-OverlayManager.lastElKeypress = function (evt) {
-    if (misc_1.isTabDown(evt)) {
-        var par = dom_1.getParentByClassName(evt.target, "row-overlay-holder");
-        if (par && par.nextElementSibling) {
-            OverlayManager.showFullName(par.nextElementSibling);
-        }
-    }
-};
 exports.OverlayManager = OverlayManager;
 exports.default = OverlayManager;
 
 },{"../../helpers/dom":1,"../../helpers/misc":4,"./svg-details-overlay":19}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var PubSub = (function () {
+var PubSub = /** @class */ (function () {
     function PubSub() {
         this.subscribers = [];
     }
@@ -2305,13 +2327,13 @@ function makeBlock(rectData, className) {
  * @returns RectData
  */
 function segmentToRectData(segment, rectData) {
+    var total = (!isNaN(segment.total)) ? "<br/>total: " + Math.round(segment.total) + "ms" : "";
     return {
         cssClass: styling_converters_1.timingTypeToCssClass(segment.type),
         height: (rectData.height - 6),
         hideOverlay: rectData.hideOverlay,
         label: "<strong>" + segment.type + "</strong><br/>" +
-            (Math.round(segment.start) + "ms - " + Math.round(segment.end) + "ms<br/>") +
-            ("total: " + Math.round(segment.total) + "ms"),
+            (Math.round(segment.start) + "ms - " + Math.round(segment.end) + "ms" + total),
         showOverlay: rectData.showOverlay,
         unit: rectData.unit,
         width: segment.total,
@@ -2354,7 +2376,7 @@ function createRect(rectData, segments, timeTotal) {
     rectHolder.appendChild(rect);
     if (segments && segments.length > 0) {
         segments.forEach(function (segment) {
-            if (segment.total > 0 && typeof segment.start === "number") {
+            if (!isNaN(segment.total) && segment.total > 0 && typeof segment.start === "number") {
                 var childRectData = segmentToRectData(segment, rectData);
                 var childRect = makeBlock(childRectData, "segment " + childRectData.cssClass);
                 firstX = Math.min(firstX, childRectData.x);
@@ -2551,7 +2573,7 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
     var y = rectData.y;
     var rowHeight = rectData.height;
     var leftColumnWith = context.options.leftColumnWith;
-    var rowItem = svg.newA(entry.responseDetails.rowClass);
+    var rowItem = svg.newA(entry.responseDetails.rowClass || "");
     rowItem.setAttribute("tabindex", "0");
     rowItem.setAttribute("xlink:href", "javascript:void(0)");
     var leftFixedHolder = svg.newSvg("left-fixed-holder", {
@@ -2605,18 +2627,27 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
         onDetailsOverlayShow(evt);
     });
     rowItem.addEventListener("keydown", function (evt) {
+        var e = evt; // need to type this manually
         // space on enter
-        if (evt.which === 32 || evt.which === 13) {
-            evt.preventDefault();
-            return onDetailsOverlayShow(evt);
+        if (e.which === 32 || e.which === 13) {
+            e.preventDefault();
+            return onDetailsOverlayShow(e);
         }
         // tab without open overlays around
-        if (misc_1.isTabUp(evt) && !hasPrevOpenOverlay && index > 0) {
-            rowItem.previousSibling.previousSibling.lastChild.lastChild.dispatchEvent(new MouseEvent("mouseenter"));
+        if (misc_1.isTabUp(e) && !hasPrevOpenOverlay && index > 0) {
+            if (rowItem.previousSibling &&
+                rowItem.previousSibling.previousSibling &&
+                rowItem.previousSibling.previousSibling.lastChild &&
+                rowItem.previousSibling.previousSibling.lastChild.lastChild) {
+                rowItem.previousSibling.previousSibling.lastChild.lastChild.dispatchEvent(new MouseEvent("mouseenter"));
+            }
             return;
         }
-        if (misc_1.isTabDown(evt) && !hasOpenOverlay) {
-            if (rowItem.nextSibling && rowItem.nextSibling.nextSibling) {
+        if (misc_1.isTabDown(e) && !hasOpenOverlay) {
+            if (rowItem.nextSibling &&
+                rowItem.nextSibling.nextSibling &&
+                rowItem.nextSibling.nextSibling.lastChild &&
+                rowItem.nextSibling.nextSibling.lastChild.lastChild) {
                 rowItem.nextSibling.nextSibling.lastChild.lastChild.dispatchEvent(new MouseEvent("mouseenter"));
             }
             return;
@@ -2645,6 +2676,7 @@ var translateYRegEx = /(?:translate)\(.+[, ]+(.+)\)/;
 var tooltipMaxWidth = 200;
 var getTranslateY = function (str) {
     if (str === void 0) { str = ""; }
+    str = (str === null) ? "" : str;
     var res = translateYRegEx.exec(str);
     if (res && res.length >= 2) {
         return parseInt(res[1], 10);
@@ -2657,9 +2689,9 @@ exports.onHoverInShowTooltip = function (base, rectData, foreignEl) {
     var row = dom_1.getParentByClassName(base, "row-item");
     var yTransformOffsest = getTranslateY(row.getAttribute("transform"));
     /** Base Y */
-    var yInt = parseInt(base.getAttribute("y"), 10);
+    var yInt = parseInt(base.getAttribute("y") || "", 10);
     /** Base X */
-    var x = base.getAttribute("x");
+    var x = base.getAttribute("x") || "";
     /** X Positon of parent in Percent */
     var xPercInt = parseFloat(x);
     var offsetY = 50;
@@ -2669,7 +2701,7 @@ exports.onHoverInShowTooltip = function (base, rectData, foreignEl) {
     var pxPerPerc = rowWidthPx / (rectData.width / rectData.unit);
     var percPerPx = (rectData.width / rectData.unit) / rowWidthPx;
     var isLeftOfRow = xPercInt > 50 && ((95 - xPercInt) * pxPerPerc < tooltipMaxWidth);
-    innerDiv.innerHTML = rectData.label;
+    innerDiv.innerHTML = rectData.label || "";
     // Disable animation for size-gathering
     dom_1.addClass(innerDiv, "no-anim");
     foreignEl.style.display = "block";
@@ -2684,7 +2716,7 @@ exports.onHoverInShowTooltip = function (base, rectData, foreignEl) {
     }
     if (isLeftOfRow) {
         var newLeft = xPercInt - ((innerDiv.clientWidth + 5) * percPerPx);
-        var leftOffset = parseInt(foreignEl.querySelector("body").style.left, 10);
+        var leftOffset = parseInt(foreignEl.querySelector("body").style.left || "", 10);
         var ratio = 1 / (1 / 100 * (100 - leftOffset));
         leftOffset = ratio * leftOffset;
         if (newLeft > -leftOffset) {
@@ -2832,18 +2864,19 @@ var appendSecond = function (context, timeHolder, secsTotal, sec, addLabel) {
     /** just used if `addLabel` is `true` - for full seconds */
     var lineLabel;
     var lineClass = "sub-second-line";
+    var x;
     if (addLabel) {
         var showTextBefore = (sec > secsTotal - 0.2);
         lineClass = "second-line";
-        var x_1 = misc_1.roundNumber(secPerc * sec) + 0.5 + "%";
+        x = misc_1.roundNumber(secPerc * sec) + 0.5 + "%";
         var css = {};
         if (showTextBefore) {
-            x_1 = misc_1.roundNumber(secPerc * sec) - 0.5 + "%";
+            x = misc_1.roundNumber(secPerc * sec) - 0.5 + "%";
             css["text-anchor"] = "end";
         }
-        lineLabel = svg.newTextEl(sec + "s", { x: x_1, y: diagramHeight }, css);
+        lineLabel = svg.newTextEl(sec + "s", { x: x, y: diagramHeight }, css);
     }
-    var x = misc_1.roundNumber(secPerc * sec) + "%";
+    x = misc_1.roundNumber(secPerc * sec) + "%";
     var lineEl = svg.newLine({
         x1: x,
         x2: x,
@@ -2918,7 +2951,7 @@ function createMarks(context, marks) {
         });
         var lastMark = marks[i - 1];
         var minDistance = 2.5; // minimum distance between marks
-        if (lastMark && mark.x - lastMark.x < minDistance) {
+        if (lastMark && lastMark.x !== undefined && mark.x - lastMark.x < minDistance) {
             lineLabel.setAttribute("x", lastMark.x + minDistance + "%");
             mark.x = lastMark.x + minDistance;
         }
@@ -3016,6 +3049,14 @@ exports.createLineRect = createLineRect;
 
 },{"../../helpers/dom":1,"../../helpers/misc":4,"../../helpers/svg":6}],27:[function(require,module,exports){
 "use strict";
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var svg = require("../helpers/svg");
 var styling_converters_1 = require("../transformers/styling-converters");
@@ -3023,9 +3064,9 @@ var overlay_manager_1 = require("./details-overlay/overlay-manager");
 var pub_sub_1 = require("./details-overlay/pub-sub");
 var row = require("./row/svg-row");
 var svg_tooltip_1 = require("./row/svg-tooltip");
-var alignmentHelper = require("./sub-components/svg-alignment-helper");
-var generalComponents = require("./sub-components/svg-general-components");
-var marks = require("./sub-components/svg-marks");
+var svgAlignmentHelper = require("./sub-components/svg-alignment-helper");
+var svgGeneralComponents = require("./sub-components/svg-general-components");
+var svgMarks = require("./sub-components/svg-marks");
 /**
  * Get a string that's as wide, or wider than any number from 0-n.
  * @param {number} n the highest number that should fit within the returned string's width.
@@ -3066,13 +3107,11 @@ function createContext(data, options, entriesToShow) {
     var context = {
         diagramHeight: diagramHeight,
         options: options,
-        overlayManager: undefined,
         pubSub: new pub_sub_1.PubSub(),
         unit: unit,
     };
     // `overlayManager` needs the `context` reference, so it's attached later
-    context.overlayManager = new overlay_manager_1.default(context);
-    return context;
+    return __assign({}, context, { overlayManager: new overlay_manager_1.default(context) });
 }
 /**
  * Entry point to start rendering the full waterfall SVG
@@ -3106,14 +3145,14 @@ function createWaterfallSvg(data, options) {
     var mouseListeners;
     if (options.showAlignmentHelpers) {
         hoverOverlayHolder = svg.newG("hover-overlays");
-        var hoverEl = alignmentHelper.createAlignmentLines(context.diagramHeight);
+        var hoverEl = svgAlignmentHelper.createAlignmentLines(context.diagramHeight);
         hoverOverlayHolder.appendChild(hoverEl.startline);
         hoverOverlayHolder.appendChild(hoverEl.endline);
-        mouseListeners = alignmentHelper.makeHoverEvtListeners(hoverEl);
+        mouseListeners = svgAlignmentHelper.makeHoverEvtListeners(hoverEl);
     }
     // Start appending SVG elements to the holder element (timeLineHolder)
-    scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(context, data.durationMs));
-    scaleAndMarksHolder.appendChild(marks.createMarks(context, data.marks));
+    scaleAndMarksHolder.appendChild(svgGeneralComponents.createTimeScale(context, data.durationMs));
+    scaleAndMarksHolder.appendChild(svgMarks.createMarks(context, data.marks));
     // This assumes all icons (mime and indicators) have the same width
     var perIconWidth = entriesToShow[0].responseDetails.icon.width;
     var maxIcons = 0;
@@ -3150,7 +3189,7 @@ function createWaterfallSvg(data, options) {
             hideOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
             label: "<strong>" + entry.url + "</strong><br/>" +
                 (Math.round(entry.start) + "ms - " + Math.round(entry.end) + "ms<br/>") +
-                ("total: " + Math.round(entry.total) + "ms"),
+                ("total: " + (isNaN(entry.total) ? "n/a " : Math.round(entry.total)) + "ms"),
             showOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
             unit: context.unit,
             width: entryWidth,
@@ -3167,7 +3206,7 @@ function createWaterfallSvg(data, options) {
     }
     // Main loop to render rows with blocks
     entriesToShow.forEach(renderRow);
-    if (options.showAlignmentHelpers) {
+    if (options.showAlignmentHelpers && hoverOverlayHolder !== undefined) {
         scaleAndMarksHolder.appendChild(hoverOverlayHolder);
     }
     timeLineHolder.appendChild(scaleAndMarksHolder);
