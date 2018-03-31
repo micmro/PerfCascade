@@ -8,7 +8,8 @@
     "noImplicitAny": false,
     "noImplicitReturns": true,
     "noUnusedParameters": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "strict": true
   },
   "exclude": [
     "node_modules",

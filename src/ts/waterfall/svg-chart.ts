@@ -1,6 +1,6 @@
 import * as svg from "../helpers/svg";
 import { requestTypeToCssClass } from "../transformers/styling-converters";
-import { Context } from "../typing/context";
+import { Context, ContextCore } from "../typing/context";
 import { ChartRenderOption } from "../typing/options";
 import { RectData } from "../typing/rect-data";
 import { HoverEvtListeners } from "../typing/svg-alignment-helpers";
@@ -10,9 +10,9 @@ import OverlayManager from "./details-overlay/overlay-manager";
 import { PubSub } from "./details-overlay/pub-sub";
 import * as row from "./row/svg-row";
 import { makeTooltip } from "./row/svg-tooltip";
-import * as alignmentHelper from "./sub-components/svg-alignment-helper";
-import * as generalComponents from "./sub-components/svg-general-components";
-import * as marks from "./sub-components/svg-marks";
+import * as svgAlignmentHelper from "./sub-components/svg-alignment-helper";
+import * as svgGeneralComponents from "./sub-components/svg-general-components";
+import * as svgMarks from "./sub-components/svg-marks";
 
 /**
  * Get a string that's as wide, or wider than any number from 0-n.
@@ -55,17 +55,17 @@ function createContext(data: WaterfallData, options: ChartRenderOption,
                        entriesToShow: WaterfallEntry[]): Context {
   const unit = data.durationMs / 100;
   const diagramHeight = (entriesToShow.length + 1) * options.rowHeight;
-  const context = {
+  const context: ContextCore = {
     diagramHeight,
     options,
-    overlayManager: undefined,
-    pubSub : new PubSub(),
+    pubSub: new PubSub(),
     unit,
   };
   // `overlayManager` needs the `context` reference, so it's attached later
-  context.overlayManager = new OverlayManager(context);
-
-  return context;
+  return {
+    ...context,
+    overlayManager: new OverlayManager(context),
+  };
 }
 
 /**
@@ -103,20 +103,20 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   });
 
   /** Holder for on-hover vertical comparison bars */
-  let hoverOverlayHolder: SVGGElement;
+  let hoverOverlayHolder: SVGGElement | undefined;
   let mouseListeners: HoverEvtListeners;
   if (options.showAlignmentHelpers) {
     hoverOverlayHolder = svg.newG("hover-overlays");
-    const hoverEl = alignmentHelper.createAlignmentLines(context.diagramHeight);
+    const hoverEl = svgAlignmentHelper.createAlignmentLines(context.diagramHeight);
     hoverOverlayHolder.appendChild(hoverEl.startline);
     hoverOverlayHolder.appendChild(hoverEl.endline);
-    mouseListeners = alignmentHelper.makeHoverEvtListeners(hoverEl);
+    mouseListeners = svgAlignmentHelper.makeHoverEvtListeners(hoverEl);
   }
 
   // Start appending SVG elements to the holder element (timeLineHolder)
 
-  scaleAndMarksHolder.appendChild(generalComponents.createTimeScale(context, data.durationMs));
-  scaleAndMarksHolder.appendChild(marks.createMarks(context, data.marks));
+  scaleAndMarksHolder.appendChild(svgGeneralComponents.createTimeScale(context, data.durationMs));
+  scaleAndMarksHolder.appendChild(svgMarks.createMarks(context, data.marks));
 
   // This assumes all icons (mime and indicators) have the same width
   const perIconWidth = entriesToShow[0].responseDetails.icon.width;
@@ -162,7 +162,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
       hideOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseLeavePartial : undefined,
       label: `<strong>${entry.url}</strong><br/>` +
         `${Math.round(entry.start)}ms - ${Math.round(entry.end)}ms<br/>` +
-        `total: ${Math.round(entry.total)}ms`,
+        `total: ${isNaN(entry.total) ? "n/a " : Math.round(entry.total)}ms`,
       showOverlay: options.showAlignmentHelpers ? mouseListeners.onMouseEnterPartial : undefined,
       unit: context.unit,
       width: entryWidth,
@@ -184,7 +184,7 @@ export function createWaterfallSvg(data: WaterfallData, options: ChartRenderOpti
   // Main loop to render rows with blocks
   entriesToShow.forEach(renderRow);
 
-  if (options.showAlignmentHelpers) {
+  if (options.showAlignmentHelpers && hoverOverlayHolder !== undefined) {
     scaleAndMarksHolder.appendChild(hoverOverlayHolder);
   }
   timeLineHolder.appendChild(scaleAndMarksHolder);

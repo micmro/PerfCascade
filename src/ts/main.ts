@@ -44,7 +44,7 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<Cha
 
   // page update behaviour
   paging.onPageUpdate((_pageIndex, pageDoc) => {
-    const el = doc.parentElement;
+    const el = doc.parentElement as HTMLElement;
     const newDoc = createWaterfallSvg(pageDoc, options);
     el.replaceChild(newDoc, doc);
     doc = newDoc;
@@ -68,7 +68,7 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<Cha
  * @returns {SVGSVGElement} - Chart SVG Element
  */
 export function fromHar(harData: Har, options: ChartOptions = {}): SVGSVGElement {
-  const harTransformerOptions: HarTransformerOptions = {
+  const harTransformerOptions = {
     ...defaultHarTransformerOptions,
     ...options,
   };

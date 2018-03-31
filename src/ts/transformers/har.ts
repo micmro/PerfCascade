@@ -40,7 +40,7 @@ export function transformDoc(harData: Har | Log, options: HarTransformerOptions)
   const pages = getPages(data);
 
   return {
-    pages: pages.map((_page, i) => this.transformPage(data, i, options)),
+    pages: pages.map((_page, i) => transformPage(data, i, options)),
   };
 }
 
@@ -100,6 +100,9 @@ export function transformPage(harData: Har | Log,
 
   const pages = getPages(data);
   const currPage = pages[pageIndex];
+  if (!currPage.startedDateTime) {
+    throw new TypeError(`Invalid HAR document: "log.pages[${pageIndex}].startedDateTime" is not set`);
+  }
   const pageStartTime = new Date(currPage.startedDateTime).getTime();
   const pageTimings = currPage.pageTimings;
 
@@ -153,10 +156,13 @@ export function transformPage(harData: Har | Log,
  * @param {Page} currPage - active page
  * @param {ChartOptions} options - HAR options
  */
-const getMarks = (pageTimings: PageTiming, currPage: Page, options: ChartOptions) => {
+const getMarks = (pageTimings: PageTiming, currPage: Page, options: ChartOptions): UserTiming[] => {
+  if (pageTimings === undefined) {
+    return [];
+  }
   const sortFn = (a: Mark, b: Mark) => a.startTime - b.startTime;
   const marks = Object.keys(pageTimings)
-    .filter((k: keyof PageTiming) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
+    .filter((k) => (typeof pageTimings[k] === "number" && pageTimings[k] >= 0))
     .map((k) => ({
       name: `${escapeHtml(k.replace(/^[_]/, ""))} (${roundNumber(pageTimings[k], 0)} ms)`,
       startTime: pageTimings[k],
@@ -193,10 +199,10 @@ const getUserTimimngs = (currPage: Page, options: ChartOptions) => {
   const findName = /^_userTime\.((?:startTimer-)?(.+))$/;
 
   const extractUserTiming = (k: string) => {
-    let name: string;
-    let fullName: string;
+    let name: string | undefined;
+    let fullName: string | undefined;
     let duration: number;
-    [, fullName, name] = findName.exec(k);
+    [, fullName, name] = findName.exec(k) || [, undefined, undefined];
 
     fullName = escapeHtml(fullName);
     name = escapeHtml(name);
@@ -230,9 +236,8 @@ const getUserTimimngs = (currPage: Page, options: ChartOptions) => {
  */
 const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): WaterfallEntryTiming[] => {
   const t = harEntry.timings;
-  return ["blocked", "dns", "connect", "send", "wait", "receive"].reduce((collect: WaterfallEntryTiming[],
-                                                                          key: TimingType) => {
-
+  const types: TimingType[] = ["blocked", "dns", "connect", "send", "wait", "receive"];
+  return types.reduce((collect: WaterfallEntryTiming[], key: TimingType) => {
     const time = getTimePair(key, harEntry, collect, startRelative);
 
     if (time.end && time.start >= time.end) {
@@ -241,10 +246,10 @@ const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): Waterf
 
     // special case for 'connect' && 'ssl' since they share time
     // http://www.softwareishard.com/blog/har-12-spec/#timings
-    if (key === "connect" && t["ssl"] && t["ssl"] !== -1) {
-      const sslStart = parseInt(harEntry[`_ssl_start`], 10) || time.start;
-      const sslEnd = parseInt(harEntry[`_ssl_end`], 10) || time.start + t.ssl;
-      const connectStart = (!!parseInt(harEntry[`_ssl_start`], 10)) ? time.start : sslEnd;
+    if (key === "connect" && t.ssl && t.ssl !== -1) {
+      const sslStart = parseInt(`${harEntry[`_ssl_start`]}`, 10) || time.start;
+      const sslEnd = parseInt(`${harEntry[`_ssl_end`]}`, 10) || time.start + t.ssl;
+      const connectStart = (!!parseInt(`${harEntry[`_ssl_start`]}`, 10)) ? time.start : sslEnd;
       return collect
         .concat([createWaterfallEntryTiming("ssl", Math.round(sslStart), Math.round(sslEnd))])
         .concat([createWaterfallEntryTiming(key, Math.round(connectStart), Math.round(time.end))]);
@@ -291,7 +296,7 @@ const getTimePair = (key: string, harEntry: Entry, collect: WaterfallEntryTiming
  */
 const createResponseDetails = (entry: Entry, indicators: WaterfallEntryIndicator[]): WaterfallResponseDetails => {
   const requestType = mimeToRequestType(entry.response.content.mimeType);
-  const statusClean = toInt(entry.response.status);
+  const statusClean = toInt(entry.response.status) || 0;
   return {
     icon: makeMimeTypeIcon(statusClean, entry.response.statusText, requestType, entry.response.redirectURL),
     indicators,

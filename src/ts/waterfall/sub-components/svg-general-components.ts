@@ -24,11 +24,12 @@ const appendSecond = (context: Context, timeHolder: SVGGElement,
   /** just used if `addLabel` is `true` - for full seconds */
   let lineLabel;
   let lineClass = "sub-second-line";
+  let x: string;
 
   if (addLabel) {
     const showTextBefore = (sec > secsTotal - 0.2);
     lineClass = "second-line";
-    let x = roundNumber(secPerc * sec) + 0.5 + "%";
+    x = roundNumber(secPerc * sec) + 0.5 + "%";
     const css = {};
     if (showTextBefore) {
       x = roundNumber(secPerc * sec) - 0.5 + "%";
@@ -37,7 +38,7 @@ const appendSecond = (context: Context, timeHolder: SVGGElement,
     lineLabel = svg.newTextEl(sec + "s", { x, y: diagramHeight }, css);
   }
 
-  const x = roundNumber(secPerc * sec) + "%";
+  x = roundNumber(secPerc * sec) + "%";
   const lineEl = svg.newLine({
     x1: x,
     x2: x,

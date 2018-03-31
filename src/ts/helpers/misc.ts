@@ -8,7 +8,7 @@
  */
 function parseUrl(url: string) {
   const pattern = RegExp("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
-  const matches = url.match(pattern);
+  const matches = url.match(pattern) || [];
   return {
     authority: matches[4],
     fragment: matches[9],

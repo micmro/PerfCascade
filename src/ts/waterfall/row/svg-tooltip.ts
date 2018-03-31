@@ -12,7 +12,8 @@ import { RectData } from "../../typing/rect-data";
 const translateYRegEx = /(?:translate)\(.+[, ]+(.+)\)/;
 const tooltipMaxWidth = 200;
 
-const getTranslateY = (str: string = "") => {
+const getTranslateY = (str: string | null = "") => {
+  str = (str === null) ? "" : str;
   const res = translateYRegEx.exec(str);
   if (res && res.length >= 2) {
     return parseInt(res[1], 10);
@@ -26,9 +27,9 @@ export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, f
   const row = getParentByClassName(base, "row-item") as SVGAElement;
   const yTransformOffsest = getTranslateY(row.getAttribute("transform"));
   /** Base Y */
-  const yInt = parseInt(base.getAttribute("y"), 10);
+  const yInt = parseInt(base.getAttribute("y") || "", 10);
   /** Base X */
-  const x = base.getAttribute("x");
+  const x = base.getAttribute("x") || "";
   /** X Positon of parent in Percent */
   const xPercInt = parseFloat(x);
   let offsetY = 50;
@@ -38,7 +39,7 @@ export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, f
   const pxPerPerc = rowWidthPx / (rectData.width / rectData.unit);
   const percPerPx = (rectData.width / rectData.unit) / rowWidthPx;
   const isLeftOfRow = xPercInt > 50 && ((95 - xPercInt) * pxPerPerc < tooltipMaxWidth);
-  innerDiv.innerHTML = rectData.label;
+  innerDiv.innerHTML = rectData.label || "";
   // Disable animation for size-gathering
   addClass(innerDiv, "no-anim");
   foreignEl.style.display = "block";
@@ -54,7 +55,7 @@ export const onHoverInShowTooltip = (base: SVGRectElement, rectData: RectData, f
   }
   if (isLeftOfRow) {
     const newLeft = xPercInt - ((innerDiv.clientWidth + 5) * percPerPx);
-    let leftOffset = parseInt(foreignEl.querySelector("body").style.left, 10);
+    let leftOffset = parseInt((foreignEl.querySelector("body") as HTMLBodyElement).style.left || "", 10);
     const ratio = 1 / (1 / 100 * (100 - leftOffset));
     leftOffset = ratio * leftOffset;
     if (newLeft > -leftOffset) { // tooltip still visible

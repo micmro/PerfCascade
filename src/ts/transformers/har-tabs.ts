@@ -2,8 +2,8 @@ import { Entry } from "har-format";
 import { pluralize } from "../helpers/misc";
 import { escapeHtml, sanitizeUrlForLink } from "../helpers/parse";
 import {
-  KvTuple,
   RequestType,
+  SafeKvTuple,
   TabRenderer,
   WaterfallEntryIndicator,
   WaterfallEntryTab,
@@ -59,7 +59,7 @@ function makeLazyWaterfallEntryTab(title: string, renderContent: TabRenderer,
 }
 
 /** General tab with warnings etc. */
-function makeGeneralTab(generalData: KvTuple[], indicators: WaterfallEntryIndicator[]): WaterfallEntryTab {
+function makeGeneralTab(generalData: SafeKvTuple[], indicators: WaterfallEntryIndicator[]): WaterfallEntryTab {
   const mainContent = makeDefinitionList(generalData);
   if (indicators.length === 0) {
     return makeWaterfallEntryTab("General", mainContent);
@@ -70,14 +70,14 @@ function makeGeneralTab(generalData: KvTuple[], indicators: WaterfallEntryIndica
   // Make indicator sections
   const errors = indicators
     .filter((i) => i.type === "error")
-    .map((i) => [i.title, i.description] as KvTuple);
+    .map((i) => [i.title, i.description] as SafeKvTuple);
   const warnings = indicators
     .filter((i) => i.type === "warning")
-    .map((i) => [i.title, i.description] as KvTuple);
+    .map((i) => [i.title, i.description] as SafeKvTuple);
   // all others
   const info = indicators
     .filter((i) => i.type !== "error" && i.type !== "warning")
-    .map((i) => [i.title, i.description] as KvTuple);
+    .map((i) => [i.title, i.description] as SafeKvTuple);
 
   if (errors.length > 0) {
     content += `<h2 class="no-boder">${pluralize("Error", errors.length)}</h2>
@@ -95,7 +95,7 @@ function makeGeneralTab(generalData: KvTuple[], indicators: WaterfallEntryIndica
   return makeWaterfallEntryTab("General", content + general);
 }
 
-function makeRequestTab(request: KvTuple[], requestHeaders: KvTuple[]): WaterfallEntryTab {
+function makeRequestTab(request: SafeKvTuple[], requestHeaders: SafeKvTuple[]): WaterfallEntryTab {
   const content = `<dl>
       ${makeDefinitionList(request)}
     </dl>
@@ -106,7 +106,7 @@ function makeRequestTab(request: KvTuple[], requestHeaders: KvTuple[]): Waterfal
   return makeWaterfallEntryTab("Request", content);
 }
 
-function makeResponseTab(respose: KvTuple[], responseHeaders: KvTuple[]): WaterfallEntryTab {
+function makeResponseTab(respose: SafeKvTuple[], responseHeaders: SafeKvTuple[]): WaterfallEntryTab {
   const content = `<dl>
       ${makeDefinitionList(respose)}
     </dl>
