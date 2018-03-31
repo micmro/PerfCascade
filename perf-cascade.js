@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.3.0 (31/03/2018) */
+/*! github.com/micmro/PerfCascade Version:2.3.1 (31/03/2018) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 "use strict";
@@ -711,7 +711,7 @@ function validateOptions(options) {
     var ensureBoolean = function (name) {
         options[name] = !!options[name];
     };
-    validateInt("leftColumnWith");
+    validateInt("leftColumnWidth");
     validateInt("rowHeight");
     validateInt("selectedPage");
     ensureBoolean("showAlignmentHelpers");
@@ -899,7 +899,7 @@ var HarTransformer = require("./transformers/har");
 var svg_chart_1 = require("./waterfall/svg-chart");
 /** default options to use if not set in `options` parameter */
 var defaultChartOptions = {
-    leftColumnWith: 25,
+    leftColumnWidth: 25,
     legendHolder: undefined,
     onParsed: undefined,
     pageSelector: undefined,
@@ -924,6 +924,12 @@ function makeLegend() {
 exports.makeLegend = makeLegend;
 function PerfCascade(waterfallDocsData, chartOptions) {
     if (chartOptions === void 0) { chartOptions = {}; }
+    if (chartOptions["leftColumnWith"] !== undefined) {
+        // tslint:disable-next-line: no-console
+        console.warn("Depreciation Warning: The option 'leftColumnWith' has been fixed to 'leftColumnWidth', " +
+            "please update your code as this will get deprecated in the future");
+        chartOptions.leftColumnWidth = chartOptions["leftColumnWith"];
+    }
     var options = parse_1.validateOptions(__assign({}, defaultChartOptions, chartOptions));
     // setup paging helper
     var paging = new paging_1.default(waterfallDocsData, options.selectedPage);
@@ -2572,17 +2578,17 @@ var ROW_LEFT_MARGIN = 3;
 function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entry, onDetailsOverlayShow) {
     var y = rectData.y;
     var rowHeight = rectData.height;
-    var leftColumnWith = context.options.leftColumnWith;
+    var leftColumnWidth = context.options.leftColumnWidth;
     var rowItem = svg.newA(entry.responseDetails.rowClass || "");
     rowItem.setAttribute("tabindex", "0");
     rowItem.setAttribute("xlink:href", "javascript:void(0)");
     var leftFixedHolder = svg.newSvg("left-fixed-holder", {
-        width: leftColumnWith + "%",
+        width: leftColumnWidth + "%",
         x: "0",
     });
     var flexScaleHolder = svg.newSvg("flex-scale-waterfall", {
-        width: 100 - leftColumnWith + "%",
-        x: leftColumnWith + "%",
+        width: 100 - leftColumnWidth + "%",
+        x: leftColumnWidth + "%",
     });
     var rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
     var rowName = rowSubComponents.createNameRowBg(y, rowHeight);
@@ -2754,7 +2760,7 @@ exports.onHoverOutShowTooltip = function (base) {
  * @param {ChartOptions} options - Chart config/customization options
  */
 exports.makeTooltip = function (options) {
-    var leftColOffsetPerc = options.leftColumnWith;
+    var leftColOffsetPerc = options.leftColumnWidth;
     var holder = svg.newSvg("tooltip-holder", {
         width: "100%",
         x: "0",
@@ -3137,8 +3143,8 @@ function createWaterfallSvg(data, options) {
     });
     /** Holder for scale, event and marks */
     var scaleAndMarksHolder = svg.newSvg("scale-and-marks-holder", {
-        width: 100 - options.leftColumnWith + "%",
-        x: options.leftColumnWith + "%",
+        width: 100 - options.leftColumnWidth + "%",
+        x: options.leftColumnWidth + "%",
     });
     /** Holder for on-hover vertical comparison bars */
     var hoverOverlayHolder;
