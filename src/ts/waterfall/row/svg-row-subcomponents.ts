@@ -129,7 +129,6 @@ function createPushIndicator(rectData: RectData): SVGElement {
  * @return {SVGElement}       Renerated SVG (rect or g element)
  */
 export function createRect(rectData: RectData, entry: WaterfallEntry): SVGElement {
-  // entry.responseDetails.indicators;
   const segments = entry.segments;
   const rect = makeBlock(rectData, `time-block ${rectData.cssClass}`);
   const rectHolder = svg.newG("rect-holder");
