@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.3.1 (31/03/2018) */
+/*! github.com/micmro/PerfCascade Version:2.4.0 (01/04/2018) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 "use strict";
@@ -1090,6 +1090,7 @@ function parseGeneralDetails(entry, startRelative, requestID) {
         ["Was pushed", parse_1.parseAndFormat(entry._was_pushed, parse_1.parsePositive, function () { return "yes"; })],
         ["Initiator (Loaded by)", entry._initiator],
         ["Initiator Line", entry._initiator_line],
+        ["Initiator Type", entry._initiator_type],
         ["Host", har_1.getHeader(entry.request.headers, "Host")],
         ["IP", entry._ip_addr],
         ["Client Port", parse_1.parseAndFormat(entry._client_port, parse_1.parsePositive)],
