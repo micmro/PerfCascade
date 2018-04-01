@@ -2,6 +2,13 @@
 
 
 
+<a name="v2.4.0"></a>
+## v2.4.0 (2018-04-01)
+
+* Also get the initiator type ([9ea109c](https://github.com/micmro/PerfCascade/commit/9ea109c))
+
+
+
 <a name="v2.3.1"></a>
 ## <small>v2.3.1 (2018-03-31)</small>
 
