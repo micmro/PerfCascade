@@ -2,6 +2,13 @@
 
 
 
+<a name="v2.4.1"></a>
+## <small>v2.4.1 (2018-04-01)</small>
+
+* #228 h2 entries have no reqest.method attribute ([65d4d10](https://github.com/micmro/PerfCascade/commit/65d4d10)), closes [#228](https://github.com/micmro/PerfCascade/issues/228)
+
+
+
 <a name="v2.4.0"></a>
 ## v2.4.0 (2018-04-01)
 
