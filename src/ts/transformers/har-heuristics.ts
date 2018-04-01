@@ -40,7 +40,7 @@ function isCompressible(entry: Entry, requestType: RequestType): boolean {
  * @returns {boolean}
  */
 function hasCacheIssue(entry: Entry) {
-  if (entry.request.method.toLowerCase() !== "get") {
+  if (!entry.request.method || entry.request.method.toLowerCase() !== "get") {
     return false;
   }
   if (entry.response.status === 204 || !misc.isInStatusCodeRange(entry.response.status, 200, 299)) {
