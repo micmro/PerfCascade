@@ -27,7 +27,7 @@ const toPosInMs = (offsetX: number, leftColumnWidthPerc: number, fullWidth: numb
 const sliceChangeCheck = (context: Context) => {
   const fullDuration = context.unit * 100;
   const options = context.options;
-  const leftColumnWidthPerc = context.options.leftColumnWith;
+  const leftColumnWidthPerc = context.options.leftColumnWidth;
   const slices = options.timeSlices;
   const lastSlideIndex = options.timeSlices.length - 1;
 
@@ -67,8 +67,8 @@ export const setupTimeSlices = (holder: SVGElement, context: Context) => {
   } : false; // ts does not have typing for passive yet - use any
 
   holder.addEventListener("mousemove", sliceChangeCheck(context), pass);
-  holder.addEventListener("mouseleave", (evt: MouseEvent) => {
-    context.options.timeSliceOnLeave(context.activeTimeslice, evt);
+  holder.addEventListener("mouseleave", (evt) => {
+    context.options.timeSliceOnLeave(context.activeTimeslice || 0, evt as MouseEvent);
     context.activeTimeslice = null;
   }, pass);
 };

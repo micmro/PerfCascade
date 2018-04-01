@@ -6,7 +6,7 @@ try {
   const options = Object.defineProperty({}, "passive", {
     get() { passiveSupported = true; },
   });
-  window.addEventListener("test", null, options); // test add enpyt evt listener
+  window.addEventListener("test", null as any, options); // test add enpyt evt listener
 } catch (err) { /** ignore */}
 
 /**
