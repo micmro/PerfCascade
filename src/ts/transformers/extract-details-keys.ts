@@ -40,6 +40,7 @@ function parseGeneralDetails(entry: Entry, startRelative: number, requestID: num
     ["Was pushed", parseAndFormat(entry._was_pushed, parsePositive, () => "yes")],
     ["Initiator (Loaded by)", entry._initiator],
     ["Initiator Line", entry._initiator_line],
+    ["Initiator Type", entry._initiator_type],
     ["Host", getHeader(entry.request.headers, "Host")],
     ["IP", entry._ip_addr],
     ["Client Port", parseAndFormat(entry._client_port, parsePositive)],
