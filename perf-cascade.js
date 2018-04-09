@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.4.1 (01/04/2018) */
+/*! github.com/micmro/PerfCascade Version:2.5.0 (09/04/2018) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 "use strict";
@@ -358,16 +358,6 @@ function audio(x, y, title, scale) {
     return wrapSvgIcon(x, y, title, "icon-audio", scale, audioIconLazy.cloneNode(false));
 }
 exports.audio = audio;
-var pushIconLazy;
-function push(x, y, title, scale) {
-    if (scale === void 0) { scale = 1; }
-    if (pushIconLazy === undefined) {
-        var d = "M14.668 9q0 .416-.285.7L9.37 14.716Q9.067 15 8.667 15q-.393 0-.694-.285l-.577\n  -.578q-.293-.292-.293-.7 0-.41.293-.7l2.256-2.258H4.23q-.4 0-.65-.29t-.25-.698v-.986q0-.408.25\n  -.697.25-.29.65-.29h5.423L7.397 5.257q-.293-.278-.293-.693 0-.416.293-.694l.577-.576Q8.267 3 8.668\n  3q.408 0 .7.293l5.015 5.014q.285.27.285.693z";
-        pushIconLazy = svgLib.newPath(d);
-    }
-    return wrapSvgIcon(x, y, title, "icon-push", scale, pushIconLazy.cloneNode(false));
-}
-exports.push = push;
 
 },{"./svg":6}],4:[function(require,module,exports){
 "use strict";
@@ -1234,6 +1224,7 @@ exports.getKeys = getKeys;
 Object.defineProperty(exports, "__esModule", { value: true });
 var har_1 = require("../helpers/har");
 var misc = require("../helpers/misc");
+var parse_1 = require("../helpers/parse");
 function isCompressible(entry, requestType) {
     var minCompressionSize = 1000;
     // small responses
@@ -1285,15 +1276,7 @@ function isPush(entry) {
     if (entry._was_pushed === undefined || entry._was_pushed === null) {
         return false;
     }
-    function toInt(input) {
-        if (typeof input === "string") {
-            return parseInt(input, 10);
-        }
-        else {
-            return input;
-        }
-    }
-    return toInt(entry._was_pushed) === 1;
+    return parse_1.toInt(entry._was_pushed) === 1;
 }
 /**
  * Check if the document (disregarding any initial http->https redirects) is loaded over a secure connection.
@@ -1316,6 +1299,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
     if (isPush(entry)) {
         output.push({
             description: "Response was pushed by the server using HTTP2 push.",
+            displayType: "inline",
             icon: "push",
             id: "push",
             title: "Response was pushed by the server",
@@ -1325,6 +1309,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
     if (docIsTLS && !isSecure(entry)) {
         output.push({
             description: "Insecure request, it should use HTTPS.",
+            displayType: "icon",
             id: "noTls",
             title: "Insecure Connection",
             type: "error",
@@ -1333,6 +1318,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
     if (hasCacheIssue(entry)) {
         output.push({
             description: "The response is not allow to be cached on the client. Consider setting 'Cache-Control' headers.",
+            displayType: "icon",
             id: "noCache",
             title: "Response not cached",
             type: "error",
@@ -1341,6 +1327,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
     if (hasCompressionIssue(entry, requestType)) {
         output.push({
             description: "The response is not compressed. Consider enabling HTTP compression on your server.",
+            displayType: "icon",
             id: "noGzip",
             title: "no gzip",
             type: "error",
@@ -1351,6 +1338,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
         entry.response.status !== 204) {
         output.push({
             description: "Response doesn't contain a 'Content-Type' header.",
+            displayType: "icon",
             id: "warning",
             title: "No MIME Type defined",
             type: "warning",
@@ -1360,7 +1348,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
 }
 exports.collectIndicators = collectIndicators;
 
-},{"../helpers/har":2,"../helpers/misc":4}],12:[function(require,module,exports){
+},{"../helpers/har":2,"../helpers/misc":4,"../helpers/parse":5}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var misc_1 = require("../helpers/misc");
@@ -2242,7 +2230,7 @@ exports.makeIcon = makeIcon;
  * @returns {Icon[]}
  */
 function getIndicatorIcons(entry) {
-    var indicators = entry.responseDetails.indicators;
+    var indicators = entry.responseDetails.indicators.filter(function (i) { return i.displayType === "icon"; });
     if (indicators.length === 0) {
         return [];
     }
@@ -2369,14 +2357,29 @@ function createTimingLabel(rectData, timeTotal, firstX) {
     }
     return txtEl;
 }
+function createPushIndicator(rectData) {
+    var y = rectData.y + rectData.height / 1.5;
+    var x = misc.roundNumber(rectData.x / rectData.unit) + "%";
+    var el = svg.newG("http2-inidicator-holder");
+    el.appendChild(svg.newTextEl("→", {
+        transform: "translate(-5)",
+        x: x,
+        y: y,
+    }, {
+        "fillOpacity": "0.6",
+        "text-anchor": "end",
+    }));
+    el.appendChild(svg.newTitle("http2 Push"));
+    return el;
+}
 /**
  * Render the block and timings for a request
  * @param  {RectData}         rectData Basic dependencys and globals
- * @param  {WaterfallEntryTiming[]} segments Request and Timing Data
- * @param  {number} timeTotal  - total time of the request
- * @return {SVGElement}                Renerated SVG (rect or g element)
+ * @param  {WaterfallEntry}   entry Request Details, e.g. Request and Timing Data
+ * @return {SVGElement}       Renerated SVG (rect or g element)
  */
-function createRect(rectData, segments, timeTotal) {
+function createRect(rectData, entry) {
+    var segments = entry.segments;
     var rect = makeBlock(rectData, "time-block " + rectData.cssClass);
     var rectHolder = svg.newG("rect-holder");
     var firstX = rectData.x;
@@ -2390,7 +2393,10 @@ function createRect(rectData, segments, timeTotal) {
                 rectHolder.appendChild(childRect);
             }
         });
-        rectHolder.appendChild(createTimingLabel(rectData, timeTotal, firstX));
+        if (misc.find(entry.responseDetails.indicators, function (indicator) { return indicator.id === "push"; })) {
+            rectHolder.appendChild(createPushIndicator(rectData));
+        }
+        rectHolder.appendChild(createTimingLabel(rectData, entry.total, firstX));
     }
     return rectHolder;
 }
@@ -2591,7 +2597,7 @@ function createRow(context, index, maxIconsWidth, maxNumberWidth, rectData, entr
         width: 100 - leftColumnWidth + "%",
         x: leftColumnWidth + "%",
     });
-    var rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
+    var rect = rowSubComponents.createRect(rectData, entry);
     var rowName = rowSubComponents.createNameRowBg(y, rowHeight);
     var rowBar = rowSubComponents.createRowBg(y, rowHeight);
     var bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));
@@ -3168,7 +3174,7 @@ function createWaterfallSvg(data, options) {
     }
     if (options.showIndicatorIcons) {
         var iconsPerBlock = entriesToShow.map(function (entry) {
-            return entry.responseDetails.indicators.length > 0 ? 1 : 0;
+            return entry.responseDetails.indicators.filter(function (i) { return i.displayType === "icon"; }).length > 0 ? 1 : 0;
         });
         maxIcons += Math.max.apply(null, iconsPerBlock);
     }
