@@ -47,7 +47,7 @@ export function createRow(context: Context, index: number,
     x: `${leftColumnWidth}%`,
   });
 
-  const rect = rowSubComponents.createRect(rectData, entry.segments, entry.total);
+  const rect = rowSubComponents.createRect(rectData, entry);
   const rowName = rowSubComponents.createNameRowBg(y, rowHeight);
   const rowBar = rowSubComponents.createRowBg(y, rowHeight);
   const bgStripe = rowSubComponents.createBgStripe(y, rowHeight, (index % 2 === 0));

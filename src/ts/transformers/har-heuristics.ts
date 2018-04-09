@@ -5,6 +5,7 @@
 import { Entry } from "har-format";
 import { hasHeader } from "../helpers/har";
 import * as misc from "../helpers/misc";
+import { toInt } from "../helpers/parse";
 import { WaterfallEntryIndicator } from "../typing/waterfall";
 import { RequestType } from "../typing/waterfall";
 
@@ -65,13 +66,6 @@ function isPush(entry: Entry): boolean {
   if (entry._was_pushed === undefined || entry._was_pushed === null) {
     return false;
   }
-  function toInt(input: string | number): number {
-    if (typeof input === "string") {
-      return parseInt(input, 10);
-    } else {
-      return input;
-    }
-  }
   return toInt(entry._was_pushed) === 1;
 }
 
@@ -97,6 +91,7 @@ export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: 
   if (isPush(entry)) {
     output.push({
       description: "Response was pushed by the server using HTTP2 push.",
+      displayType: "inline",
       icon: "push",
       id: "push",
       title: "Response was pushed by the server",
@@ -107,6 +102,7 @@ export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: 
   if (docIsTLS && !isSecure(entry)) {
     output.push({
       description: "Insecure request, it should use HTTPS.",
+      displayType: "icon",
       id: "noTls",
       title: "Insecure Connection",
       type: "error",
@@ -116,6 +112,7 @@ export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: 
   if (hasCacheIssue(entry)) {
     output.push({
       description: "The response is not allow to be cached on the client. Consider setting 'Cache-Control' headers.",
+      displayType: "icon",
       id: "noCache",
       title: "Response not cached",
       type: "error",
@@ -125,6 +122,7 @@ export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: 
   if (hasCompressionIssue(entry, requestType)) {
     output.push({
       description: "The response is not compressed. Consider enabling HTTP compression on your server.",
+      displayType: "icon",
       id: "noGzip",
       title: "no gzip",
       type: "error",
@@ -136,6 +134,7 @@ export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: 
     entry.response.status !== 204) {
     output.push({
       description: "Response doesn't contain a 'Content-Type' header.",
+      displayType: "icon",
       id: "warning",
       title: "No MIME Type defined",
       type: "warning",

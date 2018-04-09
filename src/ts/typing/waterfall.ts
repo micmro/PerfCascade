@@ -4,6 +4,8 @@ export type RequestType = "other" | "image" | "video" | "audio" | "font" | "svg"
 
 export type IndicatorType = "error" | "warning" | "info";
 
+export type IndicatorDisplayType = "icon" | "inline";
+
 /** Typing for a event, e.g. UserTiming API performance mark from WPT */
 export interface UserTiming {
   duration?: number;
@@ -62,6 +64,8 @@ export interface WaterfallEntryIndicator {
   description: string;
   /** catrgorizes the indicator */
   type: IndicatorType;
+  /** where to show the indicator, defaults to `"icon"` */
+  displayType: IndicatorDisplayType;
 }
 
 /** Time segment of an `WaterfallEntry` */

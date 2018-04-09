@@ -7,7 +7,7 @@ import * as misc from "../../helpers/misc";
 import * as svg from "../../helpers/svg";
 import { timingTypeToCssClass } from "../../transformers/styling-converters";
 import { RectData } from "../../typing/rect-data";
-import { WaterfallEntryTiming } from "../../typing/waterfall";
+import { WaterfallEntry, WaterfallEntryTiming } from "../../typing/waterfall";
 import {
   onHoverInShowTooltip,
   onHoverOutShowTooltip,
@@ -105,14 +105,31 @@ function createTimingLabel(rectData: RectData, timeTotal: number, firstX: number
   return txtEl;
 }
 
+function createPushIndicator(rectData: RectData): SVGElement {
+  const y = rectData.y + rectData.height / 1.5;
+  const x = `${misc.roundNumber(rectData.x / rectData.unit)}%`;
+  const el = svg.newG("http2-inidicator-holder");
+  el.appendChild(svg.newTextEl("→", {
+      transform: `translate(-5)`,
+      x,
+      y,
+    }, {
+      "fillOpacity": "0.6",
+      "text-anchor": "end",
+    }));
+  el.appendChild(svg.newTitle("http2 Push"));
+
+  return el;
+}
+
 /**
  * Render the block and timings for a request
  * @param  {RectData}         rectData Basic dependencys and globals
- * @param  {WaterfallEntryTiming[]} segments Request and Timing Data
- * @param  {number} timeTotal  - total time of the request
- * @return {SVGElement}                Renerated SVG (rect or g element)
+ * @param  {WaterfallEntry}   entry Request Details, e.g. Request and Timing Data
+ * @return {SVGElement}       Renerated SVG (rect or g element)
  */
-export function createRect(rectData: RectData, segments: WaterfallEntryTiming[], timeTotal: number): SVGElement {
+export function createRect(rectData: RectData, entry: WaterfallEntry): SVGElement {
+  const segments = entry.segments;
   const rect = makeBlock(rectData, `time-block ${rectData.cssClass}`);
   const rectHolder = svg.newG("rect-holder");
   let firstX = rectData.x;
@@ -129,7 +146,10 @@ export function createRect(rectData: RectData, segments: WaterfallEntryTiming[],
       }
     });
 
-    rectHolder.appendChild(createTimingLabel(rectData, timeTotal, firstX));
+    if (misc.find(entry.responseDetails.indicators, (indicator) => indicator.id === "push")) {
+      rectHolder.appendChild(createPushIndicator(rectData));
+    }
+    rectHolder.appendChild(createTimingLabel(rectData, entry.total, firstX));
   }
 
   return rectHolder;

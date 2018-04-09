@@ -19,7 +19,7 @@ export function makeIcon(type: string, title: string): Icon {
  * @returns {Icon[]}
  */
 export function getIndicatorIcons(entry: WaterfallEntry): Icon[] {
-  const indicators = entry.responseDetails.indicators;
+  const indicators = entry.responseDetails.indicators.filter((i) => i.displayType === "icon");
   if (indicators.length === 0) {
     return [];
   }
