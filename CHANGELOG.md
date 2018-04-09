@@ -2,6 +2,19 @@
 
 
 
+<a name="v2.5.0"></a>
+## v2.5.0 (2018-04-09)
+
+* #198 push icon inline rendering ([cd41a58](https://github.com/micmro/PerfCascade/commit/cd41a58)), closes [#198](https://github.com/micmro/PerfCascade/issues/198)
+* add http2 test-files ([8121b25](https://github.com/micmro/PerfCascade/commit/8121b25))
+* add package lock ([d0ef673](https://github.com/micmro/PerfCascade/commit/d0ef673))
+* cleanup ([f09cffe](https://github.com/micmro/PerfCascade/commit/f09cffe))
+* re-use `parse` modules `toInt` ([b30d48f](https://github.com/micmro/PerfCascade/commit/b30d48f))
+* show http2-push arrow inline and not as icon ([7a1610b](https://github.com/micmro/PerfCascade/commit/7a1610b))
+* use masters package-lock.json ([62358f2](https://github.com/micmro/PerfCascade/commit/62358f2))
+
+
+
 <a name="v2.4.1"></a>
 ## <small>v2.4.1 (2018-04-01)</small>
 
