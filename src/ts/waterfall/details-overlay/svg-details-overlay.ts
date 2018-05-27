@@ -55,18 +55,19 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
   closeBtn.addEventListener("click", () => overlay.onClose(overlay.index));
 
   const body = createDetailsBody(requestID, detailsHeight, overlay.entry);
-  const buttons = body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
-  const tabs = body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
+  // need to re-fetch the elements to fix Edge "Invalid Calling Object" bug
+  const getButtons = () => body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
+  const getTabs = () => body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
 
   const setTabStatus = (tabIndex: number | undefined) => {
     overlay.openTabIndex = tabIndex;
-    forEachNodeList(tabs, (tab: HTMLDivElement, j) => {
+    forEachNodeList(getTabs(), (tab: HTMLDivElement, j) => {
       tab.style.display = (tabIndex === j) ? "block" : "none";
-      buttons.item(j).classList.toggle("active", (tabIndex === j));
+      getButtons().item(j).classList.toggle("active", (tabIndex === j));
     });
   };
 
-  forEachNodeList(buttons, (btn, tabIndex) => {
+  forEachNodeList(getButtons(), (btn, tabIndex) => {
     btn.addEventListener("click", () => setTabStatus(tabIndex));
   });
 
