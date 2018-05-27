@@ -2,6 +2,13 @@
 
 
 
+<a name="v2.5.1"></a>
+## <small>v2.5.1 (2018-05-27)</small>
+
+* fix Edge tabbing bug ([bd54483](https://github.com/micmro/PerfCascade/commit/bd54483))
+
+
+
 <a name="v2.5.0"></a>
 ## v2.5.0 (2018-04-09)
 
