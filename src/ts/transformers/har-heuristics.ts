@@ -62,6 +62,10 @@ function isSecure(entry: Entry) {
   return entry.request.url.indexOf("https://") === 0;
 }
 
+function isInitialRedirect(entry: Entry, index: number) {
+  return index === 0 && !!entry.response.redirectURL;
+}
+
 function isPush(entry: Entry): boolean {
   if (entry._was_pushed === undefined || entry._was_pushed === null) {
     return false;
@@ -84,7 +88,7 @@ export function documentIsSecure(data: Entry[]) {
 }
 
 /** Scans `entry` for noteworthy issues or infos and highlights them */
-export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: RequestType) {
+export function collectIndicators(entry: Entry, index: number, docIsTLS: boolean, requestType: RequestType) {
   // const harEntry = entry;
   const output: WaterfallEntryIndicator[] = [];
 
@@ -99,7 +103,7 @@ export function collectIndicators(entry: Entry, docIsTLS: boolean, requestType: 
     });
   }
 
-  if (docIsTLS && !isSecure(entry)) {
+  if (docIsTLS && !(isSecure(entry) || isInitialRedirect(entry, index))) {
     output.push({
       description: "Insecure request, it should use HTTPS.",
       displayType: "icon",
