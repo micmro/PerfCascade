@@ -56,7 +56,7 @@ function toWaterFallEntry(entry: Entry, index: number, startRelative: number, is
   startRelative = Math.round(startRelative);
   const endRelative = Math.round(toInt(entry._all_end) || (startRelative + entry.time));
   const requestType = mimeToRequestType(entry.response.content.mimeType);
-  const indicators = collectIndicators(entry, isTLS, requestType);
+  const indicators = collectIndicators(entry, index, isTLS, requestType);
   const responseDetails = createResponseDetails(entry, indicators);
   return createWaterfallEntry(entry.request.url,
     startRelative,
