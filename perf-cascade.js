@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.5.1 (27/05/2018) */
+/*! github.com/micmro/PerfCascade Version:2.5.2 (31/05/2018) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 "use strict";
@@ -1272,6 +1272,9 @@ function hasCompressionIssue(entry, requestType) {
 function isSecure(entry) {
     return entry.request.url.indexOf("https://") === 0;
 }
+function isInitialRedirect(entry, index) {
+    return index === 0 && !!entry.response.redirectURL;
+}
 function isPush(entry) {
     if (entry._was_pushed === undefined || entry._was_pushed === null) {
         return false;
@@ -1293,7 +1296,7 @@ function documentIsSecure(data) {
 }
 exports.documentIsSecure = documentIsSecure;
 /** Scans `entry` for noteworthy issues or infos and highlights them */
-function collectIndicators(entry, docIsTLS, requestType) {
+function collectIndicators(entry, index, docIsTLS, requestType) {
     // const harEntry = entry;
     var output = [];
     if (isPush(entry)) {
@@ -1306,7 +1309,7 @@ function collectIndicators(entry, docIsTLS, requestType) {
             type: "info",
         });
     }
-    if (docIsTLS && !isSecure(entry)) {
+    if (docIsTLS && !(isSecure(entry) || isInitialRedirect(entry, index))) {
         output.push({
             description: "Insecure request, it should use HTTPS.",
             displayType: "icon",
@@ -1479,7 +1482,7 @@ function toWaterFallEntry(entry, index, startRelative, isTLS) {
     startRelative = Math.round(startRelative);
     var endRelative = Math.round(parse_1.toInt(entry._all_end) || (startRelative + entry.time));
     var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
-    var indicators = har_heuristics_1.collectIndicators(entry, isTLS, requestType);
+    var indicators = har_heuristics_1.collectIndicators(entry, index, isTLS, requestType);
     var responseDetails = createResponseDetails(entry, indicators);
     return helpers_1.createWaterfallEntry(entry.request.url, startRelative, endRelative, buildDetailTimingBlocks(startRelative, entry), responseDetails, har_tabs_1.makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators));
 }
