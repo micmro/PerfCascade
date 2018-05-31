@@ -2,6 +2,13 @@
 
 
 
+<a name="v2.5.2"></a>
+## <small>v2.5.2 (2018-05-31)</small>
+
+* Don’t warn about no https for initial redirect. ([5c19ed9](https://github.com/micmro/PerfCascade/commit/5c19ed9))
+
+
+
 <a name="v2.5.1"></a>
 ## <small>v2.5.1 (2018-05-27)</small>
 
