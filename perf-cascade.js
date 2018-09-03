@@ -1,6 +1,6 @@
-/*! github.com/micmro/PerfCascade Version:2.5.2 (31/05/2018) */
+/*! github.com/micmro/PerfCascade Version:2.5.3 (03/09/2018) */
 
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -873,13 +873,16 @@ exports.makeLegend = makeLegend;
 
 },{}],8:[function(require,module,exports){
 "use strict";
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var parse_1 = require("./helpers/parse");
@@ -1602,6 +1605,7 @@ var getUserTimimngs = function (currPage, options) {
     }
     var findName = /^_userTime\.((?:startTimer-)?(.+))$/;
     var extractUserTiming = function (k) {
+        var _a;
         var name;
         var fullName;
         var duration;
@@ -1620,7 +1624,6 @@ var getUserTimimngs = function (currPage, options) {
             name: fullName,
             startTime: currPage[k],
         };
-        var _a;
     };
     return Object.keys(currPage)
         .filter(filterFn)
@@ -2040,7 +2043,7 @@ var OverlayManager = /** @class */ (function () {
             // if overlay has a preview image show it
             var previewImg = infoOverlay.querySelector("img.preview");
             if (previewImg && !previewImg.src) {
-                previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
+                previewImg.setAttribute("src", (previewImg.attributes.getNamedItem("data-src") || { value: "" }).value);
             }
             infoOverlay.querySelector("a")
                 .addEventListener("keydown", OverlayManager.firstElKeypress);
@@ -2725,10 +2728,10 @@ exports.onHoverInShowTooltip = function (base, rectData, foreignEl) {
     innerDiv.style.opacity = "0.01";
     /** First heigth, floating might change this later, since with is not fixed */
     var initialHeight = innerDiv.clientHeight + 5;
-    if (yInt + yTransformOffsest - initialHeight > 0) {
+    if (yInt + yTransformOffsest - initialHeight > 0) { // above row
         offsetY = yTransformOffsest - initialHeight;
     }
-    else {
+    else { // below row: more offset to not hide text with mouse
         offsetY = yTransformOffsest + rectData.height + 10;
     }
     if (isLeftOfRow) {
@@ -2736,7 +2739,7 @@ exports.onHoverInShowTooltip = function (base, rectData, foreignEl) {
         var leftOffset = parseInt(foreignEl.querySelector("body").style.left || "", 10);
         var ratio = 1 / (1 / 100 * (100 - leftOffset));
         leftOffset = ratio * leftOffset;
-        if (newLeft > -leftOffset) {
+        if (newLeft > -leftOffset) { // tooltip still visible
             innerDiv.style.left = newLeft + "%";
         }
         else {
@@ -3066,13 +3069,16 @@ exports.createLineRect = createLineRect;
 
 },{"../../helpers/dom":1,"../../helpers/misc":4,"../../helpers/svg":6}],27:[function(require,module,exports){
 "use strict";
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var svg = require("../helpers/svg");
