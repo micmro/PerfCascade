@@ -2,6 +2,15 @@
 
 
 
+<a name="v2.5.3"></a>
+## <small>v2.5.3 (2018-09-03)</small>
+
+* bump dependencies ([ad29232](https://github.com/micmro/PerfCascade/commit/ad29232))
+* fix TS3 lint ([42eea0d](https://github.com/micmro/PerfCascade/commit/42eea0d))
+* Lazy reference zip.js ([7713260](https://github.com/micmro/PerfCascade/commit/7713260))
+
+
+
 <a name="v2.5.2"></a>
 ## <small>v2.5.2 (2018-05-31)</small>
 
