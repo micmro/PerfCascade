@@ -1,9 +1,11 @@
 import { Har } from "har-format";
 
-declare const zip: any;
-
 // use zip
-zip.useWebWorkers = false;
+const getConfiguredZipJs = () => {
+  const zip = window["zip"] || {};
+  zip.useWebWorkers = false;
+  return zip;
+};
 
 /** handle client side file upload */
 export function readFile(file: File,
@@ -25,6 +27,8 @@ export function readFile(file: File,
 
   /** start reading the file */
   const extension = (fileName.match(/\.[0-9a-z]+$/i) || [])[0];
+  const zip = getConfiguredZipJs();
+
   if ([".zhar", ".zip"].indexOf(extension) !== -1) {
     /** zhar */
     zip.createReader(new zip.BlobReader(file), (zipReader) => {
