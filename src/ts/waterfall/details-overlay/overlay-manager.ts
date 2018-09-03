@@ -146,7 +146,7 @@ class OverlayManager {
       // if overlay has a preview image show it
       const previewImg = infoOverlay.querySelector("img.preview") as HTMLImageElement;
       if (previewImg && !previewImg.src) {
-        previewImg.setAttribute("src", previewImg.attributes.getNamedItem("data-src").value);
+        previewImg.setAttribute("src", (previewImg.attributes.getNamedItem("data-src") || { value: "" }).value);
       }
       (infoOverlay.querySelector("a") as HTMLAnchorElement)
         .addEventListener("keydown", OverlayManager.firstElKeypress);
