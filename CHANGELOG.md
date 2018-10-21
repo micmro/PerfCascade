@@ -2,6 +2,13 @@
 
 
 
+<a name="v2.5.5"></a>
+## <small>v2.5.5 (2018-10-21)</small>
+
+* Be extra careful when checking the size #238 ([f7a217a](https://github.com/micmro/PerfCascade/commit/f7a217a)), closes [#238](https://github.com/micmro/PerfCascade/issues/238)
+
+
+
 <a name="v2.5.4"></a>
 ## <small>v2.5.4 (2018-09-03)</small>
 
