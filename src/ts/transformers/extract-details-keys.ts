@@ -101,7 +101,7 @@ function parseResponseDetails(entry: Entry): SafeKvTuple[] {
 
   const contentLength = getHeader(headers, "Content-Length");
   let contentSize;
-  if (content.size !== -1 && contentLength !== content.size.toString()) {
+  if (content.size && content.size !== -1 && contentLength !== content.size.toString()) {
     contentSize = content.size;
   }
 
