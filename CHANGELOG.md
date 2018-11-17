@@ -2,6 +2,13 @@
 
 
 
+## <small>v2.5.6 (2018-11-17)</small>
+
+* security patch, also update some build tooling ([adf21c7](https://github.com/micmro/PerfCascade/commit/adf21c7))
+* security-update: cached-path-relative ([64be9b8](https://github.com/micmro/PerfCascade/commit/64be9b8))
+
+
+
 <a name="v2.5.5"></a>
 ## <small>v2.5.5 (2018-10-21)</small>
 
