@@ -121,7 +121,12 @@ export function transformPage(harData: Har | Log,
     })
     .map((entry, index) => {
       const startRelative = new Date(entry.startedDateTime).getTime() - pageStartTime;
-      doneTime = Math.max(doneTime, startRelative + entry.time);
+      if (!isNaN(startRelative)) {
+        doneTime = Math.max(doneTime, startRelative + entry.time);
+      } else {
+        // tslint:disable-next-line:no-console
+        console.warn(`Entry has no valid 'startedDateTime' time`, entry.request.url, entry);
+      }
       return toWaterFallEntry(entry, index, startRelative, isTLS);
     });
 
