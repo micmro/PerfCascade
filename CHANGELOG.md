@@ -2,6 +2,13 @@
 
 
 
+## <small>v2.5.7 (2019-04-08)</small>
+
+* #244 add check if startRelative is valid (#245) ([2661428](https://github.com/micmro/PerfCascade/commit/2661428)), closes [#244](https://github.com/micmro/PerfCascade/issues/244) [#245](https://github.com/micmro/PerfCascade/issues/245)
+* chore: update dependencies ([8d559a1](https://github.com/micmro/PerfCascade/commit/8d559a1))
+
+
+
 ## <small>v2.5.6 (2018-11-17)</small>
 
 * security patch, also update some build tooling ([adf21c7](https://github.com/micmro/PerfCascade/commit/adf21c7))
