@@ -6,9 +6,21 @@ Responsive, SVG based [HAR](http://www.softwareishard.com/blog/har-12-spec/) wat
 [![Build status][travis-image]][travis-url]
 
 Install via `npm install perf-cascade`<br/>
-See live example: https://micmro.github.io/PerfCascade/
+Live example: https://micmro.github.io/PerfCascade/
 
 <img src="https://raw.githubusercontent.com/micmro/PerfCascade/gh-pages/img/PerfCascade-sample2.png" alt="example screenshot" width="704" height="707">
+
+## Contents
+
+- [How to use PerfCascade](#how-to-use-perfcascade)
+  * [With ES6 Compatible Module Loader (Webpack, Babel, Typescript...)](#with-es6-compatible-module-loader--webpack--babel--typescript-)
+  * [As Global Object](#as-global-object)
+  * [Use via npm](#use-via-npm)
+- [Options](#options)
+- [`*.zhar` - zipped HAR files](#--zhar----zipped-har-files)
+- [Rendering other formats (than HAR)](#rendering-other-formats--than-har-)
+- [Dev](#dev)
+- [Specs and resources](#specs-and-resources)
 
 ## How to use PerfCascade
 PerfCascade is exported with [UMD](https://github.com/umdjs/umd), so you can use it as global object, via AMD (e.g. requireJS) or commonJS (internally it uses ES6 modules).
