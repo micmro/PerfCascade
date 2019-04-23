@@ -28,7 +28,7 @@ const perfCascadeSvg = fromHar(myHarDoc)
 document.appendChild(perfCascadeSvg)
 ```
 
-_With TypeScript you can additionaly import TypeDefinitions for `ChartOptions` (PerfCascade Options) and `harFormat` (namespace for HAR Typings)_
+_With TypeScript you can additionally import TypeDefinitions for `ChartOptions` (PerfCascade Options) and `harFormat` (namespace for HAR Typings)_
 
 ### As Global Object
 When using PerfCascade without any module system it just exports as a global object `perfCascade`, you can use as following:
@@ -60,7 +60,7 @@ npm install perf-cascade
 
 Directories:
 - `node_modules/perf-cascade/dist/`: bundled UMD modules and the css file in the directory.
-- `node_modules/perf-cascade/lib`: contains the full project exported as seperate ES6 modules
+- `node_modules/perf-cascade/lib`: contains the full project exported as separate ES6 modules
 - `node_modules/perf-cascade/types`: Typescript typings
 
 ## Options
@@ -69,7 +69,7 @@ see [options.d.ts](https://github.com/micmro/PerfCascade/blob/master/src/ts/typi
 | Option      | Type | Default Value | Description |
 | ----------- | ---- | ------- | ----------- |
 | `rowHeight` | `number` | `23` | Height of every request bar block plus spacer pixel (in px) default: 23 |
-| `showAlignmentHelpers` | `boolean` | `true` | Show verticale lines to easier spot potential dependencies/blocking between requests |
+| `showAlignmentHelpers` | `boolean` | `true` | Show vertical lines to easier spot potential dependencies/blocking between requests |
 | `showMimeTypeIcon` | `boolean` | `true` |  Show mime type icon on the left |
 | `showIndicatorIcons` | `boolean` | `true` |  Show warning icons for potential issues on the left |
 | `leftColumnWidth` | `number` | `25` | Relative width of the info column on the left (in percent) |
@@ -98,9 +98,11 @@ Optionally `perfCascadeFileReader.readFile` also takes a callback (`(progress:nu
 that gets called whenever a new unzip progress status is available.
 
 ## Rendering other formats (than HAR)
-PerfCascade is composed of a parser (`src/ts/transformers/har.ts`) that parsed HAR into PerfCascade's agnostic `WaterfallDocs` format and the renderer (see `PerfCascade()` in `src/ts/main.ts`) that creats the chart SVG.
+PerfCascade is composed of a parser ([`src/ts/transformers/har.ts` | https://github.com/micmro/PerfCascade/blob/master/src/ts/transformers/har.ts]) that parsed HAR into PerfCascade's agnostic [`WaterfallDocs` | https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/waterfall.ts] format and the renderer (see `PerfCascade()` in [`src/ts/main.ts` | https://github.com/micmro/PerfCascade/blob/master/src/ts/main.ts]) that creates the chart SVG.
 
-If you want to render another format, you could clone the repo and create a new parser. It would also be possible to seperate the renderer into a seperate package, if there is enough interest to justify the effort (create an issue and we can discuss it).
+If you want to render another format, you could fork the repo and create a new parser in ([`src/ts/transformers/` | https://github.com/micmro/PerfCascade/blob/master/src/ts/transformers/]) and implement a new `fromMyNewFormat` function similar to `fromHar()`in [`src/ts/main.ts` | https://github.com/micmro/PerfCascade/blob/master/src/ts/main.ts] that takes your format, calls its parser and then calls the main `PerfCascade()` function with it and returns it.
+
+It would also be possible to separate the renderer into a separate package, if there is enough interest to justify the effort (create an issue and we can discuss it).
 
 ## Dev
 - Start live-reload server and Typescript compiler with watch: `npm run watch`
