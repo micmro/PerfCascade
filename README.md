@@ -98,9 +98,9 @@ Optionally `perfCascadeFileReader.readFile` also takes a callback (`(progress:nu
 that gets called whenever a new unzip progress status is available.
 
 ## Rendering other formats (than HAR)
-PerfCascade is composed of a parser ([`src/ts/transformers/har.ts` | https://github.com/micmro/PerfCascade/blob/master/src/ts/transformers/har.ts]) that parsed HAR into PerfCascade's agnostic [`WaterfallDocs` | https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/waterfall.ts] format and the renderer (see `PerfCascade()` in [`src/ts/main.ts` | https://github.com/micmro/PerfCascade/blob/master/src/ts/main.ts]) that creates the chart SVG.
+PerfCascade is composed of a parser [`src/ts/transformers/har.ts`](https://github.com/micmro/PerfCascade/blob/master/src/ts/transformers/har.ts) that parsed HAR into PerfCascade's agnostic [`WaterfallDocs`](https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/waterfall.ts) format and the renderer (see `PerfCascade()` in [`src/ts/main.ts`](https://github.com/micmro/PerfCascade/blob/master/src/ts/main.ts) that creates the chart SVG.
 
-If you want to render another format, you could fork the repo and create a new parser in ([`src/ts/transformers/` | https://github.com/micmro/PerfCascade/blob/master/src/ts/transformers/]) and implement a new `fromMyNewFormat` function similar to `fromHar()`in [`src/ts/main.ts` | https://github.com/micmro/PerfCascade/blob/master/src/ts/main.ts] that takes your format, calls its parser and then calls the main `PerfCascade()` function with it and returns it.
+If you want to render another format, you could fork the repo and create a new parser in [`src/ts/transformers/`](https://github.com/micmro/PerfCascade/blob/master/src/ts/transformers/) and implement a new `fromMyNewFormat` function similar to `fromHar()`in [`src/ts/main.ts`](https://github.com/micmro/PerfCascade/blob/master/src/ts/main.ts) that takes your format, calls its parser and then calls the main `PerfCascade()` function with it and returns it.
 
 It would also be possible to separate the renderer into a separate package, if there is enough interest to justify the effort (create an issue and we can discuss it).
 
