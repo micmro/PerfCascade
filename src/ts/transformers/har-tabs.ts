@@ -11,6 +11,10 @@ import {
 import { getKeys } from "./extract-details-keys";
 import { makeDefinitionList } from "./helpers";
 
+const escapedNewLineRegex = /\\n/g;
+const newLineRegex = /\n/g;
+const escapedTabRegex = /\\t/g;
+
 /**
  * Generates the tabs for the details-overlay of a `Entry`
  * @param  {Entry} entry - the entry to parse
@@ -36,6 +40,9 @@ export function makeTabs(entry: Entry, requestID: number, requestType: RequestTy
   if (requestType === "image") {
     tabs.push(makeImgTab(entry));
   }
+  if (entry.response.content && entry.response.content.mimeType.indexOf("text/") === 0 && entry.response.content.text) {
+    tabs.push(makeContentTab(entry));
+  }
   return tabs.filter((t) => t !== undefined);
 }
 
@@ -48,7 +55,7 @@ function makeWaterfallEntryTab(title: string, content: string, tabClass: string 
   };
 }
 
-/** Helper to create `WaterfallEntryTab` object literal that is evaluated lazyly at runtime (e.g. for performance) */
+/** Helper to create `WaterfallEntryTab` object literal that is evaluated lazily at runtime (e.g. for performance) */
 function makeLazyWaterfallEntryTab(title: string, renderContent: TabRenderer,
                                    tabClass: string = ""): WaterfallEntryTab {
   return {
@@ -117,11 +124,24 @@ function makeResponseTab(respose: SafeKvTuple[], responseHeaders: SafeKvTuple[])
   return makeWaterfallEntryTab("Response", content);
 }
 
+/** Tab to show the returned (text-based) payload (HTML, CSS, JS etc.) */
+function makeContentTab(entry: Entry) {
+  const escapedText = entry.response.content.text || "";
+  const unescapedText = escapedText.replace(escapedNewLineRegex, "\n").replace(escapedTabRegex, "\t");
+  const newLines = escapedText.match(newLineRegex);
+  const lineCount = newLines ? newLines.length : 0;
+  return makeLazyWaterfallEntryTab(
+    `Content (${lineCount} Line${lineCount > 1 ? "s" : ""})`,
+    () => `<pre><code>${escapeHtml(unescapedText)}</code></pre> `,
+    "content rendered-data",
+  );
+}
+
 function makeRawData(entry: Entry) {
   return makeLazyWaterfallEntryTab(
     "Raw Data",
     () => `<pre><code>${escapeHtml(JSON.stringify(entry, null, 2))}</code></pre>`,
-    "raw-data",
+    "raw-data rendered-data",
   );
 }
 
@@ -130,5 +150,5 @@ function makeImgTab(entry: Entry): WaterfallEntryTab {
   return makeLazyWaterfallEntryTab(
     "Preview",
     (detailsHeight: number) => `<img class="preview" style="max-height:${(detailsHeight - 100)}px"
- data-src="${sanitizeUrlForLink(entry.request.url)}" />`);
-}
+    data-src="${sanitizeUrlForLink(entry.request.url)}" />`);
+  }

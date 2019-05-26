@@ -179,8 +179,8 @@
 .info-overlay-holder .tab pre {overflow-y: hidden; width:100%; min-height: 100%;}
 .info-overlay-holder .tab .preview {width: auto; max-width: 100%; max-height: 500px; border: solid 1px #666;}
 .info-overlay-holder .tab dl:after {content: ""; display: table; clear: both;}
-.info-overlay-holder .tab.raw-data {padding: 0;}
-.info-overlay-holder .tab.raw-data pre {padding:12px 12px 24px;}
+.info-overlay-holder .tab.rendered-data {padding: 0;}
+.info-overlay-holder .tab.rendered-data pre {padding:12px 12px 24px;}
 
 /** Legend */
 .resource-legend { margin: 0; padding: 0; font-size: 0.75em; line-height: 1.5em; display: inline-block;}
