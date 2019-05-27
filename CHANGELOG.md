@@ -2,6 +2,17 @@
 
 
 
+## v2.6.0 (2019-05-27)
+
+* Fix: Default to 1 line ([7ab2074](https://github.com/micmro/PerfCascade/commit/7ab2074)), closes [#154](https://github.com/micmro/PerfCascade/issues/154)
+* chore: wrap long lines in Raw Data & Content tabs ([75f87ae](https://github.com/micmro/PerfCascade/commit/75f87ae)), closes [#154](https://github.com/micmro/PerfCascade/issues/154)
+* feature: add tab for text-based content #154 ([2dce61d](https://github.com/micmro/PerfCascade/commit/2dce61d)), closes [#154](https://github.com/micmro/PerfCascade/issues/154)
+* add table of contents ([de4c4ac](https://github.com/micmro/PerfCascade/commit/de4c4ac))
+* fix invalid markdown links ([1b89320](https://github.com/micmro/PerfCascade/commit/1b89320))
+* improve docs on other parser support ([e45a441](https://github.com/micmro/PerfCascade/commit/e45a441)), closes [#246](https://github.com/micmro/PerfCascade/issues/246)
+
+
+
 ## <small>v2.5.7 (2019-04-08)</small>
 
 * #244 add check if startRelative is valid (#245) ([2661428](https://github.com/micmro/PerfCascade/commit/2661428)), closes [#244](https://github.com/micmro/PerfCascade/issues/244) [#245](https://github.com/micmro/PerfCascade/issues/245)
