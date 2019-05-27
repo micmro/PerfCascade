@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.5.7 (08/04/2019) */
+/*! github.com/micmro/PerfCascade Version:2.6.0 (27/05/2019) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
@@ -1361,6 +1361,9 @@ var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
 var extract_details_keys_1 = require("./extract-details-keys");
 var helpers_1 = require("./helpers");
+var escapedNewLineRegex = /\\n/g;
+var newLineRegex = /\n/g;
+var escapedTabRegex = /\\t/g;
 /**
  * Generates the tabs for the details-overlay of a `Entry`
  * @param  {Entry} entry - the entry to parse
@@ -1383,6 +1386,9 @@ function makeTabs(entry, requestID, requestType, startRelative, endRelative, ind
     if (requestType === "image") {
         tabs.push(makeImgTab(entry));
     }
+    if (entry.response.content && entry.response.content.mimeType.indexOf("text/") === 0 && entry.response.content.text) {
+        tabs.push(makeContentTab(entry));
+    }
     return tabs.filter(function (t) { return t !== undefined; });
 }
 exports.makeTabs = makeTabs;
@@ -1395,7 +1401,7 @@ function makeWaterfallEntryTab(title, content, tabClass) {
         title: title,
     };
 }
-/** Helper to create `WaterfallEntryTab` object literal that is evaluated lazyly at runtime (e.g. for performance) */
+/** Helper to create `WaterfallEntryTab` object literal that is evaluated lazily at runtime (e.g. for performance) */
 function makeLazyWaterfallEntryTab(title, renderContent, tabClass) {
     if (tabClass === void 0) { tabClass = ""; }
     return {
@@ -1442,12 +1448,20 @@ function makeResponseTab(respose, responseHeaders) {
     var content = "<dl>\n      " + helpers_1.makeDefinitionList(respose) + "\n    </dl>\n    <h2>All Response Headers</h2>\n    <dl>\n      " + helpers_1.makeDefinitionList(responseHeaders) + "\n    </dl>";
     return makeWaterfallEntryTab("Response", content);
 }
+/** Tab to show the returned (text-based) payload (HTML, CSS, JS etc.) */
+function makeContentTab(entry) {
+    var escapedText = entry.response.content.text || "";
+    var unescapedText = escapedText.replace(escapedNewLineRegex, "\n").replace(escapedTabRegex, "\t");
+    var newLines = escapedText.match(newLineRegex);
+    var lineCount = newLines ? newLines.length : 1;
+    return makeLazyWaterfallEntryTab("Content (" + lineCount + " Line" + (lineCount > 1 ? "s" : "") + ")", function () { return "<pre><code>" + parse_1.escapeHtml(unescapedText) + "</code></pre> "; }, "content rendered-data");
+}
 function makeRawData(entry) {
-    return makeLazyWaterfallEntryTab("Raw Data", function () { return "<pre><code>" + parse_1.escapeHtml(JSON.stringify(entry, null, 2)) + "</code></pre>"; }, "raw-data");
+    return makeLazyWaterfallEntryTab("Raw Data", function () { return "<pre><code>" + parse_1.escapeHtml(JSON.stringify(entry, null, 2)) + "</code></pre>"; }, "raw-data rendered-data");
 }
 /** Image preview tab */
 function makeImgTab(entry) {
-    return makeLazyWaterfallEntryTab("Preview", function (detailsHeight) { return "<img class=\"preview\" style=\"max-height:" + (detailsHeight - 100) + "px\"\n data-src=\"" + parse_1.sanitizeUrlForLink(entry.request.url) + "\" />"; });
+    return makeLazyWaterfallEntryTab("Preview", function (detailsHeight) { return "<img class=\"preview\" style=\"max-height:" + (detailsHeight - 100) + "px\"\n    data-src=\"" + parse_1.sanitizeUrlForLink(entry.request.url) + "\" />"; });
 }
 
 },{"../helpers/misc":4,"../helpers/parse":5,"./extract-details-keys":10,"./helpers":14}],13:[function(require,module,exports){
