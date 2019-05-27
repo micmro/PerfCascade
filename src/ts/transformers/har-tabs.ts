@@ -129,7 +129,7 @@ function makeContentTab(entry: Entry) {
   const escapedText = entry.response.content.text || "";
   const unescapedText = escapedText.replace(escapedNewLineRegex, "\n").replace(escapedTabRegex, "\t");
   const newLines = escapedText.match(newLineRegex);
-  const lineCount = newLines ? newLines.length : 0;
+  const lineCount = newLines ? newLines.length : 1;
   return makeLazyWaterfallEntryTab(
     `Content (${lineCount} Line${lineCount > 1 ? "s" : ""})`,
     () => `<pre><code>${escapeHtml(unescapedText)}</code></pre> `,
