@@ -2,6 +2,12 @@
 
 
 
+## <small>v2.6.1 (2019-05-28)</small>
+
+* fix: fix wrapping in Raw Data and Content tabs ([5572360](https://github.com/micmro/PerfCascade/commit/5572360))
+
+
+
 ## v2.6.0 (2019-05-27)
 
 * Fix: Default to 1 line ([7ab2074](https://github.com/micmro/PerfCascade/commit/7ab2074)), closes [#154](https://github.com/micmro/PerfCascade/issues/154)
