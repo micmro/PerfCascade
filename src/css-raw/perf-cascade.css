@@ -180,7 +180,8 @@
 .info-overlay-holder .tab .preview {width: auto; max-width: 100%; max-height: 500px; border: solid 1px #666;}
 .info-overlay-holder .tab dl:after {content: ""; display: table; clear: both;}
 .info-overlay-holder .tab.rendered-data {padding: 0;}
-.info-overlay-holder .tab.rendered-data pre {padding:12px 12px 24px; white-space: pre-wrap;}
+.info-overlay-holder .tab.rendered-data pre {padding:12px 12px 24px;}
+.info-overlay-holder .tab.rendered-data pre > code {white-space: pre-wrap;}
 
 /** Legend */
 .resource-legend { margin: 0; padding: 0; font-size: 0.75em; line-height: 1.5em; display: inline-block;}
