@@ -3,6 +3,7 @@ import { validateOptions } from "./helpers/parse";
 import { makeLegend as makeLegendInternal } from "./legend/legend";
 import Paging from "./paging/paging";
 import * as HarTransformer from "./transformers/har";
+import * as JsonTransformer from "./transformers/myJson";
 import { ChartOptions, ChartRenderOption, HarTransformerOptions } from "./typing/options";
 import { WaterfallDocs } from "./typing/waterfall";
 import { createWaterfallSvg } from "./waterfall/svg-chart";
@@ -84,7 +85,14 @@ export function fromHar(harData: Har, options: ChartOptions = {}): SVGSVGElement
   }
   return PerfCascade(data, options);
 }
-
+export function fromJson(JsonData, options = {}) {
+    const harTransformerOptions = Object.assign({}, defaultHarTransformerOptions, options);
+    const data = JsonTransformer.transformDoc(JsonData, harTransformerOptions);
+    if (typeof options.onParsed === "function") {
+        options.onParsed(data);
+    }
+    return PerfCascade(data, options);
+}
 // aditional imported members that get exported via UMD
 export {
   ChartOptions,
