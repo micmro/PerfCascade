@@ -47,7 +47,7 @@
     "grunt-run": "^0.8.1",
     "grunt-tslint": "^5.0.2",
     "live-server": "^1.2.1",
-    "load-grunt-config": "^0.19.2",
+    "load-grunt-config": "^3.0.0",
     "tsify": "^4.0.0",
     "tslint": "~5.11.0",
     "tslint-eslint-rules": "^5.4.0",
