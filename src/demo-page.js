@@ -18,7 +18,7 @@
     rowHeight: 23, //default: 23
     showAlignmentHelpers: true, //default: true
     showIndicatorIcons: true, //default: true
-    leftColumnWith: 25, //default: 25
+    leftColumnWidth: 25, //default: 25
     pageSelector: pageSelectorEl, //default: undefined
     legendHolder: legendHolderEl, //default: undefined (hide-legend)
     showUserTiming: true //default: false
