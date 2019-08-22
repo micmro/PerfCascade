@@ -18,14 +18,13 @@
     "tsc": "tsc"
   },
   "author": {
-    "name": "Michael Mrowetz",
-    "email": "me@michaelmrowetz.com",
-    "url": "https://github.com/micmro"
+    "name": "xxx",
+    "email": "suryaanand14@gmail.com",
+    "url": "https://github.com/surya0014"
   },
   "repository": {
     "type": "git",
     "url":"https://github.com/surya0014/PerfCascade.git"
-    //"url": "https://github.com/micmro/PerfCascade.git"
   },
   "directories": {
     "lib": "./lib",
