@@ -24,7 +24,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/micmro/PerfCascade.git"
+    "url":"https://github.com/surya0014/PerfCascade.git"
+    //"url": "https://github.com/micmro/PerfCascade.git"
   },
   "directories": {
     "lib": "./lib",
