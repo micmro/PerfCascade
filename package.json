@@ -2,7 +2,8 @@
   "name": "perf-cascade",
   "version": "2.6.2",
   "description": "Har file visualizer",
-  "main": "./index.js",
+  "main": "./dist/perf-cascade.js",
+  "module": "./index.js",
   "style": "./dist/perf-cascade.css",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
