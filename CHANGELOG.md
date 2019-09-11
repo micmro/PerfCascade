@@ -2,6 +2,14 @@
 
 
 
+## <small>v2.6.3 (2019-09-11)</small>
+
+* Adapt module for ES6 ([44cb68a](https://github.com/micmro/PerfCascade/commit/44cb68a))
+* Add missing coma ([534c940](https://github.com/micmro/PerfCascade/commit/534c940))
+* fix(security): update dev dependencies ([640375a](https://github.com/micmro/PerfCascade/commit/640375a))
+
+
+
 ## <small>v2.6.2 (2019-06-29)</small>
 
 
