@@ -87,15 +87,15 @@ function makeGeneralTab(generalData: SafeKvTuple[], indicators: WaterfallEntryIn
     .map((i) => [i.title, i.description] as SafeKvTuple);
 
   if (errors.length > 0) {
-    content += `<h2 class="no-boder">${pluralize("Error", errors.length)}</h2>
+    content += `<h2 class="no-border">${pluralize("Error", errors.length)}</h2>
     <dl>${makeDefinitionList(errors)}</dl>`;
   }
   if (warnings.length > 0) {
-    content += `<h2 class="no-boder">${pluralize("Warning", warnings.length)}</h2>
+    content += `<h2 class="no-border">${pluralize("Warning", warnings.length)}</h2>
     <dl>${makeDefinitionList(warnings)}</dl>`;
   }
   if (info.length > 0) {
-    content += `<h2 class="no-boder">Info</h2>
+    content += `<h2 class="no-border">Info</h2>
     <dl>${makeDefinitionList(info)}</dl>`;
   }
 
@@ -113,9 +113,9 @@ function makeRequestTab(request: SafeKvTuple[], requestHeaders: SafeKvTuple[]): 
   return makeWaterfallEntryTab("Request", content);
 }
 
-function makeResponseTab(respose: SafeKvTuple[], responseHeaders: SafeKvTuple[]): WaterfallEntryTab {
+function makeResponseTab(response: SafeKvTuple[], responseHeaders: SafeKvTuple[]): WaterfallEntryTab {
   const content = `<dl>
-      ${makeDefinitionList(respose)}
+      ${makeDefinitionList(response)}
     </dl>
     <h2>All Response Headers</h2>
     <dl>

@@ -14,6 +14,7 @@ import {
   UserTiming,
   WaterfallData,
   WaterfallDocs,
+  WaterfallEntry,
   WaterfallEntryIndicator,
   WaterfallEntryTiming,
   WaterfallResponseDetails,
@@ -45,14 +46,14 @@ export function transformDoc(harData: Har | Log, options: HarTransformerOptions)
 }
 
 /**
- * Converts an HAR `Entry` into PerfCascads `WaterfallEntry`
+ * Converts an HAR `Entry` into PerfCascade's `WaterfallEntry`
  *
  * @param  {Entry} entry
  * @param  {number} index - resource entry index
  * @param  {number} startRelative - entry start time relative to the document in ms
  * @param  {boolean} isTLS
  */
-function toWaterFallEntry(entry: Entry, index: number, startRelative: number, isTLS: boolean) {
+function toWaterFallEntry(entry: Entry, index: number, startRelative: number, isTLS: boolean): WaterfallEntry {
   startRelative = Math.round(startRelative);
   const endRelative = Math.round(toInt(entry._all_end) || (startRelative + entry.time));
   const requestType = mimeToRequestType(entry.response.content.mimeType);
@@ -67,7 +68,7 @@ function toWaterFallEntry(entry: Entry, index: number, startRelative: number, is
   );
 }
 
-/** retuns the page or a mock page object */
+/** Returns the page or a mock page object */
 const getPages = (data: Log) => {
   if (data.pages && data.pages.length > 0) {
     return data.pages;
@@ -177,7 +178,7 @@ const getMarks = (pageTimings: PageTiming, currPage: Page, options: ChartOptions
     return marks.sort(sortFn);
   }
 
-  return getUserTimimngs(currPage, options)
+  return getUserTimings(currPage, options)
     .concat(marks)
     .sort(sortFn);
 };
@@ -187,7 +188,7 @@ const getMarks = (pageTimings: PageTiming, currPage: Page, options: ChartOptions
  * @param {Page} currPage - active page
  * @param {ChartOptions} options - HAR options
  */
-const getUserTimimngs = (currPage: Page, options: ChartOptions) => {
+const getUserTimings = (currPage: Page, options: ChartOptions) => {
   const baseFilter = options.showUserTimingEndMarker ?
     (k: string) => k.indexOf("_userTime.") === 0 :
     (k: string) => k.indexOf("_userTime.") === 0 && k.indexOf("_userTime.endTimer-") !== 0;
@@ -233,7 +234,7 @@ const getUserTimimngs = (currPage: Page, options: ChartOptions) => {
 };
 
 /**
- * Create `WaterfallEntry`s to represent the subtimings of a request
+ * Create `WaterfallEntry`s to represent the sub-timings of a request
  * ("blocked", "dns", "connect", "send", "wait", "receive")
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @param  {Entry} harEntry

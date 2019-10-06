@@ -57,7 +57,7 @@ function hasCompressionIssue(entry: Entry, requestType: RequestType) {
   return (!hasHeader(headers, "Content-Encoding") && isCompressible(entry, requestType));
 }
 
-/** Checks if the ressource uses https */
+/** Checks if the resource uses https */
 function isSecure(entry: Entry) {
   return entry.request.url.indexOf("https://") === 0;
 }

@@ -5,7 +5,7 @@ import { WaterfallEntry } from "../../typing/waterfall";
 /**
  * Creates the HTML body for the overlay
  *
- * _All tabable elements are set to `tabindex="-1"` to avoid tabing issues_
+ * _All tab-able elements are set to `tabindex="-1"` to avoid tabbing issues_
  * @param requestID ID
  * @param detailsHeight
  * @param entry
