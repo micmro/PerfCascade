@@ -40,6 +40,21 @@ function createHolder(y: number, detailsHeight: number) {
   return holder;
 }
 
+/** Shared function to copy raw data */
+const onRawDataCopyClick = (event: MouseEvent) => {
+  const btn = event.target as HTMLButtonElement;
+  if (btn.tagName.toLowerCase() === "button" && btn.classList.contains("copy-raw-data")) {
+    const data = btn.nextElementSibling ? (btn.nextElementSibling as HTMLElement).innerText : "";
+    const el = document.createElement("textarea");
+    el.value = data;
+    document.body.appendChild(el);
+    el.select();
+    el.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    document.body.removeChild(el);
+  }
+};
+
 export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHeight: number): SVGGElement {
   const requestID = overlay.index + 1;
   const holder = createHolder(y, detailsHeight);
@@ -51,10 +66,14 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
     y,
   });
 
-  const closeBtn = createCloseButtonSvg(y);
-  closeBtn.addEventListener("click", () => overlay.onClose(overlay.index));
-
   const body = createDetailsBody(requestID, detailsHeight, overlay.entry);
+  const closeBtn = createCloseButtonSvg(y);
+  closeBtn.addEventListener("click", () => {
+    overlay.onClose(overlay.index);
+    body.removeEventListener("click", onRawDataCopyClick);
+  });
+  body.addEventListener("click", onRawDataCopyClick);
+
   // need to re-fetch the elements to fix Edge "Invalid Calling Object" bug
   const getButtons = () => body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
   const getTabs = () => body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
