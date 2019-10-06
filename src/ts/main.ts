@@ -48,7 +48,7 @@ function PerfCascade(waterfallDocsData: WaterfallDocs, chartOptions: Partial<Cha
 
   let doc = createWaterfallSvg(paging.getSelectedPage(), options);
 
-  // page update behaviour
+  // page update behavior
   paging.onPageUpdate((_pageIndex, pageDoc) => {
     const el = doc.parentElement as HTMLElement;
     const newDoc = createWaterfallSvg(pageDoc, options);
@@ -85,7 +85,7 @@ export function fromHar(harData: Har, options: ChartOptions = {}): SVGSVGElement
   return PerfCascade(data, options);
 }
 
-// aditional imported members that get exported via UMD
+// additional imported members that get exported via UMD
 export {
   ChartOptions,
 };

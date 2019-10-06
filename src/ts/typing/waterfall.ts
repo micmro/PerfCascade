@@ -13,7 +13,7 @@ export interface UserTiming {
   startTime: number;
 }
 
-/** Type for a time-marker, e.g. the fireing of an event */
+/** Type for a time-marker, e.g. the firing of an event */
 export interface Mark extends UserTiming {
   /** custom data to store x position */
   x?: number;
@@ -36,7 +36,7 @@ export interface WaterfallEntry {
   tabs: WaterfallEntryTab[];
 }
 
-export type TabRenderer = (datailsHeight: number) => string;
+export type TabRenderer = (detailsHeight: number) => string;
 
 /** Represents a single tab of a `WaterfallEntry` */
 export interface WaterfallEntryTab {
@@ -44,7 +44,7 @@ export interface WaterfallEntryTab {
   title: string;
   /** stringified tab HTML */
   content?: string;
-  /** lazy eveluation to create stringified tab HTML */
+  /** lazy evaluation to create stringified tab HTML */
   renderContent?: TabRenderer;
   /** Add an additional CSS class-name to the tab */
   tabClass?: string;
@@ -62,7 +62,7 @@ export interface WaterfallEntryIndicator {
   title: string;
   /** long description e.g. for details overlay view */
   description: string;
-  /** catrgorizes the indicator */
+  /** categorizes the indicator */
   type: IndicatorType;
   /** where to show the indicator, defaults to `"icon"` */
   displayType: IndicatorDisplayType;
