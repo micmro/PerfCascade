@@ -44,9 +44,8 @@ function createHolder(y: number, detailsHeight: number) {
 const onRawDataCopyClick = (event: MouseEvent) => {
   const btn = event.target as HTMLButtonElement;
   if (btn.tagName.toLowerCase() === "button" && btn.classList.contains("copy-raw-data")) {
-    const data = btn.nextElementSibling ? (btn.nextElementSibling as HTMLElement).innerText : "";
     const el = document.createElement("textarea");
-    el.value = data;
+    el.value = btn.nextElementSibling ? (btn.nextElementSibling as HTMLElement).innerText : "";
     document.body.appendChild(el);
     el.select();
     el.setSelectionRange(0, 99999);
