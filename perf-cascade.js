@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.6.3 (11/09/2019) */
+/*! github.com/micmro/PerfCascade Version:2.7.0 (07/10/2019) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
@@ -927,7 +927,7 @@ function PerfCascade(waterfallDocsData, chartOptions) {
     // setup paging helper
     var paging = new paging_1.default(waterfallDocsData, options.selectedPage);
     var doc = svg_chart_1.createWaterfallSvg(paging.getSelectedPage(), options);
-    // page update behaviour
+    // page update behavior
     paging.onPageUpdate(function (_pageIndex, pageDoc) {
         var el = doc.parentElement;
         var newDoc = svg_chart_1.createWaterfallSvg(pageDoc, options);
@@ -1271,7 +1271,7 @@ function hasCompressionIssue(entry, requestType) {
     var headers = entry.response.headers;
     return (!har_1.hasHeader(headers, "Content-Encoding") && isCompressible(entry, requestType));
 }
-/** Checks if the ressource uses https */
+/** Checks if the resource uses https */
 function isSecure(entry) {
     return entry.request.url.indexOf("https://") === 0;
 }
@@ -1430,13 +1430,13 @@ function makeGeneralTab(generalData, indicators) {
         .filter(function (i) { return i.type !== "error" && i.type !== "warning"; })
         .map(function (i) { return [i.title, i.description]; });
     if (errors.length > 0) {
-        content += "<h2 class=\"no-boder\">" + misc_1.pluralize("Error", errors.length) + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(errors) + "</dl>";
+        content += "<h2 class=\"no-border\">" + misc_1.pluralize("Error", errors.length) + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(errors) + "</dl>";
     }
     if (warnings.length > 0) {
-        content += "<h2 class=\"no-boder\">" + misc_1.pluralize("Warning", warnings.length) + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(warnings) + "</dl>";
+        content += "<h2 class=\"no-border\">" + misc_1.pluralize("Warning", warnings.length) + "</h2>\n    <dl>" + helpers_1.makeDefinitionList(warnings) + "</dl>";
     }
     if (info.length > 0) {
-        content += "<h2 class=\"no-boder\">Info</h2>\n    <dl>" + helpers_1.makeDefinitionList(info) + "</dl>";
+        content += "<h2 class=\"no-border\">Info</h2>\n    <dl>" + helpers_1.makeDefinitionList(info) + "</dl>";
     }
     return makeWaterfallEntryTab("General", content + general);
 }
@@ -1444,8 +1444,8 @@ function makeRequestTab(request, requestHeaders) {
     var content = "<dl>\n      " + helpers_1.makeDefinitionList(request) + "\n    </dl>\n    <h2>All Request Headers</h2>\n    <dl>\n      " + helpers_1.makeDefinitionList(requestHeaders) + "\n    </dl>";
     return makeWaterfallEntryTab("Request", content);
 }
-function makeResponseTab(respose, responseHeaders) {
-    var content = "<dl>\n      " + helpers_1.makeDefinitionList(respose) + "\n    </dl>\n    <h2>All Response Headers</h2>\n    <dl>\n      " + helpers_1.makeDefinitionList(responseHeaders) + "\n    </dl>";
+function makeResponseTab(response, responseHeaders) {
+    var content = "<dl>\n      " + helpers_1.makeDefinitionList(response) + "\n    </dl>\n    <h2>All Response Headers</h2>\n    <dl>\n      " + helpers_1.makeDefinitionList(responseHeaders) + "\n    </dl>";
     return makeWaterfallEntryTab("Response", content);
 }
 /** Tab to show the returned (text-based) payload (HTML, CSS, JS etc.) */
@@ -1454,10 +1454,15 @@ function makeContentTab(entry) {
     var unescapedText = escapedText.replace(escapedNewLineRegex, "\n").replace(escapedTabRegex, "\t");
     var newLines = escapedText.match(newLineRegex);
     var lineCount = newLines ? newLines.length : 1;
-    return makeLazyWaterfallEntryTab("Content (" + lineCount + " Line" + (lineCount > 1 ? "s" : "") + ")", function () { return "<pre><code>" + parse_1.escapeHtml(unescapedText) + "</code></pre> "; }, "content rendered-data");
+    return makeLazyWaterfallEntryTab("Content (" + lineCount + " Line" + (lineCount > 1 ? "s" : "") + ")", 
+    // class `copy-tab-data` needed to catch bubbled up click event in `details-overlay/html-details-body.ts`
+    function () { return "\n    <button class=\"copy-tab-data\">Copy Content to Clipboard</button>\n    <pre><code>" + parse_1.escapeHtml(unescapedText) + "</code></pre>\n    "; }, "content rendered-data");
 }
 function makeRawData(entry) {
-    return makeLazyWaterfallEntryTab("Raw Data", function () { return "<pre><code>" + parse_1.escapeHtml(JSON.stringify(entry, null, 2)) + "</code></pre>"; }, "raw-data rendered-data");
+    return makeLazyWaterfallEntryTab("Raw Data", function () {
+        // class `copy-tab-data` needed to catch bubbled up click event in `details-overlay/html-details-body.ts`
+        return "\n      <button class=\"copy-tab-data\">Copy Raw Data to Clipboard</button>\n      <pre><code>" + parse_1.escapeHtml(JSON.stringify(entry, null, 2)) + "</code></pre>\n      ";
+    }, "raw-data rendered-data");
 }
 /** Image preview tab */
 function makeImgTab(entry) {
@@ -1488,7 +1493,7 @@ function transformDoc(harData, options) {
 }
 exports.transformDoc = transformDoc;
 /**
- * Converts an HAR `Entry` into PerfCascads `WaterfallEntry`
+ * Converts an HAR `Entry` into PerfCascade's `WaterfallEntry`
  *
  * @param  {Entry} entry
  * @param  {number} index - resource entry index
@@ -1503,7 +1508,7 @@ function toWaterFallEntry(entry, index, startRelative, isTLS) {
     var responseDetails = createResponseDetails(entry, indicators);
     return helpers_1.createWaterfallEntry(entry.request.url, startRelative, endRelative, buildDetailTimingBlocks(startRelative, entry), responseDetails, har_tabs_1.makeTabs(entry, (index + 1), requestType, startRelative, endRelative, indicators));
 }
-/** retuns the page or a mock page object */
+/** Returns the page or a mock page object */
 var getPages = function (data) {
     if (data.pages && data.pages.length > 0) {
         return data.pages;
@@ -1604,7 +1609,7 @@ var getMarks = function (pageTimings, currPage, options) {
     if (!options.showUserTiming) {
         return marks.sort(sortFn);
     }
-    return getUserTimimngs(currPage, options)
+    return getUserTimings(currPage, options)
         .concat(marks)
         .sort(sortFn);
 };
@@ -1613,7 +1618,7 @@ var getMarks = function (pageTimings, currPage, options) {
  * @param {Page} currPage - active page
  * @param {ChartOptions} options - HAR options
  */
-var getUserTimimngs = function (currPage, options) {
+var getUserTimings = function (currPage, options) {
     var baseFilter = options.showUserTimingEndMarker ?
         function (k) { return k.indexOf("_userTime.") === 0; } :
         function (k) { return k.indexOf("_userTime.") === 0 && k.indexOf("_userTime.endTimer-") !== 0; };
@@ -1650,7 +1655,7 @@ var getUserTimimngs = function (currPage, options) {
         .map(extractUserTiming);
 };
 /**
- * Create `WaterfallEntry`s to represent the subtimings of a request
+ * Create `WaterfallEntry`s to represent the sub-timings of a request
  * ("blocked", "dns", "connect", "send", "wait", "receive")
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @param  {Entry} harEntry
@@ -1927,7 +1932,7 @@ var parse_1 = require("../../helpers/parse");
 /**
  * Creates the HTML body for the overlay
  *
- * _All tabable elements are set to `tabindex="-1"` to avoid tabing issues_
+ * _All tab-able elements are set to `tabindex="-1"` to avoid tabbing issues_
  * @param requestID ID
  * @param detailsHeight
  * @param entry
@@ -2205,6 +2210,19 @@ function createHolder(y, detailsHeight) {
     holder.appendChild(bg);
     return holder;
 }
+/** Shared function to copy the tabs data */
+var onTabDataCopyClick = function (event) {
+    var btn = event.target;
+    if (btn.tagName.toLowerCase() === "button" && btn.classList.contains("copy-tab-data")) {
+        var el = document.createElement("textarea");
+        el.value = btn.nextElementSibling ? btn.nextElementSibling.innerText : "";
+        document.body.appendChild(el);
+        el.select();
+        el.setSelectionRange(0, 99999); // for mobile
+        document.execCommand("copy");
+        document.body.removeChild(el);
+    }
+};
 function createRowInfoOverlay(overlay, y, detailsHeight) {
     var requestID = overlay.index + 1;
     var holder = createHolder(y, detailsHeight);
@@ -2214,9 +2232,13 @@ function createRowInfoOverlay(overlay, y, detailsHeight) {
         x: "0",
         y: y,
     });
-    var closeBtn = createCloseButtonSvg(y);
-    closeBtn.addEventListener("click", function () { return overlay.onClose(overlay.index); });
     var body = html_details_body_1.createDetailsBody(requestID, detailsHeight, overlay.entry);
+    var closeBtn = createCloseButtonSvg(y);
+    closeBtn.addEventListener("click", function () {
+        overlay.onClose(overlay.index);
+        body.removeEventListener("click", onTabDataCopyClick);
+    });
+    body.addEventListener("click", onTabDataCopyClick);
     // need to re-fetch the elements to fix Edge "Invalid Calling Object" bug
     var getButtons = function () { return body.getElementsByClassName("tab-button"); };
     var getTabs = function () { return body.getElementsByClassName("tab"); };
@@ -2290,7 +2312,7 @@ exports.getIndicatorIcons = getIndicatorIcons;
 },{"../../helpers/misc":4}],21:[function(require,module,exports){
 "use strict";
 /**
- * Creation of sub-components used in a ressource request row
+ * Creation of sub-components used in a resource request row
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var dom_1 = require("../../helpers/dom");
