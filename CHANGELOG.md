@@ -2,6 +2,16 @@
 
 
 
+## v2.7.0 (2019-10-07)
+
+* chore: fix typos ([ddf511e](https://github.com/micmro/PerfCascade/commit/ddf511e))
+* chore(comment): fix copy-tab-data class comment ([7671aef](https://github.com/micmro/PerfCascade/commit/7671aef))
+* chore(#261): functionality working ([60df175](https://github.com/micmro/PerfCascade/commit/60df175)), closes [#261](https://github.com/micmro/PerfCascade/issues/261)
+* feature(#261): show copy on content tab ([1823a56](https://github.com/micmro/PerfCascade/commit/1823a56)), closes [#261](https://github.com/micmro/PerfCascade/issues/261)
+* feature(#261): style button ([e07da5f](https://github.com/micmro/PerfCascade/commit/e07da5f)), closes [#261](https://github.com/micmro/PerfCascade/issues/261)
+
+
+
 ## <small>v2.6.3 (2019-09-11)</small>
 
 * Adapt module for ES6 ([44cb68a](https://github.com/micmro/PerfCascade/commit/44cb68a))
