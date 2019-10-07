@@ -48,7 +48,7 @@ const onTabDataCopyClick = (event: MouseEvent) => {
     el.value = btn.nextElementSibling ? (btn.nextElementSibling as HTMLElement).innerText : "";
     document.body.appendChild(el);
     el.select();
-    el.setSelectionRange(0, 99999);
+    el.setSelectionRange(0, 99999); // for mobile
     document.execCommand("copy");
     document.body.removeChild(el);
   }
