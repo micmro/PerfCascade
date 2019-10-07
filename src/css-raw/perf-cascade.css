@@ -166,6 +166,9 @@
 .info-overlay-holder button:hover {border-color: rgba(255,255,255, 0.6);}
 .info-overlay-holder button.active {border-color: #fff; cursor: default;}
 .info-overlay-holder button.active:focus {border-color: rgba(255,255,255, 0.8);}
+.info-overlay-holder button.copy-tab-data {position: absolute; top:0.5em; right: 0.5em; border: 0; margin: 0; border-radius: 1em; background: #e0e0e0;}
+.info-overlay-holder button.copy-tab-data:focus,
+.info-overlay-holder button.copy-tab-data:hover { background: #ccc; }
 
 /* Info overlay HTML - content */
 .info-overlay-holder dt {float: left; clear: both; margin-top: 0.5em; width: 25%; text-align: right; font-weight: bold; }
@@ -173,7 +176,7 @@
 .info-overlay-holder dt:after { content: ":"; }
 .info-overlay-holder pre {font-size: 11px; line-height: 23px;  border-radius: 0; background: #f6f3f3;}
 
-.info-overlay-holder .tab {float: left; width:100%; height: 350px; padding:12px 12px 24px;}
+.info-overlay-holder .tab {float: left; position: relative; width:100%; height: 350px; padding:12px 12px 24px;}
 .info-overlay-holder .tab h2 {font-size: 1.2em; margin:0.5em 0 0; padding: 0.5em 0 0.5em 1em; clear: both; border-top: solid 1px #efefef;}
 .info-overlay-holder .tab h2:first-child {border-top: 0; padding-top: 0;}
 .info-overlay-holder .tab pre {overflow-y: hidden; width:100%; min-height: 100%;}
