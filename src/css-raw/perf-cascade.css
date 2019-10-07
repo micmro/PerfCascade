@@ -166,9 +166,9 @@
 .info-overlay-holder button:hover {border-color: rgba(255,255,255, 0.6);}
 .info-overlay-holder button.active {border-color: #fff; cursor: default;}
 .info-overlay-holder button.active:focus {border-color: rgba(255,255,255, 0.8);}
-.info-overlay-holder button.copy-raw-data {position: absolute; top:0.5em; right: 0.5em; border: 0; margin: 0; border-radius: 1em; background: #e0e0e0;}
-.info-overlay-holder button.copy-raw-data:focus,
-.info-overlay-holder button.copy-raw-data:hover { background: #ccc; }
+.info-overlay-holder button.copy-tab-data {position: absolute; top:0.5em; right: 0.5em; border: 0; margin: 0; border-radius: 1em; background: #e0e0e0;}
+.info-overlay-holder button.copy-tab-data:focus,
+.info-overlay-holder button.copy-tab-data:hover { background: #ccc; }
 
 /* Info overlay HTML - content */
 .info-overlay-holder dt {float: left; clear: both; margin-top: 0.5em; width: 25%; text-align: right; font-weight: bold; }

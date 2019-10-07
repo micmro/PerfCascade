@@ -132,7 +132,10 @@ function makeContentTab(entry: Entry) {
   const lineCount = newLines ? newLines.length : 1;
   return makeLazyWaterfallEntryTab(
     `Content (${lineCount} Line${lineCount > 1 ? "s" : ""})`,
-    () => `<pre><code>${escapeHtml(unescapedText)}</code></pre> `,
+    () => `
+    <button class="copy-tab-data">Copy Content to Clipboard</button>
+    <pre><code>${escapeHtml(unescapedText)}</code></pre>
+    `,
     "content rendered-data",
   );
 }
@@ -143,7 +146,7 @@ function makeRawData(entry: Entry) {
     () => {
       // class `copy` needed to catch bubbled up click event in `details-overlay/html-details-body.ts`
       return `
-      <button class="copy-raw-data">Copy Raw Data to Clipboard</button>
+      <button class="copy-tab-data">Copy Raw Data to Clipboard</button>
       <pre><code>${escapeHtml(JSON.stringify(entry, null, 2))}</code></pre>
       `;
     },

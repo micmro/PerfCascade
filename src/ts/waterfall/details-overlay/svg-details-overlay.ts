@@ -40,10 +40,10 @@ function createHolder(y: number, detailsHeight: number) {
   return holder;
 }
 
-/** Shared function to copy raw data */
-const onRawDataCopyClick = (event: MouseEvent) => {
+/** Shared function to copy the tabs data */
+const onTabDataCopyClick = (event: MouseEvent) => {
   const btn = event.target as HTMLButtonElement;
-  if (btn.tagName.toLowerCase() === "button" && btn.classList.contains("copy-raw-data")) {
+  if (btn.tagName.toLowerCase() === "button" && btn.classList.contains("copy-tab-data")) {
     const el = document.createElement("textarea");
     el.value = btn.nextElementSibling ? (btn.nextElementSibling as HTMLElement).innerText : "";
     document.body.appendChild(el);
@@ -69,9 +69,9 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
   const closeBtn = createCloseButtonSvg(y);
   closeBtn.addEventListener("click", () => {
     overlay.onClose(overlay.index);
-    body.removeEventListener("click", onRawDataCopyClick);
+    body.removeEventListener("click", onTabDataCopyClick);
   });
-  body.addEventListener("click", onRawDataCopyClick);
+  body.addEventListener("click", onTabDataCopyClick);
 
   // need to re-fetch the elements to fix Edge "Invalid Calling Object" bug
   const getButtons = () => body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
