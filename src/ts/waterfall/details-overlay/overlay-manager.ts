@@ -16,8 +16,8 @@ import { createRowInfoOverlay } from "./svg-details-overlay";
 /** Overlay (popup) instance manager */
 class OverlayManager {
   private static showFullName = (el: Element) => {
-    el.getElementsByClassName("row-fixed").item(0)
-      .dispatchEvent(new MouseEvent("mouseenter"));
+    el.getElementsByClassName("row-fixed")
+      .item(0)?.dispatchEvent(new MouseEvent("mouseenter"));
   }
   /**
    * Keypress Event handler for fist el in Overlay,

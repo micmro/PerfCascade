@@ -170,7 +170,7 @@ export function makeMimeTypeIcon(status: number,
  *
  * @param nestedKvPairs - nested `KvTuple`s (possibly sub-nested)
  */
-export const flattenKvTuple = (nestedKvPairs: Array<(KvTuple | KvTuple[])>): KvTuple[] => {
+export const flattenKvTuple = (nestedKvPairs: (KvTuple | KvTuple[])[]): KvTuple[] => {
   const returnKv: KvTuple[] = [];
   nestedKvPairs.forEach((maybeKv) => {
     if (maybeKv === undefined || maybeKv.length === 0) {

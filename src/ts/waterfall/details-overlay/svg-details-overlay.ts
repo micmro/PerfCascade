@@ -74,8 +74,8 @@ export function createRowInfoOverlay(overlay: OpenOverlay, y: number, detailsHei
   body.addEventListener("click", onTabDataCopyClick);
 
   // need to re-fetch the elements to fix Edge "Invalid Calling Object" bug
-  const getButtons = () => body.getElementsByClassName("tab-button") as NodeListOf<HTMLButtonElement>;
-  const getTabs = () => body.getElementsByClassName("tab") as NodeListOf<HTMLDivElement>;
+  const getButtons = () => body.getElementsByClassName("tab-button") as unknown as NodeListOf<HTMLButtonElement>;
+  const getTabs = () => body.getElementsByClassName("tab") as unknown as NodeListOf<HTMLDivElement>;
 
   const setTabStatus = (tabIndex: number | undefined) => {
     overlay.openTabIndex = tabIndex;
