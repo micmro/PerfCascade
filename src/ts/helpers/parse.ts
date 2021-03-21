@@ -26,8 +26,8 @@ export function parseAndFormat<S, T>(input: S | undefined,
 }
 
 function toString<T>(source: T): string {
-  if (typeof source["toString"] === "function") {
-    return source.toString();
+  if ("toString" in source && typeof (source as {toString: () => string}) === "function") {
+    return (source as {toString: () => string}).toString();
   } else {
     throw TypeError(`Can't convert type ${typeof source} to string`);
   }
@@ -195,10 +195,10 @@ export function validateOptions(options: ChartRenderOption): ChartRenderOption {
     if (val === undefined) {
       throw TypeError(`option "${name}" needs to be a number`);
     }
-    options[name] = val;
+    (options[name] as ChartRenderOption[keyof ChartRenderOption]) = val;
   };
   const ensureBoolean = (name: keyof ChartRenderOption) => {
-    options[name] = !!options[name];
+    (options[name] as ChartRenderOption[keyof ChartRenderOption]) = !!options[name];
   };
 
   validateInt("leftColumnWidth");
