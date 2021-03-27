@@ -21,7 +21,7 @@ export function createMarks(context: Context, marks: Mark[]) {
     const markHolder = svg.newG("mark-holder type-" + mark.name.toLowerCase().replace(/([0-9]+[ ]?ms)|\W/g, ""));
     const lineHolder = svg.newG("line-holder");
     const lineLabelHolder = svg.newG("line-label-holder");
-    const lineLabel = svg.newTextEl(mark.name, { x: x + "%", y: diagramHeight + 25 });
+    const lineLabel = svg.newTextEl(mark.name, { x: `${x}%`, y: diagramHeight + 25 });
     lineLabel.setAttribute("writing-mode", "tb");
     let lineRect: SVGGElement;
     mark.x = x;
@@ -33,11 +33,20 @@ export function createMarks(context: Context, marks: Mark[]) {
       y2: diagramHeight,
     });
 
-    const lastMark = marks[i - 1];
+    const previousMark = marks[i - 1];
+    const nextMark: Mark | undefined = marks[i + 1];
     const minDistance = 2.5; // minimum distance between marks
-    if (lastMark && lastMark.x !== undefined && mark.x - lastMark.x < minDistance) {
-      lineLabel.setAttribute("x", lastMark.x + minDistance + "%");
-      mark.x = lastMark.x + minDistance;
+    const isCloseToPerviousMark = previousMark?.x !== undefined && mark.x - previousMark.x < minDistance;
+    const nextX = roundNumber((nextMark?.startTime || 0) / context.unit);
+
+    if (nextX && nextX - mark.x < minDistance && nextX + minDistance >= 100 && !isCloseToPerviousMark) { // look ahead
+      // push current mark back if next mark would be pushed past 100% and there is no close previous mark
+      lineLabel.setAttribute("x", `${nextX - minDistance}%`);
+      mark.x = nextX - minDistance;
+    } else if (previousMark?.x !== undefined && isCloseToPerviousMark) { // look behind
+      // push mark ahead to not collide with previous mark
+      lineLabel.setAttribute("x", `${previousMark.x + minDistance}%`);
+      mark.x = previousMark.x + minDistance;
     }
     // would use polyline but can't use percentage for points
     const lineConnection = svg.newLine({
