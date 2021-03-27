@@ -2,6 +2,16 @@
 
 
 
+## v2.8.0 (2021-03-27)
+
+* feat: add lookahead for marker ([c36d82e](https://github.com/micmro/PerfCascade/commit/c36d82e)), closes [#272](https://github.com/micmro/PerfCascade/issues/272)
+* chore: update dependencies ([9b1407e](https://github.com/micmro/PerfCascade/commit/9b1407e))
+* Bump elliptic from 6.4.1 to 6.5.4 ([be35543](https://github.com/micmro/PerfCascade/commit/be35543))
+* Bump handlebars from 4.1.2 to 4.5.3 ([b4806ba](https://github.com/micmro/PerfCascade/commit/b4806ba))
+* Bump ini from 1.3.5 to 1.3.7 ([49f9b06](https://github.com/micmro/PerfCascade/commit/49f9b06))
+
+
+
 ## v2.7.0 (2019-10-07)
 
 * chore: fix typos ([ddf511e](https://github.com/micmro/PerfCascade/commit/ddf511e))
