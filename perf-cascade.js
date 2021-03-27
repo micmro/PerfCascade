@@ -1,8 +1,9 @@
-/*! github.com/micmro/PerfCascade Version:2.7.0 (07/10/2019) */
+/*! github.com/micmro/PerfCascade Version:2.8.0 (27/03/2021) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeBodyEl = exports.makeHtmlEl = exports.safeSetAttributes = exports.safeSetStyles = exports.safeSetAttribute = exports.safeSetStyle = exports.forEachNodeList = exports.getLastItemOfNodeList = exports.removeChildren = exports.getParentByClassName = exports.removeClass = exports.addClass = void 0;
 /**
  * Adds class `className` to `el`
  * @param  {Element} el
@@ -139,6 +140,7 @@ exports.makeBodyEl = makeBodyEl;
 },{}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getHeaders = exports.getHeader = exports.hasHeader = void 0;
 /** Partial function that buils a filter predicate function */
 var matchHeaderPartialFn = function (lowercaseName) {
     return function (header) { return header.name.toLowerCase() === lowercaseName; };
@@ -185,6 +187,7 @@ exports.getHeaders = getHeaders;
 },{}],3:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.audio = exports.video = exports.flash = exports.font = exports.error = exports.warning = exports.css = exports.html = exports.svg = exports.image = exports.javascript = exports.other = exports.plain = exports.err5xx = exports.err4xx = exports.err3xx = exports.noTls = void 0;
 var svgLib = require("./svg");
 /**
  *  SVG Icons
@@ -365,6 +368,7 @@ exports.audio = audio;
  *  Misc Helpers
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isTabDown = exports.isTabUp = exports.pluralize = exports.toCssClass = exports.isInStatusCodeRange = exports.roundNumber = exports.resourceUrlFormatter = exports.find = exports.findIndex = exports.contains = void 0;
 /**
  * Parses URL into its components
  * @param  {string} url
@@ -508,6 +512,7 @@ exports.isTabDown = isTabDown;
 },{}],5:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.validateOptions = exports.toInt = exports.sanitizeAlphaNumeric = exports.sanitizeUrlForLink = exports.escapeHtml = exports.formatBytes = exports.formatDateLocalized = exports.formatSeconds = exports.formatMilliseconds = exports.parsePositive = exports.parseNonNegative = exports.parseDate = exports.parseNonEmpty = exports.parseAndFormat = void 0;
 var misc_1 = require("./misc");
 /**
  * Type safe and null safe way to transform, filter and format an input value, e.g. parse a Date from a string,
@@ -531,7 +536,7 @@ function parseAndFormat(input, parseFn, formatFn) {
 }
 exports.parseAndFormat = parseAndFormat;
 function toString(source) {
-    if (typeof source["toString"] === "function") {
+    if ("toString" in source && typeof source === "function") {
         return source.toString();
     }
     else {
@@ -717,6 +722,7 @@ exports.validateOptions = validateOptions;
  *  SVG Helpers
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getNodeTextWidth = exports.newPath = exports.newTextEl = exports.newTitle = exports.newLine = exports.newRect = exports.newA = exports.newForeignObject = exports.newClipPath = exports.newG = exports.newSvg = void 0;
 var dom_1 = require("./dom");
 /** Namespace for SVG Elements */
 var svgNamespaceUri = "http://www.w3.org/2000/svg";
@@ -860,6 +866,7 @@ exports.getNodeTextWidth = getNodeTextWidth;
 },{"./dom":1}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeLegend = void 0;
 /**
  * Creates the html for diagrams legend
  */
@@ -885,6 +892,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.fromHar = exports.makeLegend = void 0;
 var parse_1 = require("./helpers/parse");
 var legend_1 = require("./legend/legend");
 var paging_1 = require("./paging/paging");
@@ -923,7 +931,7 @@ function PerfCascade(waterfallDocsData, chartOptions) {
             "please update your code as this will get deprecated in the future");
         chartOptions.leftColumnWidth = chartOptions["leftColumnWith"];
     }
-    var options = parse_1.validateOptions(__assign({}, defaultChartOptions, chartOptions));
+    var options = parse_1.validateOptions(__assign(__assign({}, defaultChartOptions), chartOptions));
     // setup paging helper
     var paging = new paging_1.default(waterfallDocsData, options.selectedPage);
     var doc = svg_chart_1.createWaterfallSvg(paging.getSelectedPage(), options);
@@ -951,7 +959,7 @@ function PerfCascade(waterfallDocsData, chartOptions) {
  */
 function fromHar(harData, options) {
     if (options === void 0) { options = {}; }
-    var harTransformerOptions = __assign({}, defaultHarTransformerOptions, options);
+    var harTransformerOptions = __assign(__assign({}, defaultHarTransformerOptions), options);
     var data = HarTransformer.transformDoc(harData, harTransformerOptions);
     if (typeof options.onParsed === "function") {
         options.onParsed(data);
@@ -1057,6 +1065,7 @@ exports.default = Paging;
 },{"../helpers/dom":1}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getKeys = void 0;
 var har_1 = require("../helpers/har");
 var parse_1 = require("../helpers/parse");
 var helpers_1 = require("./helpers");
@@ -1225,6 +1234,7 @@ exports.getKeys = getKeys;
  * Heuristics used at parse-time for HAR data
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.collectIndicators = exports.documentIsSecure = void 0;
 var har_1 = require("../helpers/har");
 var misc = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
@@ -1357,6 +1367,7 @@ exports.collectIndicators = collectIndicators;
 },{"../helpers/har":2,"../helpers/misc":4,"../helpers/parse":5}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeTabs = void 0;
 var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
 var extract_details_keys_1 = require("./extract-details-keys");
@@ -1472,6 +1483,7 @@ function makeImgTab(entry) {
 },{"../helpers/misc":4,"../helpers/parse":5,"./extract-details-keys":10,"./helpers":14}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.transformPage = exports.transformDoc = void 0;
 var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
 var har_heuristics_1 = require("./har-heuristics");
@@ -1643,6 +1655,7 @@ var getUserTimings = function (currPage, options) {
                 duration: duration,
                 name: (options.showUserTimingEndMarker ? fullName : name) + " (" + currPage[k] + " - " + (currPage[k] + duration) + " ms)",
                 startTime: currPage[k],
+                // x: currPage[k],
             };
         }
         return {
@@ -1734,6 +1747,7 @@ var createResponseDetails = function (entry, indicators) {
 },{"../helpers/misc":4,"../helpers/parse":5,"./har-heuristics":11,"./har-tabs":12,"./helpers":14}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.flattenKvTuple = exports.makeMimeTypeIcon = exports.makeRowCssClasses = exports.createWaterfallEntryTiming = exports.createWaterfallEntry = exports.mimeToRequestType = exports.makeDefinitionList = void 0;
 /** Helpers that are not file-fromat specific */
 var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
@@ -1889,7 +1903,7 @@ exports.makeMimeTypeIcon = makeMimeTypeIcon;
  *
  * @param nestedKvPairs - nested `KvTuple`s (possibly sub-nested)
  */
-exports.flattenKvTuple = function (nestedKvPairs) {
+var flattenKvTuple = function (nestedKvPairs) {
     var returnKv = [];
     nestedKvPairs.forEach(function (maybeKv) {
         if (maybeKv === undefined || maybeKv.length === 0) {
@@ -1903,10 +1917,12 @@ exports.flattenKvTuple = function (nestedKvPairs) {
     });
     return returnKv;
 };
+exports.flattenKvTuple = flattenKvTuple;
 
 },{"../helpers/misc":4,"../helpers/parse":5,"../waterfall/row/svg-indicators":20}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.timingTypeToCssClass = exports.requestTypeToCssClass = void 0;
 /**
  * Convert a RequestType into a CSS class
  * @param {RequestType} requestType
@@ -1927,6 +1943,7 @@ exports.timingTypeToCssClass = timingTypeToCssClass;
 },{}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createDetailsBody = void 0;
 var dom_1 = require("../../helpers/dom");
 var parse_1 = require("../../helpers/parse");
 /**
@@ -1971,6 +1988,7 @@ exports.createDetailsBody = createDetailsBody;
 },{"../../helpers/dom":1,"../../helpers/parse":5}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.OverlayManager = void 0;
 var dom_1 = require("../../helpers/dom");
 var misc_1 = require("../../helpers/misc");
 var svg_details_overlay_1 = require("./svg-details-overlay");
@@ -2111,8 +2129,9 @@ var OverlayManager = /** @class */ (function () {
         rowItems.forEach(updateRow);
     };
     OverlayManager.showFullName = function (el) {
-        el.getElementsByClassName("row-fixed").item(0)
-            .dispatchEvent(new MouseEvent("mouseenter"));
+        var _a;
+        (_a = el.getElementsByClassName("row-fixed")
+            .item(0)) === null || _a === void 0 ? void 0 : _a.dispatchEvent(new MouseEvent("mouseenter"));
     };
     /**
      * Keypress Event handler for fist el in Overlay,
@@ -2146,6 +2165,7 @@ exports.default = OverlayManager;
 },{"../../helpers/dom":1,"../../helpers/misc":4,"./svg-details-overlay":19}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PubSub = void 0;
 var PubSub = /** @class */ (function () {
     function PubSub() {
         this.subscribers = [];
@@ -2177,6 +2197,7 @@ exports.default = PubSub;
 },{}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createRowInfoOverlay = void 0;
 var dom_1 = require("../../helpers/dom");
 var svg = require("../../helpers/svg");
 var html_details_body_1 = require("./html-details-body");
@@ -2263,6 +2284,7 @@ exports.createRowInfoOverlay = createRowInfoOverlay;
 },{"../../helpers/dom":1,"../../helpers/svg":6,"./html-details-body":16}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getIndicatorIcons = exports.makeIcon = void 0;
 var misc_1 = require("../../helpers/misc");
 /**
  * Convinience helper to create a new `Icon`
@@ -2315,6 +2337,7 @@ exports.getIndicatorIcons = getIndicatorIcons;
  * Creation of sub-components used in a resource request row
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createRowBg = exports.createNameRowBg = exports.createBgStripe = exports.appendRequestLabels = exports.createRequestLabelFull = exports.createRequestLabelClipped = exports.createRequestNumberLabel = exports.createRect = void 0;
 var dom_1 = require("../../helpers/dom");
 var misc = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
@@ -2613,6 +2636,7 @@ exports.createRowBg = createRowBg;
 },{"../../helpers/dom":1,"../../helpers/misc":4,"../../helpers/svg":6,"../../transformers/styling-converters":15,"./svg-tooltip":23}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createRow = void 0;
 var icons = require("../../helpers/icons");
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
@@ -2732,6 +2756,7 @@ exports.createRow = createRow;
 },{"../../helpers/icons":3,"../../helpers/misc":4,"../../helpers/svg":6,"./svg-indicators":20,"./svg-row-subcomponents":21}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeTooltip = exports.onHoverOutShowTooltip = exports.onHoverInShowTooltip = void 0;
 var dom_1 = require("../../helpers/dom");
 var svg = require("../../helpers/svg");
 var translateYRegEx = /(?:translate)\(.+[, ]+(.+)\)/;
@@ -2746,7 +2771,7 @@ var getTranslateY = function (str) {
     return 0;
 };
 /** static event-handler to show tooltip */
-exports.onHoverInShowTooltip = function (base, rectData, foreignEl) {
+var onHoverInShowTooltip = function (base, rectData, foreignEl) {
     var innerDiv = foreignEl.querySelector(".tooltip-payload");
     var row = dom_1.getParentByClassName(base, "row-item");
     var yTransformOffsest = getTranslateY(row.getAttribute("transform"));
@@ -2803,7 +2828,8 @@ exports.onHoverInShowTooltip = function (base, rectData, foreignEl) {
         foreignEl.setAttribute("y", "" + (yInt + offsetY - diff));
     }
 };
-exports.onHoverOutShowTooltip = function (base) {
+exports.onHoverInShowTooltip = onHoverInShowTooltip;
+var onHoverOutShowTooltip = function (base) {
     var holder = dom_1.getParentByClassName(base, "water-fall-chart");
     var foreignEl = holder.querySelector(".tooltip");
     var innerDiv = foreignEl.querySelector(".tooltip-payload");
@@ -2811,11 +2837,12 @@ exports.onHoverOutShowTooltip = function (base) {
     foreignEl.setAttribute("height", "250"); // set to high value
     innerDiv.style.opacity = "0";
 };
+exports.onHoverOutShowTooltip = onHoverOutShowTooltip;
 /**
  * Creates the Tooltip base elements
  * @param {ChartOptions} options - Chart config/customization options
  */
-exports.makeTooltip = function (options) {
+var makeTooltip = function (options) {
     var leftColOffsetPerc = options.leftColumnWidth;
     var holder = svg.newSvg("tooltip-holder", {
         width: "100%",
@@ -2839,6 +2866,7 @@ exports.makeTooltip = function (options) {
     holder.appendChild(foreignEl);
     return holder;
 };
+exports.makeTooltip = makeTooltip;
 
 },{"../../helpers/dom":1,"../../helpers/svg":6}],24:[function(require,module,exports){
 "use strict";
@@ -2846,6 +2874,7 @@ exports.makeTooltip = function (options) {
  * vertical alignment helper lines
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeHoverEvtListeners = exports.createAlignmentLines = void 0;
 var dom_1 = require("../../helpers/dom");
 var svg = require("../../helpers/svg");
 /**
@@ -2908,6 +2937,7 @@ exports.makeHoverEvtListeners = makeHoverEvtListeners;
  * Creation of sub-components of the waterfall chart
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createTimeScale = void 0;
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
 /**
@@ -2983,6 +3013,7 @@ exports.createTimeScale = createTimeScale;
 },{"../../helpers/misc":4,"../../helpers/svg":6}],26:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createLineRect = exports.createMarks = void 0;
 var dom_1 = require("../../helpers/dom");
 var misc_1 = require("../../helpers/misc");
 var svg = require("../../helpers/svg");
@@ -3011,11 +3042,20 @@ function createMarks(context, marks) {
             y1: 0,
             y2: diagramHeight,
         });
-        var lastMark = marks[i - 1];
+        var previousMark = marks[i - 1];
+        var nextMark = marks[i + 1];
         var minDistance = 2.5; // minimum distance between marks
-        if (lastMark && lastMark.x !== undefined && mark.x - lastMark.x < minDistance) {
-            lineLabel.setAttribute("x", lastMark.x + minDistance + "%");
-            mark.x = lastMark.x + minDistance;
+        var isCloseToPerviousMark = (previousMark === null || previousMark === void 0 ? void 0 : previousMark.x) !== undefined && mark.x - previousMark.x < minDistance;
+        var nextX = misc_1.roundNumber(((nextMark === null || nextMark === void 0 ? void 0 : nextMark.startTime) || 0) / context.unit);
+        if (nextX && nextX - mark.x < minDistance && nextX + minDistance >= 100 && !isCloseToPerviousMark) { // look ahead
+            // push current mark back if next mark would be pushed past 100% and there is no close previous mark
+            lineLabel.setAttribute("x", nextX - minDistance + "%");
+            mark.x = nextX - minDistance;
+        }
+        else if ((previousMark === null || previousMark === void 0 ? void 0 : previousMark.x) !== undefined && isCloseToPerviousMark) { // look behind
+            // push mark ahead to not collide with previous mark
+            lineLabel.setAttribute("x", previousMark.x + minDistance + "%");
+            mark.x = previousMark.x + minDistance;
         }
         // would use polyline but can't use percentage for points
         var lineConnection = svg.newLine({
@@ -3123,6 +3163,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createWaterfallSvg = void 0;
 var svg = require("../helpers/svg");
 var styling_converters_1 = require("../transformers/styling-converters");
 var overlay_manager_1 = require("./details-overlay/overlay-manager");
@@ -3176,7 +3217,7 @@ function createContext(data, options, entriesToShow) {
         unit: unit,
     };
     // `overlayManager` needs the `context` reference, so it's attached later
-    return __assign({}, context, { overlayManager: new overlay_manager_1.default(context) });
+    return __assign(__assign({}, context), { overlayManager: new overlay_manager_1.default(context) });
 }
 /**
  * Entry point to start rendering the full waterfall SVG
