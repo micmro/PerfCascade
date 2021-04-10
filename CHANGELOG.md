@@ -2,6 +2,12 @@
 
 
 
+## <small>v2.8.1 (2021-04-10)</small>
+
+* fix: toString broken ([4096713](https://github.com/micmro/PerfCascade/commit/4096713)), closes [#276](https://github.com/micmro/PerfCascade/issues/276)
+
+
+
 ## v2.8.0 (2021-03-27)
 
 * feat: add lookahead for marker ([c36d82e](https://github.com/micmro/PerfCascade/commit/c36d82e)), closes [#272](https://github.com/micmro/PerfCascade/issues/272)
