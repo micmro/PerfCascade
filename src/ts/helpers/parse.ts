@@ -26,7 +26,7 @@ export function parseAndFormat<S, T>(input: S | undefined,
 }
 
 function toString<T>(source: T): string {
-  if ("toString" in source && typeof (source as {toString: () => string}) === "function") {
+  if (source["toString"] && typeof source["toString"] === "function") {
     return (source as {toString: () => string}).toString();
   } else {
     throw TypeError(`Can't convert type ${typeof source} to string`);
