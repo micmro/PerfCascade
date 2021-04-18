@@ -132,6 +132,9 @@ export function makeRowCssClasses(status: number): string {
     isInStatusCodeRange(status, 300, 399)) {
     // 304 == Not Modified, so not an issue
     classes.push("status3xx");
+  } else if (status === 0 || status === undefined) {
+    // eg connection refused, or connection timeout etc then the http status code defaults to 0
+    classes.push("status0");
   }
   return classes.join(" ");
 }
