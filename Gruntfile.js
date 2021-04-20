@@ -56,7 +56,7 @@ module.exports = function (grunt) {
   /*
    * Runnable Tasks
    */
-  //releases the current version on master to github-pages (gh-pages branch)
+  //releases the current version on main to github-pages (gh-pages branch)
   grunt.registerTask("ghPages", ["releaseBuild", "concat:pages", "copy:pages", "gh-pages"]);
 
   //releases new version with auto-version bump

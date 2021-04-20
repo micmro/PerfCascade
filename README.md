@@ -76,7 +76,7 @@ Directories:
 - `node_modules/perf-cascade/types`: Typescript typings
 
 ## Options
-see [options.d.ts](https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/options.ts) for source
+see [options.d.ts](https://github.com/micmro/PerfCascade/blob/main/src/ts/typing/options.ts) for source
 
 | Option      | Type | Default Value | Description |
 | ----------- | ---- | ------- | ----------- |
@@ -92,7 +92,7 @@ see [options.d.ts](https://github.com/micmro/PerfCascade/blob/master/src/ts/typi
 | `showUserTimingEndMarker` | `boolean` | `false` (requires `showUserTiming` to be `true`) | If `showUserTiming` is enabled all `_userTime.endTimer-*` marker are hidden by default, only the UserTiming's start and duration is shown. This option also adds an `_userTime.endTimer-*` marker.
 
 ## `*.zhar` - zipped HAR files
-By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/master/src/index.html#L78-L86) you can use `perfCascadeFileReader.readFile` to read a zip file and convert it to a JSON HAR object.
+By loading `/perf-cascade-file-reader.min.js` as in [this example](https://github.com/micmro/PerfCascade/blob/main/src/index.html#L78-L86) you can use `perfCascadeFileReader.readFile` to read a zip file and convert it to a JSON HAR object.
 
 ```javascript
 perfCascadeFileReader.readFile(fileFromTheFileInput, fileName, function(error, data){
@@ -110,9 +110,9 @@ Optionally `perfCascadeFileReader.readFile` also takes a callback (`(progress:nu
 that gets called whenever a new unzip progress status is available.
 
 ## Rendering other formats (than HAR)
-PerfCascade is composed of a parser [`src/ts/transformers/har.ts`](https://github.com/micmro/PerfCascade/blob/master/src/ts/transformers/har.ts) that parsed HAR into PerfCascade's agnostic [`WaterfallDocs`](https://github.com/micmro/PerfCascade/blob/master/src/ts/typing/waterfall.ts) format and the renderer (see `PerfCascade()` in [`src/ts/main.ts`](https://github.com/micmro/PerfCascade/blob/master/src/ts/main.ts) that creates the chart SVG.
+PerfCascade is composed of a parser [`src/ts/transformers/har.ts`](https://github.com/micmro/PerfCascade/blob/main/src/ts/transformers/har.ts) that parsed HAR into PerfCascade's agnostic [`WaterfallDocs`](https://github.com/micmro/PerfCascade/blob/main/src/ts/typing/waterfall.ts) format and the renderer (see `PerfCascade()` in [`src/ts/main.ts`](https://github.com/micmro/PerfCascade/blob/main/src/ts/main.ts) that creates the chart SVG.
 
-If you want to render another format, you could fork the repo and create a new parser in [`src/ts/transformers/`](https://github.com/micmro/PerfCascade/blob/master/src/ts/transformers/) and implement a new `fromMyNewFormat` function similar to `fromHar()`in [`src/ts/main.ts`](https://github.com/micmro/PerfCascade/blob/master/src/ts/main.ts) that takes your format, calls its parser and then calls the main `PerfCascade()` function with it and returns it.
+If you want to render another format, you could fork the repo and create a new parser in [`src/ts/transformers/`](https://github.com/micmro/PerfCascade/blob/main/src/ts/transformers/) and implement a new `fromMyNewFormat` function similar to `fromHar()`in [`src/ts/main.ts`](https://github.com/micmro/PerfCascade/blob/main/src/ts/main.ts) that takes your format, calls its parser and then calls the main `PerfCascade()` function with it and returns it.
 
 It would also be possible to separate the renderer into a separate package, if there is enough interest to justify the effort (create an issue and we can discuss it).
 
