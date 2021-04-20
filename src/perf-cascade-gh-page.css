@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.8.1 (10/04/2021) */
+/*! github.com/micmro/PerfCascade Version:2.9.0 (19/04/2021) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -765,19 +765,25 @@ a:hover {
 .row-item:focus .even {fill: #000; opacity: 0.2; }
 
 .row-item .rect-holder text {fill: #aaa}
+.row-item.status0 .even,
 .row-item.status5xx .even {fill: #f66;}
+.row-item.status0 .odd,
 .row-item.status5xx .odd {fill: #f00;}
 .row-item.status4xx .even{fill: #c33;}
 .row-item.status4xx .odd {fill: #c00;}
 .row-item.status3xx .even {fill: #ff6;}
 .row-item.status3xx .odd {fill: #ff0;}
 
+.row-item.status0 .even,
+.row-item.status0 .odd,
 .row-item.status5xx .even,
 .row-item.status5xx .odd,
 .row-item.status4xx .even,
 .row-item.status4xx .odd,
 .row-item.status3xx .even,
 .row-item.status3xx .odd {opacity: 0.3;}
+.row-item.status0:hover .even,
+.row-item.status0:hover .odd,
 .row-item.status5xx:hover .even,
 .row-item.status5xx:hover .odd,
 .row-item.status4xx:hover .even,
