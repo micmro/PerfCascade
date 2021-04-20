@@ -2,6 +2,13 @@
 
 
 
+## v2.9.0 (2021-04-20)
+
+* prep rename master to main ([1a4e7d9](https://github.com/micmro/PerfCascade/commit/1a4e7d9))
+* feat: highlight HTTP status code 0 (or undefined) ([717d974](https://github.com/micmro/PerfCascade/commit/717d974)), closes [#267](https://github.com/micmro/PerfCascade/issues/267)
+
+
+
 ## <small>v2.8.1 (2021-04-10)</small>
 
 * fix: toString broken ([4096713](https://github.com/micmro/PerfCascade/commit/4096713)), closes [#276](https://github.com/micmro/PerfCascade/issues/276)
