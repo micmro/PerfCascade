@@ -303,11 +303,13 @@ const getTimePair = (key: string, harEntry: Entry, collect: WaterfallEntryTiming
 const createResponseDetails = (entry: Entry, indicators: WaterfallEntryIndicator[]): WaterfallResponseDetails => {
   const requestType = mimeToRequestType(entry.response.content.mimeType);
   const statusClean = toInt(entry.response.status) || 0;
+  const renderBlockingStatus = entry._renderBlocking || "";
+  const largestContentfulPaintStatus = entry._isLCP || false;
   return {
     icon: makeMimeTypeIcon(statusClean, entry.response.statusText, requestType, entry.response.redirectURL),
     indicators,
     requestType,
-    rowClass: makeRowCssClasses(statusClean),
+    rowClass: makeRowCssClasses(statusClean, renderBlockingStatus, largestContentfulPaintStatus),
     statusCode: statusClean,
   };
 };

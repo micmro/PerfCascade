@@ -48,12 +48,25 @@
 .row-item.status3xx .even {fill: #ff6;}
 .row-item.status3xx .odd {fill: #ff0;}
 
+.row-item.potentiallyRenderBlocking .even{fill: #e5a331;}
+.row-item.potentiallyRenderBlocking .odd {fill: #e5a331;}
+.row-item.renderBlocking .even{fill: #e57231; stroke-dasharray: 5; stroke: black; stroke-width: 2px;}
+.row-item.renderBlocking .odd {fill: #e57231; stroke-dasharray: 5; stroke: black; stroke-width: 2px;}
+.row-item.largestContentfulPaint .even{fill: #c9e531; stroke-dasharray: 8; stroke-width: 2px; stroke: black; }
+.row-item.largestContentfulPaint .odd {fill: #c9e531; stroke-dasharray: 8; stroke-width: 2px;stroke: black; }
+
 .row-item.status0 .even,
 .row-item.status0 .odd,
 .row-item.status5xx .even,
 .row-item.status5xx .odd,
 .row-item.status4xx .even,
 .row-item.status4xx .odd,
+.row-item.renderBlocking .even,
+.row-item.renderBlocking .odd,
+.row-item.potentiallyRenderBlocking .even,
+.row-item.potentiallyRenderBlocking .odd,
+.row-item.largestContentfulPaint .even,
+.row-item.largestContentfulPaint .odd,
 .row-item.status3xx .even,
 .row-item.status3xx .odd {opacity: 0.3;}
 .row-item.status0:hover .even,
@@ -62,8 +75,17 @@
 .row-item.status5xx:hover .odd,
 .row-item.status4xx:hover .even,
 .row-item.status4xx:hover .odd,
+.row-item.renderBlocking:hover .even,
+.row-item.renderBlocking:hover .odd,
+.row-item.potentiallyRenderBlocking:hover .even,
+.row-item.potentiallyRenderBlocking:hover .odd,
+.row-item.largestContentfulPaint:hover .even,
+.row-item.largestContentfulPaint:hover .odd,
 .row-item.status3xx:hover .even,
 .row-item.status3xx:hover .odd {opacity: 0.5;}
+
+
+
 
 .tooltip-holder {overflow: visible;}
 .tooltip * {padding: 0; margin:0;}

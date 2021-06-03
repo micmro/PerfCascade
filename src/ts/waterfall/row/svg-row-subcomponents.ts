@@ -37,7 +37,7 @@ function makeBlock(rectData: RectData, className: string) {
         foreignElLazy = (getParentByClassName(rect, "water-fall-chart") as Element)
           .querySelector(".tooltip") as SVGForeignObjectElement;
       }
-      showDelayTimeOut = setTimeout(() => {
+      showDelayTimeOut = window.setTimeout(() => {
         showDelayTimeOut = null;
         onHoverInShowTooltip(rect, rectData, foreignElLazy as SVGForeignObjectElement);
       }, 100);

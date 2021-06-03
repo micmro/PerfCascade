@@ -120,9 +120,11 @@ export function createWaterfallEntryTiming(type: TimingType,
 /**
  * Creates the css classes for a row based on it's status code
  * @param  {number} status - HTTP status code
+ * @param  {string} renderBlockingStatus - Render blocking status (Chrome only)
+ * @param  {boolean} largestContentfulPaintStatus -if largest contentful paint
  * @returns string - concatinated css class names
  */
-export function makeRowCssClasses(status: number): string {
+export function makeRowCssClasses(status: number, renderBlockingStatus: string, largestContentfulPaintStatus: boolean) {
   const classes = ["row-item"];
   if (isInStatusCodeRange(status, 500, 599)) {
     classes.push("status5xx");
@@ -136,6 +138,17 @@ export function makeRowCssClasses(status: number): string {
     // eg connection refused, or connection timeout etc then the http status code defaults to 0
     classes.push("status0");
   }
+
+  if (largestContentfulPaintStatus  === true) {
+    classes.push("largestContentfulPaint");
+  }
+
+  if (renderBlockingStatus === "potentially_blocking") {
+    classes.push("potentiallyRenderBlocking");
+  } else if (renderBlockingStatus === "blocking") {
+    classes.push("renderBlocking");
+  }
+
   return classes.join(" ");
 }
 
