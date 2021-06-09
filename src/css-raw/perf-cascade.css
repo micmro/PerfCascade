@@ -10,9 +10,9 @@
 .water-fall-chart .line-holder {stroke-width:1; stroke: #ccc; stroke-opacity:0.5; transition: all 60ms;}
 .water-fall-chart .line-holder .line-mark {fill: #69009e; opacity: 0.01; stroke-width: 0; transition: all 60ms;}
 .water-fall-chart .line-holder.active {stroke: #69009e; stroke-width:2; stroke-opacity:1;}
-.water-fall-chart .line-holder.active .line-mark { opacity: 0.4;}
-.water-fall-chart .type-onload .line-holder  {stroke: #c0c0ff;}
-.water-fall-chart .type-oncontentload .line-holder  {stroke: #d888df;}
+.water-fall-chart .line-holder.active .line-mark {opacity: 0.4;}
+.water-fall-chart .type-onload .line-holder {stroke: #c0c0ff;}
+.water-fall-chart .type-oncontentload .line-holder {stroke: #d888df;}
 
 .water-fall-chart .labels {width:100%;}
 .water-fall-chart .labels .inner-label {pointer-events: none;}
@@ -36,7 +36,7 @@
 
 .row-item:focus {outline: solid 1.5px #aaa; outline-offset: -1.5px}
 .row-item:focus .odd,
-.row-item:focus .even {fill: #000; opacity: 0.2; }
+.row-item:focus .even {fill: #000; opacity: 0.2;}
 
 .row-item .rect-holder text {fill: #aaa}
 .row-item.status0 .even,
@@ -48,12 +48,12 @@
 .row-item.status3xx .even {fill: #ff6;}
 .row-item.status3xx .odd {fill: #ff0;}
 
-.row-item.potentiallyRenderBlocking .even{fill: #e5a331;}
+.row-item.potentiallyRenderBlocking .even,
 .row-item.potentiallyRenderBlocking .odd {fill: #e5a331;}
-.row-item.renderBlocking .even{fill: #e57231; stroke-dasharray: 5; stroke: black; stroke-width: 2px;}
+.row-item.renderBlocking .even,
 .row-item.renderBlocking .odd {fill: #e57231; stroke-dasharray: 5; stroke: black; stroke-width: 2px;}
-.row-item.largestContentfulPaint .even{fill: #c9e531; stroke-dasharray: 8; stroke-width: 2px; stroke: black; }
-.row-item.largestContentfulPaint .odd {fill: #c9e531; stroke-dasharray: 8; stroke-width: 2px;stroke: black; }
+.row-item.largestContentfulPaint .even,
+.row-item.largestContentfulPaint .odd {fill: #c9e531; stroke-dasharray: 8; stroke-width: 2px; stroke: black;}
 
 .row-item.status0 .even,
 .row-item.status0 .odd,
@@ -91,7 +91,7 @@
 .tooltip * {padding: 0; margin:0;}
 .tooltip html {font-size: 10px; line-height: 1.2em;}
 .tooltip body {position: relative;}
-.tooltip-payload {position: absolute; top:0; left:0; padding: 0.25em; font-size: 10px; display: inline-block;  background: rgba(255,255,255, 0.9); border: solid 1px #f0f0f0; word-break: break-all; overflow-wrap: break-word; transition: opacity 300ms;}
+.tooltip-payload {position: absolute; top:0; left:0; padding: 0.25em; font-size: 10px; display: inline-block; background: rgba(255,255,255, 0.9); border: solid 1px #f0f0f0; word-break: break-all; overflow-wrap: break-word; transition: opacity 300ms;}
 .tooltip-payload.no-anim {transition: none;}
 
 /** overlay animation settings **/
@@ -102,7 +102,7 @@
 .time-scale text {transition:transform 60ms;}
 .water-fall-chart.closing {transition-delay: 60ms;}
 
-.labels { overflow: hidden;}
+.labels {overflow: hidden;}
 
 /*block colours for MIME types*/
 .block-css {fill: #a6d18f;}
@@ -170,9 +170,9 @@
 .type-other {background: #808080;} /*#b3b3b3 - 40%*/
 
 /* Info overlay HTML - base */
-.info-overlay-holder * { padding: 0; margin:0; font-size: 12px;}
-.info-overlay-holder body { position: relative;  height: 450px; clear: both; padding: 0; margin:0; width:100%; background: #fff; color: #666;}
-.info-overlay-holder body .wrapper { height: 450px; width: 100%; overflow: scroll;}
+.info-overlay-holder * {padding: 0; margin:0; font-size: 12px;}
+.info-overlay-holder body {position: relative; height: 450px; clear: both; padding: 0; margin:0; width:100%; background: #fff; color: #666;}
+.info-overlay-holder body .wrapper {height: 450px; width: 100%; overflow: scroll;}
 
 /* Info overlay HTML - header */
 .info-overlay-holder header {position: relative; box-shadow: 0px 0px 2px 2px rgba(0,0,0,0.25);}
@@ -187,8 +187,8 @@
 .info-overlay-holder h3 strong {font-size: 1.1em;}
 .info-overlay-holder .tab-nav ul {margin: 0; padding: 0;}
 .info-overlay-holder .tab-nav li {margin: 0; padding: 0; display: inline-block;}
-.info-overlay-holder button { background: transparent; outline:0; border:0; border-bottom: solid 2px transparent; padding: 0.5em 1em; margin:0 0.25em;}
-.info-overlay-holder li:first-child  button {margin-left: 1em;}
+.info-overlay-holder button {background: transparent; outline:0; border:0; border-bottom: solid 2px transparent; padding: 0.5em 1em; margin:0 0.25em;}
+.info-overlay-holder li:first-child button {margin-left: 1em;}
 .info-overlay-holder button:focus,
 .info-overlay-holder button.active:focus,
 .info-overlay-holder button:hover {border-color: rgba(255,255,255, 0.6);}
@@ -196,13 +196,13 @@
 .info-overlay-holder button.active:focus {border-color: rgba(255,255,255, 0.8);}
 .info-overlay-holder button.copy-tab-data {position: absolute; top:0.5em; right: 0.5em; border: 0; margin: 0; border-radius: 1em; background: #e0e0e0;}
 .info-overlay-holder button.copy-tab-data:focus,
-.info-overlay-holder button.copy-tab-data:hover { background: #ccc; }
+.info-overlay-holder button.copy-tab-data:hover {background: #ccc;}
 
 /* Info overlay HTML - content */
-.info-overlay-holder dt {float: left; clear: both; margin-top: 0.5em; width: 25%; text-align: right; font-weight: bold; }
+.info-overlay-holder dt {float: left; clear: both; margin-top: 0.5em; width: 25%; text-align: right; font-weight: bold;}
 .info-overlay-holder dd {float: left; width:73%; margin: 0.5em 0 0 2%; padding: 0 0 0.5em 0;}
-.info-overlay-holder dt:after { content: ":"; }
-.info-overlay-holder pre {font-size: 11px; line-height: 23px;  border-radius: 0; background: #f6f3f3;}
+.info-overlay-holder dt:after {content: ":";}
+.info-overlay-holder pre {font-size: 11px; line-height: 23px; border-radius: 0; background: #f6f3f3;}
 
 .info-overlay-holder .tab {float: left; position: relative; width:100%; height: 350px; padding:12px 12px 24px;}
 .info-overlay-holder .tab h2 {font-size: 1.2em; margin:0.5em 0 0; padding: 0.5em 0 0.5em 1em; clear: both; border-top: solid 1px #efefef;}
@@ -215,26 +215,22 @@
 .info-overlay-holder .tab.rendered-data pre > code {white-space: pre-wrap;}
 
 /** Legend */
-.resource-legend { margin: 0; padding: 0; font-size: 0.75em; line-height: 1.5em; display: inline-block;}
+.resource-legend {margin: 0; padding: 0; font-size: 0.75em; line-height: 1.5em; display: inline-block;}
 .resource-legend li {margin: 0 1em 0 0; padding: 0; white-space: nowrap; display: inline-block;}
-.resource-legend li:before {content:''; width: 1em; height: 1em; margin: 0 0.5em 0 0; vertical-align: text-top; display: inline-block; }
+.resource-legend li:before {content:''; width: 1em; height: 1em; margin: 0 0.5em 0 0; vertical-align: text-top; display: inline-block;}
 
-.resource-legend .legend-blocked:before { background: #aaa;}
-.resource-legend .legend-dns:before { background: #159588;}
-.resource-legend .legend-connect:before { background: #fd9727; }
-.resource-legend .legend-ssl:before { background: #c141cd; }
-.resource-legend .legend-send:before { background: #b0bec5; }
-.resource-legend .legend-wait:before { background: #1ec659; }
-.resource-legend .legend-receive:before { background: #1eaaf1; }
+.resource-legend .legend-blocked:before {background: #aaa;}
+.resource-legend .legend-dns:before {background: #159588;}
+.resource-legend .legend-connect:before {background: #fd9727;}
+.resource-legend .legend-ssl:before {background: #c141cd;}
+.resource-legend .legend-send:before {background: #b0bec5;}
+.resource-legend .legend-wait:before {background: #1ec659;}
+.resource-legend .legend-receive:before {background: #1eaaf1;}
 
-.icon {
-  fill: #666;
-}
+.icon {fill: #666;}
 
 .icon-4xx,
 .icon-5xx,
 .icon-no-cache,
 .icon-no-gzip,
-.icon-warning {
-  fill: #b55;
-}
+.icon-warning {fill: #b55;}
