@@ -47,6 +47,8 @@ function parseGeneralDetails(entry: Entry, startRelative: number, requestID: num
     ["Expires", entry._expires],
     ["Cache Time", parseAndFormat(entry._cache_time, parsePositive, formatSeconds)],
     ["CDN Provider", entry._cdn_provider],
+    ["Render blocking", entry._renderBlocking],
+    ["Is Largest Contentful Paint", entry._isLCP ? "yes" : undefined],
     byteSizeProperty("ObjectSize", entry._objectSize),
     byteSizeProperty("Bytes In (downloaded)", entry._bytesIn),
     byteSizeProperty("Bytes Out (uploaded)", entry._bytesOut),
