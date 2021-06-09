@@ -139,7 +139,7 @@ export function makeRowCssClasses(status: number, renderBlockingStatus: string, 
     classes.push("status0");
   }
 
-  if (largestContentfulPaintStatus  === true) {
+  if (largestContentfulPaintStatus === true) {
     classes.push("largestContentfulPaint");
   }
 
