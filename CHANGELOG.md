@@ -2,6 +2,11 @@
 
 
 
+## v2.10.0 (2021-06-10)
+
+
+
+
 ## v2.9.0 (2021-04-20)
 
 * prep rename master to main ([1a4e7d9](https://github.com/micmro/PerfCascade/commit/1a4e7d9))
