@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.10.0 (09/06/2021) */
+/*! github.com/micmro/PerfCascade Version:2.10.1 (09/06/2021) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
@@ -1099,6 +1099,8 @@ function parseGeneralDetails(entry, startRelative, requestID) {
         ["Expires", entry._expires],
         ["Cache Time", parse_1.parseAndFormat(entry._cache_time, parse_1.parsePositive, parse_1.formatSeconds)],
         ["CDN Provider", entry._cdn_provider],
+        ["Render blocking", entry._renderBlocking],
+        ["Is Largest Contentful Paint", entry._isLCP ? "yes" : undefined],
         byteSizeProperty("ObjectSize", entry._objectSize),
         byteSizeProperty("Bytes In (downloaded)", entry._bytesIn),
         byteSizeProperty("Bytes Out (uploaded)", entry._bytesOut),
@@ -1735,11 +1737,13 @@ var getTimePair = function (key, harEntry, collect, startRelative) {
 var createResponseDetails = function (entry, indicators) {
     var requestType = helpers_1.mimeToRequestType(entry.response.content.mimeType);
     var statusClean = parse_1.toInt(entry.response.status) || 0;
+    var renderBlockingStatus = entry._renderBlocking || "";
+    var largestContentfulPaintStatus = entry._isLCP || false;
     return {
         icon: helpers_1.makeMimeTypeIcon(statusClean, entry.response.statusText, requestType, entry.response.redirectURL),
         indicators: indicators,
         requestType: requestType,
-        rowClass: helpers_1.makeRowCssClasses(statusClean),
+        rowClass: helpers_1.makeRowCssClasses(statusClean, renderBlockingStatus, largestContentfulPaintStatus),
         statusCode: statusClean,
     };
 };
@@ -1850,9 +1854,11 @@ exports.createWaterfallEntryTiming = createWaterfallEntryTiming;
 /**
  * Creates the css classes for a row based on it's status code
  * @param  {number} status - HTTP status code
+ * @param  {string} renderBlockingStatus - Render blocking status (Chrome only)
+ * @param  {boolean} largestContentfulPaintStatus -if largest contentful paint
  * @returns string - concatinated css class names
  */
-function makeRowCssClasses(status) {
+function makeRowCssClasses(status, renderBlockingStatus, largestContentfulPaintStatus) {
     var classes = ["row-item"];
     if (misc_1.isInStatusCodeRange(status, 500, 599)) {
         classes.push("status5xx");
@@ -1868,6 +1874,15 @@ function makeRowCssClasses(status) {
     else if (status === 0 || status === undefined) {
         // eg connection refused, or connection timeout etc then the http status code defaults to 0
         classes.push("status0");
+    }
+    if (largestContentfulPaintStatus === true) {
+        classes.push("largestContentfulPaint");
+    }
+    if (renderBlockingStatus === "potentially_blocking") {
+        classes.push("potentiallyRenderBlocking");
+    }
+    else if (renderBlockingStatus === "blocking") {
+        classes.push("renderBlocking");
     }
     return classes.join(" ");
 }
