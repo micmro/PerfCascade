@@ -145,7 +145,7 @@ export function makeRowCssClasses(status: number, renderBlockingStatus: string, 
 
   if (renderBlockingStatus === "potentially_blocking") {
     classes.push("potentiallyRenderBlocking");
-  } else if (renderBlockingStatus === "blocking") {
+  } else if (renderBlockingStatus === "blocking" || renderBlockingStatus === "in_body_parser_blocking") {
     classes.push("renderBlocking");
   }
 
