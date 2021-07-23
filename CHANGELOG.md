@@ -2,6 +2,12 @@
 
 
 
+## <small>v2.10.2 (2021-07-23)</small>
+
+* Add misisng render blocking status. ([59126ce](https://github.com/micmro/PerfCascade/commit/59126ce))
+
+
+
 ## <small>v2.10.1 (2021-06-10)</small>
 
 * Show render blocking (Chrome 92) and largest contentful paint. (#278) ([0493bb9](https://github.com/micmro/PerfCascade/commit/0493bb9)), closes [#278](https://github.com/micmro/PerfCascade/issues/278)
