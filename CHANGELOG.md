@@ -2,6 +2,12 @@
 
 
 
+## <small>v2.10.3 (2021-08-25)</small>
+
+* Catch when HAR ebtry is missing mime type. ([fe67079](https://github.com/micmro/PerfCascade/commit/fe67079))
+
+
+
 ## <small>v2.10.2 (2021-07-23)</small>
 
 * Add misisng render blocking status. ([59126ce](https://github.com/micmro/PerfCascade/commit/59126ce))
