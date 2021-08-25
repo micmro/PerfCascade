@@ -40,7 +40,7 @@ export function makeTabs(entry: Entry, requestID: number, requestType: RequestTy
   if (requestType === "image") {
     tabs.push(makeImgTab(entry));
   }
-  if (entry.response.content && entry.response.content.mimeType.indexOf("text/") === 0 && entry.response.content.text) {
+  if (entry.response.content && entry.response.content.mimeType && entry.response.content.mimeType.indexOf("text/") === 0 && entry.response.content.text) {
     tabs.push(makeContentTab(entry));
   }
   return tabs.filter((t) => t !== undefined);
