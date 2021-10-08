@@ -77,6 +77,7 @@ export interface WaterfallEntryTiming {
   start: number;
   /** end time in ms - relative to initial document request */
   end: number;
+  chunks?: Array<object>;
 }
 
 export interface WaterfallResponseDetails {

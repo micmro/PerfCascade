@@ -236,12 +236,15 @@ const getUserTimings = (currPage: Page, options: ChartOptions) => {
 /**
  * Create `WaterfallEntry`s to represent the sub-timings of a request
  * ("blocked", "dns", "connect", "send", "wait", "receive")
+ * TODO: `harEntry: Entry` Entry interface doesn't have the chunks property and this fails TS.
+ * I see no benefit in typechecking harEntry IMHO. But to fix this we need to import that interface and update it.
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @param  {Entry} harEntry
  * @returns Array
  */
-const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): WaterfallEntryTiming[] => {
+const buildDetailTimingBlocks = (startRelative: number, harEntry): WaterfallEntryTiming[] => {
   const t = harEntry.timings;
+  const chunks = harEntry._chunks || [];
   const types: TimingType[] = ["blocked", "dns", "connect", "send", "wait", "receive"];
   return types.reduce((collect: WaterfallEntryTiming[], key: TimingType) => {
     const time = getTimePair(key, harEntry, collect, startRelative);
@@ -259,6 +262,10 @@ const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): Waterf
       return collect
         .concat([createWaterfallEntryTiming("ssl", Math.round(sslStart), Math.round(sslEnd))])
         .concat([createWaterfallEntryTiming(key, Math.round(connectStart), Math.round(time.end))]);
+    }
+
+    if (key === "receive" && chunks && chunks.length > 0) {
+      return collect.concat([createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end), chunks)]);
     }
 
     return collect.concat([createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end))]);

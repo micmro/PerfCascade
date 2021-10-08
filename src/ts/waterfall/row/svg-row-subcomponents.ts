@@ -57,6 +57,21 @@ function makeBlock(rectData: RectData, className: string) {
   return holder;
 }
 
+function makeChunkBlock(chunkData, rectData: RectData, className: string) {
+  const holder = svg.newG("");
+  const blockHeight = rectData.height - 1;
+  // const blockWidth = chunkData.ts - (chunkData.bytes / (5000000 / 8.0));
+  const rectX = misc.roundNumber(chunkData.ts / rectData.unit) + "%";
+  const rect = svg.newRect({
+    height: blockHeight,
+    width: "1px", // misc.roundNumber(blockWidth / rectData.unit) + "%",
+    x: rectX,
+    y: rectData.y,
+  }, className);
+  holder.appendChild(rect);
+  return holder;
+}
+
 /**
  * Converts a segment to RectData
  * @param  {WaterfallEntryTiming} segment
@@ -142,6 +157,14 @@ export function createRect(rectData: RectData, entry: WaterfallEntry): SVGElemen
         const childRectData = segmentToRectData(segment, rectData);
         const childRect = makeBlock(childRectData, `segment ${childRectData.cssClass}`);
         firstX = Math.min(firstX, childRectData.x);
+
+        if (segment.type === 'receive' && segment.chunks && segment.chunks.length > 0) {
+          segment.chunks.forEach((chunk) => {
+            const chunkRect = makeChunkBlock(chunk, childRectData, `${childRectData.cssClass}-chunk`);
+            childRect.appendChild(chunkRect);
+          });
+        }
+
         rectHolder.appendChild(childRect);
       }
     });

@@ -106,7 +106,8 @@ export function createWaterfallEntry(url: string,
 /** helper to create a `WaterfallEntryTiming` */
 export function createWaterfallEntryTiming(type: TimingType,
                                            start: number,
-                                           end: number): WaterfallEntryTiming {
+                                           end: number,
+                                           chunks?: { bytes: number, ts: number }[]): WaterfallEntryTiming {
   const total = (typeof start !== "number" || typeof end !== "number") ? NaN : (end - start);
   const typeClean = sanitizeAlphaNumeric(type) as TimingType;
   return {
@@ -114,6 +115,7 @@ export function createWaterfallEntryTiming(type: TimingType,
     start,
     total,
     type : typeClean,
+    chunks,
   };
 }
 
