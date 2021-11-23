@@ -236,13 +236,11 @@ const getUserTimings = (currPage: Page, options: ChartOptions) => {
 /**
  * Create `WaterfallEntry`s to represent the sub-timings of a request
  * ("blocked", "dns", "connect", "send", "wait", "receive")
- * TODO: `harEntry: Entry` Entry interface doesn't have the chunks property and this fails TS.
- * I see no benefit in typechecking harEntry IMHO. But to fix this we need to import that interface and update it.
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @param  {Entry} harEntry
  * @returns Array
  */
-const buildDetailTimingBlocks = (startRelative: number, harEntry): WaterfallEntryTiming[] => {
+const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): WaterfallEntryTiming[] => {
   const t = harEntry.timings;
   const chunks = harEntry._chunks || [];
   const types: TimingType[] = ["blocked", "dns", "connect", "send", "wait", "receive"];

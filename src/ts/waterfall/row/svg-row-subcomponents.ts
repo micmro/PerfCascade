@@ -60,6 +60,7 @@ function makeBlock(rectData: RectData, className: string) {
 function makeChunkBlock(chunkData, rectData: RectData, className: string) {
   const holder = svg.newG("");
   const blockHeight = rectData.height - 1;
+  // TODO: Once we have a way to pass the available bandwidth we can calculate the length for each chunk.
   // const blockWidth = chunkData.ts - (chunkData.bytes / (5000000 / 8.0));
   const rectX = misc.roundNumber(chunkData.ts / rectData.unit) + "%";
   const rect = svg.newRect({
