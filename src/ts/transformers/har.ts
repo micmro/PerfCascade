@@ -242,6 +242,7 @@ const getUserTimings = (currPage: Page, options: ChartOptions) => {
  */
 const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): WaterfallEntryTiming[] => {
   const t = harEntry.timings;
+  const chunks = harEntry._chunks || [];
   const types: TimingType[] = ["blocked", "dns", "connect", "send", "wait", "receive"];
   return types.reduce((collect: WaterfallEntryTiming[], key: TimingType) => {
     const time = getTimePair(key, harEntry, collect, startRelative);
@@ -259,6 +260,10 @@ const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): Waterf
       return collect
         .concat([createWaterfallEntryTiming("ssl", Math.round(sslStart), Math.round(sslEnd))])
         .concat([createWaterfallEntryTiming(key, Math.round(connectStart), Math.round(time.end))]);
+    }
+
+    if (key === "receive" && chunks && chunks.length > 0) {
+      return collect.concat([createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end), chunks)]);
     }
 
     return collect.concat([createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end))]);

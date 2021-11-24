@@ -132,6 +132,7 @@
 .block-send {fill: #b0bec5;}
 .block-wait {fill: #1ec659;}
 .block-receive {fill: #1eaaf1;}
+.block-receive-chunk {fill: #a1c3fa;}
 .block-undefined {fill: #0f0;}
 
 /* Info overlay SVG - wrapper */

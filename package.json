@@ -56,6 +56,6 @@
     "whatwg-fetch": "^3.6.2"
   },
   "dependencies": {
-    "@types/har-format": "^1.2.6"
+    "@types/har-format": "^1.2.8"
   }
 }
