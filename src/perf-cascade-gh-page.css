@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.10.3 (25/08/2021) */
+/*! github.com/micmro/PerfCascade Version:2.11.0 (24/11/2021) */
 /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
 /**
@@ -858,6 +858,7 @@ a:hover {
 .block-send {fill: #b0bec5;}
 .block-wait {fill: #1ec659;}
 .block-receive {fill: #1eaaf1;}
+.block-receive-chunk {fill: #a1c3fa;}
 .block-undefined {fill: #0f0;}
 
 /* Info overlay SVG - wrapper */
