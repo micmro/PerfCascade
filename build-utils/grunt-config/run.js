@@ -8,6 +8,7 @@ module.exports = {
   tscEs6: {
     cmd: 'npm',
     args: `run tsc -- src/ts/main.ts src/ts/file-reader.ts
+    --noEmit false
     --outDir ./build/npm/lib/
     --module es6
     --target es6
