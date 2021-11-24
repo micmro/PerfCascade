@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.10.3 (25/08/2021) */
+/*! github.com/micmro/PerfCascade Version:2.11.0 (24/11/2021) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascade = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
@@ -1678,6 +1678,7 @@ var getUserTimings = function (currPage, options) {
  */
 var buildDetailTimingBlocks = function (startRelative, harEntry) {
     var t = harEntry.timings;
+    var chunks = harEntry._chunks || [];
     var types = ["blocked", "dns", "connect", "send", "wait", "receive"];
     return types.reduce(function (collect, key) {
         var time = getTimePair(key, harEntry, collect, startRelative);
@@ -1693,6 +1694,9 @@ var buildDetailTimingBlocks = function (startRelative, harEntry) {
             return collect
                 .concat([helpers_1.createWaterfallEntryTiming("ssl", Math.round(sslStart), Math.round(sslEnd))])
                 .concat([helpers_1.createWaterfallEntryTiming(key, Math.round(connectStart), Math.round(time.end))]);
+        }
+        if (key === "receive" && chunks && chunks.length > 0) {
+            return collect.concat([helpers_1.createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end), chunks)]);
         }
         return collect.concat([helpers_1.createWaterfallEntryTiming(key, Math.round(time.start), Math.round(time.end))]);
     }, []);
@@ -1752,7 +1756,6 @@ var createResponseDetails = function (entry, indicators) {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.flattenKvTuple = exports.makeMimeTypeIcon = exports.makeRowCssClasses = exports.createWaterfallEntryTiming = exports.createWaterfallEntry = exports.mimeToRequestType = exports.makeDefinitionList = void 0;
-/** Helpers that are not file-fromat specific */
 var misc_1 = require("../helpers/misc");
 var parse_1 = require("../helpers/parse");
 var svg_indicators_1 = require("../waterfall/row/svg-indicators");
@@ -1840,7 +1843,7 @@ function createWaterfallEntry(url, start, end, segments, responseDetails, tabs) 
 }
 exports.createWaterfallEntry = createWaterfallEntry;
 /** helper to create a `WaterfallEntryTiming` */
-function createWaterfallEntryTiming(type, start, end) {
+function createWaterfallEntryTiming(type, start, end, chunks) {
     var total = (typeof start !== "number" || typeof end !== "number") ? NaN : (end - start);
     var typeClean = parse_1.sanitizeAlphaNumeric(type);
     return {
@@ -1848,6 +1851,7 @@ function createWaterfallEntryTiming(type, start, end) {
         start: start,
         total: total,
         type: typeClean,
+        chunks: chunks,
     };
 }
 exports.createWaterfallEntryTiming = createWaterfallEntryTiming;
@@ -2406,6 +2410,23 @@ function makeBlock(rectData, className) {
     }
     return holder;
 }
+function makeChunkBlock(chunkData, rectData, className) {
+    var holder = svg.newG("");
+    var blockHeight = rectData.height - 1;
+    // TODO: Once we have a way to pass the available bandwidth we can calculate the length for each chunk.
+    // const blockWidth = chunkData.ts - (chunkData.bytes / (5000000 / 8.0));
+    var rectX = misc.roundNumber(chunkData.ts / rectData.unit) + "%";
+    var rect = svg.newRect({
+        height: blockHeight,
+        width: "1px",
+        x: rectX,
+        y: rectData.y,
+    }, className, {
+        pointerEvents: "none"
+    });
+    holder.appendChild(rect);
+    return holder;
+}
 /**
  * Converts a segment to RectData
  * @param  {WaterfallEntryTiming} segment
@@ -2478,10 +2499,16 @@ function createRect(rectData, entry) {
     if (segments && segments.length > 0) {
         segments.forEach(function (segment) {
             if (!isNaN(segment.total) && segment.total > 0 && typeof segment.start === "number") {
-                var childRectData = segmentToRectData(segment, rectData);
-                var childRect = makeBlock(childRectData, "segment " + childRectData.cssClass);
-                firstX = Math.min(firstX, childRectData.x);
-                rectHolder.appendChild(childRect);
+                var childRectData_1 = segmentToRectData(segment, rectData);
+                var childRect_1 = makeBlock(childRectData_1, "segment " + childRectData_1.cssClass);
+                firstX = Math.min(firstX, childRectData_1.x);
+                if (segment.type === 'receive' && segment.chunks && segment.chunks.length > 0) {
+                    segment.chunks.forEach(function (chunk) {
+                        var chunkRect = makeChunkBlock(chunk, childRectData_1, childRectData_1.cssClass + "-chunk");
+                        childRect_1.appendChild(chunkRect);
+                    });
+                }
+                rectHolder.appendChild(childRect_1);
             }
         });
         if (misc.find(entry.responseDetails.indicators, function (indicator) { return indicator.id === "push"; })) {
