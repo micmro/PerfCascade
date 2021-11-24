@@ -68,6 +68,13 @@ export interface WaterfallEntryIndicator {
   displayType: IndicatorDisplayType;
 }
 
+export interface Chunk {
+  /** float - timestamp of beginning of chunk */
+  ts: number;
+  /** integer - encoded data length (sum = _bytesIn) */
+  bytes: number;
+}
+
 /** Time segment of an `WaterfallEntry` */
 export interface WaterfallEntryTiming {
   /** total duration in ms */
@@ -77,7 +84,7 @@ export interface WaterfallEntryTiming {
   start: number;
   /** end time in ms - relative to initial document request */
   end: number;
-  chunks?: Array<object>;
+  chunks?: Chunk[];
 }
 
 export interface WaterfallResponseDetails {

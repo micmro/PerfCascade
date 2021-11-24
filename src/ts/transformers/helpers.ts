@@ -1,8 +1,9 @@
-/** Helpers that are not file-fromat specific */
+/** Helpers that are not file-format specific */
+import type { Chunk } from "har-format";
 import { isInStatusCodeRange, toCssClass } from "../helpers/misc";
 import { escapeHtml, sanitizeAlphaNumeric } from "../helpers/parse";
-import { RequestType, SafeKvTuple } from "../typing/waterfall";
-import {
+import type { RequestType, SafeKvTuple } from "../typing/waterfall";
+import type {
   Icon,
   KvTuple,
   TimingType,
@@ -107,7 +108,7 @@ export function createWaterfallEntry(url: string,
 export function createWaterfallEntryTiming(type: TimingType,
                                            start: number,
                                            end: number,
-                                           chunks?: { bytes: number, ts: number }[]): WaterfallEntryTiming {
+                                           chunks?: Chunk[]): WaterfallEntryTiming {
   const total = (typeof start !== "number" || typeof end !== "number") ? NaN : (end - start);
   const typeClean = sanitizeAlphaNumeric(type) as TimingType;
   return {
