@@ -68,7 +68,11 @@ function makeChunkBlock(chunkData, rectData: RectData, className: string) {
     width: "1px", // misc.roundNumber(blockWidth / rectData.unit) + "%",
     x: rectX,
     y: rectData.y,
-  }, className);
+  },
+  className,
+  {
+    pointerEvents: "none"
+  });
   holder.appendChild(rect);
   return holder;
 }
