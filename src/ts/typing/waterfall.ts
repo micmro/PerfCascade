@@ -84,6 +84,7 @@ export interface WaterfallEntryTiming {
   start: number;
   /** end time in ms - relative to initial document request */
   end: number;
+  /** chunks of the response if the connection / HAR supports it */
   chunks?: Chunk[];
 }
 
