@@ -2,6 +2,20 @@
 
 
 
+## v2.11.0 (2021-11-24)
+
+* fix: make pointer-events pass through chunk ([e625bf7](https://github.com/micmro/PerfCascade/commit/e625bf7))
+* fix: TS linting ([a9969da](https://github.com/micmro/PerfCascade/commit/a9969da))
+* chore: add doc to chunk ([8fa0c37](https://github.com/micmro/PerfCascade/commit/8fa0c37))
+* chore: update package.lock ([712f9f5](https://github.com/micmro/PerfCascade/commit/712f9f5))
+* test: add test-date with chunks ([5972205](https://github.com/micmro/PerfCascade/commit/5972205))
+* build: fix file emission in folder ([00ad338](https://github.com/micmro/PerfCascade/commit/00ad338))
+* Support chunks in HTTP2 ([aa47744](https://github.com/micmro/PerfCascade/commit/aa47744))
+* Support chunks in HTTP2 - Type check ([1b405ec](https://github.com/micmro/PerfCascade/commit/1b405ec))
+* Support chunks in HTTP2 - Update har-format types ([1d8a925](https://github.com/micmro/PerfCascade/commit/1d8a925))
+
+
+
 ## <small>v2.10.3 (2021-08-25)</small>
 
 * Catch when HAR ebtry is missing mime type. ([fe67079](https://github.com/micmro/PerfCascade/commit/fe67079))
