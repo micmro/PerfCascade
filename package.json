@@ -52,7 +52,7 @@
     "tsify": "^5.0.4",
     "tslint": "~6.1.3",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^4.3.2",
+    "typescript": "^4.8.4",
     "whatwg-fetch": "^3.6.2"
   },
   "dependencies": {

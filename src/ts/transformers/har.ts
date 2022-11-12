@@ -214,7 +214,7 @@ const getUserTimings = (currPage: Page, options: ChartOptions) => {
     name = escapeHtml(name);
 
     if (fullName !== name && currPage[`_userTime.endTimer-${name}`]) {
-      duration = currPage[`_userTime.endTimer-${name}`] - currPage[k];
+      duration = currPage[`_userTime.endTimer-${name}`] as number - currPage[k];
       return {
         duration,
         name: `${options.showUserTimingEndMarker ? fullName : name} (${currPage[k]} - ${currPage[k] + duration} ms)`,
@@ -279,18 +279,19 @@ const buildDetailTimingBlocks = (startRelative: number, harEntry: Entry): Waterf
  * @param  {number} startRelative - Number of milliseconds since page load started (`page.startedDateTime`)
  * @returns {Object}
  */
-const getTimePair = (key: string, harEntry: Entry, collect: WaterfallEntryTiming[], startRelative: number) => {
-  let wptKey;
+const getTimePair = (key: TimingType, harEntry: Entry, collect: WaterfallEntryTiming[], startRelative: number) => {
+  let wptKey: Exclude<TimingType, 'wait' | 'receive'>  | 'ttfb' | 'download';
+
   switch (key) {
     case "wait": wptKey = "ttfb"; break;
     case "receive": wptKey = "download"; break;
     default: wptKey = key;
   }
-  const preciseStart = parseInt(harEntry[`_${wptKey}_start`], 10);
-  const preciseEnd = parseInt(harEntry[`_${wptKey}_end`], 10);
+  const preciseStart = parseInt(`${harEntry[`_${wptKey}_start`]}`, 10);
+  const preciseEnd = parseInt(`${harEntry[`_${wptKey}_end`]}`, 10);
   const start = isNaN(preciseStart) ?
-    ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart;
-  const end = isNaN(preciseEnd) ? (start + harEntry.timings[key]) : preciseEnd;
+  ((collect.length > 0) ? collect[collect.length - 1].end : startRelative) : preciseStart;
+  const end = isNaN(preciseEnd) ? (start + (harEntry.timings[key] ?? 0)) : preciseEnd;
 
   return {
     end: Math.round(end),

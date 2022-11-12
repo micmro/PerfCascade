@@ -70,14 +70,28 @@ const appendSecond = (context: Context, timeHolder: SVGGElement,
  */
 export function createTimeScale(context: Context, durationMs: number): SVGGElement {
   const timeHolder = svg.newG("time-scale full-width");
-  const subStepMs = Math.ceil(durationMs / 10000) * 200;
+  /** Constant to represent a Second in Milliseconds */
+  const secInMs = 1000;
+  /** Number of (Sub-)Steps in a second */
+  const stepsInASec = 5;
+  // more than 20sec doesn't leave space for sub-steps
+  const showSubSteps = durationMs < 20 * secInMs;
+
+  /** Space for a Step or SubStep - sub-steps rounded to 1st digit */
+  const subStepMs = showSubSteps
+      ? Math.ceil(durationMs / (10 * secInMs)) * (secInMs/stepsInASec)
+      : secInMs;
+
+
+  // need BigInt (`BigInt(10)` or `10n` notation) here
+  // to avoid floating point precision rounding errors
   /** steps between each major second marker */
-  const subStep = 1000 / subStepMs;
-  const secs = durationMs / 1000;
-  const steps = durationMs / subStepMs;
+  const subStep = Number(1000n  / BigInt(subStepMs));
+  const secs = durationMs / secInMs;
+  const steps = Math.floor(durationMs / subStepMs);
 
   for (let i = 0; i <= steps; i++) {
-    const isMarkerStep = i % subStep < 0.000000001; // to avoid rounding issues
+    const isMarkerStep = i % subStep === 0;
     const secValue = i / subStep;
 
     appendSecond(context, timeHolder, secs, secValue, isMarkerStep);

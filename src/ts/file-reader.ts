@@ -21,7 +21,7 @@ export function readFile(file: File,
       const harData = JSON.parse(rawData);
       callback(null, harData.log);
     } catch (e) {
-      callback(e);
+      callback(e as Error);
     }
   }
 
