@@ -18,7 +18,6 @@ import { OverlayChangeEvent } from "../../typing/open-overlay";
  */
 const appendSecond = (context: Context, timeHolder: SVGGElement,
                       secsTotal: number, sec: number, addLabel: boolean = false) => {
-
   const diagramHeight = context.diagramHeight;
   const secPerc = 100 / secsTotal;
   /** just used if `addLabel` is `true` - for full seconds */
@@ -66,19 +65,26 @@ const appendSecond = (context: Context, timeHolder: SVGGElement,
 /**
  * Renders the time-scale SVG elements (1sec, 2sec...)
  * @param  {Context} context  Execution context object
- * @param {number} durationMs    Full duration of the waterfall
+ * @param {number} durationMs  Full duration of the waterfall
  */
 export function createTimeScale(context: Context, durationMs: number): SVGGElement {
   const timeHolder = svg.newG("time-scale full-width");
   const subStepMs = Math.ceil(durationMs / 10000) * 200;
+  /** Precision to counter JS' floating point number precision rounding errors */
+  const precision = 1000000000;
   /** steps between each major second marker */
-  const subStep = 1000 / subStepMs;
+  const subStep = Math.round(1000 * precision / subStepMs)/precision;
   const secs = durationMs / 1000;
   const steps = durationMs / subStepMs;
 
+  console.log('durationMs', durationMs, '\nsubStepMs', subStepMs,  '\nsubStep', subStep, '\nsecs', secs, '\nsteps', steps)
+
   for (let i = 0; i <= steps; i++) {
-    const isMarkerStep = i % subStep < 0.000000001; // to avoid rounding issues
-    const secValue = i / subStep;
+    const mod = i % subStep;
+    const roundingMargin = 10 / precision;;
+    const isMarkerStep = mod < roundingMargin || mod > subStep - roundingMargin; // to avoid rounding issues
+    const secValue = Math.round(i / subStep);
+    console.log('>>>> isMarkerStep', isMarkerStep, secValue, mod)
 
     appendSecond(context, timeHolder, secs, secValue, isMarkerStep);
   }
