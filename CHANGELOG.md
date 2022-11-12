@@ -2,6 +2,23 @@
 
 
 
+## v3.0.0 (2022-11-12)
+
+* fix: #288 via BigInt ([a91934c](https://github.com/micmro/PerfCascade/commit/a91934c)), closes [#288](https://github.com/micmro/PerfCascade/issues/288)
+* fix: publish as ES2020 ([4ea675a](https://github.com/micmro/PerfCascade/commit/4ea675a))
+* chore: update TS to 4.8.4 ([17218e2](https://github.com/micmro/PerfCascade/commit/17218e2))
+* Bump cached-path-relative from 1.0.2 to 1.1.0 ([0f719fc](https://github.com/micmro/PerfCascade/commit/0f719fc))
+* Bump grunt from 1.4.1 to 1.5.2 ([be73e0d](https://github.com/micmro/PerfCascade/commit/be73e0d))
+* Bump grunt from 1.5.2 to 1.5.3 ([4ca7419](https://github.com/micmro/PerfCascade/commit/4ca7419))
+* Bump trim-off-newlines from 1.0.1 to 1.0.3 ([b2e6f72](https://github.com/micmro/PerfCascade/commit/b2e6f72))
+
+
+### Breaking Change
+
+* To support BigInt the compile target has changed to ES2020,
+therefore Internet Explorer is no longer supported.
+
+
 ## v2.11.0 (2021-11-24)
 
 * fix: make pointer-events pass through chunk ([e625bf7](https://github.com/micmro/PerfCascade/commit/e625bf7))
