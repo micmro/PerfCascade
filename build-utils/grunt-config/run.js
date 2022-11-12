@@ -10,8 +10,8 @@ module.exports = {
     args: `run tsc -- src/ts/main.ts src/ts/file-reader.ts
     --noEmit false
     --outDir ./build/npm/lib/
-    --module es6
-    --target es6
+    --module es2020
+    --target es2020
     --rootDir src/ts/
     --declaration true
     --declarationDir ./build/npm/types

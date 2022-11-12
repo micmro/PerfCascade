@@ -1,7 +1,7 @@
 module.exports = {
   options: {
     plugin: [['tsify', {
-      'target': 'es2020'
+      'target': 'ES2020'
     }]],
     banner: "<%= banner %>",
     browserifyOptions: {
