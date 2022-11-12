@@ -1,4 +1,4 @@
-/*! github.com/micmro/PerfCascade Version:2.11.0 (24/11/2021) */
+/*! github.com/micmro/PerfCascade Version:3.0.0 (12/11/2022) */
 /*
  Copyright (c) 2013 Gildas Lormeau. All rights reserved.
 
@@ -3122,15 +3122,15 @@
 	env.Inflater = env._jzlib_Inflater = Inflater;
 })(this);
 
-/*! github.com/micmro/PerfCascade Version:2.11.0 (24/11/2021) */
+/*! github.com/micmro/PerfCascade Version:3.0.0 (12/11/2022) */
 
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.perfCascadeFileReader = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.readFile = void 0;
 // use zip
-var getConfiguredZipJs = function () {
-    var zip = window["zip"] || {};
+const getConfiguredZipJs = () => {
+    const zip = window["zip"] || {};
     zip.useWebWorkers = false;
     return zip;
 };
@@ -3141,7 +3141,7 @@ function readFile(file, fileName, callback, onProgress) {
     }
     function parseJson(rawData) {
         try {
-            var harData = JSON.parse(rawData);
+            const harData = JSON.parse(rawData);
             callback(null, harData.log);
         }
         catch (e) {
@@ -3149,13 +3149,13 @@ function readFile(file, fileName, callback, onProgress) {
         }
     }
     /** start reading the file */
-    var extension = (fileName.match(/\.[0-9a-z]+$/i) || [])[0];
-    var zip = getConfiguredZipJs();
+    const extension = (fileName.match(/\.[0-9a-z]+$/i) || [])[0];
+    const zip = getConfiguredZipJs();
     if ([".zhar", ".zip"].indexOf(extension) !== -1) {
         /** zhar */
-        zip.createReader(new zip.BlobReader(file), function (zipReader) {
-            zipReader.getEntries(function (x) {
-                x[0].getData(new zip.TextWriter(), function (txt) {
+        zip.createReader(new zip.BlobReader(file), (zipReader) => {
+            zipReader.getEntries((x) => {
+                x[0].getData(new zip.TextWriter(), (txt) => {
                     parseJson(txt);
                     // close the zip reader
                     zipReader.close();
@@ -3164,9 +3164,9 @@ function readFile(file, fileName, callback, onProgress) {
         });
     }
     else {
-        var reader = new FileReader();
+        const reader = new FileReader();
         /** try to parse the file once uploaded to browser */
-        reader.addEventListener("load", function (e) {
+        reader.addEventListener("load", (e) => {
             parseJson(e.target.result);
         });
         reader.readAsText(file);
