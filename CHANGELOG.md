@@ -2,6 +2,13 @@
 
 
 
+## <small>v3.0.2 (2022-11-13)</small>
+
+* Release v3.0.1 ([65ab767](https://github.com/micmro/PerfCascade/commit/65ab767))
+* fix: build ([caf6ef7](https://github.com/micmro/PerfCascade/commit/caf6ef7))
+
+
+
 ## <small>v3.0.1 (2022-11-13)</small>
 
 * fix: release ([a2a9551](https://github.com/micmro/PerfCascade/commit/a2a9551))
