@@ -10,6 +10,7 @@ set -e #exit on errors
 # check vars
 : "${VERSION?Need to set VERSION environment variable}"
 : "${GITHUB_TOKEN?Need to set GITHUB_TOKEN environment variable}"
+: "${NPM_TOKEN?Need to set NPM_TOKEN environment variable}"
 
 echo "Start Github release for ${VERSION}..."
 

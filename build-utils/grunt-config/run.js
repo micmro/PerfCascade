@@ -4,25 +4,18 @@ module.exports = {
   options: {
     failOnError: true
   },
-  //run typescrip compiler directly since all tools don't support latest flags
+  //run typescript compiler directly since all tools don't support latest flags
   tscEs6: {
-    cmd: 'npm',
-    args: `run tsc -- src/ts/main.ts src/ts/file-reader.ts
-    --noEmit false
-    --outDir ./build/npm/lib/
-    --module es2020
-    --target es2020
-    --rootDir src/ts/
-    --declaration true
-    --declarationDir ./build/npm/types
-    `.replace(/\n[\t ]+/g, ' ').split(' ').filter(x => x != '')
+    options: {
+      cwd: process.cwd()
+    },
+    exec: `bash build-utils/tsc-build.sh`
   },
   npmPublish: {
     options: {
       cwd: process.cwd() + "/build/npm"
     },
-    cmd: 'npm',
-    args: ['publish'],
+    exec: `. ./ENV_VARS && npm publish`
   },
   publishRelease: {
     options: {
