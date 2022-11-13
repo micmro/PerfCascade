@@ -2,6 +2,12 @@
 
 
 
+## <small>v3.0.3 (2022-11-13)</small>
+
+* fix: publish step ([66c43bd](https://github.com/micmro/PerfCascade/commit/66c43bd))
+
+
+
 ## <small>v3.0.2 (2022-11-13)</small>
 
 * Release v3.0.1 ([65ab767](https://github.com/micmro/PerfCascade/commit/65ab767))
