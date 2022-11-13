@@ -45,6 +45,7 @@ module.exports = {
       "build-utils/npm-export/index.js",
       "build-utils/npm-export/index.d.ts",
       "package.json",
+      ".npmrc",
       "README.md",
       "LICENSE",
     ],

@@ -15,7 +15,7 @@ module.exports = {
     options: {
       cwd: process.cwd() + "/build/npm"
     },
-    exec: `. ../../ENV_VARS && npm publish`
+    exec: `. ../../ENV_VARS && NPM_TOKEN=$NPM_TOKEN npm publish`
   },
   publishRelease: {
     options: {
