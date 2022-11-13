@@ -2,6 +2,12 @@
 
 
 
+## <small>v3.0.1 (2022-11-13)</small>
+
+* fix: release ([a2a9551](https://github.com/micmro/PerfCascade/commit/a2a9551))
+
+
+
 ## v3.0.0 (2022-11-12)
 
 * fix: #288 via BigInt ([a91934c](https://github.com/micmro/PerfCascade/commit/a91934c)), closes [#288](https://github.com/micmro/PerfCascade/issues/288)
