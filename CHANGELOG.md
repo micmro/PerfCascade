@@ -4,7 +4,6 @@
 
 ## <small>v3.0.1 (2022-11-13)</small>
 
-* fix: build ([caf6ef7](https://github.com/micmro/PerfCascade/commit/caf6ef7))
 * fix: release ([a2a9551](https://github.com/micmro/PerfCascade/commit/a2a9551))
 
 
